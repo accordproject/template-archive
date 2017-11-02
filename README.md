@@ -8,7 +8,7 @@ Top level repository (cicero), with sub packages. Each sub-package is published 
 
 ## Development
 
-* install `lerna` globally.
+* install `lerna` globally (`npm install -g lerna`).
 * run `lerna bootstrap` from the top level to install all dependencies recursively.
 * run `lerna run test` to run the unit tests
 
