@@ -67,7 +67,7 @@ data.json:
 
 ```
 cd packages/cicero-cli
- cicero execute --template ~/dev/template-library/helloworld/ --dsl ~/dev/cicero-template-library/helloworld/sample.txt --data ~/dev/cicero-template-library/helloworld/data.json 
+node . execute --template ~/dev/template-library/helloworld/ --dsl ~/dev/cicero-template-library/helloworld/sample.txt --data ~/dev/cicero-template-library/helloworld/data.json 
 ```
 
 The results of execution (a JSON serialized object) are displayed. They include:
