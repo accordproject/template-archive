@@ -2,8 +2,9 @@
 
 ## Structure of the Code Repository
 Top level repository (cicero), with sub packages. Each sub-package is published as an independent npm module using `lerna`:
-* accord-core :  `Template` and `Clause` classes to manage the grammar, models and logic.
-* accord-engine :  A Node.js VM based execution engine
+* cicero-core :  `Template` and `Clause` classes to manage the grammar, models and logic.
+* cicero-engine :  A Node.js VM based execution engine
+* cicero-cli : Command line utility for testing
 
 ## Development
 
