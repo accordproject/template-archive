@@ -1,5 +1,7 @@
 # Cicero
 
+[![Build Status](https://travis-ci.org/accordproject/cicero.svg?branch=master)](https://travis-ci.org/accordproject/cicero)
+
 ## Structure of the Code Repository
 
 Top level repository (cicero), with sub packages. Each sub-package is published as an independent npm module using `lerna`:
