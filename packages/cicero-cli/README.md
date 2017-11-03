@@ -1,6 +1,6 @@
 # Cicero CLI
 
-This module includes useful command line utilities for working with Cicero.
+This module includes useful command line utilities for working with Cicero..
 
 ## Installation
 

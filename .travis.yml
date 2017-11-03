@@ -15,13 +15,8 @@ install: |
   date
 script: 'lerna run test 2>&1'
 after_failure: 'tail -n +1 -- /home/travis/.npm/_logs/*-debug.log'
-deploy:
-  provider: npm
-  on:
-    tags: true
-    branch: master
-  api_key:
-    secure: r1sl4TAxnqT/ShvIUuKnMxgpq0e0Lm7Xz+g6XLE78dq0cA+4dBuqgOxO28rXLGZdnnnUg2SAwcyAGtu3Zhvukc4IBQ9rA62qEG06Yg+2TX8ucy6ktubZPmRrw13sbE4HF4mG69Q2mPj4O2PTQDab5896bWyfWrxbd6QqIPGdPMeY0SoxMubEMgkfucl6pmD8d/eUUmUeaofNkpaS3NV/1tj+5ATnxGnpx/fguOuQVnrDiDjePHOIL8dXJa9VzM7n/bF2CYZ94YyKAfaU072CTyAEPLt5LNmdu7NNQm4fxN5RauSMr9pruSIl3AxbiZ0PGSCXSxPCBaa6MmBCZnx/gRyekQBGnh5WbDAqTYpM/hSGnU6rWuJuDp+sCJ776ltjxEGk3rYYa1JiRVpyNBG091RCU2GtnBOpwuxmi3xKlMyr2kp454qpJc+u5ETtYqB33vqpUeo9RsaOxtLiARfuuaIZk5dpSygOp3o8mJw+CpIt/7c/S7bSOK0KfIofwvQPvgM70lIPK5yj9uawBd/iIb2kC4qugAYdMyk9TiguKd3hAxNqESK/1K/Zi9SoNgssP5jkCfhQSVKcs83CNZ3eJSaFnUzjsPZ3cf8ABBi9vBCj7TNzKa1tmJ6py9RWpq9ewGvQV3LvAMGjKnAt5ATzjqT3cYK1tj7Mjf6ghi0nS0s=
+deploy: |
+  lerna publish --conventional-commits -m "chore(release): publish %s"
 cache:
   directories:
   - node_modules
