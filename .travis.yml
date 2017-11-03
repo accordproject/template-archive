@@ -5,6 +5,7 @@ dist: trusty
 before_install: |
   set -e
   date
+  npm install -g
   npm install -g lerna
   lerna bootstrap
   date
