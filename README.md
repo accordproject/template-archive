@@ -1,10 +1,17 @@
 # Cicero
 
 ## Structure of the Code Repository
+
 Top level repository (cicero), with sub packages. Each sub-package is published as an independent npm module using `lerna`:
 * cicero-core :  `Template` and `Clause` classes to manage the grammar, models and logic.
 * cicero-engine :  A Node.js VM based execution engine
 * cicero-cli : Command line utility for testing
+
+## Installation
+
+```
+npm install cicero-engine --save
+```
 
 ## Development
 
