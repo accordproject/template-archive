@@ -16,7 +16,7 @@
     "postlicchk": "npm run doc",
     "doc": "jsdoc --pedantic --recurse -c jsdoc.json",
     "test": "nyc mocha --recursive -t 10000",
-    "browserify": "browserify ./index.js -t [ babelify --presets [ latest ] ] > ./out/accord-core.js"
+    "browserify": "browserify ./index.js -t [ babelify --presets [ latest ] ] > ./out/cicero-core.js"
   },
   "repository": {
     "type": "git",

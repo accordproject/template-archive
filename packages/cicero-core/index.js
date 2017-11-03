@@ -16,7 +16,7 @@
 
 /**
  * Clause Core
- * @module @clausehq/accord-core
+ * @module cicero-core
  */
 
 module.exports.Clause = require('./lib/clause');

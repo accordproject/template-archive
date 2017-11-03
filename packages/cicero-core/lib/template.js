@@ -44,7 +44,7 @@ const ENCODING = 'utf8';
  * Template for a clause.
  * </p>
  * @class
- * @memberof module:accord-core
+ * @memberof module:cicero-core
  */
 class Template {
 

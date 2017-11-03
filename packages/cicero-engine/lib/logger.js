@@ -21,7 +21,7 @@
  * @private
  * @class
  * @abstract
- * @memberof module:accord-engine
+ * @memberof module:cicero-engine
  */
 class Logger {
 

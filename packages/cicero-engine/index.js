@@ -16,7 +16,7 @@
 
 /**
  * Clause Engine
- * @module @clausehq/clause-engine
+ * @module @cicero-engine
  */
 
 module.exports.Engine = require('./lib/engine.js');

@@ -28,7 +28,7 @@ const LOG = Logger.getLog('Template');
  * </ul>
  * </p>
  * @class
- * @memberof module:accord-core
+ * @memberof module:cicero-core
  */
 class Metadata {
 

@@ -14,8 +14,8 @@
 
 'use strict';
 
-const Template = require('@clausehq/accord-core').Template;
-const Clause = require('@clausehq/accord-core').Clause;
+const Template = require('cicero-core').Template;
+const Clause = require('cicero-core').Clause;
 const Engine = require('../lib/engine');
 
 const chai = require('chai');

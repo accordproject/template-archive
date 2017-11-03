@@ -22,7 +22,7 @@ const EnumDeclaration = require('composer-common').EnumDeclaration;
 const EnumValueDeclaration = require('composer-common').EnumValueDeclaration;
 const ClassDeclaration = require('composer-common').ClassDeclaration;
 const util = require('util');
-const debug = require('debug')('accord:grammarvisitor');
+const debug = require('debug')('cicero:grammarvisitor');
 
 /**
  * Convert composer types to Nearley rules

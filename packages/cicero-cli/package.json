@@ -46,8 +46,8 @@
     "sinon": "^4.0.1"
   },
   "dependencies": {
-    "@clausehq/accord-core": "^0.0.10",
-    "@clausehq/accord-engine": "^0.0.10",
+    "cicero-core": "^0.0.10",
+    "cicero-engine": "^0.0.10",
     "composer-common": "0.14.2",
     "config": "^1.24.0",
     "debug": "^2.6.2",
