@@ -1,0 +1,34 @@
+language: node_js
+node_js:
+    - '8'
+matrix:
+    include:
+        - {}
+dist: trusty
+addons:
+    apt:
+        packages:
+before_install: |
+    set -e
+    date
+    npm install -g lerna
+    lerna bootstrap
+    date
+install: |
+    set -e
+    date
+    lerna bootstrap 2>&1
+    date
+script: |
+    lerna run test 2>&1
+after_failure: |
+    tail -n +1 -- /home/travis/.npm/_logs/*-debug.log
+deploy:
+    provider: npm
+    on:
+        tags: true
+        branch: master
+cache:
+  directories:
+    - node_modules
+services:
