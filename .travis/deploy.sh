@@ -1,0 +1,1 @@
+  lerna publish --yes --conventional-commits -m "chore(release): publish %s"

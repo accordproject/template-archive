@@ -15,8 +15,12 @@ install: |
   date
 script: 'lerna run test 2>&1'
 after_failure: 'tail -n +1 -- /home/travis/.npm/_logs/*-debug.log'
-deploy: |
-  'lerna publish --yes --conventional-commits -m "chore(release): publish %s"'
+deploy:
+  provider: script
+  script: .travis/deploy.sh $TRAVIS_TAG
+  on:
+    branch: master
+    tags: true
 cache:
   directories:
   - node_modules
