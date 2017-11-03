@@ -18,6 +18,7 @@ after_failure: 'tail -n +1 -- /home/travis/.npm/_logs/*-debug.log'
 deploy:
   provider: script
   script: .travis/deploy.sh $TRAVIS_TAG
+  skip_cleanup: true
   on:
     branch: master
     tags: true
