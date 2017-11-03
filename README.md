@@ -2,12 +2,13 @@
 
 ## Structure of the Code Repository
 Top level repository (cicero), with sub packages. Each sub-package is published as an independent npm module using `lerna`:
-* accord-core :  `Template` and `Clause` classes to manage the grammar, models and logic.
-* accord-engine :  A Node.js VM based execution engine
+* cicero-core :  `Template` and `Clause` classes to manage the grammar, models and logic.
+* cicero-engine :  A Node.js VM based execution engine
+* cicero-cli : Command line utility for testing
 
 ## Development
 
-* install `lerna` globally.
+* install `lerna` globally (`npm install -g lerna`).
 * run `lerna bootstrap` from the top level to install all dependencies recursively.
 * run `lerna run test` to run the unit tests
 
@@ -66,7 +67,7 @@ data.json:
 
 ```
 cd packages/cicero-cli
- cicero execute --template ~/dev/template-library/helloworld/ --dsl ~/dev/cicero-template-library/helloworld/sample.txt --data ~/dev/cicero-template-library/helloworld/data.json 
+node . execute --template ~/dev/template-library/helloworld/ --dsl ~/dev/cicero-template-library/helloworld/sample.txt --data ~/dev/cicero-template-library/helloworld/data.json 
 ```
 
 The results of execution (a JSON serialized object) are displayed. They include:
