@@ -99,3 +99,5 @@ The output response object
    }
 }
 ```
+
+© 2017 Clause, Inc.
