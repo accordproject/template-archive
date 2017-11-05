@@ -5,6 +5,7 @@ dist: trusty
 before_install: |
   set -e
   date
+  echo "//registry.npmjs.org/:_authToken=\${NPM_TOKEN}" > .npmrc
   npm install -g
   npm install -g lerna
   lerna bootstrap
@@ -14,11 +15,11 @@ install: |
   date
   lerna bootstrap 2>&1
   date
-script: 'lerna run test 2>&1'
-after_failure: 'tail -n +1 -- /home/travis/.npm/_logs/*-debug.log'
+script: lerna run test 2>&1
+after_failure: tail -n +1 -- /home/travis/.npm/_logs/*-debug.log
 deploy:
   provider: script
-  script: ./.travis/deploy.sh $TRAVIS_TAG
+  script: "./.travis/deploy.sh \${TRAVIS_TAG}"
   skip_cleanup: true
   on:
     branch: master
