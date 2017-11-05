@@ -18,11 +18,17 @@ install: |
 script: lerna run test 2>&1
 after_failure: tail -n +1 -- /home/travis/.npm/_logs/*-debug.log
 deploy:
-  provider: script
-  script: "./.travis/deploy.sh ${TRAVIS_TAG}"
-  skip_cleanup: true
-  on:
-    branch: master
+  - provider: script
+    script: "./.travis/unstable.sh ${TRAVIS_TAG}"
+    skip_cleanup: true
+    on:
+      branch: master
+  - provider: script
+    script: "./.travis/stable.sh ${TRAVIS_TAG}"
+    skip_cleanup: true
+    on:
+      branch: master
+      tags: true
 cache:
   directories:
   - node_modules
