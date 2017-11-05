@@ -1,6 +1,6 @@
 {
   "name": "cicero-core",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "description": "Cicero Core - implementation of Accord Protocol Template Specification",
   "engines": {
     "node": ">=8",
@@ -8,7 +8,7 @@
   },
   "main": "index.js",
   "scripts": {
-    "prepublish": "nearleyc ./lib/tdl.ne -o ./lib/tdl.js",
+    "prepare": "nearleyc ./lib/tdl.ne -o ./lib/tdl.js",
     "pretest": "npm run lint",
     "lint": "eslint .",
     "postlint": "npm run licchk",
