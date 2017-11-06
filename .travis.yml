@@ -24,12 +24,6 @@ deploy:
     on:
       branch: master
       tags: false
-  - provider: script
-    script: "./.travis/stable.sh ${TRAVIS_TAG}"
-    skip_cleanup: true
-    on:
-      branch: master
-      tags: true
 cache:
   directories:
   - node_modules
