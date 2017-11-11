@@ -2,6 +2,12 @@
 
 [![Build Status](https://travis-ci.org/accordproject/cicero.svg?branch=master)](https://travis-ci.org/accordproject/cicero)
 
+## Introduction
+
+Cicero is an Open Source implementation of the Accord Protocol, Template Specification. It defines the structure of natural language templates, bound to a data model, that can be executed using request/response JSON messages.
+
+Using Cicero you can take any existing natural language text (typically a clause or a contract) and declaratively bind it to a data model. Cicero generates a parser (using the Earley parser algorithm) to parse and validate source text, extracting machine readable/computable data. The Cicero engine can then be used to execute a clause (an instance of a template) against a JSON payload.
+
 ## Structure of the Code Repository
 
 Top level repository (cicero), with sub packages. Each sub-package is published as an independent npm module using `lerna`:
@@ -13,6 +19,7 @@ Top level repository (cicero), with sub packages. Each sub-package is published 
 
 ```
 npm install cicero-engine --save
+npm install cicero-cli --save
 ```
 
 ## Development
