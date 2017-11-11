@@ -8,6 +8,10 @@ Cicero is an Open Source implementation of the Accord Protocol, Template Specifi
 
 Using Cicero you can take any existing natural language text (typically a clause or a contract) and declaratively bind it to a data model. Cicero generates a parser (using the Earley parser algorithm) to parse and validate source text, extracting machine readable/computable data. The Cicero engine can then be used to execute a clause (an instance of a template) against a JSON payload.
 
+## Get Involved!
+
+We are an open community and welcome both lawyers and technologists to work on both specifications and code. If you would like to get involved please join the #technology-wg Slack channel by signing up here: https://www.accordproject.org
+
 ## Structure of the Code Repository
 
 Top level repository (cicero), with sub packages. Each sub-package is published as an independent npm module using `lerna`:
