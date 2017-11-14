@@ -100,9 +100,9 @@ class Engine {
                 let ns${n} = type${n}.substr(0, type${n}.lastIndexOf('.'));
                 let clazz${n} = type${n}.substr(type${n}.lastIndexOf('.')+1);
                 let response${n} = factory.newTransaction(ns${n}, clazz${n});
-                let context = {request: request, response: response${n}, data: data};
-                ${ele.getName()}(context);
-                return context.response;
+                let context${n} = {request: request, response: response${n}, data: data};
+                ${ele.getName()}(context${n});
+                return context${n}.response;
             break;`;
         });
 
@@ -123,7 +123,8 @@ class Engine {
     /**
      * Execute a clause, passing in the request object
      * @param {Clause} clause  - the clause to execute
-     * @param {Object} request  - the request
+     * @param {object} request  - the request, a JS object that can be deserialized 
+     * using the Composer serializer.
      * @return {Promise} a promise that resolves to a result for the clause
      * @private
      */
@@ -132,48 +133,55 @@ class Engine {
         const me = this;
 
         return new Promise(function (resolve, reject) {
-            console.log('Engine processing ' + request.$class);
-            // ensure the request is valid
-            const tx = clause.getTemplate().getSerializer().fromJSON(request);
-            tx.validate();
 
-            let script = me.scripts[clause.getIdentifier()];
+            try {
+                // ensure the request is valid
+                const tx = clause.getTemplate().getSerializer().fromJSON(request);
+                tx.validate();
 
-            if (!script) {
-                me.compileClause(clause);
-            }
+                console.log('Engine processing ' + request.$class);
 
-            script = me.scripts[clause.getIdentifier()];
+                let script = me.scripts[clause.getIdentifier()];
 
-            if (!script) {
-                throw new Error('Failed to created executable script for ' + clause.getIdentifier());
-            }
-
-            const data = clause.getData();
-            const factory = clause.getTemplate().getFactory();
-            const vm = new VM({
-                timeout: 1000,
-                sandbox: {
-                    moment: require('moment'),
-                    logger: new Logger(clause.getTemplate().getSerializer())
+                if (!script) {
+                    me.compileClause(clause);
                 }
-            });
 
-            // add immutables to the context
-            vm.freeze(tx, 'request'); // Second argument adds object to global.
-            vm.freeze(data, 'data'); // Second argument adds object to global.
-            vm.freeze(factory, 'factory'); // Second argument adds object to global.
+                script = me.scripts[clause.getIdentifier()];
 
-            const response = vm.run(script);
+                if (!script) {
+                    throw new Error('Failed to created executable script for ' + clause.getIdentifier());
+                }
 
-            response.validate();
-            const result = {
-                'clause': clause.getIdentifier(),
-                'request': request,
-                'response': clause.getTemplate().getSerializer().toJSON(response)
-            };
+                const data = clause.getData();
+                const factory = clause.getTemplate().getFactory();
+                const vm = new VM({
+                    timeout: 1000,
+                    sandbox: {
+                        moment: require('moment'),
+                        logger: new Logger(clause.getTemplate().getSerializer())
+                    }
+                });
 
-            resolve(result);
+                // add immutables to the context
+                vm.freeze(tx, 'request'); // Second argument adds object to global.
+                vm.freeze(data, 'data'); // Second argument adds object to global.
+                vm.freeze(factory, 'factory'); // Second argument adds object to global.
+
+                const response = vm.run(script);
+
+                response.validate();
+                const result = {
+                    'clause': clause.getIdentifier(),
+                    'request': request,
+                    'response': clause.getTemplate().getSerializer().toJSON(response)
+                };
+
+                resolve(result);
+            }
+            catch(err) {
+                reject(err);
+            }
         });
     }
 }
