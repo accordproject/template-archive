@@ -1,6 +1,6 @@
 {
   "name": "cicero-cli",
-  "version": "0.2.3",
+  "version": "0.2.4",
   "description": "Cicero CLI",
   "engines": {
     "node": ">=8",
