@@ -2,7 +2,7 @@
 
 [![Build Status](https://travis-ci.org/accordproject/cicero.svg?branch=master)](https://travis-ci.org/accordproject/cicero)
 
-[![lerna](https://img.shields.io/badge/maintained%20with-lerna-cc00ff.svg)](https://lernajs.io/)
+[![lerna](https://img.shields.io/badge/maintained%20with-lerna-cc00ff.svg)](https://lernajs.io/)l
 
 ## Introduction
 
@@ -29,6 +29,7 @@ Top level repository (cicero), with sub packages. Each sub-package is published 
 You need npm and node to use Cicero. You can download both from [here](https://nodejs.org).
 
 These instructions were tested using:
+* git version 2.13.6
 * npm version 5.3.0
 * node version 8.6.0
 
@@ -38,10 +39,18 @@ npm install cicero-cli --save
 
 ## Using an existing Template
 
+### Download the Template
+
+You can either [download the latest release archive](https://github.com/accordproject/cicero-template-library/releases) or simply `git clone` the repository:
+
+```
+git clone https://github.com/accordproject/cicero-template-library
+```
+
 ### Parse
 Use the `cicero parse` command to load a template from a directory on disk and then use it to parse input text, echoing the result of parsing. If the input text is valid the parsing result will be a JSON serialized instance of the Template Mode:
 
-template.tem:
+Sample template.tem:
 
 ```
 Name of the person to greet: [{name}].
@@ -56,7 +65,8 @@ Thank you!
 ```
 
 ```
-cicero parse --template ~/dev/template-library/helloworld/ --dsl ~/dev/template-library/helloworld/sample.txt
+cd cicero-template-library
+cicero parse --template ./helloworld/ --dsl ./helloworld/sample.txt
 Setting clause data: {"$class":"io.clause.helloworld.TemplateModel","name":"Dan"}
 ```
 
@@ -89,7 +99,8 @@ data.json:
 ```
 
 ```
-cicero execute --template ~/dev/template-library/helloworld/ --dsl ~/dev/cicero-template-library/helloworld/sample.txt --data ~/dev/cicero-template-library/helloworld/data.json 
+cd cicero-template-library
+cicero execute --template ./helloworld/ --dsl ./helloworld/sample.txt --data ./helloworld/data.json 
 ```
 
 The results of execution (a JSON serialized object) are displayed. They include:
