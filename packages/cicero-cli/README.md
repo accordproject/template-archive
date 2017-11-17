@@ -9,3 +9,7 @@ This module includes useful command line utilities for working with Cicero. It s
 ```
 npm install -g cicero-cli
 ```
+
+## Usage
+
+Run `cicero --help` for usage instructions.
