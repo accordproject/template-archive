@@ -6,6 +6,9 @@
     "node": ">=8",
     "npm": ">=3"
   },
+  "bin": {
+    "cicero": "./index.js"
+  },
   "main": "index.js",
   "scripts": {
     "pretest": "npm run lint",

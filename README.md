@@ -24,21 +24,20 @@ Top level repository (cicero), with sub packages. Each sub-package is published 
 
 ## Installation
 
+You need npm and node to use Cicero. You can download both from [here](https://nodejs.org).
+
+These instructions were tested using:
+* npm version 5.3.0
+* node version 8.6.0
+
 ```
-npm install cicero-engine --save
 npm install cicero-cli --save
 ```
 
-## Development
-
-* install `lerna` globally (`npm install -g lerna`).
-* run `lerna bootstrap` from the top level to install all dependencies recursively.
-* run `lerna run test` to run the unit tests
-
-## Running
+## Using an existing Template
 
 ### Parse
-Use the cicero-cli `parse` command to load a template from a directory on disk and then use it to parse input text, echoing the result of parsing. If the input text is valid the parsing result will be a JSON serialized instance of the Template Mode:
+Use the `cicero parse` command to load a template from a directory on disk and then use it to parse input text, echoing the result of parsing. If the input text is valid the parsing result will be a JSON serialized instance of the Template Mode:
 
 template.tem:
 
@@ -55,8 +54,7 @@ Thank you!
 ```
 
 ```
-cd packages/cicero-cli
-node . parse --template ~/dev/template-library/helloworld/ --dsl ~/dev/template-library/helloworld/sample.txt
+cicero parse --template ~/dev/template-library/helloworld/ --dsl ~/dev/template-library/helloworld/sample.txt
 Setting clause data: {"$class":"io.clause.helloworld.TemplateModel","name":"Dan"}
 ```
 
@@ -78,7 +76,7 @@ Unexpected "F"
 ```
 
 ### Execute
-Use the execute command to load a template from a directory on disk, instantiate a clause based on input text, and then invoke the clause using an incoming JSON payload.
+Use the `cicero execute` command to load a template from a directory on disk, instantiate a clause based on input text, and then invoke the clause using an incoming JSON payload.
 
 ```
 data.json:
@@ -89,8 +87,7 @@ data.json:
 ```
 
 ```
-cd packages/cicero-cli
-node . execute --template ~/dev/template-library/helloworld/ --dsl ~/dev/cicero-template-library/helloworld/sample.txt --data ~/dev/cicero-template-library/helloworld/data.json 
+cicero execute --template ~/dev/template-library/helloworld/ --dsl ~/dev/cicero-template-library/helloworld/sample.txt --data ~/dev/cicero-template-library/helloworld/data.json 
 ```
 
 The results of execution (a JSON serialized object) are displayed. They include:
@@ -113,5 +110,8 @@ The output response object
    }
 }
 ```
+
+## Developing an Application
+
 
 © 2017 Clause, Inc.
