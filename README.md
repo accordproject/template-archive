@@ -2,6 +2,8 @@
 
 [![Build Status](https://travis-ci.org/accordproject/cicero.svg?branch=master)](https://travis-ci.org/accordproject/cicero)
 
+[![lerna](https://img.shields.io/badge/maintained%20with-lerna-cc00ff.svg)](https://lernajs.io/)
+
 ## Introduction
 
 Cicero is an Open Source implementation of the Accord Protocol, Template Specification. It defines the structure of natural language templates, bound to a data model, that can be executed using request/response JSON messages.
