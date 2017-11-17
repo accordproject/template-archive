@@ -280,9 +280,9 @@ class Template {
      * Cleans a chunk of text to make it safe to include
      * as a grammar rule. We need to remove linefeeds and
      * escape any '"' characters.
-     * 
+     *
      * @param {string} input - the input text from the template
-     * @return {string} cleaned text 
+     * @return {string} cleaned text
      */
     cleanChunk(input) {
         // we replace all \r and \n with \n
@@ -296,7 +296,7 @@ class Template {
 
     /**
      * Finds the first binding for the given property
-     * 
+     *
      * @param {string} propertyName the name of the property
      * @param {object[]} elements the result of parsing the template_txt.
      * @return {int} the index of the element or -1
