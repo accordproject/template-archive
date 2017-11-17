@@ -41,7 +41,7 @@ npm install cicero-cli --save
 
 ### Download the Template
 
-You can either [download the latest release archive](https://github.com/accordproject/cicero-template-library/releases) or simply `git clone` the repository:
+You can either [download the latest release archive](https://github.com/accordproject/cicero-template-library/releases) or if you have `git` installed simply `git clone` the repository:
 
 ```
 git clone https://github.com/accordproject/cicero-template-library
