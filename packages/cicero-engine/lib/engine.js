@@ -124,7 +124,7 @@ class Engine {
     /**
      * Execute a clause, passing in the request object
      * @param {Clause} clause  - the clause to execute
-     * @param {object} request  - the request, a JS object that can be deserialized 
+     * @param {object} request  - the request, a JS object that can be deserialized
      * using the Composer serializer.
      * @return {Promise} a promise that resolves to a result for the clause
      * @private
