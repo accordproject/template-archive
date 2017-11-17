@@ -8,6 +8,10 @@
     "semver": "^5.3.0",
     "sleep-promise": "^2.0.0"
   },
+  "engines": {
+    "node": ">=8",
+    "npm": ">=3"
+  },
   "name": "cicero",
   "description": "You must install [Lerna](https://lernajs.io) to build this multi-package repository.",
   "version": "0.1.0",

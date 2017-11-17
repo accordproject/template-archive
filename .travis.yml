@@ -7,9 +7,6 @@ before_install: |
   date
   echo "//registry.npmjs.org/:_authToken=\${NPM_TOKEN}" > .npmrc
   npm install -g
-  npm install -g lerna
-  lerna bootstrap
-  date
 install: |
   set -e
   date
