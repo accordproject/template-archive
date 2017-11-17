@@ -18,6 +18,7 @@ const ModelManager = require('composer-common').ModelManager;
 const Writer = require('composer-common').Writer;
 const GrammarVisitor = require('../lib/grammarvisitor');
 const Template = require('../lib/template');
+const logger = require('../lib/logger');
 
 const fs = require('fs');
 const path = require('path');
@@ -61,7 +62,7 @@ describe('GrammarVisitor', () => {
 
             const generatedGrammar = parameters.writer.getBuffer();
             generatedGrammar.should.not.be.null;
-            console.log(generatedGrammar);
+            logger.debug('Generated grammar', generatedGrammar);
 
             // check we can parse the generated grammar
             const ast = Template.compileGrammar(generatedGrammar);

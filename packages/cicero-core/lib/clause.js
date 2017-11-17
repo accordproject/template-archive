@@ -14,6 +14,7 @@
 
 'use strict';
 
+const logger = require('./logger');
 const crypto = require('crypto');
 
 /**
@@ -47,7 +48,7 @@ class Clause {
         }
 
         // validate the data using the template model
-        console.log('Setting clause data: ' + JSON.stringify(data));
+        logger.debug('Setting clause data: ' + JSON.stringify(data));
         const resource = this.template.getSerializer().fromJSON(data);
         resource.validate();
 
@@ -80,7 +81,7 @@ class Clause {
             }, this);
         }
         const ast = parser.results[0];
-        console.log('Result of parsing: ' + ast);
+        logger.debug('Result of parsing: ' + ast);
 
         if(!ast) {
             throw new Error('Parsing clause text returned a null AST. This may mean the text is valid, but not complete.');

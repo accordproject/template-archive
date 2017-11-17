@@ -15,6 +15,7 @@
 
 'use strict';
 
+const logger = require('cicero-core').logger;
 const Commands = require('./lib/commands');
 
 require('yargs')
@@ -27,15 +28,15 @@ require('yargs')
         });
     }, (argv) => {
         if (argv.verbose) {
-            console.info(`parse dsl ${argv.dsl} using a template ${argv.template}`);
+            logger.info(`parse dsl ${argv.dsl} using a template ${argv.template}`);
         }
 
         return Commands.parse(argv.template, argv.dsl)
             .then((result) => {
-                console.log(JSON.stringify(result));
+                logger.info(JSON.stringify(result));
             })
             .catch((err) => {
-                console.log(err.message + ' ' + JSON.stringify(err));
+                logger.error(err.message + ' ' + JSON.stringify(err));
             });
     })
     .command('execute', 'execute a clause with JSON data', (yargs) => {
@@ -50,15 +51,15 @@ require('yargs')
         });
     }, (argv) => {
         if (argv.verbose) {
-            console.info(`execute dsl ${argv.dsl} using a template ${argv.template} with data ${argv.data}`);
+            logger.info(`execute dsl ${argv.dsl} using a template ${argv.template} with data ${argv.data}`);
         }
 
         return Commands.execute(argv.template, argv.dsl, argv.data)
             .then((result) => {
-                console.log(JSON.stringify(result));
+                logger.info(JSON.stringify(result));
             })
             .catch((err) => {
-                console.log(err.message + ' ' + JSON.stringify(err));
+                logger.error(err.message + ' ' + JSON.stringify(err));
             });
     })
     .option('verbose', {

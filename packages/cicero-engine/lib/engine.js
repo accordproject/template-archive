@@ -15,6 +15,7 @@
 'use strict';
 
 const Logger = require('./logger');
+const logger = require('cicero-core').logger;
 
 const {
     VM,
@@ -116,7 +117,7 @@ class Engine {
         `;
 
         const code = head + methods + tail;
-        console.log(code);
+        logger.debug(code);
         return code;
     }
 
@@ -139,7 +140,7 @@ class Engine {
                 const tx = clause.getTemplate().getSerializer().fromJSON(request);
                 tx.validate();
 
-                console.log('Engine processing ' + request.$class);
+                logger.debug('Engine processing ' + request.$class);
 
                 let script = me.scripts[clause.getIdentifier()];
 

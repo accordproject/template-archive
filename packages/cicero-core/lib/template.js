@@ -24,9 +24,8 @@ const Introspector = require('composer-common').Introspector;
 const ModelManager = require('composer-common').ModelManager;
 const ScriptManager = require('composer-common').ScriptManager;
 const Serializer = require('composer-common').Serializer;
-const Logger = require('composer-common').Logger;
 const Writer = require('composer-common').Writer;
-const LOG = Logger.getLog('Template');
+const logger = require('./logger');
 
 const nearley = require('nearley');
 const compile = require('nearley/lib/compile');
@@ -271,7 +270,7 @@ class Template {
 
         const combined = parameters.writer.getBuffer();
 
-        console.log('Generated template grammar' + combined);
+        logger.debug('Generated template grammar' + combined);
 
         this.setGrammar(combined);
         this.templatizedGrammar = templatizedGrammar;
@@ -373,7 +372,7 @@ class Template {
             eval(grammarJs);
             return module.exports;
         } catch (err) {
-            console.log(err);
+            logger.error(err);
             throw err;
         }
     }
@@ -386,7 +385,7 @@ class Template {
      */
     static fromArchive(Buffer) {
         const method = 'fromArchive';
-        LOG.entry(method, Buffer.length);
+        logger.entry(method, Buffer.length);
         return JSZip.loadAsync(Buffer).then(function (zip) {
             let promise = Promise.resolve();
             let ctoModelFiles = [];
@@ -398,18 +397,18 @@ class Template {
             let grammar = null;
             let templatizedGrammar = null;
 
-            LOG.debug(method, 'Loading README.md');
+            logger.debug(method, 'Loading README.md');
             let readme = zip.file('README.md');
             if (readme) {
                 promise = promise.then(() => {
                     return readme.async('string');
                 }).then((contents) => {
-                    LOG.debug(method, 'Loaded README.md');
+                    logger.debug(method, 'Loaded README.md');
                     readmeContents = contents;
                 });
             }
 
-            LOG.debug(method, 'Loading package.json');
+            logger.debug(method, 'Loading package.json');
             let packageJson = zip.file('package.json');
             if (packageJson === null) {
                 throw Error('package.json must exist');
@@ -417,21 +416,21 @@ class Template {
             promise = promise.then(() => {
                 return packageJson.async('string');
             }).then((contents) => {
-                LOG.debug(method, 'Loaded package.json');
+                logger.debug(method, 'Loaded package.json');
                 packageJsonContents = JSON.parse(contents);
             });
 
-            LOG.debug(method, 'Loading grammar.ne');
+            logger.debug(method, 'Loading grammar.ne');
             let grammarNe = zip.file('grammar/grammar.ne');
             if (grammarNe !== null) {
                 promise = promise.then(() => {
                     return grammarNe.async('string');
                 }).then((contents) => {
-                    LOG.debug(method, 'Loaded grammar.ne');
+                    logger.debug(method, 'Loaded grammar.ne');
                     grammar = contents;
                 });
             } else {
-                LOG.debug(method, 'Loading template.tem');
+                logger.debug(method, 'Loading template.tem');
                 let template_txt = zip.file('grammar/template.tem');
 
                 if (template_txt === null) {
@@ -441,32 +440,32 @@ class Template {
                 promise = promise.then(() => {
                     return template_txt.async('string');
                 }).then((contents) => {
-                    LOG.debug(method, 'Loaded template.tem');
+                    logger.debug(method, 'Loaded template.tem');
                     templatizedGrammar = contents;
                 });
             }
 
-            LOG.debug(method, 'Looking for model files');
+            logger.debug(method, 'Looking for model files');
             let ctoFiles = zip.file(/models\/.*\.cto$/); //Matches any file which is in the 'models' folder and has a .cto extension
             ctoFiles.forEach(function (file) {
-                LOG.debug(method, 'Found model file, loading it', file.name);
+                logger.debug(method, 'Found model file, loading it', file.name);
                 ctoModelFileNames.push(file.name);
                 promise = promise.then(() => {
                     return file.async('string');
                 }).then((contents) => {
-                    LOG.debug(method, 'Loaded model file');
+                    logger.debug(method, 'Loaded model file');
                     ctoModelFiles.push(contents);
                 });
             });
 
-            LOG.debug(method, 'Looking for JavaScript files');
+            logger.debug(method, 'Looking for JavaScript files');
             let jsFiles = zip.file(/lib\/.*\.js$/); //Matches any file which is in the 'lib' folder and has a .js extension
             jsFiles.forEach(function (file) {
-                LOG.debug(method, 'Found JavaScript file, loading it', file.name);
+                logger.debug(method, 'Found JavaScript file, loading it', file.name);
                 promise = promise.then(() => {
                     return file.async('string');
                 }).then((contents) => {
-                    LOG.debug(method, 'Loaded JavaScript file');
+                    logger.debug(method, 'Loaded JavaScript file');
                     let tempObj = {
                         'name': file.name,
                         'contents': contents
@@ -477,30 +476,30 @@ class Template {
             });
 
             return promise.then(() => {
-                LOG.debug(method, 'Loaded package.json');
+                logger.debug(method, 'Loaded package.json');
                 template = new Template(packageJsonContents, readmeContents);
 
-                LOG.debug(method, 'Adding model files to model manager');
+                logger.debug(method, 'Adding model files to model manager');
                 template.modelManager.addModelFiles(ctoModelFiles, ctoModelFileNames); // Adds all cto files to model manager
-                LOG.debug(method, 'Added model files to model manager');
-                LOG.debug(method, 'Adding JavaScript files to script manager');
+                logger.debug(method, 'Added model files to model manager');
+                logger.debug(method, 'Adding JavaScript files to script manager');
                 jsScriptFiles.forEach(function (obj) {
                     let jsObject = template.scriptManager.createScript(obj.name, 'js', obj.contents);
                     template.scriptManager.addScript(jsObject); // Adds all js files to script manager
                 });
-                LOG.debug(method, 'Added JavaScript files to script manager');
+                logger.debug(method, 'Added JavaScript files to script manager');
 
                 // check the template model
                 template.getTemplateModel();
 
-                LOG.debug(method, 'Setting grammar');
+                logger.debug(method, 'Setting grammar');
                 if (grammar) {
                     template.setGrammar(grammar);
                 } else {
                     template.buildGrammar(templatizedGrammar);
                 }
 
-                LOG.exit(method, template.toString());
+                logger.exit(method, template.toString());
                 return template; // Returns template
             });
         });
@@ -635,7 +634,7 @@ class Template {
         }
 
         const method = 'fromDirectory';
-        LOG.entry(method, path);
+        logger.entry(method, path);
 
         // grab the README.md
         let readmeContents = null;
@@ -643,7 +642,7 @@ class Template {
         if (fs.existsSync(readmePath)) {
             readmeContents = fs.readFileSync(readmePath, ENCODING);
             if (readmeContents) {
-                LOG.debug(method, 'Loaded README.md', readmeContents);
+                logger.debug(method, 'Loaded README.md', readmeContents);
             }
         }
 
@@ -654,7 +653,7 @@ class Template {
             throw new Error('Failed to find package.json');
         }
 
-        LOG.debug(method, 'Loaded package.json', packageJsonContents);
+        logger.debug(method, 'Loaded package.json', packageJsonContents);
 
         // parse the package.json
         let jsonObject = JSON.parse(packageJsonContents);
@@ -676,27 +675,27 @@ class Template {
                 return element === 'node_modules';
             });
 
-            LOG.debug(method, file, result);
+            logger.debug(method, file, result);
             return result;
         };
 
         // process each module dependency
         // filtering using a glob on the module dependency name
         if (jsonObject.dependencies) {
-            LOG.debug(method, 'All dependencies', Object.keys(jsonObject.dependencies).toString());
+            logger.debug(method, 'All dependencies', Object.keys(jsonObject.dependencies).toString());
             const dependencies = Object.keys(jsonObject.dependencies).filter(minimatch.filter(options.dependencyGlob, {
                 dot: true
             }));
-            LOG.debug(method, 'Matched dependencies', dependencies);
+            logger.debug(method, 'Matched dependencies', dependencies);
 
             for (let dep of dependencies) {
                 // find all the *.cto files under the npm install dependency path
                 let dependencyPath = fsPath.resolve(path, 'node_modules', dep);
-                LOG.debug(method, 'Checking dependency path', dependencyPath);
+                logger.debug(method, 'Checking dependency path', dependencyPath);
                 if (!fs.existsSync(dependencyPath)) {
                     // need to check to see if this is in a peer directory as well
                     //
-                    LOG.debug(method, 'trying different path ' + path.replace(packageName, ''));
+                    logger.debug(method, 'trying different path ' + path.replace(packageName, ''));
                     dependencyPath = fsPath.resolve(path.replace(packageName, ''), dep);
                     if (!fs.existsSync(dependencyPath)) {
                         throw new Error('npm dependency path ' + dependencyPath + ' does not exist. Did you run npm install?');
@@ -715,7 +714,7 @@ class Template {
                     process: function (path, contents) {
                         modelFiles.push(contents);
                         modelFileNames.push(path);
-                        LOG.debug(method, 'Found model file', path);
+                        logger.debug(method, 'Found model file', path);
                     }
                 });
             }
@@ -735,12 +734,12 @@ class Template {
             process: function (path, contents) {
                 modelFiles.push(contents);
                 modelFileNames.push(path);
-                LOG.debug(method, 'Found model file', path);
+                logger.debug(method, 'Found model file', path);
             }
         });
 
         template.getModelManager().addModelFiles(modelFiles, modelFileNames);
-        LOG.debug(method, 'Added model files', modelFiles.length);
+        logger.debug(method, 'Added model files', modelFiles.length);
 
         // find script files outside the npm install directory
         const scriptFiles = [];
@@ -757,7 +756,7 @@ class Template {
                 let filePath = fsPath.parse(path);
                 const jsScript = template.getScriptManager().createScript(path, filePath.ext.toLowerCase(), contents);
                 scriptFiles.push(jsScript);
-                LOG.debug(method, 'Found script file ', path);
+                logger.debug(method, 'Found script file ', path);
             }
         });
 
@@ -769,7 +768,7 @@ class Template {
             template.getScriptManager().addScript(script);
         }
 
-        LOG.debug(method, 'Added script files', scriptFiles.length);
+        logger.debug(method, 'Added script files', scriptFiles.length);
 
         // check the template model
         template.getTemplateModel();
@@ -786,13 +785,13 @@ class Template {
         if (!grammarNe) {
             let template_txt = fs.readFileSync(fsPath.resolve(path, 'grammar/template.tem'), ENCODING);
             template.buildGrammar(template_txt);
-            LOG.debug(method, 'Loaded template.tem', template_txt);
+            logger.debug(method, 'Loaded template.tem', template_txt);
         } else {
-            LOG.debug(method, 'Loaded grammar.ne', grammarNe);
+            logger.debug(method, 'Loaded grammar.ne', grammarNe);
             template.setGrammar(grammarNe);
         }
 
-        LOG.exit(method, path);
+        logger.exit(method, path);
         return Promise.resolve(template);
     }
 
@@ -805,7 +804,7 @@ class Template {
     static processDirectory(path, fileProcessor) {
         const items = Template.walkSync(path, [], fileProcessor);
         items.sort();
-        LOG.debug('processDirectory', 'Path ' + path, items);
+        logger.debug('processDirectory', 'Path ' + path, items);
         items.forEach((item) => {
             Template.processFile(item, fileProcessor);
         });
@@ -820,11 +819,11 @@ class Template {
     static processFile(file, fileProcessor) {
 
         if (fileProcessor.accepts(file)) {
-            LOG.debug('processFile', 'FileProcessor accepted', file);
+            logger.debug('processFile', 'FileProcessor accepted', file);
             let fileContents = fs.readFileSync(file, ENCODING);
             fileProcessor.process(file, fileContents);
         } else {
-            LOG.debug('processFile', 'FileProcessor rejected', file);
+            logger.debug('processFile', 'FileProcessor rejected', file);
         }
     }
 

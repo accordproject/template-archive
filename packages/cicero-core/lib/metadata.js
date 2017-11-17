@@ -14,8 +14,7 @@
 
 'use strict';
 
-const Logger = require('composer-common').Logger;
-const LOG = Logger.getLog('Template');
+const logger = require('./logger');
 
 // This code is derived from BusinessNetworkMetadata in Hyperleger Composer composer-common.
 
@@ -43,7 +42,7 @@ class Metadata {
      */
     constructor(packageJson, readme) {
         const method = 'constructor';
-        LOG.entry(method, readme);
+        logger.entry(method, readme);
 
         if(!packageJson || typeof(packageJson) !== 'object') {
             throw new Error('package.json is required and must be an object');
@@ -61,7 +60,7 @@ class Metadata {
 
 
         this.readme = readme;
-        LOG.exit(method);
+        logger.exit(method);
     }
 
     /**

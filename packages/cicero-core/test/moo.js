@@ -14,6 +14,7 @@
 
 'use strict';
 const moo = require('moo');
+const logger = require('../lib/logger');
 
 // we use lexer states to distinguish between the tokens
 // in the text and the tokens inside the variables
@@ -51,6 +52,6 @@ lexer.reset('[{v1}] \n one [{"foo":? v2}] [{v3}] two \n\nthree[{v4}]\nfour.');
 let n = lexer.next();
 
 while (n) {
-    console.log(n.type + ': ' + n.value);
+    logger.debug(n.type + ': ' + n.value);
     n = lexer.next();
 }

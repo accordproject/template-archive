@@ -14,6 +14,8 @@
 
 'use strict';
 
+const logger = require('cicero-core').logger;
+
 /**
  * <p>
  * A logger class, exposed to logic
@@ -54,10 +56,10 @@ class Logger {
                 }
             }, this);
 
-            console.log(JSON.stringify(printable));
+            logger.info( 'CICERO-ENGINE', JSON.stringify(printable));
         }
         else {
-            console.log(obj);
+            logger.info( 'CICERO-ENGINE', obj);
         }
     }
 }

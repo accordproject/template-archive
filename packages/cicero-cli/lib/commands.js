@@ -14,6 +14,7 @@
 
 'use strict';
 
+const logger = require('cicero-core').logger;
 const Template = require('cicero-core').Template;
 const Clause = require('cicero-core').Clause;
 const Engine = require('cicero-engine').Engine;
@@ -46,7 +47,7 @@ class Commands {
                 return clause.getData();
             })
             .catch((err) => {
-                console.log(err);
+                logger.error(err);
             });
     }
 
@@ -71,7 +72,7 @@ class Commands {
                 return engine.execute(clause, jsonData);
             })
             .catch((err) => {
-                console.log(err);
+                logger.error(err);
             });
     }
 }
