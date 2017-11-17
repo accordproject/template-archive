@@ -7,6 +7,15 @@
     "name": "Accord",
     "url": "https://github.com/accordproject/cicero"
   },
+  "scripts": {
+    "pretest": "npm run lint",
+    "lint": "eslint .",
+    "postlint": "npm run licchk",
+    "licchk": "license-check",
+    "test": "nyc mocha --recursive -t 10000"
+  },
+  "repository": "https://github.com/accordproject/cicero.git",
+  "license": "Apache-2.0",
   "files": [
     "generators"
   ],
@@ -69,14 +78,5 @@
     "branches": 33,
     "functions": 75,
     "lines": 60
-  },
-  "scripts": {
-    "pretest": "npm run lint",
-    "lint": "eslint .",
-    "postlint": "npm run licchk",
-    "licchk": "license-check",
-    "test": "nyc mocha --recursive -t 10000"
-  },
-  "repository": "https://github.com/accordproject/cicero.git",
-  "license": "Apache-2.0"
+  }
 }
