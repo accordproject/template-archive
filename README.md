@@ -2,17 +2,17 @@
 
 [![Build Status](https://travis-ci.org/accordproject/cicero.svg?branch=master)](https://travis-ci.org/accordproject/cicero)
 
-[![lerna](https://img.shields.io/badge/maintained%20with-lerna-cc00ff.svg)](https://lernajs.io/)l
+[![lerna](https://img.shields.io/badge/maintained%20with-lerna-cc00ff.svg)](https://lernajs.io/)
 
 ## Introduction
 
-Cicero is an Open Source implementation of the Accord Protocol, Template Specification. It defines the structure of natural language templates, bound to a data model, that can be executed using request/response JSON messages.
+Cicero is an Open Source implementation of the [Accord Protocol, Template Specification](https://docs.google.com/document/d/1UacA_r2KGcBA2D4voDgGE8jqid-Uh4Dt09AE-shBKR0). It defines the structure of natural language templates, bound to a data model, that can be executed using request/response JSON messages.
 
-Using Cicero you can take any existing natural language text (typically a clause or a contract) and declaratively bind it to a data model. Cicero generates a parser (using the Earley parser algorithm) to parse and validate source text, extracting machine readable/computable data. The Cicero engine can then be used to execute a clause (an instance of a template) against a JSON payload.
+Using Cicero you can take any existing natural language text (typically a clause or a contract) and declaratively bind it to a data model. Cicero generates a parser (using the Earley parser algorithm) to parse and validate source text, extracting machine readable/computable data. The Cicero engine can then be used to execute a clause (an instance of a template) against a JSON payload. Cicero clauses are typically stateless (idempotent) functions. They receive an incoming request and the template data, and they produce a response.
 
 ## Get Involved!
 
-We are an open community and welcome both lawyers and technologists to work on both specifications and code. If you would like to get involved please join the #technology-wg Slack channel by signing up here: https://www.accordproject.org.
+We are an open community and welcome both lawyers and technologists to work on the specifications and code. If you would like to get involved please join the Accord #technology-wg Slack channel by signing up here: https://www.accordproject.org.
 
 [Accord Technology Working Group weekly meeting](
 https://calendar.google.com/calendar/event?action=TEMPLATE&tmeid=MjZvYzIzZHVrYnI1aDVzbjZnMHJqYmtwaGlfMjAxNzExMTVUMjEwMDAwWiBkYW5AY2xhdXNlLmlv&tmsrc=dan%40clause.io)
@@ -104,9 +104,9 @@ cicero execute --template ./helloworld/ --dsl ./helloworld/sample.txt --data ./h
 ```
 
 The results of execution (a JSON serialized object) are displayed. They include:
-Details of the clause executed (name, version, SHA256 hash of clause data)
-The incoming request object
-The output response object
+* Details of the clause executed (name, version, SHA256 hash of clause data)
+* The incoming request object
+* The output response object
 
 ```
 {
@@ -124,9 +124,55 @@ The output response object
 }
 ```
 
+Note that in the response data from the template has been combined with data from the request.
+
+## Creating a New Template
+
+Now that you have executed an existing template, let's create a new template. 
+
+> If you would like to contribute your template back into the `cicero-template-library` please start by [forking](https://help.github.com/articles/fork-a-repo/) the `cicero-template-library` project on GitHub. This will make it easy for you to submit a pull request to get your new template added to the library.
+
+Install the template generator:
+
+```bash
+npm install -g yo
+npm install -g generator-cicero-template
+```
+
+Run the template generator:
+
+> If you have forked the `cicero-template-library` cd into that directory first.
+
+```bash
+yo cicero-template
+```
+
+Give your generator a name (no spaces) and then supply a namespace for your template model (again, no spaces). The generator will then create the files and directories required for a basic template (based on the helloworld template).
+
+### Edit the Template Grammar
+
+Start by editing the template grammar in the `grammar/template.tem` file. You will want to replace the text with something suitable for your template, introducing variables as required. The variables are marked-up using `[{name}]`.
+
+### Edit the Template Model
+
+All of the variables referenced in your template grammar must exist in your template model. Edit the file 'models/model.cto' to include all your variables. The [Composer Modelling Language](https://hyperledger.github.io/composer/reference/cto_language.html) primitive data types are:
+   * String
+   * Long
+   * Integer
+   * DateTime
+   * Double
+   * Boolean
+
+### Edit the Request and Response Transaction Types
+
+Your template expects to receive data as input and will produce data as output. The structure of this request/response data is captured in `Request` and `Response` transaction types in your model namespace. Open up the file `models/model.cto` and edit the definition of the `Request` type to include all the data you expect to receive from the outside world and that will be used by the business logic of your template. Similarly edit the definition of the `Response` type to include all the data that the business logic for your template will compute and would like to return to the caller.
+
+### Edit the Logic of the Template
+
+Now edit the business logic of the template itself. At present this is expressed as ES 2015 JavaScript functions (other languages may be supported in the future). Open the file `lib/logic.js` and edit the `execute` method to perform the calculations your logic requires. Use the `context.request` and `context.data` properties to access the incoming request and the template data respectively, setting properties on `context.response` to be returned to the caller.
+
 ## Developing an Application
 
 TBD.
-
 
 © 2017 Clause, Inc.

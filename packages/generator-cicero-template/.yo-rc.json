@@ -1,0 +1,9 @@
+{
+  "generator-node": {
+    "promptValues": {
+      "authorName": "Accord",
+      "authorEmail": "danscode@selman.org",
+      "authorUrl": "https://github.com/accordproject/cicero"
+    }
+  }
+}

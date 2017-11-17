@@ -1,0 +1,20 @@
+namespace <%= data.modelNamespace %>
+
+transaction Request {
+  o String input
+}
+
+transaction Response {
+  o String output
+}
+
+/**
+ * The template model
+ */
+@AccordTemplateModel("<%= data.templateName %>")
+transaction TemplateModel { // TODO (DCS) this should be a concept, but blocked by https://github.com/hyperledger/composer/issues/2472
+  /**
+   * The name for the clause
+   */
+  o String name
+}
