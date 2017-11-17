@@ -1,2 +1,4 @@
 coverage
-**/templates
+node_modules
+out
+generators/app/templates/lib/

@@ -1,44 +1,68 @@
+/*
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
 'use strict';
 const Generator = require('yeoman-generator');
 const chalk = require('chalk');
 const yosay = require('yosay');
 
 module.exports = class extends Generator {
-  prompting() {
+
+    /**
+    * Promts for the user
+    * @return {Promise} a promise to the user prompts
+    */
+    prompting() {
     // Have Yeoman greet the user.
-    this.log(
-      yosay('Welcome to the ' + chalk.red('generator-cicero-template') + ' generator!')
-    );
+        this.log(
+            yosay('Welcome to the ' + chalk.red('generator-cicero-template') + ' generator!')
+        );
 
-    const prompts = [
-      {
-        type: 'input',
-        name: 'templateName',
-        message: 'What is the name of your template?',
-        default: 'mytemplate'
-      },
-      {
-        type: 'input',
-        name: 'modelNamespace',
-        message: 'What is the namespace for your model?',
-        default: 'org.example.mytemplate'
-      }
-    ];
+        const prompts = [
+            {
+                type: 'input',
+                name: 'templateName',
+                message: 'What is the name of your template?',
+                default: 'mytemplate'
+            },
+            {
+                type: 'input',
+                name: 'modelNamespace',
+                message: 'What is the namespace for your model?',
+                default: 'org.example.mytemplate'
+            }
+        ];
 
-    return this.prompt(prompts).then(props => {
-      // To access props later use this.props.someAnswer;
-      this.props = props;
-    });
-  }
+        return this.prompt(prompts).then(props => {
+            // To access props later use this.props.someAnswer;
+            this.props = props;
+        });
+    }
 
-  writing() {
-    console.log(JSON.stringify(this.props));
-    this.fs.copyTpl(
-      this.templatePath('.'),
-      this.destinationPath(this.props.templateName),
-      { data: this.props }
-    );
-  }
+    /**
+    * Write data to disk
+    */
+    writing() {
+        this.fs.copyTpl(
+            this.templatePath('.'),
+            this.destinationPath(this.props.templateName),
+            { data: this.props }
+        );
+    }
 
-  install() {}
+    /**
+    * Install phase
+    */
+    install() {}
 };
