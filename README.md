@@ -35,7 +35,7 @@ These instructions were tested using:
 * node version 8.6.0
 
 ```
-npm install cicero-cli --save
+npm install -g cicero-cli
 ```
 
 ## Using an existing Template
