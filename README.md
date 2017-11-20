@@ -23,6 +23,7 @@ Top level repository (cicero), with sub packages. Each sub-package is published 
 * cicero-core :  `Template` and `Clause` classes to manage the grammar, models and logic.
 * cicero-engine :  A Node.js VM based execution engine
 * cicero-cli : Command line utility for testing
+* generator-cicero-template: Utility to generate a new template
 
 ## Installation
 
