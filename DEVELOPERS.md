@@ -46,7 +46,7 @@ git clone https://github.com/<github username>/cicero.git
 # Go to the Cicero directory:
 cd cicero
 
-# Add the main AngularJS repository as an upstream remote to your repository:
+# Add the main Cicero repository as an upstream remote to your repository:
 git remote add upstream "https://github.com/acccordproject/cicero.git"
 
 # Install node.js dependencies:
