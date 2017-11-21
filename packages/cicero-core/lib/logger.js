@@ -20,13 +20,12 @@ let logger = new (winston.Logger)({
     transports: [
         new (winston.transports.Console)(),
         new (winston.transports.File)({
-            name: 'info-file',
-            filename: 'filelog-info.log',
-            level: 'info'
+            name: 'combined-file',
+            filename: 'combined.log'
         }),
         new (winston.transports.File)({
             name: 'error-file',
-            filename: 'filelog-error.log',
+            filename: 'error.log',
             level: 'error'
         })
     ]
