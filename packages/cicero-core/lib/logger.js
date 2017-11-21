@@ -21,7 +21,8 @@ let logger = new (winston.Logger)({
         new (winston.transports.Console)(),
         new (winston.transports.File)({
             name: 'combined-file',
-            filename: 'combined.log'
+            filename: 'combined.log',
+            level: 'debug'
         }),
         new (winston.transports.File)({
             name: 'error-file',
