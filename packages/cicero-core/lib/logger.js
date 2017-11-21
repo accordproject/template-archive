@@ -15,19 +15,27 @@
 'use strict';
 
 const winston = require('winston');
+const fs = require('fs');
+const env = process.env.NODE_ENV || 'development';
+const tsFormat = () => (new Date()).toLocaleTimeString();
 
-let logger = new (winston.Logger)({
+const logDir = 'log';
+// Create the log directory if it does not exist
+if (!fs.existsSync(logDir)) {
+    fs.mkdirSync(logDir);
+}
+
+let logger = new(winston.Logger)({
     transports: [
-        new (winston.transports.Console)(),
-        new (winston.transports.File)({
-            name: 'combined-file',
-            filename: 'combined.log',
-            level: 'debug'
+        new(winston.transports.Console)({
+            colorize: true,
+            timestamp: tsFormat,
+            level: 'info'
         }),
-        new (winston.transports.File)({
-            name: 'error-file',
-            filename: 'error.log',
-            level: 'error'
+        new(winston.transports.File)({
+            name: 'logs-file',
+            filename: `${logDir}/trace.log`,
+            level: env === 'development' ? 'debug' : 'info'
         })
     ]
 });
