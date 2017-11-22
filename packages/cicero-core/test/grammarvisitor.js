@@ -53,6 +53,9 @@ describe('GrammarVisitor', () => {
             const model = fs.readFileSync(path.resolve(__dirname, 'data/latedeliveryandpenalty/models', 'model.cto'), 'utf8');
             mm.addModelFile(model);
 
+            const test = fs.readFileSync(path.resolve(__dirname, 'data/latedeliveryandpenalty/models', 'test.cto'), 'utf8');
+            mm.addModelFile(test);
+
             const writer = new Writer();
             const parameters = {
                 writer: writer

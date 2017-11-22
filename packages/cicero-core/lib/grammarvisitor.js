@@ -51,7 +51,7 @@ class GrammarVisitor {
         } else if (thing instanceof Field) {
             return this.visitField(thing, parameters);
         } else if (thing instanceof RelationshipDeclaration) {
-            return this.visitRelationship(thing, parameters);
+            return this.visitRelationshipDeclaration(thing, parameters);
         } else if (thing instanceof EnumValueDeclaration) {
             return this.visitEnumValueDeclaration(thing, parameters);
         } else {
@@ -205,6 +205,8 @@ DateTime -> DATE  {% id %}`);
      */
     visitField(field, parameters) {
 
+        debug('entering visitField', field.getName());
+
         let qualifier = '';
 
         if(field.isArray()) {
@@ -243,7 +245,8 @@ DateTime -> DATE  {% id %}`);
      * @return {Object} the result of visiting or null
      * @private
      */
-    visitRelationship(relationship, parameters) {
+    visitRelationshipDeclaration(relationship, parameters) {
+        debug('entering visitRelationshipDeclaration', relationship.getName());
         return 'String';
     }
 
