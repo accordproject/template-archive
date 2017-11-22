@@ -29,7 +29,8 @@ const sinon = require('sinon');
 describe('Clause', () => {
 
     let sandbox;
-    const testLatePenaltyInput = fs.readFileSync(path.resolve(__dirname, 'data/', 'sample.txt'), 'utf8');
+    const testLatePenaltyInput = fs.readFileSync(path.resolve(__dirname, 'data/latedeliveryandpenalty', 'sample.txt'), 'utf8');
+    const testCongaInput = fs.readFileSync(path.resolve(__dirname, 'data/conga', 'sample.txt'), 'utf8');
 
     beforeEach(() => {
         sandbox = sinon.sandbox.create();
@@ -41,8 +42,16 @@ describe('Clause', () => {
 
     describe('#constructor', () => {
 
-        it('should create a clause for a template', () => {
+        it('should create a clause for a latedeliveryandpenalty template', () => {
             return Template.fromDirectory('./test/data/latedeliveryandpenalty')
+                .then((template) => {
+                    const clause = new Clause(template);
+                    clause.should.not.be.null;
+                });
+        });
+
+        it('should create a clause for a conga template', () => {
+            return Template.fromDirectory('./test/data/conga')
                 .then((template) => {
                     const clause = new Clause(template);
                     clause.should.not.be.null;
@@ -83,7 +92,7 @@ describe('Clause', () => {
 
     describe('#parse', () => {
 
-        it('should be able to set the data from natural language text', () => {
+        it('should be able to set the data from latedeliveryandpenalty natural language text', () => {
             return Template.fromDirectory('./test/data/latedeliveryandpenalty')
                 .then((template) => {
                     const clause = new Clause(template);
@@ -108,6 +117,21 @@ describe('Clause', () => {
                     clause.getData().should.eql(data);
 
                     clause.getIdentifier().should.equal('latedeliveryandpenalty@0.0.1-f29b89b0cdced37fca2508346a9fdb425a8523a1ab913d3af77d9ee8fbd56e8e');
+                });
+        });
+
+        it('should be able to set the data from conga natural language text', () => {
+            return Template.fromDirectory('./test/data/conga')
+                .then((template) => {
+                    const clause = new Clause(template);
+                    clause.parse(testCongaInput);
+                    const data = {
+                        $class: 'org.accordproject.conga.TemplateModel',
+                        name: 'Dan Selman',
+                        amount: 100.0
+                    };
+                    clause.getData().should.eql(data);
+                    clause.getIdentifier().should.equal('conga@0.0.1-f38f8cd80f5802cfaffb5c9e800b80853f73e5b4b14ed22a83c719d440846e44');
                 });
         });
     });

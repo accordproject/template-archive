@@ -132,6 +132,7 @@ class Template {
      */
     buildGrammar(templatizedGrammar) {
 
+        logger.debug('buildGrammar', templatizedGrammar);
         const templateModel = this.getTemplateModel();
         const parser = new nearley.Parser(nearley.Grammar.fromCompiled(templateGrammar));
         parser.feed(templatizedGrammar);
@@ -141,7 +142,7 @@ class Template {
 
         // parse the template grammar
         const ast = parser.results[0];
-
+        logger.debug('Template AST', ast);
         const writer = new Writer();
 
         writer.writeLine(0, '\n');
@@ -174,7 +175,11 @@ class Template {
         // index all rules
         const rules = {};
         ast.data.forEach((element, index) => {
-            rules['C' + index] = element;
+            // ignore empty chunks (issue #1)
+            if(element.type !== 'Chunk' || element.value.length > 0 ) {
+                logger.debug(`element C${index} ${JSON.stringify(element)}`);
+                rules['C' + index] = element;
+            }
         }, this);
 
         // create the root rule
@@ -269,7 +274,6 @@ class Template {
         this.getModelManager().accept(gv, parameters);
 
         const combined = parameters.writer.getBuffer();
-
         logger.debug('Generated template grammar' + combined);
 
         this.setGrammar(combined);

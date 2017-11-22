@@ -20,6 +20,10 @@ const logger = require('../lib/logger');
 // in the text and the tokens inside the variables
 const lexer = moo.states({
     main: {
+        varstart: {
+            match: '[{',
+            push: 'var',
+        }, // push to the var state
         // a chunk is everything up until '[{', even across newlines. We then trim off the '[{'
         // we also push the lexer into the 'var' state
         Chunk: {
@@ -33,7 +37,7 @@ const lexer = moo.states({
         LastChunk : {
             match: /[^]+/,
             lineBreaks: true,
-        }
+        },
     },
     var: {
         varend: {
@@ -52,6 +56,6 @@ lexer.reset('[{v1}] \n one [{"foo":? v2}] [{v3}] two \n\nthree[{v4}]\nfour.');
 let n = lexer.next();
 
 while (n) {
-    logger.debug(n.type + ': ' + n.value);
+    logger.info(n.type + ': ' + n.value);
     n = lexer.next();
 }
