@@ -12,8 +12,7 @@
     "lint": "eslint .",
     "postlint": "npm run licchk",
     "licchk": "license-check",
-    "test": "mocha && nyc mocha",
-    "coverage": "nyc report --reporter=text-lcov"
+    "test": "mocha && nyc mocha"
   },
   "repository": {
     "type": "git",
