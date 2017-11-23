@@ -56,6 +56,6 @@ lexer.reset('[{v1}] \n one [{"foo":? v2}] [{v3}] two \n\nthree[{v4}]\nfour.');
 let n = lexer.next();
 
 while (n) {
-    logger.info(n.type + ': ' + n.value);
+    logger.debug(n.type + ': ' + n.value);
     n = lexer.next();
 }

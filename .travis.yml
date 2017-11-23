@@ -15,6 +15,7 @@ install: |
   date
 script: lerna run test 2>&1
 after_failure: tail -n +1 -- /home/travis/.npm/_logs/*-debug.log
+after_success: lerna run coverage
 deploy:
   - provider: script
     script: "./.travis/unstable.sh ${TRAVIS_TAG}"
