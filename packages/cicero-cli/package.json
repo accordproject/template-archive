@@ -18,7 +18,7 @@
     "postlicchk": "npm run doc",
     "doc": "jsdoc --pedantic --recurse -c jsdoc.json",
     "test": "mocha && nyc mocha",
-    "coverage": "nyc report --reporter=text-lcov | coveralls"
+    "coverage": "nyc report --reporter=text-lcov"
   },
   "repository": {
     "type": "git",
@@ -45,8 +45,7 @@
     "mocha": "^3.4.2",
     "mockery": "^2.0.0",
     "nyc": "^11.3.0",
-    "sinon": "^4.0.1",
-    "coveralls": "^3.0.0"    
+    "sinon": "^4.0.1"
   },
   "dependencies": {
     "cicero-core": "^0.2.12",
@@ -80,7 +79,8 @@
     "reporter": [
       "lcov",
       "text-summary",
-      "html"
+      "html",
+      "json"
     ],
     "include": [
       "lib/**/*.js"

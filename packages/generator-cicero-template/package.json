@@ -13,7 +13,7 @@
     "postlint": "npm run licchk",
     "licchk": "license-check",
     "test": "mocha && nyc mocha",
-    "coverage": "nyc report --reporter=text-lcov | coveralls"
+    "coverage": "nyc report --reporter=text-lcov"
   },
   "repository": {
     "type": "git",
@@ -40,7 +40,6 @@
     "chai": "^3.5.0",
     "chai-as-promised": "^6.0.0",
     "chai-things": "^0.2.0",
-    "coveralls": "^3.0.0",
     "eslint": "^4.6.1",
     "jsdoc": "^3.5.5",
     "license-check": "^1.1.5",
@@ -76,7 +75,8 @@
     "reporter": [
       "lcov",
       "text-summary",
-      "html"
+      "html",
+      "json"      
     ],
     "include": [
       "generators/app/**/*.js"
