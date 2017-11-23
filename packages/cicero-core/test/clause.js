@@ -127,11 +127,12 @@ describe('Clause', () => {
                     clause.parse(testCongaInput);
                     const data = {
                         $class: 'org.accordproject.conga.TemplateModel',
-                        name: 'Dan Selman',
-                        amount: 100.0
+                        participant: 'Dan Selman',
+                        amount: 100.0,
+                        swag: 'penguins'
                     };
                     clause.getData().should.eql(data);
-                    clause.getIdentifier().should.equal('conga@0.0.1-f38f8cd80f5802cfaffb5c9e800b80853f73e5b4b14ed22a83c719d440846e44');
+                    clause.getIdentifier().should.equal('conga@0.0.1-e204ba22ff8e8fddb341da6d67041bfa74b84937c8fe01b1e9bd73b5375a9168');
                 });
         });
     });

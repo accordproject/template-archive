@@ -81,7 +81,9 @@ var grammar = {
         },
     {"name": "TEMPLATE$ebnf$1", "symbols": ["ITEM"]},
     {"name": "TEMPLATE$ebnf$1", "symbols": ["TEMPLATE$ebnf$1", "ITEM"], "postprocess": function arrpush(d) {return d[0].concat([d[1]]);}},
-    {"name": "TEMPLATE", "symbols": ["TEMPLATE$ebnf$1", (lexer.has("LastChunk") ? {type: "LastChunk"} : LastChunk)], "postprocess":  (data) => {
+    {"name": "TEMPLATE$ebnf$2", "symbols": [(lexer.has("LastChunk") ? {type: "LastChunk"} : LastChunk)], "postprocess": id},
+    {"name": "TEMPLATE$ebnf$2", "symbols": [], "postprocess": function(d) {return null;}},
+    {"name": "TEMPLATE", "symbols": ["TEMPLATE$ebnf$1", "TEMPLATE$ebnf$2"], "postprocess":  (data) => {
             return {
                 type: 'Template',
                 data: flatten(data)

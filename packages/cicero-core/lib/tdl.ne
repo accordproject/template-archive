@@ -63,8 +63,8 @@ const lexer = moo.states({
 
 @lexer lexer
 
-# A template is one or more items, followed by a LastChunk
-TEMPLATE -> ITEM:+ %LastChunk
+# A template is one or more items, followed by an optional LastChunk
+TEMPLATE -> ITEM:+ %LastChunk:?
 {% (data) => {
         return {
             type: 'Template',

@@ -20,6 +20,7 @@ const fsPath = require('path');
 const JSZip = require('jszip');
 const minimatch = require('minimatch');
 const Factory = require('composer-common').Factory;
+const RelationshipDeclaration = require('composer-common').RelationshipDeclaration;
 const Introspector = require('composer-common').Introspector;
 const ModelManager = require('composer-common').ModelManager;
 const ScriptManager = require('composer-common').ScriptManager;
@@ -175,8 +176,8 @@ class Template {
         // index all rules
         const rules = {};
         ast.data.forEach((element, index) => {
-            // ignore empty chunks (issue #1)
-            if(element.type !== 'Chunk' || element.value.length > 0 ) {
+            // ignore empty chunks (issue #1) and missing optional last chunks
+            if(element && (element.type !== 'Chunk' || element.value.length > 0) ) {
                 logger.debug(`element C${index} ${JSON.stringify(element)}`);
                 rules['C' + index] = element;
             }
@@ -232,6 +233,10 @@ class Template {
                     throw new Error(`Template references a property '${propertyName}' that is not declared in the template model '${templateModel.getFullyQualifiedName()}'. Details: ${JSON.stringify(element)}`);
                 }
                 let type = property.getType();
+                // relationships need to be transformed into strings
+                if(property instanceof RelationshipDeclaration) {
+                    type = 'String';
+                }
                 let action = '{% id %}';
 
                 const decorator = property.getDecorator('AccordType');
@@ -246,9 +251,10 @@ class Template {
 
                 let suffix = ':';
                 // TODO (DCS) need a serialization for arrays
-                // if(property.isArray()) {
-                //     suffix += '+';
-                // }
+                if(property.isArray()) {
+                    throw new Error('Arrays are not yet supported!');
+                    // suffix += '+';
+                }
                 if(property.isOptional()) {
                     suffix += '?';
                 }

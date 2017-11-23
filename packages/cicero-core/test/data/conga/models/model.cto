@@ -5,8 +5,9 @@ namespace org.accordproject.conga
  */
 @AccordTemplateModel("conga")
 concept TemplateModel {
-  o String name
   o Double amount
+  o String swag
+  --> Participant participant
 }
 
 /**
