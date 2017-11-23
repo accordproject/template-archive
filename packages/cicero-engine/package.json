@@ -14,8 +14,7 @@
     "licchk": "license-check",
     "postlicchk": "npm run doc",
     "doc": "jsdoc --pedantic --recurse -c jsdoc.json",
-    "test": "mocha && nyc mocha",
-    "coverage": "nyc report --reporter=text-lcov"
+    "test": "mocha && nyc mocha"
   },
   "repository": {
     "type": "git",
