@@ -15,8 +15,8 @@
     "licchk": "license-check",
     "postlicchk": "npm run doc",
     "doc": "jsdoc --pedantic --recurse -c jsdoc.json",
-    "test": "nyc mocha --recursive -t 10000",
-    "browserify": "browserify ./index.js -t [ babelify --presets [ latest ] ] > ./out/cicero-core.js"
+    "test": "mocha && nyc mocha",
+    "coverage": "nyc report --reporter=text-lcov | coveralls"
   },
   "repository": {
     "type": "git",
@@ -35,21 +35,18 @@
   },
   "homepage": "https://github.com/accordproject/cicero#readme",
   "devDependencies": {
-    "babel-preset-latest": "^6.24.1",
-    "babelify": "^7.3.0",
     "browserfs": "^1.1.0",
-    "browserify": "^13.3.0",
     "chai": "^3.5.0",
     "chai-as-promised": "^6.0.0",
     "chai-things": "^0.2.0",
+    "coveralls": "^3.0.0",
     "eslint": "^4.6.1",
     "jsdoc": "^3.5.5",
     "license-check": "^1.1.5",
     "mocha": "^3.4.2",
     "mockery": "^2.0.0",
-    "nyc": "^11.2.1",
-    "sinon": "^4.0.1",
-    "source-map-support": "^0.4.15"
+    "nyc": "^11.3.0",
+    "sinon": "^4.0.1"
   },
   "dependencies": {
     "composer-common": "0.15.1",
@@ -77,27 +74,24 @@
     "logError": true
   },
   "nyc": {
-    "require": [
-      "babel-register"
-    ],
-    "sourceMap": false,
-    "instrument": false,
-    "exclude": [
-      "coverage/**",
-      "out/**",
-      "scripts/**",
-      "systest/**",
-      "test/**"
-    ],
+    "produce-source-map" : "true",
+    "sourceMap": "inline",
     "reporter": [
+      "lcov",
       "text-summary",
       "html"
     ],
+    "include": [
+      "lib/**/*.js"
+    ],
+    "exclude": [
+      "lib/tdl.js"
+    ],
     "all": true,
     "check-coverage": true,
-    "statements": 90,
-    "branches": 70,
-    "functions": 90,
-    "lines": 90
+    "statements": 86,
+    "branches": 64,
+    "functions": 88,
+    "lines": 85
   }
 }
