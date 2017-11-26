@@ -1,6 +1,6 @@
 {
   "name": "cicero-core",
-  "version": "0.2.12",
+  "version": "0.2.13",
   "description": "Cicero Core - implementation of Accord Protocol Template Specification",
   "engines": {
     "node": ">=8",
@@ -72,13 +72,13 @@
     "logError": true
   },
   "nyc": {
-    "produce-source-map" : "true",
+    "produce-source-map": "true",
     "sourceMap": "inline",
     "reporter": [
       "lcov",
       "text-summary",
       "html",
-      "json"      
+      "json"
     ],
     "include": [
       "lib/**/*.js"

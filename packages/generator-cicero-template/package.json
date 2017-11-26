@@ -1,6 +1,6 @@
 {
   "name": "generator-cicero-template",
-  "version": "0.2.12",
+  "version": "0.2.13",
   "description": "Code generator for a Cicero Template",
   "engines": {
     "node": ">=8",
@@ -75,7 +75,7 @@
       "lcov",
       "text-summary",
       "html",
-      "json"      
+      "json"
     ],
     "include": [
       "generators/app/**/*.js"
