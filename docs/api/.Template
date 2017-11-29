@@ -1,0 +1,456 @@
+.. _module-cicero-core.Template:
+
+===================
+Class: ``Template``
+===================
+
+Member Of :doc:`module-cicero-core`
+
+.. contents:: Local Navigation
+   :local:
+
+Children
+========
+
+.. toctree::
+   :maxdepth: 1
+   
+   
+Description
+===========
+
+<p>Create the Template.<br>Note: Only to be called by framework code. Applications should<br>retrieve instances from {@link Template.fromArchive}.</p>
+
+
+.. _module-cicero-core.rst#.Temp.getTemplateModel:
+
+
+Function: ``getTemplateModel``
+==============================
+
+<p>Returns the template model for the template</p>
+
+.. js:function:: getTemplateModel()
+
+    
+    :return ClassDeclaration: <p>the template model for the template</p>
+    
+.. _module-cicero-core.rst#.Temp.getIdentifier:
+
+
+Function: ``getIdentifier``
+===========================
+
+<p>Returns the identifier for this clause</p>
+
+.. js:function:: getIdentifier()
+
+    
+    :return String: <p>the identifier of this clause</p>
+    
+.. _module-cicero-core.rst#.Temp.getMetadata:
+
+
+Function: ``getMetadata``
+=========================
+
+<p>Returns the metadata for this clause</p>
+
+.. js:function:: getMetadata()
+
+    
+    :return kMetadata: <p>the metadata for this clause</p>
+    
+.. _module-cicero-core.rst#.Temp.getParser:
+
+
+Function: ``getParser``
+=======================
+
+<p>Gets a parser object for this template</p>
+
+.. js:function:: getParser()
+
+    
+    :return object: <p>the parser for this template</p>
+    
+.. _module-cicero-core.rst#.Temp.setGrammar:
+
+
+Function: ``setGrammar``
+========================
+
+<p>Set the grammar for the template</p>
+
+.. js:function:: setGrammar(grammar)
+
+    
+    :param String grammar: <p>the grammar for the template</p>
+    
+.. _module-cicero-core.rst#.Temp.buildGrammar:
+
+
+Function: ``buildGrammar``
+==========================
+
+<p>Build a grammar from a template</p>
+
+.. js:function:: buildGrammar(templatizedGrammar)
+
+    
+    :param String templatizedGrammar: <p>the annotated template</p>
+    
+.. _module-cicero-core.rst#.Temp.cleanChunk:
+
+
+Function: ``cleanChunk``
+========================
+
+<p>Cleans a chunk of text to make it safe to include<br>as a grammar rule. We need to remove linefeeds and<br>escape any '&quot;' characters.</p>
+
+.. js:function:: cleanChunk(input)
+
+    
+    :param string input: <p>the input text from the template</p>
+    :return string: <p>cleaned text</p>
+    
+.. _module-cicero-core.rst#.Temp.findFirstBinding:
+
+
+Function: ``findFirstBinding``
+==============================
+
+<p>Finds the first binding for the given property</p>
+
+.. js:function:: findFirstBinding(propertyName, elements)
+
+    
+    :param string propertyName: <p>the name of the property</p>
+    :param Array.<object> elements: <p>the result of parsing the template_txt.</p>
+    :return int: <p>the index of the element or -1</p>
+    
+.. _module-cicero-core.rst#.Temp.getGrammar:
+
+
+Function: ``getGrammar``
+========================
+
+<p>Get the grammar for the template</p>
+
+.. js:function:: getGrammar()
+
+    
+    :return String: <ul>
+    <li>the grammar for the template</li>
+    </ul>
+    
+.. _module-cicero-core.rst#.Temp.getName:
+
+
+Function: ``getName``
+=====================
+
+<p>Returns the name for this clause</p>
+
+.. js:function:: getName()
+
+    
+    :return String: <p>the name of this clause</p>
+    
+.. _module-cicero-core.rst#.Temp.getVersion:
+
+
+Function: ``getVersion``
+========================
+
+<p>Returns the version for this clause</p>
+
+.. js:function:: getVersion()
+
+    
+    :return String: <p>the version of this clause. Use semver module<br>to parse.</p>
+    
+.. _module-cicero-core.rst#.Temp.getDescription:
+
+
+Function: ``getDescription``
+============================
+
+<p>Returns the description for this clause</p>
+
+.. js:function:: getDescription()
+
+    
+    :return String: <p>the description of this clause</p>
+    
+.. _module-cicero-core.rst#.Temp.compileGrammar:
+
+
+Function: ``compileGrammar``
+============================
+
+<p>Compiles a Nearley grammar to its AST</p>
+
+.. js:function:: compileGrammar(sourceCode)
+
+    
+    :param string sourceCode: <p>the source text for the grammar</p>
+    :return object: <p>the AST for the grammar</p>
+    
+.. _module-cicero-core.rst#.Temp.fromArchive:
+
+
+Function: ``fromArchive``
+=========================
+
+<p>Create a Clause from an archive.</p>
+
+.. js:function:: fromArchive(Buffer)
+
+    
+    :param Buffer Buffer: <p>the Buffer to a zip archive</p>
+    :return Promise: <p>a Promise to the instantiated business network</p>
+    
+.. _module-cicero-core.rst#.Temp.toArchive:
+
+
+Function: ``toArchive``
+=======================
+
+<p>Store a Template as an archive.</p>
+
+.. js:function:: toArchive([options])
+
+    
+    :param Object options: <p>JSZip options</p>
+    :return Buffer: <p>buffer  - the zlib buffer</p>
+    
+.. _module-cicero-core.rst#.Temp.fromDirectory:
+
+
+Function: ``fromDirectory``
+===========================
+
+<p>Builds a Template from the contents of a directory.<br>The directory must include a package.json in the root (used to specify<br>the name, version and description of the business network). This method<br>is designed to work with business networks that refer to external models<br>using npm dependencies as well as business networks that statically<br>package their model files.</p>
+<p><br>If package.json contains a dependencies property then this method will search for<br>model (CTO) files under the node_modules directory for each dependency that<br>passes the options.dependencyGlob pattern.<br></p><br><p><br>If the network depends on an npm module its dependencies (transitive closure)<br>will also be scanned for model (CTO) files.<br></p><br><p><br>The directory may optionally contain a README.md file which is accessible from the<br>BusinessNetworkMetadata.getREADME method.<br></p><br><p><br>In addition all model files will be added that are not under node_modules<br>and that pass the options.modelFileGlob pattern. By default you should put<br>model files under a directory called 'models'.<br></p><br><p><br>All script (js) files will be added that are not under node_modules and<br>that pass the options.scriptGlob pattern. By default you should put Javascript<br>files under the 'lib' directory.<br></p>
+
+.. js:function:: fromDirectory(path[, options][, options.dependencyGlob][, options.modelFileGlob][, options.scriptGlob])
+
+    
+    :param String path: <p>to a local directory</p>
+    :param Object options: <p>an optional set of options to configure the instance.</p>
+    :param Object options.dependencyGlob: <p>specify the glob pattern used to match<br>the npm dependencies to process. Defaults to **</p>
+    :param boolean options.modelFileGlob: <p>specify the glob pattern used to match<br>the model files to include. Defaults to <strong>\/models/</strong>\/*.cto</p>
+    :param boolean options.scriptGlob: <p>specify the glob pattern used to match<br>the script files to include. Defaults to <strong>\/lib/</strong>\/*.js</p>
+    :return Promise: <p>a Promise to the instantiated business network</p>
+    
+.. _module-cicero-core.rst#.Temp.processDirectory:
+
+
+Function: ``processDirectory``
+==============================
+
+
+
+.. js:function:: processDirectory(path, fileProcessor)
+
+    
+    :param String path: <p>the path to process</p>
+    :param Object fileProcessor: <p>the file processor. It must have<br>accept and process methods.</p>
+    
+.. _module-cicero-core.rst#.Temp.processFile:
+
+
+Function: ``processFile``
+=========================
+
+
+
+.. js:function:: processFile(file, fileProcessor)
+
+    
+    :param String file: <p>the file to process</p>
+    :param Object fileProcessor: <p>the file processor. It must have<br>accepts and process methods.</p>
+    
+.. _module-cicero-core.rst#.Temp.walkSync:
+
+
+Function: ``walkSync``
+======================
+
+
+
+.. js:function:: walkSync(dir, filelist, fileProcessor)
+
+    
+    :param String dir: <p>the dir to walk</p>
+    :param Array.<Object> filelist: <p>input files</p>
+    :param Object fileProcessor: <p>the file processor. It must have<br>accepts and process methods.</p>
+    :return Array.<Object>: <p>filelist - output files</p>
+    
+.. _module-cicero-core.rst#.Temp.accept:
+
+
+Function: ``accept``
+====================
+
+<p>Visitor design pattern</p>
+
+.. js:function:: accept(visitor, parameters)
+
+    
+    :param Object visitor: <p>the visitor</p>
+    :param Object parameters: <p>the parameter</p>
+    :return Object: <p>the result of visiting or null</p>
+    
+.. _module-cicero-core.rst#.Temp.getIntrospector:
+
+
+Function: ``getIntrospector``
+=============================
+
+<p>Provides access to the Introspector for this business network. The Introspector<br>is used to reflect on the types defined within this business network.</p>
+
+.. js:function:: getIntrospector()
+
+    
+    :return Introspector: <p>the Introspector for this business network</p>
+    
+.. _module-cicero-core.rst#.Temp.getFactory:
+
+
+Function: ``getFactory``
+========================
+
+<p>Provides access to the Factory for this business network. The Factory<br>is used to create the types defined in this business network.</p>
+
+.. js:function:: getFactory()
+
+    
+    :return Factory: <p>the Factory for this business network</p>
+    
+.. _module-cicero-core.rst#.Temp.getSerializer:
+
+
+Function: ``getSerializer``
+===========================
+
+<p>Provides access to the Serializer for this business network. The Serializer<br>is used to serialize instances of the types defined within this business network.</p>
+
+.. js:function:: getSerializer()
+
+    
+    :return Serializer: <p>the Serializer for this business network</p>
+    
+.. _module-cicero-core.rst#.Temp.getScriptManager:
+
+
+Function: ``getScriptManager``
+==============================
+
+<p>Provides access to the ScriptManager for this business network. The ScriptManager<br>manage access to the scripts that have been defined within this business network.</p>
+
+.. js:function:: getScriptManager()
+
+    
+    :return ScriptManager: <p>the ScriptManager for this business network</p>
+    
+.. _module-cicero-core.rst#.Temp.getModelManager:
+
+
+Function: ``getModelManager``
+=============================
+
+<p>Provides access to the ModelManager for this business network. The ModelManager<br>manage access to the models that have been defined within this business network.</p>
+
+.. js:function:: getModelManager()
+
+    
+    :return ModelManager: <p>the ModelManager for this business network</p>
+    
+.. _module-cicero-core.rst#.Temp.setReadme:
+
+
+Function: ``setReadme``
+=======================
+
+<p>Set the readme file within the Metadata</p>
+
+.. js:function:: setReadme(readme)
+
+    
+    :param String readme: <p>the readme in markdown for the business network</p>
+    
+.. _module-cicero-core.rst#.Temp.setPackageJson:
+
+
+Function: ``setPackageJson``
+============================
+
+<p>Set the packageJson within the Metadata</p>
+
+.. js:function:: setPackageJson(packageJson)
+
+    
+    :param object packageJson: <p>the JS object for package.json</p>
+    
+
+.. _module-cicero-core.rst#.Temp.modelManager:
+
+Member: ``modelManager``: 
+
+.. _module-cicero-core.rst#.Temp.scriptManager:
+
+Member: ``scriptManager``: 
+
+.. _module-cicero-core.rst#.Temp.introspector:
+
+Member: ``introspector``: 
+
+.. _module-cicero-core.rst#.Temp.factory:
+
+Member: ``factory``: 
+
+.. _module-cicero-core.rst#.Temp.serializer:
+
+Member: ``serializer``: 
+
+.. _module-cicero-core.rst#.Temp.metadata:
+
+Member: ``metadata``: 
+
+.. _module-cicero-core.rst#.Temp.grammar:
+
+Member: ``grammar``: 
+
+.. _module-cicero-core.rst#.Temp.grammarAst:
+
+Member: ``grammarAst``: 
+
+.. _module-cicero-core.rst#.Temp.templatizedGrammar:
+
+Member: ``templatizedGrammar``: 
+
+.. _module-cicero-core.rst#.Temp.grammarAst:
+
+Member: ``grammarAst``: 
+
+.. _module-cicero-core.rst#.Temp.grammar:
+
+Member: ``grammar``: 
+
+.. _module-cicero-core.rst#.Temp.templatizedGrammar:
+
+Member: ``templatizedGrammar``: 
+
+.. _module-cicero-core.rst#.Temp.metadata:
+
+Member: ``metadata``: 
+
+.. _module-cicero-core.rst#.Temp.metadata:
+
+Member: ``metadata``: 
+
+
+
+
