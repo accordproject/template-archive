@@ -19,14 +19,9 @@ const logger = require('./logger');
 // This code is derived from BusinessNetworkMetadata in Hyperleger Composer composer-common.
 
 /**
- * <p>
- * Defines the metadata for a Template. This includes:
- * <ul>
- *   <li>package.json</li>
- *   <li>README.md (optional)</li>
- * </ul>
- * </p>
+ * Defines the metadata for a Template, including the name, version, README markdown.
  * @class
+ * @public
  * @memberof module:cicero-core
  */
 class Metadata {

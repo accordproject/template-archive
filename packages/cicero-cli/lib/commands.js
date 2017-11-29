@@ -21,9 +21,7 @@ const Engine = require('cicero-engine').Engine;
 const fs = require('fs');
 
 /**
- * <p>
- * Commands
- * </p>
+ * Utility class that implements the commands exposed by the Cicero CLI.
  * @class
  * @memberof module:composer-cli
  */

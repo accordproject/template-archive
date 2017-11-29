@@ -20,9 +20,7 @@ const logger = require('cicero-core').logger;
  * <p>
  * A logger class, exposed to logic
  * </p>
- * @private
- * @class
- * @abstract
+ * @public
  * @memberof module:cicero-engine
  */
 class Logger {

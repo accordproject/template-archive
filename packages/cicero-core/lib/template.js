@@ -40,20 +40,19 @@ const ENCODING = 'utf8';
 // This code is derived from BusinessNetworkDefinition in Hyperleger Composer composer-common.
 
 /**
- * <p>
- * Template for a clause.
- * </p>
+ * A template for a legal clause. A Template has a template model, request/response transaction types,
+ * a template grammar (natural language for the template) as well as the business logic to execute the
+ * template.
  * @class
+ * @public
  * @memberof module:cicero-core
  */
 class Template {
 
     /**
      * Create the Template.
-     * <p>
      * <strong>Note: Only to be called by framework code. Applications should
-     * retrieve instances from {@link Clause.fromArchive}</strong>
-     * </p>
+     * retrieve instances from {@link Template.fromArchive}.
      * @param {object} packageJson  - the JS object for package.json
      * @param {String} readme  - the readme in markdown for the clause (optional)
      */
@@ -516,7 +515,7 @@ class Template {
     }
 
     /**
-     * Store a Clause as an archive.
+     * Store a Template as an archive.
      * @param {Object} [options]  - JSZip options
      * @return {Buffer} buffer  - the zlib buffer
      */

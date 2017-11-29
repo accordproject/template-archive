@@ -12,8 +12,6 @@
     "lint": "eslint .",
     "postlint": "npm run licchk",
     "licchk": "license-check",
-    "postlicchk": "npm run doc",
-    "doc": "jsdoc --pedantic --recurse -c jsdoc.json",
     "test": "mocha && nyc mocha"
   },
   "repository": {

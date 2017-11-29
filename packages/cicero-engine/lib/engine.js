@@ -26,9 +26,8 @@ const {
  * <p>
  * Engine class. Stateless execution of clauses against a request object, returning a response to the caller.
  * </p>
- * @private
  * @class
- * @abstract
+ * @public
  * @memberof module:cicero-engine
  */
 class Engine {

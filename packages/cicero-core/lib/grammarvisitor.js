@@ -25,11 +25,11 @@ const util = require('util');
 const debug = require('debug')('cicero:grammarvisitor');
 
 /**
- * Convert composer types to Nearley rules
+ * Converts composer models and types to Nearley rules
  *
  * @private
  * @class
- * @memberof module:composer-common
+ * @memberof module:cicero-core
  */
 class GrammarVisitor {
     /**

@@ -1,14 +1,14 @@
 {
+    "source": {
+        "include": ["packages"],
+        "exclude": ["packages/generator-cicero-template"],
+        "includePattern": ".+\\.js(doc|x)?$",
+        "excludePattern": ".?\/(coverage|out|node_modules|test)\/.+"
+    },
+    "recurseDepth": 10,
     "tags": {
         "allowUnknownTags": true,
         "dictionaries": ["jsdoc","closure"]
-    },
-    "source": {
-        "include": [
-            "./lib",
-            "./index.js"
-        ],
-        "includePattern": ".+\\.js(doc|x)?$"
     },
     "plugins": ["plugins/markdown"],
     "templates": {
@@ -18,7 +18,7 @@
       "dateFormat": "ddd MMM Do YYYY",
       "outputSourceFiles": true,
       "outputSourcePath": true,
-      "systemName": "Smart Clause SDK",
+      "systemName": "Accord Cicero",
       "footer": "",
       "copyright": "Released under the Apache License v2.0",
       "navType": "vertical",

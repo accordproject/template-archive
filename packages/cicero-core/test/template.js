@@ -21,19 +21,8 @@ const chai = require('chai');
 chai.should();
 chai.use(require('chai-things'));
 chai.use(require('chai-as-promised'));
-const sinon = require('sinon');
 
 describe('Template', () => {
-
-    let sandbox;
-
-    beforeEach(() => {
-        sandbox = sinon.sandbox.create();
-    });
-
-    afterEach(() => {
-        sandbox.restore();
-    });
 
     describe('#fromDirectory', () => {
 
@@ -41,31 +30,26 @@ describe('Template', () => {
             return Template.fromDirectory('./test/data/latedeliveryandpenalty').should.be.fulfilled;
         });
 
-        it('should roundtrip a template', () => {
-            return Template.fromDirectory('./test/data/latedeliveryandpenalty')
-                .then((template) => {
-                    template.getIdentifier().should.equal('latedeliveryandpenalty@0.0.1');
-                    template.getModelManager().getModelFile('io.clause.latedeliveryandpenalty').should.not.be.null;
-                    template.getGrammar().should.not.be.null;
-                    template.getScriptManager().getScripts().length.should.equal(1);
-                    template.getMetadata().getREADME().should.not.be.null;
-                    template.getName().should.equal('latedeliveryandpenalty');
-                    template.getDescription().should.equal('Late Delivery and Penalty. In case of delayed delivery except for Force Majeure cases, the Seller shall pay to the Buyer for every 9 DAY of delay penalty amounting to 7% of the total value of the Equipment whose delivery has been delayed. Any fractional part of a DAY is to be considered a full DAY. The total amount of penalty shall not however, exceed 2% of the total value of the Equipment involved in late delivery. If the delay is more than 2 WEEK, the Buyer is entitled to terminate this Contract.');
-                    template.getVersion().should.equal('0.0.1');
-                    return template.toArchive();
-                })
-                .then((buffer) => {
-                    buffer.should.not.be.null;
-                    return Template.fromArchive(buffer);
-                })
-                .then((template) => {
-                    template.getIdentifier().should.equal('latedeliveryandpenalty@0.0.1');
-                    template.getModelManager().getModelFile('io.clause.latedeliveryandpenalty').should.not.be.null;
-                    template.getGrammar().should.not.be.null;
-                    template.getScriptManager().getScripts().length.should.equal(1);
-                    template.getMetadata().getREADME().should.not.be.null;
-                    return template.toArchive();
-                });
+        it('should roundtrip a template', async function() {
+            const template = await Template.fromDirectory('./test/data/latedeliveryandpenalty');
+            template.getIdentifier().should.equal('latedeliveryandpenalty@0.0.1');
+            template.getModelManager().getModelFile('io.clause.latedeliveryandpenalty').should.not.be.null;
+            template.getGrammar().should.not.be.null;
+            template.getScriptManager().getScripts().length.should.equal(1);
+            template.getMetadata().getREADME().should.not.be.null;
+            template.getName().should.equal('latedeliveryandpenalty');
+            template.getDescription().should.equal('Late Delivery and Penalty. In case of delayed delivery except for Force Majeure cases, the Seller shall pay to the Buyer for every 9 DAY of delay penalty amounting to 7% of the total value of the Equipment whose delivery has been delayed. Any fractional part of a DAY is to be considered a full DAY. The total amount of penalty shall not however, exceed 2% of the total value of the Equipment involved in late delivery. If the delay is more than 2 WEEK, the Buyer is entitled to terminate this Contract.');
+            template.getVersion().should.equal('0.0.1');
+            const buffer = await template.toArchive();
+            buffer.should.not.be.null;
+            const template2 = await Template.fromArchive(buffer);
+            template2.getIdentifier().should.equal(template.getIdentifier());
+            template2.getModelManager().getModelFile('io.clause.latedeliveryandpenalty').should.not.be.null;
+            template2.getGrammar().should.not.be.null;
+            template2.getScriptManager().getScripts().length.should.equal(template.getScriptManager().getScripts().length);
+            template2.getMetadata().getREADME().should.equal(template.getMetadata().getREADME());
+            const buffer2 = await template2.toArchive();
+            buffer2.should.not.be.null;
         });
     });
 });

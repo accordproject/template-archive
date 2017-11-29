@@ -22,44 +22,39 @@ const chai = require('chai');
 
 chai.should();
 chai.use(require('chai-things'));
-const sinon = require('sinon');
 
 const fs = require('fs');
 const path = require('path');
 
 describe('Engine', () => {
 
-    let sandbox;
     let engine;
     let clause;
-    let template;
     const testLatePenaltyInput = fs.readFileSync(path.resolve(__dirname, 'data/', 'sample.txt'), 'utf8');
 
-    beforeEach(() => {
-        sandbox = sinon.sandbox.create();
+    beforeEach(async function () {
         engine = new Engine();
-
-        return Template.fromDirectory('./test/data/latedeliveryandpenalty')
-            .then((t) => {
-                template = t;
-                clause = new Clause(template);
-                clause.parse(testLatePenaltyInput);
-            });
+        const template = await Template.fromDirectory('./test/data/latedeliveryandpenalty');
+        clause = new Clause(template);
+        clause.parse(testLatePenaltyInput);
     });
 
-    afterEach(() => {
-        sandbox.restore();
-    });
+    afterEach(() => {});
 
-    describe('#execute', () => {
+    describe('#execute', function () {
 
-        it('should execute a smart clause', () => {
-            const request = {'$class':'io.clause.latedeliveryandpenalty.LateDeliveryAndPenaltyRequest','forceMajeure':false,'agreedDelivery':'2017-10-07T16:38:01.412Z','goodsValue':200,'transactionId':'402c8f50-9e61-433e-a7c1-afe61c06ef00','timestamp':'2017-11-12T17:38:01.412Z'};
-            return engine.execute(clause, request)
-                .then((result) => {
-                    result.should.not.be.null;
-                    result.response.penalty.should.equal(110.00000000000001);
-                });
+        it('should execute a smart clause', async function () {
+            const request = {
+                '$class': 'io.clause.latedeliveryandpenalty.LateDeliveryAndPenaltyRequest',
+                'forceMajeure': false,
+                'agreedDelivery': '2017-10-07T16:38:01.412Z',
+                'goodsValue': 200,
+                'transactionId': '402c8f50-9e61-433e-a7c1-afe61c06ef00',
+                'timestamp': '2017-11-12T17:38:01.412Z'
+            };
+            const result = await engine.execute(clause, request);
+            result.should.not.be.null;
+            result.response.penalty.should.equal(110.00000000000001);
         });
     });
 });

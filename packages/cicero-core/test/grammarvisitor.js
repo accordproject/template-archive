@@ -27,19 +27,8 @@ const chai = require('chai');
 chai.should();
 chai.use(require('chai-things'));
 chai.use(require('chai-as-promised'));
-const sinon = require('sinon');
 
 describe('GrammarVisitor', () => {
-
-    let sandbox;
-
-    beforeEach(() => {
-        sandbox = sinon.sandbox.create();
-    });
-
-    afterEach(() => {
-        sandbox.restore();
-    });
 
     describe('#visit', () => {
 
