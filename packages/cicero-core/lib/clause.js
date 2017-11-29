@@ -29,7 +29,7 @@ const crypto = require('crypto');
 class Clause {
 
     /**
-     * Create the Clause.
+     * Create the Clause and link it to a Template.
      * @param {Template} template  - the template for the clause
      */
     constructor(template) {
@@ -39,7 +39,8 @@ class Clause {
 
     /**
      * Set the data for the clause
-     * @param {object} data  - the data for the clause
+     * @param {object} data  - the data for the clause, must be an instance of the
+     * template model for the clause's template
      */
     setData(data) {
         // verify that data is an instance of the template model
@@ -60,7 +61,7 @@ class Clause {
 
     /**
      * Get the data for the clause
-     * @return {object} - the data for the clause
+     * @return {object} - the data for the clause, or null if it has not been set
      */
     getData() {
         return this.data;
@@ -93,7 +94,8 @@ class Clause {
     }
 
     /**
-     * Returns the identifier for this clause
+     * Returns the identifier for this clause. The identifier is the identifier of
+     * the template plus '-' plus a hash of the data for the clause (if set).
      * @return {String} the identifier of this clause
      */
     getIdentifier() {

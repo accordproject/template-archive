@@ -65,7 +65,6 @@ class Metadata {
      * @param {string} name the template name to check
      * @returns {boolean} true if valid, false otherwise
      *
-     * @memberOf BusinessNetworkMetadata
      * @private
      */
     _validName(name) {

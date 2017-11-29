@@ -15,7 +15,7 @@
 'use strict';
 
 /**
- * Clause Core
+ * Cicero Core - defines the core data types for Cicero.
  * @module cicero-core
  */
 

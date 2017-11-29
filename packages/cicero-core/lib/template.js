@@ -51,7 +51,7 @@ class Template {
 
     /**
      * Create the Template.
-     * <strong>Note: Only to be called by framework code. Applications should
+     * Note: Only to be called by framework code. Applications should
      * retrieve instances from {@link Template.fromArchive}.
      * @param {object} packageJson  - the JS object for package.json
      * @param {String} readme  - the readme in markdown for the clause (optional)
