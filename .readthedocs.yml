@@ -1,0 +1,4 @@
+requirements_file: requirements/docs.txt
+
+python:
+   pip_install: true
