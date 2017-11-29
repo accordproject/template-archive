@@ -1,0 +1,7 @@
+.. _Sphinx: http://sphinx.pocoo.org/
+.. _Sphinx Documentation: http://sphinx.pocoo.org/contents.html
+.. _showing code examples: http://sphinx.pocoo.org/markup/code.html
+.. _reStructuredText: http://docutils.sourceforge.net/rst.html
+.. _rST Reference: http://docutils.sourceforge.net/rst.html#reference-documentation
+.. _directive: http://docutils.sourceforge.net/docs/ref/rst/directives.html
+.. _markdown: http://daringfireball.net/projects/markdown/

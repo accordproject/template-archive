@@ -6,6 +6,8 @@
 Accord Cicero Documentation
 ===================================
 
+.. include:: links.txt
+
 .. toctree::
    :maxdepth: 2
    :caption: Getting Started
