@@ -30,8 +30,8 @@ import os
 # ones.
 extensions = ['sphinx_js']
 
-js_source_path = ' ../packages/cicero-core/lib/ '
-jsdoc_config_path = '../jsdoc.json'
+# js_source_path = ' ../packages/cicero-core/lib/ '
+#  jsdoc_config_path = '../jsdoc.json'
 primary_domain = 'js'
 
 # Add any paths that contain templates here, relative to this directory.
