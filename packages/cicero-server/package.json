@@ -44,10 +44,8 @@
     "sinon": "^4.0.1"
   },
   "dependencies": {
-    "cfenv": "^1.0.4",
     "cicero-core": "^0.2.13",
     "cicero-engine": "^0.2.13",
-    "dat-node": "^3.5.5",
     "express": "^4.16.2"
   },
   "license-check-config": {

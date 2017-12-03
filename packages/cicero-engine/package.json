@@ -45,7 +45,7 @@
   },
   "dependencies": {
     "cicero-core": "^0.2.13",
-    "composer-common": "0.15.1",
+    "composer-common": "^0.16.0",
     "config": "^1.24.0",
     "debug": "^2.6.2",
     "moment": "^2.18.1",
