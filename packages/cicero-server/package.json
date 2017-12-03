@@ -6,8 +6,12 @@
     "node": ">=8",
     "npm": ">=3"
   },
+  "bin": {
+    "cicero-server": "./app.js"
+  },
   "main": "app.js",
   "scripts": {
+    "start": "node app.js",    
     "pretest": "npm run lint",
     "lint": "eslint .",
     "postlint": "npm run licchk",
