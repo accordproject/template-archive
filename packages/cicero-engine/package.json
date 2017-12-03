@@ -1,6 +1,6 @@
 {
   "name": "cicero-engine",
-  "version": "0.2.13",
+  "version": "0.2.14",
   "description": "Cicero Engine - Node.js VM based implementation of Accord Protcol Template Specification execution",
   "engines": {
     "node": ">=8",
@@ -44,7 +44,7 @@
     "sinon": "^4.0.1"
   },
   "dependencies": {
-    "cicero-core": "^0.2.13",
+    "cicero-core": "^0.2.14",
     "composer-common": "^0.16.0",
     "config": "^1.24.0",
     "debug": "^2.6.2",
