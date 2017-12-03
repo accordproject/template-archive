@@ -1,6 +1,6 @@
 {
   "name": "cicero-server",
-  "version": "0.2.14",
+  "version": "0.2.15",
   "description": "Cicero Server - wraps the Cicero Engine and exposes it as a RESTful service",
   "engines": {
     "node": ">=8",
@@ -11,7 +11,7 @@
   },
   "main": "app.js",
   "scripts": {
-    "start": "node app.js",    
+    "start": "node app.js",
     "pretest": "npm run lint",
     "lint": "eslint .",
     "postlint": "npm run licchk",
@@ -55,7 +55,7 @@
   "license-check-config": {
     "src": [
       "**/*.js",
-      "!./app.js",     
+      "!./app.js",
       "!./test/data/**/*",
       "!./coverage/**/*",
       "!./node_modules/**/*",
