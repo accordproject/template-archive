@@ -55,6 +55,7 @@
   "license-check-config": {
     "src": [
       "**/*.js",
+      "!./app.js",     
       "!./test/data/**/*",
       "!./coverage/**/*",
       "!./node_modules/**/*",
