@@ -1,38 +1,37 @@
 {
-  "name": "cicero-core",
+  "name": "cicero-server",
   "version": "0.2.13",
-  "description": "Cicero Core - implementation of Accord Protocol Template Specification",
+  "description": "Cicero Server - wraps the Cicero Engine and exposes it as a RESTful service",
   "engines": {
     "node": ">=8",
     "npm": ">=3"
   },
-  "main": "index.js",
+  "main": "app.js",
   "scripts": {
-    "prepare": "nearleyc ./lib/tdl.ne -o ./lib/tdl.js",
     "pretest": "npm run lint",
     "lint": "eslint .",
     "postlint": "npm run licchk",
     "licchk": "license-check",
-    "test": "mocha && nyc mocha"
+    "test": "echo not implemented"
   },
   "repository": {
     "type": "git",
-    "url": "https://github.com/accordproject/cicero.git"
+    "url": "git+https://github.com/accordproject/cicero.git"
   },
   "keywords": [
     "accord",
-    "cicero",
+    "legal",
+    "tech",
     "smart",
     "contract"
   ],
-  "author": "acccordproject.org",
+  "author": "clause.io",
   "license": "Apache-2.0",
   "bugs": {
     "url": "https://github.com/accordproject/cicero/issues"
   },
   "homepage": "https://github.com/accordproject/cicero#readme",
   "devDependencies": {
-    "browserfs": "^1.1.0",
     "chai": "^3.5.0",
     "chai-as-promised": "^6.0.0",
     "chai-things": "^0.2.0",
@@ -45,22 +44,11 @@
     "sinon": "^4.0.1"
   },
   "dependencies": {
-    "composer-common": "0.15.1",
-    "config": "^1.24.0",
-    "debug": "^2.6.2",
-    "gunzip-maybe": "^1.4.1",
-    "jszip": "^3.1.4",
-    "minimatch": "^3.0.4",
-    "moment": "^2.18.1",
-    "moo": "^0.4.3",
-    "nearley": "^2.11.0",
-    "request-promise-native": "^1.0.5",
-    "stream-to-string": "^1.1.0",
-    "streamifier": "^0.1.1",
-    "tar-fs": "^1.16.0",
-    "tar-stream": "^1.5.5",
-    "tmp-promise": "^1.0.4",
-    "winston": "^2.3.1"
+    "cfenv": "^1.0.4",
+    "cicero-core": "^0.2.13",
+    "cicero-engine": "^0.2.13",
+    "dat-node": "^3.5.5",
+    "express": "^4.16.2"
   },
   "license-check-config": {
     "src": [
@@ -68,8 +56,7 @@
       "!./test/data/**/*",
       "!./coverage/**/*",
       "!./node_modules/**/*",
-      "!./out/**/*",
-      "!./lib/tdl.js"
+      "!./out/**/*"
     ],
     "path": "header.txt",
     "blocking": true,
@@ -88,14 +75,12 @@
     "include": [
       "lib/**/*.js"
     ],
-    "exclude": [
-      "lib/tdl.js"
-    ],
+    "exclude": [],
     "all": true,
     "check-coverage": true,
-    "statements": 86,
-    "branches": 64,
-    "functions": 88,
-    "lines": 85
+    "statements": 93,
+    "branches": 70,
+    "functions": 92,
+    "lines": 93
   }
 }

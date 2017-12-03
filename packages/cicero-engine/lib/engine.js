@@ -128,61 +128,51 @@ class Engine {
      * @return {Promise} a promise that resolves to a result for the clause
      * @private
      */
-    execute(clause, request) {
+    async execute(clause, request) {
 
-        const me = this;
+        // ensure the request is valid
+        const tx = clause.getTemplate().getSerializer().fromJSON(request);
+        tx.validate();
 
-        return new Promise(function (resolve, reject) {
+        logger.debug('Engine processing ' + request.$class);
 
-            try {
-                // ensure the request is valid
-                const tx = clause.getTemplate().getSerializer().fromJSON(request);
-                tx.validate();
+        let script = this.scripts[clause.getIdentifier()];
 
-                logger.debug('Engine processing ' + request.$class);
+        if (!script) {
+            this.compileClause(clause);
+        }
 
-                let script = me.scripts[clause.getIdentifier()];
+        script = this.scripts[clause.getIdentifier()];
 
-                if (!script) {
-                    me.compileClause(clause);
-                }
+        if (!script) {
+            throw new Error('Failed to created executable script for ' + clause.getIdentifier());
+        }
 
-                script = me.scripts[clause.getIdentifier()];
-
-                if (!script) {
-                    throw new Error('Failed to created executable script for ' + clause.getIdentifier());
-                }
-
-                const data = clause.getData();
-                const factory = clause.getTemplate().getFactory();
-                const vm = new VM({
-                    timeout: 1000,
-                    sandbox: {
-                        moment: require('moment'),
-                        logger: new Logger(clause.getTemplate().getSerializer())
-                    }
-                });
-
-                // add immutables to the context
-                vm.freeze(tx, 'request'); // Second argument adds object to global.
-                vm.freeze(data, 'data'); // Second argument adds object to global.
-                vm.freeze(factory, 'factory'); // Second argument adds object to global.
-
-                const response = vm.run(script);
-
-                response.validate();
-                const result = {
-                    'clause': clause.getIdentifier(),
-                    'request': request,
-                    'response': clause.getTemplate().getSerializer().toJSON(response)
-                };
-
-                resolve(result);
-            }
-            catch(err) {
-                reject(err);
+        const data = clause.getData();
+        const factory = clause.getTemplate().getFactory();
+        const vm = new VM({
+            timeout: 1000,
+            sandbox: {
+                moment: require('moment'),
+                logger: new Logger(clause.getTemplate().getSerializer())
             }
         });
+
+        // add immutables to the context
+        vm.freeze(tx, 'request'); // Second argument adds object to global.
+        vm.freeze(data, 'data'); // Second argument adds object to global.
+        vm.freeze(factory, 'factory'); // Second argument adds object to global.
+
+        const response = vm.run(script);
+
+        response.validate();
+        const result = {
+            'clause': clause.getIdentifier(),
+            'request': request,
+            'response': clause.getTemplate().getSerializer().toJSON(response)
+        };
+
+        return result;
     }
 }
 
