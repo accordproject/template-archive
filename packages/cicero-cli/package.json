@@ -1,6 +1,6 @@
 {
   "name": "cicero-cli",
-  "version": "0.2.14",
+  "version": "0.2.16",
   "description": "Cicero CLI",
   "engines": {
     "node": ">=8",
@@ -44,8 +44,8 @@
     "sinon": "^4.0.1"
   },
   "dependencies": {
-    "cicero-core": "^0.2.14",
-    "cicero-engine": "^0.2.14",
+    "cicero-core": "^0.2.16",
+    "cicero-engine": "^0.2.16",
     "composer-common": "^0.16.0",
     "config": "^1.24.0",
     "debug": "^2.6.2",
