@@ -131,7 +131,7 @@ class Engine {
     async execute(clause, request) {
 
         // ensure the request is valid
-        const tx = clause.getTemplate().getSerializer().fromJSON(request, {acceptResourcesForRelationships: true});
+        const tx = clause.getTemplate().getSerializer().fromJSON(request, {permitResourcesForRelationships: true});
         tx.validate();
 
         logger.debug('Engine processing ' + request.$class);
