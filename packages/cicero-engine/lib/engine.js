@@ -166,8 +166,9 @@ class Engine {
         vm.freeze(factory, 'factory'); // Second argument adds object to global.
 
         const response = vm.run(script);
-
+        response.$validator = new ResourceValidator({permitResourcesForRelationships: true});
         response.validate();
+
         const result = {
             'clause': clause.getIdentifier(),
             'request': request,
