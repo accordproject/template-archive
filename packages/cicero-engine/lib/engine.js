@@ -16,6 +16,7 @@
 
 const Logger = require('./logger');
 const logger = require('cicero-core').logger;
+const ResourceValidator = require('composer-common/lib/serializer/resourcevalidator');
 
 const {
     VM,
@@ -131,7 +132,8 @@ class Engine {
     async execute(clause, request) {
 
         // ensure the request is valid
-        const tx = clause.getTemplate().getSerializer().fromJSON(request, {permitResourcesForRelationships: true});
+        const tx = clause.getTemplate().getSerializer().fromJSON(request, {validate: false, acceptResourcesForRelationships: true});
+        tx.$validator = new ResourceValidator({permitResourcesForRelationships: true});
         tx.validate();
 
         logger.debug('Engine processing ' + request.$class);
