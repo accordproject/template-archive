@@ -171,7 +171,7 @@ class Engine {
         const result = {
             'clause': clause.getIdentifier(),
             'request': request,
-            'response': clause.getTemplate().getSerializer().toJSON(response)
+            'response': clause.getTemplate().getSerializer().toJSON(response, {convertResourcesToRelationships: true})
         };
 
         return result;
