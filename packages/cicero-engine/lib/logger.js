@@ -47,7 +47,7 @@ class Logger {
             keys.forEach(function(key) {
                 let element = obj[key];
                 if(element.getType) {
-                    printable[key] = this.serializer.toJSON(element, {validate: false});
+                    printable[key] = this.serializer.toJSON(element, {validate: false, permitResourcesForRelationships: true});
                 }
                 else {
                     printable[key] = element;
