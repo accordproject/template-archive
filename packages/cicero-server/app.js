@@ -54,7 +54,7 @@ app.post('/execute/:template/:data', async function (req, httpResponse, next) {
     console.log('Clause: ' + req.params.data);
     try {
         const template = await Template.fromDirectory(`${process.env.CICERO_DIR}/${req.params.template}`);
-        const data = fs.readFileSync(`${process.env.CICERO_DIR}/${req.params.data}`);
+        const data = fs.readFileSync(`${process.env.CICERO_DIR}/${req.params.template}/${req.params.data}`);
         const clause = new Clause(template);
         if(req.params.data.endsWith('.json')) {
             clause.setData(JSON.parse(data.toString()));
