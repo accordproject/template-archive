@@ -185,12 +185,7 @@ class Template {
         // create the root rule
         writer.write('ROOT -> ');
         for (let rule in rules) {
-            let suffix = '';
-            const element = rules[rule];
-            if (element.type === 'BooleanBinding') {
-                suffix = ':?';
-            }
-            writer.write(`${rule}${suffix} `);
+            writer.write(`${rule} `);
         }
 
         writer.write('\n');
@@ -223,7 +218,7 @@ class Template {
                 dynamicGrammar += this.cleanChunk(element.value);
                 break;
             case 'BooleanBinding':
-                dynamicGrammar += `${element.string.value} {% (d) => {return d[0] !== null;}%} # ${element.fieldName.value}`;
+                dynamicGrammar += `${element.string.value}:? {% (d) => {return d[0] !== null;}%} # ${element.fieldName.value}`;
                 break;
             case 'Binding': {
                 const propertyName = element.fieldName.value;
