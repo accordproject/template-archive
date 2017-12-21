@@ -11,7 +11,7 @@ Cicero is an Open Source implementation of the [Accord Protocol, Template Specif
 
 ## Smart Clauses™
 
-Using Cicero you can take any existing natural language text (typically a clause or a contract) and declaratively bind it to a data model. Cicero generates a parser (using the Earley parser algorithm) to parse and validate source text, extracting machine readable/computable data. The Cicero engine can then be used to execute a Smart Clause™ (an instance of a template) against a JSON payload. Cicero clauses are typically stateless (idempotent) functions. They receive an incoming request and the template data, and they produce a response.
+Using Cicero you can take any existing natural language text (typically a clause or a contract) and declaratively bind it to a data model. Cicero generates a parser (using the Earley parser algorithm) to parse and validate source text, extracting machine readable/computable data. The Cicero engine can then be used to execute a Smart Clause™ (an instance of a template) against a JSON payload. Smart Clause™ software can be used to add computable functionality to any document. Clauses are typically stateless (idempotent) functions. They receive an incoming request and the template data, and they produce a response.
 
 ## Get Involved!
 
