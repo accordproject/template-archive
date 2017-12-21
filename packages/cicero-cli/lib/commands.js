@@ -18,7 +18,14 @@ const logger = require('cicero-core').logger;
 const Template = require('cicero-core').Template;
 const Clause = require('cicero-core').Clause;
 const Engine = require('cicero-engine').Engine;
+const CodeGen = require('composer-common').CodeGen;
+const FileWriter = CodeGen.FileWriter;
 const fs = require('fs');
+const GoLangVisitor = CodeGen.GoLangVisitor;
+const JavaVisitor = CodeGen.JavaVisitor;
+const JSONSchemaVisitor = CodeGen.JSONSchemaVisitor;
+const PlantUMLVisitor = CodeGen.PlantUMLVisitor;
+const TypescriptVisitor = CodeGen.TypescriptVisitor;
 
 /**
  * Utility class that implements the commands exposed by the Cicero CLI.
@@ -68,6 +75,50 @@ class Commands {
                 clause.parse(sampleText);
                 const engine = new Engine();
                 return engine.execute(clause, jsonData);
+            })
+            .catch((err) => {
+                logger.error(err);
+            });
+    }
+
+    /**
+     * Converts the model for a template into code
+     *
+     * @param {string} format the format to generate
+     * @param {string} templatePath to the template directory
+     * @param {string} outputDirectory the output directory
+     * @returns {object} Promise to the result of code generation
+     */
+    static generate(format, templatePath, outputDirectory) {
+
+        return Template.fromDirectory(templatePath)
+            .then((template) => {
+
+                let visitor = null;
+
+                switch(format) {
+                case 'Go':
+                    visitor = new GoLangVisitor();
+                    break;
+                case 'PlantUML':
+                    visitor = new PlantUMLVisitor();
+                    break;
+                case 'Typescript':
+                    visitor = new TypescriptVisitor();
+                    break;
+                case 'Java':
+                    visitor = new JavaVisitor();
+                    break;
+                case 'JSONSchema':
+                    visitor = new JSONSchemaVisitor();
+                    break;
+                default:
+                    throw new Error ('Unrecognized code generator: ' + format );
+                }
+
+                let parameters = {};
+                parameters.fileWriter = new FileWriter(outputDirectory);
+                template.getModelManager().accept(visitor, parameters);
             })
             .catch((err) => {
                 logger.error(err);

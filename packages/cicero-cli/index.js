@@ -62,6 +62,29 @@ require('yargs')
                 logger.error(err.message + ' ' + JSON.stringify(err));
             });
     })
+    .command('generate', 'generate code from the template model', (yargs) => {
+        yargs.option('template', {
+            describe: 'path to the directory with the template'
+        });
+        yargs.option('format', {
+            describe: 'format of the code to generate'
+        });
+        yargs.option('outputDirectory', {
+            describe: 'output directory path'
+        });
+    }, (argv) => {
+        if (argv.verbose) {
+            logger.info(`generate code in format ${argv.format} from the model for template ${argv.template} into directory ${argv.outputDirectory}`);
+        }
+
+        return Commands.generate(argv.format, argv.template, argv.outputDirectory)
+            .then((result) => {
+                logger.info('Completed.');
+            })
+            .catch((err) => {
+                logger.error(err.message + ' ' + JSON.stringify(err));
+            });
+    })
     .option('verbose', {
         alias: 'v',
         default: false
