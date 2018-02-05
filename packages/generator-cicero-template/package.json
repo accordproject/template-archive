@@ -1,6 +1,6 @@
 {
   "name": "generator-cicero-template",
-  "version": "0.2.24",
+  "version": "0.2.25",
   "description": "Code generator for a Cicero Template",
   "engines": {
     "node": ">=8",
