@@ -18,7 +18,7 @@ deploy:
   - provider: script
     script: "./.travis/stable.sh ${TRAVIS_TAG}"
     skip_cleanup: true
-  on:
+  - on:
     tags: true
     repo: accordproject/cicero
 cache:
