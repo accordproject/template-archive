@@ -30,7 +30,8 @@ import os
 # ones.
 extensions = ['sphinx_js']
 
-js_source_path = '../packages/cicero-core/lib/'
+root_for_relative_js_paths = '../packages/'
+js_source_path = ['cicero-core/lib/', 'cicero-engine/lib/']
 jsdoc_config_path = '../jsdoc.json'
 primary_domain = 'js'
 
