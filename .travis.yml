@@ -15,10 +15,9 @@ script: lerna run test 2>&1
 after_failure: tail -n +1 -- /home/travis/.npm/_logs/*-debug.log
 after_success: npm run coverage
 deploy:
-  provider: npm
-  email: dan@clause.io
-  api_key:
-    secure: RG25HQ5mrsNSk3yG5kvrwpwnnI3Ffi/YOv0J3cZGG3QGGRaC6QSFbvYcyAWOVkWWnXFklq6rD22t92c1kXC7+hH/fGx1UR5GJksxoO+pntYONlrhKTxNSE6jUkno+y8PwjP/BEG2fFZPVHoGek3a16ooOO9qXiWNybtPlx23hE/xwaFHezNUm/150dEldo++yXeTElqa0mh1Ce8Cx9l9H6X7LYEROXyQL9Qvno7inmyUCpfol8RTfQTZudf3IgrxFjzGleaEA5jCNng0R5vIzz+ai3aUTm/ettR8He+7zPTMC1N/A618MxZmGHAHsOVbW8WmbR0tahDizYlqcTXPIegI2CyV/ZD8eOQIgavKJFrkNICazqJBJRYbrMp0c1S5sJADc3M6UD03hEGQ7yhlOGM52uD0HO6JYTIIE2mkrfgs+Mpd8/mNrOVC7UTC+4YtlYYtJMbkjmXn5GBQarUW/0uMf8hPyA7VAYIQsh1UQWOsyBdWs2D94kIpKa4vdto5WWDmyXiXgRVcYJnYOM/IeyIlXNEznhFEaD6JK10qSELJ/1LdVNoM06F0jmnRo162YPDe9E05Oo9AtBnZS4e2AsfAo2knem2CeEmAOKjChufw+BG0kHMLHBcWBqkTqnmJP2KqV+mQ66Jw6Gg3RZYq1uC3lx5MFM6L/djETZ9myFQ=
+  - provider: script
+    script: "./.travis/stable.sh ${TRAVIS_TAG}"
+    skip_cleanup: true
   on:
     tags: true
     repo: accordproject/cicero
