@@ -5,8 +5,6 @@ dist: trusty
 before_install: |
   set -e
   date
-  echo "//registry.npmjs.org/:_authToken=\${NPM_TOKEN}" > .npmrc
-  date
 install: |
   set -e
   date
