@@ -1,6 +1,6 @@
 # Cicero
 
-[![Documentation Status](https://readthedocs.org/projects/cicero-docs/badge/?version=latest)](http://cicero-docs.readthedocs.io/en/latest/?badge=latest)
+[![Documentation Status](https://readthedocs.org/projects/accordcicero/badge/?version=latest)](http://accordcicero.readthedocs.io/en/latest/?badge=latest)
 [![Build Status](https://travis-ci.org/accordproject/cicero.svg?branch=master)](https://travis-ci.org/accordproject/cicero)
 [![Coverage Status](https://coveralls.io/repos/github/accordproject/cicero/badge.svg?branch=master)](https://coveralls.io/github/accordproject/cicero?branch=master)
 [![lerna](https://img.shields.io/badge/maintained%20with-lerna-cc00ff.svg)](https://lernajs.io/)
@@ -8,6 +8,8 @@
 ## Introduction
 
 Cicero is an Open Source implementation of the [Accord Protocol, Template Specification](https://docs.google.com/document/d/1UacA_r2KGcBA2D4voDgGE8jqid-Uh4Dt09AE-shBKR0). It defines the structure of natural language templates, bound to a data model, that can be executed using request/response JSON messages.
+
+You can read the latest user documentation here: http://accordcicero.readthedocs.io/en/latest/
 
 ## Smart Clause™
 
