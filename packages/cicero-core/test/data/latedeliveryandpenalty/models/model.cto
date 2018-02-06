@@ -1,6 +1,6 @@
 namespace io.clause.latedeliveryandpenalty
 
-import org.accord.base.*
+import org.accordproject.time.* from github://accordproject/models/master/time.cto
 
 /**
  * Defines the data model for the LateDeliveryAndPenalty template.

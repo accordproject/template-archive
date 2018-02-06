@@ -56,14 +56,14 @@ describe('Clause', () => {
                 $class: 'io.clause.latedeliveryandpenalty.TemplateModel',
                 forceMajeure: false,
                 penaltyDuration : {
-                    $class : 'org.accord.base.Duration',
+                    $class : 'org.accordproject.time.Duration',
                     amount : 1,
                     unit : 'DAY'
                 },
                 penaltyPercentage : 10,
                 capPercentage : 50,
                 termination : {
-                    $class : 'org.accord.base.Duration',
+                    $class : 'org.accordproject.time.Duration',
                     amount : 10,
                     unit : 'DAY'
                 },
@@ -86,19 +86,19 @@ describe('Clause', () => {
                 forceMajeure: true,
                 fractionalPart : 'DAY',
                 penaltyDuration: {
-                    $class: 'org.accord.base.Duration',
+                    $class: 'org.accordproject.time.Duration',
                     amount: 9,
                     unit: 'DAY'
                 },
                 penaltyPercentage: 7,
                 termination: {
-                    $class: 'org.accord.base.Duration',
+                    $class: 'org.accordproject.time.Duration',
                     amount: 2,
                     unit: 'WEEK',
                 }
             };
             clause.getData().should.eql(data);
-            clause.getIdentifier().should.equal('latedeliveryandpenalty@0.0.1-f29b89b0cdced37fca2508346a9fdb425a8523a1ab913d3af77d9ee8fbd56e8e');
+            clause.getIdentifier().should.equal('latedeliveryandpenalty@0.0.1-68cf586ba281f947a8b6e15fe0f8773ad877396167bd2bd91d481b348607d79b');
         });
 
         it('should be able to set the data from conga natural language text', async function() {

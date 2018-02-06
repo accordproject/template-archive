@@ -32,18 +32,18 @@ describe('GrammarVisitor', () => {
 
     describe('#visit', () => {
 
-        it('should generate grammar from a modelmanager', () => {
+        it('should generate grammar from a modelmanager', async () => {
 
             const mm = new ModelManager();
 
-            const base = fs.readFileSync(path.resolve(__dirname, 'data/latedeliveryandpenalty/models', 'base.cto'), 'utf8');
-            mm.addModelFile(base);
-
             const model = fs.readFileSync(path.resolve(__dirname, 'data/latedeliveryandpenalty/models', 'model.cto'), 'utf8');
-            mm.addModelFile(model);
+            mm.addModelFile(model, 'model.cto', true);
 
             const test = fs.readFileSync(path.resolve(__dirname, 'data/latedeliveryandpenalty/models', 'test.cto'), 'utf8');
-            mm.addModelFile(test);
+            mm.addModelFile(test, 'test.cto', true);
+
+            await mm.updateExternalModels();
+            mm.validateModelFiles();
 
             const writer = new Writer();
             const parameters = {
