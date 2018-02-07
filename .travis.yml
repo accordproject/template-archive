@@ -5,8 +5,6 @@ dist: trusty
 before_install: |
   set -e
   date
-  echo "//registry.npmjs.org/:_authToken=\${NPM_TOKEN}" > .npmrc
-  date
 install: |
   set -e
   date
@@ -18,11 +16,12 @@ after_failure: tail -n +1 -- /home/travis/.npm/_logs/*-debug.log
 after_success: npm run coverage
 deploy:
   - provider: script
-    script: "./.travis/unstable.sh ${TRAVIS_TAG}"
+    script: "./.travis/stable.sh ${TRAVIS_TAG}"
     skip_cleanup: true
     on:
       branch: master
-      tags: false
+      tags: true
+      repo: accordproject/cicero
 cache:
   directories:
   - node_modules

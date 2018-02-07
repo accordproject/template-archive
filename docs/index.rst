@@ -35,14 +35,28 @@ Accord Cicero Documentation
 
 .. toctree::
    :maxdepth: 2
-   :caption: CLI and API Reference
+   :caption: CLI Reference
 
    cli
-   api/module-cicero-core
-   api/module-cicero-engine
 
+.. toctree::
+   :maxdepth: 2
+   :caption: Core API
 
-.. autoclass:: Clause(template)
+.. autoclass:: Clause
+   :members:
+
+.. autoclass:: Template
+   :members:
+
+.. autoclass:: Metadata
+   :members:
+
+.. toctree::
+    :maxdepth: 2
+    :caption: Engine API
+
+.. autoclass:: Engine
    :members:
 
 Indices and tables
