@@ -485,6 +485,7 @@ class Template {
 
                 logger.debug(method, 'Adding model files to model manager');
                 template.modelManager.addModelFiles(ctoModelFiles, ctoModelFileNames); // Adds all cto files to model manager
+
                 logger.debug(method, 'Added model files to model manager');
                 logger.debug(method, 'Adding JavaScript files to script manager');
                 jsScriptFiles.forEach(function (obj) {
@@ -651,12 +652,12 @@ class Template {
         }
 
         // grab the package.json
-        let packageJsonContents = fs.readFileSync(fsPath.resolve(path, 'package.json'), ENCODING);
-
-        if (!packageJsonContents) {
+        const packageJsonPath = fsPath.resolve(path, 'package.json');
+        if (!fs.existsSync(packageJsonPath)) {
             throw new Error('Failed to find package.json');
         }
 
+        let packageJsonContents = fs.readFileSync(packageJsonPath, ENCODING);
         logger.debug(method, 'Loaded package.json', packageJsonContents);
 
         // parse the package.json
@@ -742,61 +743,63 @@ class Template {
             }
         });
 
-        template.getModelManager().addModelFiles(modelFiles, modelFileNames);
-        logger.debug(method, 'Added model files', modelFiles.length);
+        template.getModelManager().addModelFiles(modelFiles, modelFileNames, true);
+        return template.getModelManager().updateExternalModels().then(() => {
+            logger.debug(method, 'Added model files', modelFiles.length);
 
-        // find script files outside the npm install directory
-        const scriptFiles = [];
-        Template.processDirectory(path, {
-            accepts: function (file) {
-                return isFileInNodeModuleDir(file, path) === false && minimatch(file, options.scriptGlob, {
-                    dot: true
-                });
-            },
-            acceptsDir: function (dir) {
-                return !isFileInNodeModuleDir(dir, path);
-            },
-            process: function (path, contents) {
-                let filePath = fsPath.parse(path);
-                const jsScript = template.getScriptManager().createScript(path, filePath.ext.toLowerCase(), contents);
-                scriptFiles.push(jsScript);
-                logger.debug(method, 'Found script file ', path);
+            // find script files outside the npm install directory
+            const scriptFiles = [];
+            Template.processDirectory(path, {
+                accepts: function (file) {
+                    return isFileInNodeModuleDir(file, path) === false && minimatch(file, options.scriptGlob, {
+                        dot: true
+                    });
+                },
+                acceptsDir: function (dir) {
+                    return !isFileInNodeModuleDir(dir, path);
+                },
+                process: function (path, contents) {
+                    let filePath = fsPath.parse(path);
+                    const jsScript = template.getScriptManager().createScript(path, filePath.ext.toLowerCase(), contents);
+                    scriptFiles.push(jsScript);
+                    logger.debug(method, 'Found script file ', path);
+                }
+            });
+
+            if (modelFiles.length === 0) {
+                throw new Error('Failed to find a model file.');
             }
+
+            for (let script of scriptFiles) {
+                template.getScriptManager().addScript(script);
+            }
+
+            logger.debug(method, 'Added script files', scriptFiles.length);
+
+            // check the template model
+            template.getTemplateModel();
+
+            // grab the grammar
+            let grammarNe = null;
+
+            try {
+                grammarNe = fs.readFileSync(fsPath.resolve(path, 'grammar/grammar.ne'), ENCODING);
+            } catch (err) {
+                // ignore
+            }
+
+            if (!grammarNe) {
+                let template_txt = fs.readFileSync(fsPath.resolve(path, 'grammar/template.tem'), ENCODING);
+                template.buildGrammar(template_txt);
+                logger.debug(method, 'Loaded template.tem', template_txt);
+            } else {
+                logger.debug(method, 'Loaded grammar.ne', grammarNe);
+                template.setGrammar(grammarNe);
+            }
+
+            logger.exit(method, path);
+            return Promise.resolve(template);
         });
-
-        if (modelFiles.length === 0) {
-            throw new Error('Failed to find a model file.');
-        }
-
-        for (let script of scriptFiles) {
-            template.getScriptManager().addScript(script);
-        }
-
-        logger.debug(method, 'Added script files', scriptFiles.length);
-
-        // check the template model
-        template.getTemplateModel();
-
-        // grab the grammar
-        let grammarNe = null;
-
-        try {
-            grammarNe = fs.readFileSync(fsPath.resolve(path, 'grammar/grammar.ne'), ENCODING);
-        } catch (err) {
-            // ignore
-        }
-
-        if (!grammarNe) {
-            let template_txt = fs.readFileSync(fsPath.resolve(path, 'grammar/template.tem'), ENCODING);
-            template.buildGrammar(template_txt);
-            logger.debug(method, 'Loaded template.tem', template_txt);
-        } else {
-            logger.debug(method, 'Loaded grammar.ne', grammarNe);
-            template.setGrammar(grammarNe);
-        }
-
-        logger.exit(method, path);
-        return Promise.resolve(template);
     }
 
     /**

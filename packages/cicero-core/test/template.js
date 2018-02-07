@@ -15,6 +15,7 @@
 'use strict';
 
 const Template = require('../lib/template');
+const nearley = require('nearley');
 
 const chai = require('chai');
 
@@ -50,6 +51,36 @@ describe('Template', () => {
             template2.getMetadata().getREADME().should.equal(template.getMetadata().getREADME());
             const buffer2 = await template2.toArchive();
             buffer2.should.not.be.null;
+        });
+
+        it('should throw an error if multiple template models are found', async () => {
+            return Template.fromDirectory('./test/data/multiple-concepts').should.be.rejectedWith('Found multiple concepts decorated with @AccordTemplateModel');
+        });
+
+        it('should throw an error if no template models are found', async () => {
+            return Template.fromDirectory('./test/data/no-concepts').should.be.rejectedWith('Failed to find the template model. Decorate a concept with @AccordTemplateModel("conga").');
+        });
+
+        it('should throw an error if a package.json file does not exist', async () => {
+            return (() => Template.fromDirectory('./test/data/no-packagejson')).should.throw('Failed to find package.json');
+        });
+
+    });
+
+    describe('#getParser', () => {
+
+        it('should throw an error if called before calling setGrammar or buildGrammar', async () => {
+            const template = new Template({
+                'name': 'conga',
+                'version': '0.0.1',
+                'description': '"Dan Selman" agrees to spend 100.0 conga coins on "swag"'
+            });
+            return (() => template.getParser()).should.throw('Must call setGrammar or buildGrammar before calling getParser');
+        });
+
+        it('should return a parser object', async () => {
+            const template = await Template.fromDirectory('./test/data/latedeliveryandpenalty');
+            return template.getParser().should.be.an.instanceof(nearley.Parser);
         });
     });
 });
