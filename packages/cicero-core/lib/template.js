@@ -484,30 +484,28 @@ class Template {
                 template = new Template(packageJsonContents, readmeContents);
 
                 logger.debug(method, 'Adding model files to model manager');
-                template.modelManager.addModelFiles(ctoModelFiles, ctoModelFileNames, true); // Adds all cto files to model manager
-                return template.getModelManager().updateExternalModels().then(() => {
-                    template.getModelManager().validateModelFiles();
-                    logger.debug(method, 'Added model files to model manager');
-                    logger.debug(method, 'Adding JavaScript files to script manager');
-                    jsScriptFiles.forEach(function (obj) {
-                        let jsObject = template.scriptManager.createScript(obj.name, 'js', obj.contents);
-                        template.scriptManager.addScript(jsObject); // Adds all js files to script manager
-                    });
-                    logger.debug(method, 'Added JavaScript files to script manager');
+                template.modelManager.addModelFiles(ctoModelFiles, ctoModelFileNames); // Adds all cto files to model manager
 
-                    // check the template model
-                    template.getTemplateModel();
-
-                    logger.debug(method, 'Setting grammar');
-                    if (grammar) {
-                        template.setGrammar(grammar);
-                    } else {
-                        template.buildGrammar(templatizedGrammar);
-                    }
-
-                    logger.exit(method, template.toString());
-                    return template; // Returns template
+                logger.debug(method, 'Added model files to model manager');
+                logger.debug(method, 'Adding JavaScript files to script manager');
+                jsScriptFiles.forEach(function (obj) {
+                    let jsObject = template.scriptManager.createScript(obj.name, 'js', obj.contents);
+                    template.scriptManager.addScript(jsObject); // Adds all js files to script manager
                 });
+                logger.debug(method, 'Added JavaScript files to script manager');
+
+                // check the template model
+                template.getTemplateModel();
+
+                logger.debug(method, 'Setting grammar');
+                if (grammar) {
+                    template.setGrammar(grammar);
+                } else {
+                    template.buildGrammar(templatizedGrammar);
+                }
+
+                logger.exit(method, template.toString());
+                return template; // Returns template
             });
         });
     }
@@ -654,12 +652,12 @@ class Template {
         }
 
         // grab the package.json
-        let packageJsonContents = fs.readFileSync(fsPath.resolve(path, 'package.json'), ENCODING);
-
-        if (!packageJsonContents) {
+        const packageJsonPath = fsPath.resolve(path, 'package.json');
+        if (!fs.existsSync(packageJsonPath)) {
             throw new Error('Failed to find package.json');
         }
 
+        let packageJsonContents = fs.readFileSync(packageJsonPath, ENCODING);
         logger.debug(method, 'Loaded package.json', packageJsonContents);
 
         // parse the package.json
@@ -747,7 +745,6 @@ class Template {
 
         template.getModelManager().addModelFiles(modelFiles, modelFileNames, true);
         return template.getModelManager().updateExternalModels().then(() => {
-            template.getModelManager().validateModelFiles();
             logger.debug(method, 'Added model files', modelFiles.length);
 
             // find script files outside the npm install directory

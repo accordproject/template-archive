@@ -13,7 +13,7 @@
     "lint": "eslint .",
     "postlint": "npm run licchk",
     "licchk": "license-check",
-    "test": "mocha && nyc mocha"
+    "test": "nyc mocha --recursive -t 10000"
   },
   "repository": {
     "type": "git",
