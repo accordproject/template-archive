@@ -19,6 +19,7 @@ const fs = require('fs');
 const fsPath = require('path');
 const JSZip = require('jszip');
 const minimatch = require('minimatch');
+const glob = require('glob');
 const Factory = require('composer-common').Factory;
 const RelationshipDeclaration = require('composer-common').RelationshipDeclaration;
 const Introspector = require('composer-common').Introspector;
@@ -55,15 +56,16 @@ class Template {
      * retrieve instances from {@link Template.fromArchive}.
      * @param {object} packageJson  - the JS object for package.json
      * @param {String} readme  - the readme in markdown for the clause (optional)
+     * @param {object} samples - the sample text for the template in different locales (optional)
      */
-    constructor(packageJson, readme) {
+    constructor(packageJson, readme, samples) {
 
         this.modelManager = new ModelManager();
         this.scriptManager = new ScriptManager(this.modelManager);
         this.introspector = new Introspector(this.modelManager);
         this.factory = new Factory(this.modelManager);
         this.serializer = new Serializer(this.factory, this.modelManager);
-        this.metadata = new Metadata(packageJson, readme);
+        this.metadata = new Metadata(packageJson, readme, samples);
         this.grammar = null;
         this.grammarAst = null;
         this.templatizedGrammar = null;
@@ -395,6 +397,7 @@ class Template {
             let ctoModelFiles = [];
             let ctoModelFileNames = [];
             let jsScriptFiles = [];
+            let sampleTextFiles = {};
             let template;
             let readmeContents = null;
             let packageJsonContents = null;
@@ -411,6 +414,26 @@ class Template {
                     readmeContents = contents;
                 });
             }
+
+            logger.debug(method, 'Looking for sample files');
+            // Matches any file which is in the root folder and has the naming pattern
+            // 'sample.txt' or 'sample_XX.txt' where XX is a two letter language code
+            let sampleFiles = zip.file(/sample(_[a-z]{2})?\.txt$/);
+            sampleFiles.forEach(function (file) {
+                logger.debug(method, 'Found sample file, loading it', file.name);
+                promise = promise.then(() => {
+                    return file.async('string');
+                }).then((contents) => {
+                    logger.debug(method, 'Loaded sample file');
+                    let matches = file.name.match(/sample_([a-z]{2})?\.txt$/);
+                    let locale = 'default';
+                    // No match found
+                    if(!matches[1]){
+                        locale = matches[1];
+                    }
+                    sampleTextFiles[locale] = contents;
+                });
+            });
 
             logger.debug(method, 'Loading package.json');
             let packageJson = zip.file('package.json');
@@ -481,7 +504,7 @@ class Template {
 
             return promise.then(() => {
                 logger.debug(method, 'Loaded package.json');
-                template = new Template(packageJsonContents, readmeContents);
+                template = new Template(packageJsonContents, readmeContents, sampleTextFiles);
 
                 logger.debug(method, 'Adding model files to model manager');
                 template.modelManager.addModelFiles(ctoModelFiles, ctoModelFileNames); // Adds all cto files to model manager
@@ -660,12 +683,37 @@ class Template {
         let packageJsonContents = fs.readFileSync(packageJsonPath, ENCODING);
         logger.debug(method, 'Loaded package.json', packageJsonContents);
 
+        logger.debug(method, 'Looking for sample files');
+        let sampleTextFiles = {};
+        // Matches any file which is in the root folder and has the naming pattern
+        // 'sample.txt' or 'sample_XX.txt' where XX is a two letter language code
+        let sampleFiles = glob.sync('@(sample.txt|sample_[a-z][a-z].txt)', { cwd: fsPath.resolve(path) });
+        if (sampleFiles.length === 0){
+            throw new Error('Failed to find any sample files. e.g. sample.txt, sample_fr.txt');
+        }
+        sampleFiles.forEach(function (file) {
+            logger.debug(method, 'Found sample file, loading it: ' + file);
+            const sampleFilePath = fsPath.resolve(path, file);
+            const sampleFileContents = fs.readFileSync(sampleFilePath, ENCODING);
+            logger.debug(method, 'Loaded ' + file, sampleFileContents);
+
+            let matches = file.match(/sample_([a-z]{2})?\.txt$/);
+            let locale = 'default';
+
+            // No match found
+            if(matches !== null && !matches[1]){
+                locale = matches[1];
+            }
+            logger.debug(method, 'Using locale', locale);
+            sampleTextFiles[locale] = sampleFileContents;
+        });
+
         // parse the package.json
         let jsonObject = JSON.parse(packageJsonContents);
         let packageName = jsonObject.name;
 
         // create the template
-        const template = new Template(jsonObject, readmeContents);
+        const template = new Template(jsonObject, readmeContents, sampleTextFiles);
         const modelFiles = [];
         const modelFileNames = [];
 
@@ -918,12 +966,33 @@ class Template {
     }
 
     /**
+     * Set the samples within the Metadata
+     * @param {object} samples the samples for the tempalte
+     * @private
+     */
+    setSamples(samples) {
+        this.metadata = new Metadata(this.metadata.getPackageJson(), this.metadata.getREADME(), samples);
+    }
+
+    /**
+     * Set a locale-specified sample within the Metadata
+     * @param {object} sample the samples for the template
+     * @param {string} locale the two letter ISO 639-1 code for the language
+     * @private
+     */
+    setSample(sample, locale) {
+        const samples = this.metadata.getSamples();
+        samples[locale] = sample;
+        this.metadata = new Metadata(this.metadata.getPackageJson(), this.metadata.getREADME(), samples);
+    }
+
+    /**
      * Set the readme file within the Metadata
      * @param {String} readme the readme in markdown for the business network
      * @private
      */
     setReadme(readme) {
-        this.metadata = new Metadata(this.metadata.getPackageJson(), readme);
+        this.metadata = new Metadata(this.metadata.getPackageJson(), readme, this.metadata.getSamples());
     }
 
     /**
@@ -932,7 +1001,7 @@ class Template {
      * @private
      */
     setPackageJson(packageJson) {
-        this.metadata = new Metadata(packageJson, this.metadata.getREADME());
+        this.metadata = new Metadata(packageJson, this.metadata.getREADME(), this.metadata.getSamples());
     }
 
 }

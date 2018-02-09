@@ -74,6 +74,10 @@ describe('Template', () => {
                 'name': 'conga',
                 'version': '0.0.1',
                 'description': '"Dan Selman" agrees to spend 100.0 conga coins on "swag"'
+            },
+            null,
+            {
+                'default':'"Dan Selman" agrees to spend 100.0 conga coins on "swag"',
             });
             return (() => template.getParser()).should.throw('Must call setGrammar or buildGrammar before calling getParser');
         });
