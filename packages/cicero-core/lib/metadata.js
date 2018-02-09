@@ -38,7 +38,7 @@ class Metadata {
      */
     constructor(packageJson, readme, samples) {
         const method = 'constructor';
-        logger.entry(method, readme);
+        logger.entry(method, readme, samples);
 
         if(!packageJson || typeof(packageJson) !== 'object') {
             throw new Error('package.json is required and must be an object');
@@ -97,7 +97,7 @@ class Metadata {
      * If no locale is specified returns the default sample if it has been specified.
      *
      * @param {string} locale the two letter ISO 639-1 code for the language
-     * @return {string} the sample file for the template in the given {@link locale} or null
+     * @return {string} the sample file for the template in the given locale or null
      */
     getSample(locale) {
         if(!locale && 'default' in this.samples){

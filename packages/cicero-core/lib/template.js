@@ -423,17 +423,18 @@ class Template {
             logger.debug(method, 'Looking for sample files');
             let sampleFiles = zip.file(SAMPLE_FILE_REGEXP);
             sampleFiles.forEach(function (file) {
-                logger.debug(method, 'Found sample file, loading it', file.name);
+                logger.debug(method, 'Found sample file, loading it', file);
                 promise = promise.then(() => {
                     return file.async('string');
                 }).then((contents) => {
                     logger.debug(method, 'Loaded sample file');
-                    let matches = file.name.match(`sample(_${languageTagRegex()})?.txt$`);
+                    let matches = file.name.match(SAMPLE_FILE_REGEXP);
                     let locale = 'default';
-                    // No match found
-                    if(!matches[1]){
-                        locale = matches[1];
+                    // Locale match found
+                    if(matches !== null && matches[2]){
+                        locale = matches[2];
                     }
+                    logger.debug(method, 'Using sample file locale, ' + locale);
                     sampleTextFiles[locale] = contents;
                 });
             });
@@ -561,6 +562,20 @@ class Template {
         // save the README.md if present
         if (this.getMetadata().getREADME()) {
             zip.file('README.md', this.getMetadata().getREADME(), options);
+        }
+
+        // Save the sample files
+        const sampleFiles = this.getMetadata().getSamples();
+        if(sampleFiles){
+            Object.keys(sampleFiles).forEach(function (locale) {
+                let fileName;
+                if(locale === 'default'){
+                    fileName = 'sample.txt';
+                } else {
+                    fileName = `sample_${locale}.txt`;
+                }
+                zip.file(fileName, sampleFiles[locale], options);
+            });
         }
 
         let modelManager = this.getModelManager();
@@ -693,8 +708,9 @@ class Template {
             throw new Error('Failed to find any sample files. e.g. sample.txt, sample_fr.txt');
         }
         sampleFiles.forEach(function (file) {
-            if(!file.match(SAMPLE_FILE_REGEXP)){
-                throw new Error('Invalid Locale used in sample file, ' + file + '. Locales should be IEFT language tags, e.g. sample_fr.txt');
+            const matches = file.match(SAMPLE_FILE_REGEXP);
+            if(file !== 'sample.txt' && matches === null){
+                throw new Error('Invalid locale used in sample file, ' + file + '. Locales should be IETF language tags, e.g. sample_fr.txt');
             }
 
             logger.debug(method, 'Found sample file, loading it: ' + file);
@@ -702,14 +718,12 @@ class Template {
             const sampleFileContents = fs.readFileSync(sampleFilePath, ENCODING);
             logger.debug(method, 'Loaded ' + file, sampleFileContents);
 
-            let matches = file.match(/sample_([a-z]{2})?\.txt$/);
             let locale = 'default';
-
-            // No match found
-            if(matches !== null && !matches[1]){
-                locale = matches[1];
+            // Match found
+            if(matches !== null && matches[2]){
+                locale = matches[2];
             }
-            logger.debug(method, 'Using locale', locale);
+            logger.debug(method, 'Using sample file locale', locale);
             sampleTextFiles[locale] = sampleFileContents;
         });
 
