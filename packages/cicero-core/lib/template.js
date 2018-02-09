@@ -20,6 +20,8 @@ const fsPath = require('path');
 const JSZip = require('jszip');
 const minimatch = require('minimatch');
 const glob = require('glob');
+const xregexp = require('xregexp');
+const languageTagRegex = require('ietf-language-tag-regex');
 const Factory = require('composer-common').Factory;
 const RelationshipDeclaration = require('composer-common').RelationshipDeclaration;
 const Introspector = require('composer-common').Introspector;
@@ -37,6 +39,9 @@ const templateGrammar = require('./tdl.js');
 const GrammarVisitor = require('./grammarvisitor');
 
 const ENCODING = 'utf8';
+// Matches 'sample.txt' or 'sample_TAG.txt' where TAG is an IETF language tag (BCP 47)
+const IETF_REGEXP = languageTagRegex({ exact: false }).toString().slice(1,-2);
+const SAMPLE_FILE_REGEXP = xregexp('sample(_(' + IETF_REGEXP + '))?.txt$');
 
 // This code is derived from BusinessNetworkDefinition in Hyperleger Composer composer-common.
 
@@ -416,16 +421,14 @@ class Template {
             }
 
             logger.debug(method, 'Looking for sample files');
-            // Matches any file which is in the root folder and has the naming pattern
-            // 'sample.txt' or 'sample_XX.txt' where XX is a two letter language code
-            let sampleFiles = zip.file(/sample(_[a-z]{2})?\.txt$/);
+            let sampleFiles = zip.file(SAMPLE_FILE_REGEXP);
             sampleFiles.forEach(function (file) {
                 logger.debug(method, 'Found sample file, loading it', file.name);
                 promise = promise.then(() => {
                     return file.async('string');
                 }).then((contents) => {
                     logger.debug(method, 'Loaded sample file');
-                    let matches = file.name.match(/sample_([a-z]{2})?\.txt$/);
+                    let matches = file.name.match(`sample(_${languageTagRegex()})?.txt$`);
                     let locale = 'default';
                     // No match found
                     if(!matches[1]){
@@ -685,13 +688,15 @@ class Template {
 
         logger.debug(method, 'Looking for sample files');
         let sampleTextFiles = {};
-        // Matches any file which is in the root folder and has the naming pattern
-        // 'sample.txt' or 'sample_XX.txt' where XX is a two letter language code
-        let sampleFiles = glob.sync('@(sample.txt|sample_[a-z][a-z].txt)', { cwd: fsPath.resolve(path) });
+        let sampleFiles = glob.sync('@(sample.txt|sample_*.txt)', { cwd: fsPath.resolve(path) });
         if (sampleFiles.length === 0){
             throw new Error('Failed to find any sample files. e.g. sample.txt, sample_fr.txt');
         }
         sampleFiles.forEach(function (file) {
+            if(!file.match(SAMPLE_FILE_REGEXP)){
+                throw new Error('Invalid Locale used in sample file, ' + file + '. Locales should be IEFT language tags, e.g. sample_fr.txt');
+            }
+
             logger.debug(method, 'Found sample file, loading it: ' + file);
             const sampleFilePath = fsPath.resolve(path, file);
             const sampleFileContents = fs.readFileSync(sampleFilePath, ENCODING);

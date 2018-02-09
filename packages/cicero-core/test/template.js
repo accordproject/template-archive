@@ -65,6 +65,14 @@ describe('Template', () => {
             return (() => Template.fromDirectory('./test/data/no-packagejson')).should.throw('Failed to find package.json');
         });
 
+        it('should create a template from a directory with a locale sample', () => {
+            return Template.fromDirectory('./test/data/locales-conga').should.be.fulfilled;
+        });
+
+        it('should throw an error if a sample.txt file does not exist', async () => {
+            return (() => Template.fromDirectory('./test/data/no-sample')).should.throw('Failed to find any sample files. e.g. sample.txt, sample_fr.txt');
+        });
+
     });
 
     describe('#getParser', () => {
