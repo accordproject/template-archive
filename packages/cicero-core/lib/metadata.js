@@ -96,16 +96,16 @@ class Metadata {
      * Returns the sample for this template in the given locale. This may be null.
      * If no locale is specified returns the default sample if it has been specified.
      *
-     * @param {string} locale the two letter ISO 639-1 code for the language
+     * @param {string} locale the IETF language code for the language
      * @return {string} the sample file for the template in the given locale or null
      */
     getSample(locale) {
         if(!locale && 'default' in this.samples){
             return this.samples.default;
-        } else if (!locale && !(locale in this.samples)){
-            return null;
-        } else {
+        } else if (locale && locale in this.samples){
             return this.samples[locale];
+        } else {
+            return null;
         }
     }
 
