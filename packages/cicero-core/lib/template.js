@@ -662,7 +662,6 @@ class Template {
 
         // parse the package.json
         let jsonObject = JSON.parse(packageJsonContents);
-        let packageName = jsonObject.name;
 
         // create the template
         const template = new Template(jsonObject, readmeContents);
@@ -675,7 +674,7 @@ class Template {
         const isFileInNodeModuleDir = function (file, basePath) {
             const method = 'isFileInNodeModuleDir';
             let filePath = fsPath.parse(file);
-            let subPath = filePath.dir.substring(basePath.length);
+            let subPath = filePath.dir.substring(basePath.length-1);
             let result = subPath.split(fsPath.sep).some((element) => {
                 return element === 'node_modules';
             });
@@ -684,49 +683,7 @@ class Template {
             return result;
         };
 
-        // process each module dependency
-        // filtering using a glob on the module dependency name
-        if (jsonObject.dependencies) {
-            logger.debug(method, 'All dependencies', Object.keys(jsonObject.dependencies).toString());
-            const dependencies = Object.keys(jsonObject.dependencies).filter(minimatch.filter(options.dependencyGlob, {
-                dot: true
-            }));
-            logger.debug(method, 'Matched dependencies', dependencies);
-
-            for (let dep of dependencies) {
-                // find all the *.cto files under the npm install dependency path
-                let dependencyPath = fsPath.resolve(path, 'node_modules', dep);
-                logger.debug(method, 'Checking dependency path', dependencyPath);
-                if (!fs.existsSync(dependencyPath)) {
-                    // need to check to see if this is in a peer directory as well
-                    //
-                    logger.debug(method, 'trying different path ' + path.replace(packageName, ''));
-                    dependencyPath = fsPath.resolve(path.replace(packageName, ''), dep);
-                    if (!fs.existsSync(dependencyPath)) {
-                        throw new Error('npm dependency path ' + dependencyPath + ' does not exist. Did you run npm install?');
-                    }
-                }
-
-                Template.processDirectory(dependencyPath, {
-                    accepts: function (file) {
-                        return isFileInNodeModuleDir(file, dependencyPath) === false && minimatch(file, options.modelFileGlob, {
-                            dot: true
-                        });
-                    },
-                    acceptsDir: function (dir) {
-                        return !isFileInNodeModuleDir(dir, dependencyPath);
-                    },
-                    process: function (path, contents) {
-                        modelFiles.push(contents);
-                        modelFileNames.push(path);
-                        logger.debug(method, 'Found model file', path);
-                    }
-                });
-            }
-        }
-
         // find CTO files outside the npm install directory
-        //
         Template.processDirectory(path, {
             accepts: function (file) {
                 return isFileInNodeModuleDir(file, path) === false && minimatch(file, options.modelFileGlob, {
