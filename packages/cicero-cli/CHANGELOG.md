@@ -3,6 +3,14 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+<a name="0.2.40"></a>
+## [0.2.40](https://github.com/accordproject/cicero/compare/v0.2.38...v0.2.40) (2018-02-12)
+
+
+
+
+**Note:** Version bump only for package cicero-cli
+
 <a name="0.2.38"></a>
 ## [0.2.38](https://github.com/accordproject/cicero/compare/v0.2.37...v0.2.38) (2018-02-12)
 
