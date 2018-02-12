@@ -1,5 +1,8 @@
 {
     "name": "<%= data.templateName %>",
     "version": "0.0.0",
-    "description": "Name of the person to greet: \"Dan\".\nThank you!"
+    "description": "Name of the person to greet: \"Dan\".\nThank you!",
+    "engines": {
+      "cicero": "^<%= data.engineVersion %>"
+    }
   }
