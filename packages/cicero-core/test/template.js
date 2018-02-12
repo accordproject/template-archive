@@ -78,7 +78,7 @@ describe('Template', () => {
         it('should throw an error if the locale is not in the IETF format', async () => {
             return (() => Template.fromDirectory('./test/data/bad-locale')).should.throw('Invalid locale used in sample file, sample_!.txt. Locales should be IETF language tags, e.g. sample_fr.txt');
         });
-      
+
         // Test case for issue #23
         it('should create template from a directory that has node_modules with duplicate namespace', () => {
             return Template.fromDirectory('./test/data/with-node_modules').should.be.fulfilled;

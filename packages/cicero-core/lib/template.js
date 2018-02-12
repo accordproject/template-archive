@@ -61,7 +61,7 @@ class Template {
      * retrieve instances from {@link Template.fromArchive}.
      * @param {object} packageJson  - the JS object for package.json
      * @param {String} readme  - the readme in markdown for the clause (optional)
-     * @param {object} samples - the sample text for the template in different locales (optional)
+     * @param {object} samples - the sample text for the template in different locales
      */
     constructor(packageJson, readme, samples) {
 
@@ -953,7 +953,7 @@ class Template {
     /**
      * Set a locale-specified sample within the Metadata
      * @param {object} sample the samples for the template
-     * @param {string} locale the two letter ISO 639-1 code for the language
+     * @param {string} locale the IETF Language Tag (BCP 47) for the language
      * @private
      */
     setSample(sample, locale) {

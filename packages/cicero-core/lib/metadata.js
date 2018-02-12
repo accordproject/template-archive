@@ -34,7 +34,14 @@ class Metadata {
      * </p>
      * @param {object} packageJson  - the JS object for package.json (required)
      * @param {String} readme  - the README.md for the template (may be null)
-     * @param {object} samples - the sample text for the template in different locales
+     * @param {object} samples - the sample text for the template in different locales,
+     * represented as an object whose keys are the locales and whose values are the sample text.
+     * For example: 
+     *  {
+     *      default: 'default sample text',
+     *      en: 'sample text in english',
+     *      fr: 'exemple de texte français'
+     *  }
      */
     constructor(packageJson, readme, samples) {
         const method = 'constructor';
