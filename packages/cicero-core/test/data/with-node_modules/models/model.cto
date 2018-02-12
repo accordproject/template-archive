@@ -1,0 +1,25 @@
+namespace org.accordproject.conga
+
+/**
+ * Defines the data model for the Conga template.
+ */
+@AccordTemplateModel("conga")
+concept TemplateModel {
+  o Double amount
+  o String swag
+  --> Participant participant
+}
+
+/**
+ * Defines the input data required by the template
+ */
+transaction Payup {
+}
+
+/**
+ * Defines the output data for the template
+ */
+transaction Response {
+  o String name
+  o Double amount
+}

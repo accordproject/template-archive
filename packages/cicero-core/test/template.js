@@ -65,6 +65,11 @@ describe('Template', () => {
             return (() => Template.fromDirectory('./test/data/no-packagejson')).should.throw('Failed to find package.json');
         });
 
+        // Test case for issue #23
+        it('should create template from a directory that has node_modules with duplicate namespace', () => {
+            return Template.fromDirectory('./test/data/with-node_modules').should.be.fulfilled;
+        });
+
     });
 
     describe('#getParser', () => {

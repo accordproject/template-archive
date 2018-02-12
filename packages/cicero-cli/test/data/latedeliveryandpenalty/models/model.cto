@@ -1,0 +1,100 @@
+namespace org.accordproject.latedeliveryandpenalty
+
+/**
+ * Units for a duration. 24 hour days are assumed.
+ */
+enum TemporalUnit {
+  o SECOND
+  o MINUTE
+  o HOUR
+  o DAY
+  o WEEK
+  o YEAR
+}
+
+/**
+ * A duration. For example, 6 hours.
+ */
+concept Duration {
+  o Long amount
+  o TemporalUnit unit
+}
+
+/**
+ * Defines the data model for the LateDeliveryAndPenalty template.
+ * This defines the structure of the abstract syntax tree that the parser for the template
+ * must generate from input source text.
+ */
+@AccordTemplateModel("latedeliveryandpenalty")
+concept TemplateModel {
+  /**
+   * Does the clause include a force majeure provision?
+   */
+  o Boolean forceMajeure
+
+  /**
+   * For every penaltyDuration that the goods are late
+   */
+  o Duration penaltyDuration
+
+  /**
+   * Seller pays the buyer penaltyPercentage % of the value of the goods
+   */
+  o Double penaltyPercentage
+
+  /**
+   * Up to capPercentage % of the value of the goods
+   */
+  o Double capPercentage
+
+  /**
+   * If the goods are >= termination late then the buyer may terminate the contract
+   */
+  o Duration termination
+
+  /**
+   * Fractional part of a ... is considered a whole ...
+   */
+  o TemporalUnit fractionalPart
+}
+
+/**
+ * Defines the input data required by the template
+ */
+transaction LateDeliveryAndPenaltyRequest {
+
+  /**
+   * Are we in a force majeure situation? 
+   */
+  o Boolean forceMajeure
+
+  /**
+   * What was the agreed delivery date for the goods?
+   */
+  o DateTime agreedDelivery
+
+  /**
+   * If the goods have been delivered, when where they delivered?
+   */
+  o DateTime deliveredAt optional
+
+  /**
+   * What is the value of the goods?
+   */
+  o Double goodsValue
+}
+
+/**
+ * Defines the output data for the template
+ */
+transaction LateDeliveryAndPenaltyResponse {
+  /**
+   * The penalty to be paid by the seller
+   */
+  o Double penalty
+
+  /**
+   * Whether the buyer may terminate the contract 
+   */
+  o Boolean buyerMayTerminate
+}
