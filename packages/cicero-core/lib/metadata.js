@@ -36,12 +36,14 @@ class Metadata {
      * @param {String} readme  - the README.md for the template (may be null)
      * @param {object} samples - the sample text for the template in different locales,
      * represented as an object whose keys are the locales and whose values are the sample text.
-     * For example: 
+     * For example:
      *  {
      *      default: 'default sample text',
      *      en: 'sample text in english',
      *      fr: 'exemple de texte français'
      *  }
+     * Locale keys (with the exception of default) conform to the IETF Language Tag specification (BCP 47).
+     * THe `default` key represents sample template text in a non-specified language, stored in a file called `sample.txt`.
      */
     constructor(packageJson, readme, samples) {
         const method = 'constructor';
