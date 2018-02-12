@@ -1,6 +1,6 @@
 {
   "name": "cicero-core",
-  "version": "0.2.32",
+  "version": "0.2.33",
   "description": "Cicero Core - implementation of Accord Protocol Template Specification",
   "engines": {
     "node": ">=8",
@@ -25,7 +25,7 @@
     "smart",
     "contract"
   ],
-  "author": "acccordproject.org",
+  "author": "accordproject.org",
   "license": "Apache-2.0",
   "bugs": {
     "url": "https://github.com/accordproject/cicero/issues"
