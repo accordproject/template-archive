@@ -1,6 +1,6 @@
 {
   "name": "cicero-core",
-  "version": "0.2.37",
+  "version": "0.2.38",
   "description": "Cicero Core - implementation of Accord Protocol Template Specification",
   "engines": {
     "node": ">=8",
@@ -48,7 +48,7 @@
     "sinon": "^4.0.1"
   },
   "dependencies": {
-    "composer-common": "next-unstable",
+    "composer-common": "next",
     "config": "^1.24.0",
     "debug": "^2.6.2",
     "glob": "^7.1.2",
