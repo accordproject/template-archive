@@ -48,7 +48,9 @@
     "composer-common": "next-unstable",
     "config": "^1.24.0",
     "debug": "^2.6.2",
+    "glob": "^7.1.2",
     "gunzip-maybe": "^1.4.1",
+    "ietf-language-tag-regex": "^0.0.5",
     "jszip": "^3.1.4",
     "minimatch": "^3.0.4",
     "moment": "^2.18.1",
@@ -60,7 +62,8 @@
     "tar-fs": "^1.16.0",
     "tar-stream": "^1.5.5",
     "tmp-promise": "^1.0.4",
-    "winston": "^2.3.1"
+    "winston": "^2.3.1",
+    "xregexp": "^4.0.0"
   },
   "license-check-config": {
     "src": [

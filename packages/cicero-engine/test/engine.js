@@ -30,7 +30,7 @@ describe('Engine', () => {
 
     let engine;
     let clause;
-    const testLatePenaltyInput = fs.readFileSync(path.resolve(__dirname, 'data/', 'sample.txt'), 'utf8');
+    const testLatePenaltyInput = fs.readFileSync(path.resolve(__dirname, 'data/latedeliveryandpenalty', 'sample.txt'), 'utf8');
 
     beforeEach(async function () {
         engine = new Engine();

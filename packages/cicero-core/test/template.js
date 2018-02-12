@@ -41,6 +41,7 @@ describe('Template', () => {
             template.getName().should.equal('latedeliveryandpenalty');
             template.getDescription().should.equal('Late Delivery and Penalty. In case of delayed delivery except for Force Majeure cases, the Seller shall pay to the Buyer for every 9 DAY of delay penalty amounting to 7% of the total value of the Equipment whose delivery has been delayed. Any fractional part of a DAY is to be considered a full DAY. The total amount of penalty shall not however, exceed 2% of the total value of the Equipment involved in late delivery. If the delay is more than 2 WEEK, the Buyer is entitled to terminate this Contract.');
             template.getVersion().should.equal('0.0.1');
+            template.getMetadata().getSample().should.equal('Late Delivery and Penalty. In case of delayed delivery except for Force Majeure cases, the Seller shall pay to the Buyer for every 9 DAY of delay penalty amounting to 7% of the total value of the Equipment whose delivery has been delayed. Any fractional part of a DAY is to be considered a full DAY. The total amount of penalty shall not however, exceed 2% of the total value of the Equipment involved in late delivery. If the delay is more than 2 WEEK, the Buyer is entitled to terminate this Contract.');
             const buffer = await template.toArchive();
             buffer.should.not.be.null;
             const template2 = await Template.fromArchive(buffer);
@@ -49,6 +50,7 @@ describe('Template', () => {
             template2.getGrammar().should.not.be.null;
             template2.getScriptManager().getScripts().length.should.equal(template.getScriptManager().getScripts().length);
             template2.getMetadata().getREADME().should.equal(template.getMetadata().getREADME());
+            template2.getMetadata().getSamples().should.eql(template.getMetadata().getSamples());
             const buffer2 = await template2.toArchive();
             buffer2.should.not.be.null;
         });
@@ -65,6 +67,18 @@ describe('Template', () => {
             return (() => Template.fromDirectory('./test/data/no-packagejson')).should.throw('Failed to find package.json');
         });
 
+        it('should create a template from a directory with a locale sample', () => {
+            return Template.fromDirectory('./test/data/locales-conga').should.be.fulfilled;
+        });
+
+        it('should throw an error if a sample.txt file does not exist', async () => {
+            return (() => Template.fromDirectory('./test/data/no-sample')).should.throw('Failed to find any sample files. e.g. sample.txt, sample_fr.txt');
+        });
+
+        it('should throw an error if the locale is not in the IETF format', async () => {
+            return (() => Template.fromDirectory('./test/data/bad-locale')).should.throw('Invalid locale used in sample file, sample_!.txt. Locales should be IETF language tags, e.g. sample_fr.txt');
+        });
+
         // Test case for issue #23
         it('should create template from a directory that has node_modules with duplicate namespace', () => {
             return Template.fromDirectory('./test/data/with-node_modules').should.be.fulfilled;
@@ -79,6 +93,10 @@ describe('Template', () => {
                 'name': 'conga',
                 'version': '0.0.1',
                 'description': '"Dan Selman" agrees to spend 100.0 conga coins on "swag"'
+            },
+            null,
+            {
+                'default':'"Dan Selman" agrees to spend 100.0 conga coins on "swag"',
             });
             return (() => template.getParser()).should.throw('Must call setGrammar or buildGrammar before calling getParser');
         });
@@ -86,6 +104,35 @@ describe('Template', () => {
         it('should return a parser object', async () => {
             const template = await Template.fromDirectory('./test/data/latedeliveryandpenalty');
             return template.getParser().should.be.an.instanceof(nearley.Parser);
+        });
+    });
+
+    describe('#setSamples', () => {
+
+        it('should not throw for valid samples object', async () => {
+            const template = await Template.fromDirectory('./test/data/latedeliveryandpenalty');
+            return (() => template.setSamples({ default: 'sample text' })).should.not.throw();
+        });
+
+        it('should throw for null samples object', async () => {
+            const template = await Template.fromDirectory('./test/data/latedeliveryandpenalty');
+            return (() => template.setSamples(null)).should.throw('sample.txt is required');
+        });
+    });
+
+    describe('#setSample', () => {
+
+        it('should not throw for valid sample object', async () => {
+            const template = await Template.fromDirectory('./test/data/latedeliveryandpenalty');
+            return (() => template.setSample('sample text','default')).should.not.throw();
+        });
+    });
+
+    describe('#setReadme', () => {
+
+        it('should not throw for valid readme text', async () => {
+            const template = await Template.fromDirectory('./test/data/latedeliveryandpenalty');
+            return (() => template.setReadme('readme text')).should.not.throw();
         });
     });
 });

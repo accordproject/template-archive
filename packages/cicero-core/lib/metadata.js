@@ -34,13 +34,27 @@ class Metadata {
      * </p>
      * @param {object} packageJson  - the JS object for package.json (required)
      * @param {String} readme  - the README.md for the template (may be null)
+     * @param {object} samples - the sample text for the template in different locales,
+     * represented as an object whose keys are the locales and whose values are the sample text.
+     * For example:
+     *  {
+     *      default: 'default sample text',
+     *      en: 'sample text in english',
+     *      fr: 'exemple de texte français'
+     *  }
+     * Locale keys (with the exception of default) conform to the IETF Language Tag specification (BCP 47).
+     * THe `default` key represents sample template text in a non-specified language, stored in a file called `sample.txt`.
      */
-    constructor(packageJson, readme) {
+    constructor(packageJson, readme, samples) {
         const method = 'constructor';
-        logger.entry(method, readme);
+        logger.entry(method, readme, samples);
 
         if(!packageJson || typeof(packageJson) !== 'object') {
             throw new Error('package.json is required and must be an object');
+        }
+
+        if(!samples || typeof(samples) !== 'object') {
+            throw new Error('sample.txt is required');
         }
 
         if (!packageJson.name || !this._validName(packageJson.name)) {
@@ -53,8 +67,8 @@ class Metadata {
             throw new Error('README must be a string');
         }
 
-
         this.readme = readme;
+        this.samples = samples;
         logger.exit(method);
     }
 
@@ -77,6 +91,31 @@ class Metadata {
             }
         }
         return true;
+    }
+
+    /**
+     * Returns the samples for this template.
+     * @return {object} the sample files for the template
+     */
+    getSamples() {
+        return this.samples;
+    }
+
+    /**
+     * Returns the sample for this template in the given locale. This may be null.
+     * If no locale is specified returns the default sample if it has been specified.
+     *
+     * @param {string} locale the IETF language code for the language
+     * @return {string} the sample file for the template in the given locale or null
+     */
+    getSample(locale) {
+        if(!locale && 'default' in this.samples){
+            return this.samples.default;
+        } else if (locale && locale in this.samples){
+            return this.samples[locale];
+        } else {
+            return null;
+        }
     }
 
     /**
