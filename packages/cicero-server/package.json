@@ -1,6 +1,6 @@
 {
   "name": "cicero-server",
-  "version": "0.2.40",
+  "version": "0.2.41",
   "description": "Cicero Server - wraps the Cicero Engine and exposes it as a RESTful service",
   "engines": {
     "node": ">=8",
@@ -48,8 +48,8 @@
     "sinon": "^4.0.1"
   },
   "dependencies": {
-    "cicero-core": "^0.2.40",
-    "cicero-engine": "^0.2.40",
+    "cicero-core": "^0.2.41",
+    "cicero-engine": "^0.2.41",
     "express": "^4.16.2"
   },
   "license-check-config": {
