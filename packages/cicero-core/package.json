@@ -1,11 +1,14 @@
 {
   "name": "cicero-core",
-  "version": "0.2.35",
+  "version": "0.2.36",
   "description": "Cicero Core - implementation of Accord Protocol Template Specification",
   "engines": {
     "node": ">=8",
     "npm": ">=3"
   },
+  "files": [
+    "lib"
+  ],
   "main": "index.js",
   "scripts": {
     "prepare": "nearleyc ./lib/tdl.ne -o ./lib/tdl.js",
