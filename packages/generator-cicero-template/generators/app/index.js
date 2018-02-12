@@ -16,6 +16,7 @@
 const Generator = require('yeoman-generator');
 const chalk = require('chalk');
 const yosay = require('yosay');
+const packageJson = require('../../package.json');
 
 module.exports = class extends Generator {
 
@@ -45,6 +46,7 @@ module.exports = class extends Generator {
         ];
 
         return this.prompt(prompts).then(props => {
+            props.engineVersion= packageJson.version;
             // To access props later use this.props.someAnswer;
             this.props = props;
         });

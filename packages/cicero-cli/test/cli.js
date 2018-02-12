@@ -15,27 +15,47 @@
 'use strict';
 
 const chai = require('chai');
-
+const path = require('path');
 chai.should();
 chai.use(require('chai-things'));
-const sinon = require('sinon');
+chai.use(require('chai-as-promised'));
 
-describe('CLI', () => {
+const Commands = require('../lib/commands');
 
-    let sandbox;
-
-    beforeEach(() => {
-        sandbox = sinon.sandbox.create();
-    });
-
-    afterEach(() => {
-        sandbox.restore();
-    });
+describe('cicero-cli', () => {
+    const template = path.resolve(__dirname, 'data/latedeliveryandpenalty/');
+    const sample = path.resolve(__dirname, 'data/latedeliveryandpenalty/', 'sample.txt');
+    const data = path.resolve(__dirname, 'data/latedeliveryandpenalty/', 'data.json');
 
     describe('#parse', () => {
-
         it('should parse a clause using a template', () => {
-            // TODO (DCS)
+            return Commands.parse(template, sample).should.eventually.eql({
+                '$class':'org.accordproject.latedeliveryandpenalty.TemplateModel',
+                'forceMajeure':true,
+                'penaltyDuration':{
+                    '$class':'org.accordproject.latedeliveryandpenalty.Duration',
+                    'amount':9,
+                    'unit':'DAY'
+                },
+                'penaltyPercentage':7,
+                'capPercentage':2,
+                'termination':{
+                    '$class':'org.accordproject.latedeliveryandpenalty.Duration',
+                    'amount':2,
+                    'unit':'WEEK'
+                },
+                'fractionalPart':'DAY'
+            });
         });
     });
+
+    describe('#execute', () => {
+        it('should execute a clause using a template', async () => {
+            const response = await Commands.execute(template, sample, data);
+            response.response.$class.should.be.equal('org.accordproject.latedeliveryandpenalty.LateDeliveryAndPenaltyResponse');
+            response.response.penalty.should.be.equal(4);
+            response.response.buyerMayTerminate.should.be.equal(false);
+        });
+    });
+
 });
