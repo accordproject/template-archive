@@ -21,14 +21,23 @@ const Commands = require('./lib/commands');
 require('yargs')
     .command('parse', 'parse dsl text using a template', (yargs) => {
         yargs.option('template', {
-            describe: 'path to the directory with the template'
+            describe: 'path to the directory with the template',
+            type: 'string'
         });
         yargs.option('dsl', {
-            describe: 'path to the clause text'
+            describe: 'path to the clause text',
+            type: 'string'
         });
     }, (argv) => {
         if (argv.verbose) {
             logger.info(`parse dsl ${argv.dsl} using a template ${argv.template}`);
+        }
+
+        try {
+            argv = Commands.validateParseArgs(argv);
+        } catch (err){
+            logger.error(err.message);
+            return;
         }
 
         return Commands.parse(argv.template, argv.dsl)
@@ -41,17 +50,24 @@ require('yargs')
     })
     .command('execute', 'execute a clause with JSON data', (yargs) => {
         yargs.option('template', {
-            describe: 'path to the directory with the template'
+            describe: 'path to the directory with the template',
+            type: 'string'
         });
         yargs.option('dsl', {
-            describe: 'path to the clause text'
+            describe: 'path to the clause text',
+            type: 'string'
         });
         yargs.option('data', {
-            describe: 'path to the request JSON data'
+            describe: 'path to the request JSON data',
+            type: 'string'
         });
     }, (argv) => {
-        if (argv.verbose) {
-            logger.info(`execute dsl ${argv.dsl} using a template ${argv.template} with data ${argv.data}`);
+
+        try {
+            argv = Commands.validateExecuteArgs(argv);
+        } catch (err){
+            logger.error(err.message);
+            return;
         }
 
         return Commands.execute(argv.template, argv.dsl, argv.data)
@@ -64,17 +80,30 @@ require('yargs')
     })
     .command('generate', 'generate code from the template model', (yargs) => {
         yargs.option('template', {
-            describe: 'path to the directory with the template'
+            describe: 'path to the directory with the template',
+            type: 'string',
+            default: '.'
         });
         yargs.option('format', {
-            describe: 'format of the code to generate'
+            describe: 'format of the code to generate',
+            type: 'string',
+            default: 'JSONSchema'
         });
         yargs.option('outputDirectory', {
-            describe: 'output directory path'
+            describe: 'output directory path',
+            type: 'string',
+            default: './output/'
         });
     }, (argv) => {
         if (argv.verbose) {
             logger.info(`generate code in format ${argv.format} from the model for template ${argv.template} into directory ${argv.outputDirectory}`);
+        }
+
+        try {
+            argv = Commands.validateExecuteArgs(argv);
+        } catch (err){
+            logger.error(err.message);
+            return;
         }
 
         return Commands.generate(argv.format, argv.template, argv.outputDirectory)
