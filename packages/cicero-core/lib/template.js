@@ -741,7 +741,8 @@ class Template {
         const isFileInNodeModuleDir = function (file, basePath) {
             const method = 'isFileInNodeModuleDir';
             let filePath = fsPath.parse(file);
-            let subPath = filePath.dir.substring(basePath.length-1);
+            basePath = fsPath.resolve(basePath);
+            let subPath = fsPath.resolve(filePath.dir).substring(basePath.length);
             let result = subPath.split(fsPath.sep).some((element) => {
                 return element === 'node_modules';
             });
