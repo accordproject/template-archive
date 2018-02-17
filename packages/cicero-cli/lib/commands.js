@@ -21,6 +21,7 @@ const Engine = require('cicero-engine').Engine;
 const CodeGen = require('composer-common').CodeGen;
 const FileWriter = CodeGen.FileWriter;
 const fs = require('fs');
+const path = require('path');
 const GoLangVisitor = CodeGen.GoLangVisitor;
 const JavaVisitor = CodeGen.JavaVisitor;
 const JSONSchemaVisitor = CodeGen.JSONSchemaVisitor;
@@ -57,6 +58,51 @@ class Commands {
     }
 
     /**
+     * Set default params before we parse a sample text using a template
+     *
+     * @param {object} argv the inbound argument values object
+     * @returns {object} a modfied argument object
+     */
+    static validateParseArgs(argv) {
+        // the user typed 'cicero parse dir'
+        if(argv._.length === 2){
+            argv.template = argv._[1];
+        }
+
+        if(!argv.template){
+            logger.info('Using current directory as template folder');
+            argv.template = '.';
+        }
+
+        argv.template = path.resolve(argv.template);
+
+        const packageJsonExists = fs.existsSync(path.resolve(argv.template,'package.json'));
+        let isCiceroTemplate = false;
+        if(packageJsonExists){
+            const packageJsonContents = JSON.parse(fs.readFileSync(path.resolve(argv.template,'package.json')),'utf8');
+            isCiceroTemplate = packageJsonContents.engines && packageJsonContents.engines.cicero;
+        }
+
+        if(!argv.dsl){
+            logger.info('Loading a default sample.txt file.');
+            argv.dsl = path.resolve(argv.template,'sample.txt');
+        }
+
+        if (argv.verbose) {
+            logger.info(`parse dsl ${argv.dsl} using a template ${argv.template}`);
+        }
+
+        let dslExists = fs.existsSync(argv.dsl);
+        if(!packageJsonExists || !isCiceroTemplate){
+            throw new Error(`${argv.template} is not a valid cicero template. Make sure that package.json exists and that it has a engines.cicero entry.`);
+        } else if (!dslExists){
+            throw new Error('A sample text file is required. Try the --dsl flag or create a sample.txt in the root folder of your template.');
+        } else {
+            return argv;
+        }
+    }
+
+    /**
      * Execute a sample text using a template
      *
      * @param {string} templatePath to the template directory
@@ -79,6 +125,60 @@ class Commands {
             .catch((err) => {
                 logger.error(err);
             });
+    }
+
+    /**
+     * Set default params before we execute a template
+     *
+     * @param {object} argv the inbound argument values object
+     * @returns {object} a modfied argument object
+     */
+    static validateExecuteArgs(argv) {
+        // the user typed 'cicero parse dir'
+        if(argv._.length === 2){
+            argv.template = argv._[1];
+        }
+
+        if(!argv.template){
+            logger.info('Using current directory as template folder');
+            argv.template = '.';
+        }
+
+        argv.template = path.resolve(argv.template);
+
+        const packageJsonExists = fs.existsSync(path.resolve(argv.template,'package.json'));
+        let isCiceroTemplate = false;
+        if(packageJsonExists){
+            const packageJsonContents = JSON.parse(fs.readFileSync(path.resolve(argv.template,'package.json')),'utf8');
+            isCiceroTemplate = packageJsonContents.engines && packageJsonContents.engines.cicero;
+        }
+
+
+        if(!argv.dsl){
+            logger.info('Loading a default sample.txt file.');
+            argv.dsl = path.resolve(argv.template,'sample.txt');
+        }
+
+        if(!argv.data){
+            logger.info('Loading a default data.json file.');
+            argv.data = path.resolve(argv.template,'data.json');
+        }
+
+        if (argv.verbose) {
+            logger.info(`execute dsl ${argv.dsl} using a template ${argv.template} with data ${argv.data}`);
+        }
+
+        let dataExists = fs.existsSync(argv.data);
+        let dslExists = fs.existsSync(argv.dsl);
+        if(!packageJsonExists || !isCiceroTemplate){
+            throw new Error(`${argv.template} is not a valid cicero template. Make sure that package.json exists and that it has a engines.cicero entry.`);
+        } else if(!dataExists){
+            throw new Error('A data file is required. Try the --data flag or create a data.json in the root folder of your template.');
+        } else if (!dslExists){
+            throw new Error('A sample text file is required. Try the --dsl flag or create a sample.txt in the root folder of your template.');
+        } else {
+            return argv;
+        }
     }
 
     /**
