@@ -38,6 +38,8 @@ const nearleyGrammar = require('nearley/lib/nearley-language-bootstrapped');
 const templateGrammar = require('./tdl.js');
 const GrammarVisitor = require('./grammarvisitor');
 
+const Jura = require('jura-compiler/lib/jura');
+
 const ENCODING = 'utf8';
 // Matches 'sample.txt' or 'sample_TAG.txt' where TAG is an IETF language tag (BCP 47)
 const IETF_REGEXP = languageTagRegex({ exact: false }).toString().slice(1,-2);
@@ -74,6 +76,8 @@ class Template {
         this.grammar = null;
         this.grammarAst = null;
         this.templatizedGrammar = null;
+        this.logicjsonly = false;
+        this.logicboth = false;
     }
 
     /**
@@ -402,6 +406,7 @@ class Template {
             let ctoModelFiles = [];
             let ctoModelFileNames = [];
             let jsScriptFiles = [];
+            let juraScriptFiles = [];
             let sampleTextFiles = {};
             let template;
             let readmeContents = null;
@@ -506,6 +511,22 @@ class Template {
                 });
             });
 
+            logger.debug(method, 'Looking for Jura files');
+            let juraFiles = zip.file(/lib\/.*\.jura$/); //Matches any file which is in the 'lib' folder and has a .jura extension
+            juraFiles.forEach(function (file) {
+                logger.debug(method, 'Found Jura file, loading it', file.name);
+                promise = promise.then(() => {
+                    return file.async('string');
+                }).then((contents) => {
+                    logger.debug(method, 'Loaded Jura file');
+                    let tempObj = {
+                        'name': file.name,
+                        'contents': contents
+                    };
+                    juraScriptFiles.push(tempObj);
+                });
+            });
+
             return promise.then(() => {
                 logger.debug(method, 'Loaded package.json');
                 template = new Template(packageJsonContents, readmeContents, sampleTextFiles);
@@ -520,6 +541,12 @@ class Template {
                     template.scriptManager.addScript(jsObject); // Adds all js files to script manager
                 });
                 logger.debug(method, 'Added JavaScript files to script manager');
+
+                juraScriptFiles.forEach(function (obj) {
+                    let juraObject = template.scriptManager.createScript(obj.name, 'jura', obj.contents);
+                    template.scriptManager.addScript(juraObject); // Adds all jura files to script manager
+                });
+                logger.debug(method, 'Added Jura files to script manager');
 
                 // check the template model
                 template.getTemplateModel();
@@ -658,7 +685,7 @@ class Template {
      * @param {boolean} [options.modelFileGlob] - specify the glob pattern used to match
      * the model files to include. Defaults to **\/models/**\/*.cto
      * @param {boolean} [options.scriptGlob] - specify the glob pattern used to match
-     * the script files to include. Defaults to **\/lib/**\/*.js
+     * the script files to include. Defaults to **\/lib/**\/*.+(js|jura)
      * @return {Promise} a Promise to the instantiated business network
      */
     static fromDirectory(path, options) {
@@ -676,7 +703,7 @@ class Template {
         }
 
         if (!options.scriptGlob) {
-            options.scriptGlob = '**/lib/**/*.js';
+            options.scriptGlob = '**/lib/**/*.+(js|jura)';
         }
 
         const method = 'fromDirectory';
@@ -785,6 +812,10 @@ class Template {
                 },
                 process: function (path, contents) {
                     let filePath = fsPath.parse(path);
+                    if (filePath.ext.toLowerCase() === '.jura') {
+                        logger.debug(method, 'Compiling Jura to JavaScript ', path);
+                        contents = Jura.compileToJavaScript(contents,null,null,true);
+                    }
                     const jsScript = template.getScriptManager().createScript(path, filePath.ext.toLowerCase(), contents);
                     scriptFiles.push(jsScript);
                     logger.debug(method, 'Found script file ', path);

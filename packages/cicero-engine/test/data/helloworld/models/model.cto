@@ -1,0 +1,20 @@
+namespace org.accordproject.helloworld
+
+transaction Request {
+  o String input
+}
+
+transaction Response {
+  o String output
+}
+
+/**
+ * The template model
+ */
+@AccordTemplateModel("helloworld")
+concept TemplateModel {
+  /**
+   * The name for the clause
+   */
+  o String name
+}

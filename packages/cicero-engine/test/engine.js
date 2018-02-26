@@ -26,7 +26,7 @@ chai.use(require('chai-things'));
 const fs = require('fs');
 const path = require('path');
 
-describe('Engine', () => {
+describe('EngineLatePenalty', () => {
 
     let engine;
     let clause;
@@ -52,9 +52,96 @@ describe('Engine', () => {
                 'transactionId': '402c8f50-9e61-433e-a7c1-afe61c06ef00',
                 'timestamp': '2017-11-12T17:38:01.412Z'
             };
-            const result = await engine.execute(clause, request);
+            const result = await engine.execute(clause, request, true);
             result.should.not.be.null;
             result.response.penalty.should.equal(110.00000000000001);
+        });
+    });
+    describe('#executejura', function () {
+
+        it('should execute a smart clause', async function () {
+            const request = {
+                '$class': 'io.clause.latedeliveryandpenalty.LateDeliveryAndPenaltyRequest',
+                'forceMajeure': false,
+                'agreedDelivery': '2017-10-07T16:38:01.412Z',
+                'goodsValue': 200.00,
+                'transactionId': '402c8f50-9e61-433e-a7c1-afe61c06ef00',
+                'timestamp': '2017-11-12T17:38:01.412Z'
+            };
+            const result = await engine.execute(clause, request, false);
+            result.should.not.be.null;
+            result.response.penalty.should.equal(110);
+        });
+    });
+});
+describe('EngineVolumeDiscount', () => {
+
+    let engine;
+    let clause;
+    const volumeDiscountInput = fs.readFileSync(path.resolve(__dirname, 'data/volumediscount', 'sample.txt'), 'utf8');
+
+    beforeEach(async function () {
+        engine = new Engine();
+        const template = await Template.fromDirectory('./test/data/volumediscount');
+        clause = new Clause(template);
+        clause.parse(volumeDiscountInput);
+    });
+
+    afterEach(() => {});
+
+    describe('#execute', function () {
+
+        it('should execute a smart clause', async function () {
+            const request = {
+                '$class': 'org.accordproject.volumediscount.VolumeDiscountRequest',
+                'netAnnualChargeVolume': 0.4
+            };
+            const result = await engine.execute(clause, request, true);
+            result.should.not.be.null;
+            result.response.discountRate.should.equal(3);
+        });
+    });
+});
+describe('EngineHelloWorld', () => {
+
+    let engine;
+    let clause;
+    const helloWorldInput = fs.readFileSync(path.resolve(__dirname, 'data/helloworld', 'sample.txt'), 'utf8');
+
+    beforeEach(async function () {
+        engine = new Engine();
+        const template = await Template.fromDirectory('./test/data/helloworld');
+        clause = new Clause(template);
+        clause.parse(helloWorldInput);
+    });
+
+    afterEach(() => {});
+
+    describe('#execute', function () {
+
+        it('should execute a smart clause', async function () {
+            const request = {
+                '$class': 'org.accordproject.helloworld.Request',
+                'input': 'Accord Project'
+            };
+            const result = await engine.execute(clause, request, false);
+            result.should.not.be.null;
+            result.response.output.should.equal('Hello Fred Blogs (Accord Project)');
+        });
+    });
+    describe('#execute2', function () {
+
+        it('should execute a smart clause', async function () {
+            try {
+                const request = {
+                    '$class': 'org.accordproject.helloworld.Request',
+                    'input': 'Accord Project'
+                };
+                const result = await engine.execute(clause, request, true);
+                return result;
+            } catch (err) {
+                err.should.be.Error;
+            }
         });
     });
 });

@@ -1,0 +1,20 @@
+{
+    "name": "helloworld",
+    "version": "0.0.5",
+    "description": "This is the Hello World of Accord Protocol Templates. Executing the clause will simply echo back the text that occurs after the string `Hello` prepended to text that is passed in the request.",
+    "engines": {
+        "cicero": "^0.2.28"
+    },
+    "scripts": {
+        "test": "mocha"
+    },
+    "devDependencies": {
+        "chai": "^4.1.2",
+        "chai-as-promised": "^7.1.1",
+        "chai-things": "^0.2.0",
+        "cicero-core": "^0.2.13",
+        "cicero-engine": "^0.2.13",
+        "mocha": "^4.0.1",
+        "moment": "^2.19.2"
+    }
+}
