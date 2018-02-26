@@ -1,0 +1,22 @@
+{
+    "name": "volumediscount",
+    "version": "0.0.6",
+    "description": "A sample volume discount clause.",
+    "engines": {
+        "cicero": "^0.2.28"
+    },
+    "scripts": {
+        "test": "mocha",
+        "parse": "cicero parse --template ./ --dsl sample.txt",
+        "execute": "cicero execute --template ./ --dsl sample.txt --data data.json"
+    },
+    "devDependencies": {
+        "chai": "^4.1.2",
+        "chai-as-promised": "^7.1.1",
+        "chai-things": "^0.2.0",
+        "cicero-core": "^0.2.13",
+        "cicero-engine": "^0.2.13",
+        "mocha": "^4.0.1",
+        "moment": "^2.19.2"
+    }
+}
