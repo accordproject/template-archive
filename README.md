@@ -181,4 +181,4 @@ Now edit the business logic of the template itself. At present this is expressed
 
 TBD.
 
-© 2017 Clause, Inc.
+© 2017-2018 Clause, Inc.
