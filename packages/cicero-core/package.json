@@ -66,7 +66,8 @@
     "tar-stream": "^1.5.5",
     "tmp-promise": "^1.0.4",
     "winston": "^2.3.1",
-    "xregexp": "^4.0.0"
+    "xregexp": "^4.0.0",
+    "jura-compiler": "^0.0.11"
   },
   "license-check-config": {
     "src": [

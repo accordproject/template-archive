@@ -51,7 +51,8 @@
     "moment": "^2.20.1",
     "nearley": "^2.11.0",
     "vm2": "^3.5.0",
-    "winston": "^2.3.1"
+    "winston": "^2.3.1",
+    "jura-compiler": "^0.0.11"
   },
   "license-check-config": {
     "src": [

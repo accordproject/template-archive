@@ -41,32 +41,99 @@ class Engine {
     }
 
     /**
-     * Compile and cache a clause
+     * Compile and cache a clause with Jura logic
      * @param {Clause} clause  - the clause to compile
      * @private
      */
-    compileClause(clause) {
+    compileJuraClause(clause) {
+        let allJuraScripts = '';
+        let template = clause.getTemplate();
 
-        let allScripts = '';
-
-        clause.getTemplate().getScriptManager().getScripts().forEach(function (element) {
-            allScripts += element.getContents();
+        template.getScriptManager().getScripts().forEach(function (element) {
+            if (element.getLanguage() === '.jura') {
+                allJuraScripts += element.getContents();
+            }
         }, this);
 
-        allScripts += this.buildDispatchFunction(clause);
-        // console.log(allScripts);
-
-        const script = new VMScript(allScripts);
+        if (allJuraScripts === '') {
+            throw new Error('Did not find any Jura logic');
+        }
+        allJuraScripts += this.buildJuraDispatchFunction(clause);
+        // console.log(allJuraScripts);
+        const script = new VMScript(allJuraScripts);
         this.scripts[clause.getIdentifier()] = script;
     }
 
     /**
-     * Generate the runtime dispatch logic
+     * Compile and cache a clause with JavaScript logic
+     * @param {Clause} clause  - the clause to compile
+     * @private
+     */
+    compileJsClause(clause) {
+        let allJsScripts = '';
+        let template = clause.getTemplate();
+
+        template.getScriptManager().getScripts().forEach(function (element) {
+            if (element.getLanguage() === '.js') {
+                allJsScripts += element.getContents();
+            }
+        }, this);
+
+        if (allJsScripts === '') {
+            throw new Error('Did not find any JavaScript logic');
+        }
+        allJsScripts += this.buildJsDispatchFunction(clause);
+        // console.log(allJsScripts);
+        const script = new VMScript(allJsScripts);
+        this.scripts[clause.getIdentifier()] = script;
+    }
+
+    /**
+     * Generate the runtime dispatch logic for Jura
      * @param {Clause} clause  - the clause to compile
      * @return {string} the Javascript code for dispatch
      * @private
      */
-    buildDispatchFunction(clause) {
+    buildJuraDispatchFunction(clause) {
+        // get the function declarations of all functions
+        // that have the @clause annotation
+        const functionDeclarations = clause.getTemplate().getScriptManager().getScripts().map((ele) => {
+            return ele.getFunctionDeclarations();
+        })
+            .reduce((flat, next) => {
+                return flat.concat(next);
+            })
+            .filter((ele) => {
+                return ele.getDecorators().indexOf('AccordClauseLogic') >= 0;
+            }).map((ele) => {
+                return ele;
+            });
+
+        if (functionDeclarations.length === 0) {
+            throw new Error('Did not find any function declarations with the @AccordClauseLogic annotation');
+        }
+
+        const code = `
+        __dispatch(data,request);
+
+        function __dispatch(data,request) {
+            // Jura dispatch call
+            let context = {this: data, request: serializer.toJSON(request), this: data, now: moment()};
+            return serializer.fromJSON(dispatch(context));
+        } 
+        `;
+
+        logger.debug(code);
+        return code;
+    }
+
+    /**
+     * Generate the runtime dispatch logic for JavaScript
+     * @param {Clause} clause  - the clause to compile
+     * @return {string} the Javascript code for dispatch
+     * @private
+     */
+    buildJsDispatchFunction(clause) {
 
         // get the function declarations of all functions
         // that have the @clause annotation
@@ -113,7 +180,6 @@ class Engine {
             } // switch
             return 'oops';
         }
-        
         `;
 
         const code = head + methods + tail;
@@ -126,13 +192,15 @@ class Engine {
      * @param {Clause} clause  - the clause to execute
      * @param {object} request  - the request, a JS object that can be deserialized
      * using the Composer serializer.
+     * @param {boolean} forcejs  - whether to force JS logic.
      * @return {Promise} a promise that resolves to a result for the clause
      * @private
      */
-    async execute(clause, request) {
-
+    async execute(clause, request, forcejs) {
         // ensure the request is valid
-        const tx = clause.getTemplate().getSerializer().fromJSON(request, {validate: false, acceptResourcesForRelationships: true});
+        const template = clause.getTemplate();
+        template.logicjsonly = forcejs;
+        const tx = template.getSerializer().fromJSON(request, {validate: false, acceptResourcesForRelationships: true});
         tx.$validator = new ResourceValidator({permitResourcesForRelationships: true});
         tx.validate();
 
@@ -141,7 +209,17 @@ class Engine {
         let script = this.scripts[clause.getIdentifier()];
 
         if (!script) {
-            this.compileClause(clause);
+            if (template.logicjsonly) {
+                this.compileJsClause(clause);
+            } else {
+                // Attempt jura compilation first
+                try {
+                    this.compileJuraClause(clause);
+                } catch(err) {
+                    logger.debug('Error compiling Jura logic, falling back to JavaScript'+err);
+                    this.compileJsClause(clause);
+                }
+            }
         }
 
         script = this.scripts[clause.getIdentifier()];
@@ -151,12 +229,13 @@ class Engine {
         }
 
         const data = clause.getData();
-        const factory = clause.getTemplate().getFactory();
+        const factory = template.getFactory();
         const vm = new VM({
             timeout: 1000,
             sandbox: {
                 moment: require('moment'),
-                logger: new Logger(clause.getTemplate().getSerializer())
+                serializer:template.getSerializer(),
+                logger: new Logger(template.getSerializer())
             }
         });
 
@@ -164,6 +243,11 @@ class Engine {
         vm.freeze(tx, 'request'); // Second argument adds object to global.
         vm.freeze(data, 'data'); // Second argument adds object to global.
         vm.freeze(factory, 'factory'); // Second argument adds object to global.
+        const Fs = require('fs');
+        const Path = require('path');
+        // XXX This needs to be cleaned up to properly load the runtime as a Node module XXX
+        const jurRuntime = Fs.readFileSync(Path.join(__dirname,'..','..','..','node_modules','jura-compiler','lib','juraruntime.js'), 'utf8');
+        vm.run(jurRuntime);
 
         const response = vm.run(script);
         response.$validator = new ResourceValidator({permitResourcesForRelationships: true});
@@ -172,7 +256,7 @@ class Engine {
         const result = {
             'clause': clause.getIdentifier(),
             'request': request,
-            'response': clause.getTemplate().getSerializer().toJSON(response, {convertResourcesToRelationships: true})
+            'response': template.getSerializer().toJSON(response, {convertResourcesToRelationships: true})
         };
 
         return result;
