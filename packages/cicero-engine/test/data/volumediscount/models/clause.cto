@@ -1,0 +1,57 @@
+namespace org.accordproject.volumediscount
+
+/**
+ * Defines the data model for the VolumeDiscount template.
+ * This defines the structure of the abstract syntax tree that the parser for the template
+ * must generate from input source text.
+ */
+@AccordTemplateModel("volumediscount")
+concept TemplateModel {
+  /**
+   * First volume
+   */
+  o Double firstVolume
+
+  /**
+   * Second volume
+   */
+  o Double secondVolume
+
+  /**
+   * First rate
+   */
+  o Double firstRate
+
+  /**
+   * Second rate
+   */
+  o Double secondRate
+
+  /**
+   * Third rate
+   */
+  o Double thirdRate
+
+}
+
+/**
+ * Defines the input data required by the template
+ */
+transaction VolumeDiscountRequest {
+
+  /**
+   * 
+   */
+  o Double netAnnualChargeVolume
+
+}
+
+/**
+ * Defines the output data for the template
+ */
+transaction VolumeDiscountResponse {
+  /**
+   * The discount rate
+   */
+  o Double discountRate
+}
