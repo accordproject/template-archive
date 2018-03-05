@@ -246,7 +246,7 @@ class Engine {
         const Fs = require('fs');
         const Path = require('path');
         // XXX This needs to be cleaned up to properly load the runtime as a Node module XXX
-        const jurRuntime = Fs.readFileSync(Path.join(__dirname,'..','..','..','node_modules','jura-compiler','lib','juraruntime.js'), 'utf8');
+        const jurRuntime = Fs.readFileSync(Path.join(__dirname,'..','..','..','node_modules','jura-engine','lib','juraruntime.js'), 'utf8');
         vm.run(jurRuntime);
 
         const response = vm.run(script);
