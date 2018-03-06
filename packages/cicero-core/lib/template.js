@@ -1012,6 +1012,68 @@ class Template {
         this.metadata = new Metadata(packageJson, this.metadata.getREADME(), this.metadata.getSamples());
     }
 
+    /**
+     * Provides a list of the input types that are accepted by this Template. Types use the fully-qualified form.
+     * @return {Array} a list of the request types
+     */
+    getRequestTypes() {
+        // get the function declarations of all functions
+        // that have the @clause annotation
+        const functionDeclarations = this.getScriptManager().getScripts().map((ele) => {
+            return ele.getFunctionDeclarations();
+        })
+            .reduce((flat, next) => {
+                return flat.concat(next);
+            })
+            .filter((ele) => {
+                return ele.getDecorators().indexOf('AccordClauseLogic') >= 0;
+            }).map((ele) => {
+                return ele;
+            });
+
+        if (functionDeclarations.length === 0) {
+            throw new Error('Did not find any function declarations with the @AccordClauseLogic annotation');
+        }
+
+        let types = [];
+
+        functionDeclarations.forEach((ele, n) => {
+            types.push(ele.getParameterTypes()[1]);
+        });
+
+        logger.debug(types);
+        return types;
+    }
+
+    /**
+     * Provides a list of the return types that of this Template. Types use the fully-qualified form.
+     * @return {Array} a list of the response types
+     */
+    getResponseTypes() {
+        const functionDeclarations = this.getScriptManager().getScripts().map((ele) => {
+            return ele.getFunctionDeclarations();
+        })
+            .reduce((flat, next) => {
+                return flat.concat(next);
+            })
+            .filter((ele) => {
+                return ele.getDecorators().indexOf('AccordClauseLogic') >= 0;
+            }).map((ele) => {
+                return ele;
+            });
+
+        if (functionDeclarations.length === 0) {
+            throw new Error('Did not find any function declarations with the @AccordClauseLogic annotation');
+        }
+
+        let types = [];
+        functionDeclarations.forEach((ele, n) => {
+            types.push(ele.getParameterTypes()[2]);
+        });
+        logger.debug(types);
+        return types;
+    }
+
 }
 
 module.exports = Template;

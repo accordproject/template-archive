@@ -72,6 +72,44 @@ describe('Clause', () => {
             clause.setData(data);
             clause.getData().should.eql(data);
         });
+        it('should throw error for bad $class', async function() {
+            const template = await Template.fromDirectory('./test/data/latedeliveryandpenalty');
+            const clause = new Clause(template);
+            const data = {
+                $class: 'bad.class.name'
+            };
+            (()=> clause.setData(data)).should.throw('Invalid data, must be a valid instance of the template model io.clause.latedeliveryandpenalty.TemplateModel but got: {"$class":"bad.class.name"} ');
+        });
+    });
+
+    describe('#toJSON', () => {
+
+        it('should get a JSON representation of a clause', async function() {
+            const template = await Template.fromDirectory('./test/data/latedeliveryandpenalty');
+            const clause = new Clause(template);
+            const data = {
+                $class: 'io.clause.latedeliveryandpenalty.TemplateModel',
+                forceMajeure: false,
+                penaltyDuration : {
+                    $class : 'org.accordproject.time.Duration',
+                    amount : 1,
+                    unit : 'DAY'
+                },
+                penaltyPercentage : 10,
+                capPercentage : 50,
+                termination : {
+                    $class : 'org.accordproject.time.Duration',
+                    amount : 10,
+                    unit : 'DAY'
+                },
+                fractionalPart : 'DAY'
+            };
+            clause.setData(data);
+            clause.toJSON().should.eql({
+                'data': data,
+                'template': 'latedeliveryandpenalty@0.0.1'
+            });
+        });
     });
 
     describe('#parse', () => {
@@ -113,6 +151,12 @@ describe('Clause', () => {
             };
             clause.getData().should.eql(data);
             clause.getIdentifier().should.equal('conga@0.0.1-e204ba22ff8e8fddb341da6d67041bfa74b84937c8fe01b1e9bd73b5375a9168');
+        });
+
+        it('should throw an error for empty text', async function() {
+            const template = await Template.fromDirectory('./test/data/conga');
+            const clause = new Clause(template);
+            (()=> clause.parse('')).should.throw('Parsing clause text returned a null AST. This may mean the text is valid, but not complete.');
         });
     });
 });
