@@ -135,4 +135,70 @@ describe('Template', () => {
             return (() => template.setReadme('readme text')).should.not.throw();
         });
     });
+
+    describe('#getRequestTypes', () => {
+
+        it('should return request types for single accordclauselogic function', async () => {
+            const template = await Template.fromDirectory('./test/data/latedeliveryandpenalty');
+            const types = template.getRequestTypes();
+            types.should.be.eql([
+                'io.clause.latedeliveryandpenalty.LateDeliveryAndPenaltyRequest',
+                // TODO The second value comes from the compiled Jura.
+                // Change this to fully qualified type once this issue is fixed
+                // https://github.com/accordproject/jura/issues/19
+                'Request',
+            ]);
+        });
+
+        it('should throw error when no logic is defined', async () => {
+            const template = await Template.fromDirectory('./test/data/no-logic');
+            return (() => template.getRequestTypes()).should.throw('Did not find any function declarations with the @AccordClauseLogic annotation');
+        });
+    });
+
+    describe('#getResponseTypes', () => {
+
+        it('should return response type for single accordclauselogic function', async () => {
+            const template = await Template.fromDirectory('./test/data/latedeliveryandpenalty');
+            const types = template.getResponseTypes();
+            types.should.be.eql([
+                'io.clause.latedeliveryandpenalty.LateDeliveryAndPenaltyResponse',
+                // TODO The second value comes from the compiled Jura.
+                // Change this to fully qualified type once this issue is fixed
+                // https://github.com/accordproject/jura/issues/19
+                'Response',
+            ]);
+        });
+
+        it('should throw error when no logic is defined', async () => {
+            const template = await Template.fromDirectory('./test/data/no-logic');
+            return (() => template.getResponseTypes()).should.throw('Did not find any function declarations with the @AccordClauseLogic annotation');
+        });
+    });
+
+    describe('#getFactory', () => {
+        it('should return a Factory', async () => {
+            const Factory = require('composer-common').Factory;
+            const template = await Template.fromDirectory('./test/data/latedeliveryandpenalty');
+            template.getFactory().should.be.an.instanceof(Factory);
+        });
+    });
+
+    describe('#getSerializer', () => {
+        it('should return a Serializer', async () => {
+            const Serializer = require('composer-common').Serializer;
+            const template = await Template.fromDirectory('./test/data/latedeliveryandpenalty');
+            template.getSerializer().should.be.an.instanceof(Serializer);
+        });
+    });
+
+    describe('#setPackageJson', () => {
+        it('should set the package json of the metadata', async () => {
+            const template = await Template.fromDirectory('./test/data/latedeliveryandpenalty');
+            const packageJson = template.getMetadata().getPackageJson();
+            packageJson.name = 'new_name';
+            template.setPackageJson(packageJson);
+            template.getMetadata().getPackageJson().name.should.be.equal('new_name');
+        });
+    });
 });
