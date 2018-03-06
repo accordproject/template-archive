@@ -25,5 +25,5 @@ b) Discount. The Discount is determined according to the following table:
 | $1 million to $10 million | 2.90%                |
 | Greater than $10 million  | 2.80%                |
 
-_______________________					_____________________
- Card, Inc.								Merchant
+_______________________                                 _____________________
+ Card, Inc.                                                             Merchant
