@@ -25,5 +25,5 @@ b) Discount. The Discount is determined according to the following table:
 | $[{firstVolume}] million to $[{secondVolume}] million | [{secondRate}]%                |
 | Greater than $[{secondVolume}] million  | [{thirdRate}]%                |
 
-_______________________					_____________________
- Card, Inc.								Merchant
+_______________________                                 _____________________
+ Card, Inc.                                                             Merchant
