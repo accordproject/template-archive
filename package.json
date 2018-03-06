@@ -41,6 +41,5 @@
     "contract"
   ],
   "author": "accordproject.org",
-  "license": "Apache-2.0",
-  "dependencies": {}
+  "license": "Apache-2.0"
 }

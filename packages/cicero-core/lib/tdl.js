@@ -1,7 +1,7 @@
-// Generated automatically by nearley
+// Generated automatically by nearley, version 2.12.1
 // http://github.com/Hardmath123/nearley
 (function () {
-function id(x) {return x[0]; }
+function id(x) { return x[0]; }
 
   const flatten = d => {
     return d.reduce(

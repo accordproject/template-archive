@@ -48,10 +48,10 @@
     "composer-common": "0.17.4",
     "config": "^1.24.0",
     "debug": "^2.6.2",
-    "jura-compiler": "^0.0.17",
-    "jura-engine": "^0.0.17",
+    "jura-compiler": "^0.0.19",
+    "jura-engine": "^0.0.19",
     "moment": "^2.20.1",
-    "nearley": "^2.11.0",
+    "nearley": "^2.12.1",
     "vm2": "^3.5.0",
     "winston": "^2.3.1"
   },
