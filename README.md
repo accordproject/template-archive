@@ -7,7 +7,7 @@
 
 ## Introduction
 
-Cicero is an Open Source implementation of the [Accord Protocol, Template Specification](https://docs.google.com/document/d/1UacA_r2KGcBA2D4voDgGE8jqid-Uh4Dt09AE-shBKR0). It defines the structure of natural language templates, bound to a data model, that can be executed using request/response JSON messages.
+Cicero is an Open Source implementation of the [Accord Project Template Specification](https://docs.google.com/document/d/1UacA_r2KGcBA2D4voDgGE8jqid-Uh4Dt09AE-shBKR0). It defines the structure of natural language templates, bound to a data model, that can be executed using request/response JSON messages.
 
 You can read the latest user documentation here: http://accordcicero.readthedocs.io/en/latest/
 
