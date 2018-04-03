@@ -33,27 +33,19 @@
   "homepage": "https://github.com/accordproject/cicero#readme",
   "devDependencies": {
     "chai": "^3.5.0",
-    "chai-as-promised": "^6.0.0",
     "chai-things": "^0.2.0",
     "eslint": "^4.6.1",
-    "jsdoc": "^3.5.5",
     "license-check": "^1.1.5",
     "mocha": "^3.4.2",
-    "mockery": "^2.0.0",
-    "nyc": "^11.3.0",
-    "sinon": "^4.0.1"
+    "nyc": "^11.3.0"
   },
   "dependencies": {
     "cicero-core": "^0.2.46",
     "composer-common": "0.17.4",
-    "config": "^1.24.0",
-    "debug": "^2.6.2",
     "jura-compiler": "^0.0.19",
     "jura-engine": "^0.0.19",
     "moment": "^2.20.1",
-    "nearley": "^2.12.1",
-    "vm2": "^3.5.0",
-    "winston": "^2.3.1"
+    "vm2": "^3.5.0"
   },
   "license-check-config": {
     "src": [
