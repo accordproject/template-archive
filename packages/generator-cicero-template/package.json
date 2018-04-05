@@ -1,5 +1,5 @@
 {
-  "name": "generator-cicero-template",
+  "name": "@accordproject/generator-cicero-template",
   "version": "0.2.46",
   "description": "Code generator for a Cicero Template",
   "engines": {
@@ -35,6 +35,9 @@
     "accord project",
     "yeoman-generator"
   ],
+  "publishConfig": {
+    "access": "public"
+  },
   "devDependencies": {
     "chai": "^3.5.0",
     "chai-as-promised": "^6.0.0",
