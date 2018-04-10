@@ -11,14 +11,6 @@ See [Conventional Commits](https://conventionalcommits.org) for commit guideline
 
 **Note:** Version bump only for package @accordproject/generator-cicero-template
 
-<a name="0.2.47"></a>
-## [0.2.47](https://github.com/accordproject/cicero/compare/v0.2.46...v0.2.47) (2018-04-10)
-
-
-
-
-**Note:** Version bump only for package @accordproject/generator-cicero-template
-
 <a name="0.2.46"></a>
 ## [0.2.46](https://github.com/accordproject/cicero/compare/v0.2.45...v0.2.46) (2018-03-06)
 
