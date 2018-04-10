@@ -58,7 +58,7 @@ If you would like to implement a new feature then consider what kind of change i
 
   as a Pull Request. See the section about [Pull Request Submission Guidelines](contributing.md#submit-pr), and
 
-  for detailed information the [core development documentation](developers/).
+  for detailed information the [core development documentation](developers.md).
 
 ###  Want a Doc Fix?
 
@@ -68,7 +68,7 @@ If you want to help improve the docs, it's a good idea to let others know what y
 
 If you're making a small change \(typo, phrasing\) don't worry about filing an issue first. Use the friendly blue "Improve this doc" button at the top right of the doc page to fork the repository in-place and make a quick change on the fly. The commit message is preformatted to the right type and scope, so you only have to add the description.
 
-For large fixes, please build and test the documentation before submitting the PR to be sure you haven't accidentally introduced any layout or formatting issues. You should also make sure that your commit message follows the [**Commit Message Guidelines**](developers/#commits).
+For large fixes, please build and test the documentation before submitting the PR to be sure you haven't accidentally introduced any layout or formatting issues. You should also make sure that your commit message follows the [**Commit Message Guidelines**](developers.md#commits).
 
 ##  Issue Submission Guidelines
 
@@ -88,7 +88,7 @@ Before you submit your pull request consider the following guidelines:
 
   that relates to your submission. You don't want to duplicate effort.
 
-* Create the [development environment](developers/#setup)
+* Create the [development environment](developers.md#setup)
 * Make your changes in a new git branch:
 
   ```text
@@ -96,13 +96,13 @@ Before you submit your pull request consider the following guidelines:
   ```
 
 * Create your patch commit, **including appropriate test cases**.
-* Follow our [Coding Rules](developers/#rules).
-* If the changes affect public APIs, change or add relevant [documentation](developers/#documentation).
-* Run the [unit](developers/#unit-tests) and [E2E test](developers/#e2e-tests) suites, and ensure that all tests
+* Follow our [Coding Rules](developers.md#rules).
+* If the changes affect public APIs, change or add relevant [documentation](developers.md#documentation).
+* Run the [unit](developers.md#unit-tests) and [E2E test](developers.md#e2e-tests) suites, and ensure that all tests
 
   pass.
 
-* Commit your changes using a descriptive commit message that follows our [commit message conventions](developers/#commits). Adherence to the [commit message conventions](developers/#commits) is required, because release notes are automatically generated from these messages.
+* Commit your changes using a descriptive commit message that follows our [commit message conventions](developers.md#commits). Adherence to the [commit message conventions](developers.md#commits) is required, because release notes are automatically generated from these messages.
 
   ```text
     git commit -a
