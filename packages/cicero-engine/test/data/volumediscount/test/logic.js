@@ -14,9 +14,9 @@
 
 'use strict';
 
-const Template = require('cicero-core').Template;
-const Clause = require('cicero-core').Clause;
-const Engine = require('cicero-engine').Engine;
+const Template = require('@accordproject/cicero-core').Template;
+const Clause = require('@accordproject/cicero-core').Clause;
+const Engine = require('@accordproject/cicero-engine').Engine;
 
 const fs = require('fs');
 const path = require('path');

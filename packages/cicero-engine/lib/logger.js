@@ -14,7 +14,7 @@
 
 'use strict';
 
-const logger = require('cicero-core').logger;
+const logger = require('@accordproject/cicero-core').logger;
 
 /**
  * <p>

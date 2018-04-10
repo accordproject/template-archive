@@ -15,7 +15,7 @@
 'use strict';
 
 const Logger = require('./logger');
-const logger = require('cicero-core').logger;
+const logger = require('@accordproject/cicero-core').logger;
 const ResourceValidator = require('composer-common/lib/serializer/resourcevalidator');
 
 const {
