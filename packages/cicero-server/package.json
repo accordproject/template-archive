@@ -1,5 +1,5 @@
 {
-  "name": "cicero-server",
+  "name": "@accordproject/cicero-server",
   "version": "0.2.46",
   "description": "Cicero Server - wraps the Cicero Engine and exposes it as a RESTful service",
   "engines": {
@@ -29,6 +29,9 @@
     "smart",
     "contract"
   ],
+  "publishConfig": {
+    "access": "public"
+  },
   "author": "clause.io",
   "license": "Apache-2.0",
   "bugs": {
@@ -48,8 +51,8 @@
     "sinon": "^4.0.1"
   },
   "dependencies": {
-    "cicero-core": "^0.2.46",
-    "cicero-engine": "^0.2.46",
+    "@accordproject/cicero-core": "^0.2.46",
+    "@accordproject/cicero-engine": "^0.2.46",
     "express": "^4.16.2"
   },
   "license-check-config": {

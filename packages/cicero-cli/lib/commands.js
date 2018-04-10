@@ -14,10 +14,10 @@
 
 'use strict';
 
-const logger = require('cicero-core').logger;
-const Template = require('cicero-core').Template;
-const Clause = require('cicero-core').Clause;
-const Engine = require('cicero-engine').Engine;
+const logger = require('@accordproject/cicero-core').logger;
+const Template = require('@accordproject/cicero-core').Template;
+const Clause = require('@accordproject/cicero-core').Clause;
+const Engine = require('@accordproject/cicero-engine').Engine;
 const CodeGen = require('composer-common').CodeGen;
 const FileWriter = CodeGen.FileWriter;
 const fs = require('fs');

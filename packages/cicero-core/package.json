@@ -1,5 +1,5 @@
 {
-  "name": "cicero-core",
+  "name": "@accordproject/cicero-core",
   "version": "0.2.46",
   "description": "Cicero Core - implementation of Accord Protocol Template Specification",
   "engines": {
@@ -28,6 +28,9 @@
     "smart",
     "contract"
   ],
+  "publishConfig": {
+    "access": "public"
+  },
   "author": "accordproject.org",
   "license": "Apache-2.0",
   "bugs": {
