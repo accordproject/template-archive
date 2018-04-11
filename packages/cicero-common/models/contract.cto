@@ -26,7 +26,7 @@ transaction Request {}
 transaction Response {}
 /* An Error is a concept */
 concept ErrorResponse {}
-/* An event is a transaction */
+/* An action is a transaction -- actions could be external events or specify obligations */
 transaction Action {}
 /* A payload has contract data, a request and a state */
 concept Payload {
