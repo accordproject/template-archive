@@ -1,0 +1,51 @@
+namespace org.accordproject.contract
+
+/**
+ * Contract data
+ * -- This is the result of matching a template
+ */
+
+/* A state is a concept with a contract status */
+concept State {
+}
+/* A contract is a concept -- This contains the contract data */
+concept Contract {
+}
+/* A clause is a concept -- This contains the clause data */
+concept Clause {
+}
+
+/**
+ * Contract API
+ * -- Describes input and output of calls to a contract's clause
+ */
+
+/* A request is a transaction */
+transaction Request {}
+/* A response is a transaction */
+transaction Response {}
+/* An Error is a concept */
+concept ErrorResponse {}
+/* An event is a transaction */
+transaction Action {}
+/* A payload has contract data, a request and a state */
+concept Payload {
+  o Contract contract  // the contract data (replaces current clause)
+  o Request request
+  o State state
+}
+/* If the call to a contract's clause succeeds, it returns a response, a list of events and a new state */
+concept Success {
+  o Response response
+  o Action[] actions
+  o State state
+}
+/* If the call to a contract's clause fails, it returns and error */ 
+concept Failure {
+  o ErrorResponse error
+}
+
+/**
+ * The functional signature for a contract call is as follows:
+ * clausecall : String contractName -> String clauseName -> Payload payload -> Success | Failure
+ */

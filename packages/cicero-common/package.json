@@ -1,0 +1,84 @@
+{
+  "name": "@accordproject/cicero-common",
+  "version": "0.2.48",
+  "description": "Cicero Common - implementation of Accord Protocol Template Specification",
+  "engines": {
+    "node": ">=8",
+    "npm": ">=3"
+  },
+  "publishConfig": {
+    "access": "public"
+  },
+  "scripts": {
+    "pretest": "npm run lint",
+    "lint": "eslint .",
+    "postlint": "npm run licchk",
+    "licchk": "license-check",
+    "test": "mocha && nyc mocha"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/accordproject/cicero.git"
+  },
+  "keywords": [
+    "accord",
+    "cicero",
+    "smart",
+    "contract"
+  ],
+  "author": "accordproject.org",
+  "license": "Apache-2.0",
+  "bugs": {
+    "url": "https://github.com/accordproject/cicero/issues"
+  },
+  "homepage": "https://github.com/accordproject/cicero#readme",
+  "devDependencies": {
+    "chai": "^3.5.0",
+    "chai-as-promised": "^6.0.0",
+    "chai-things": "^0.2.0",
+    "eslint": "^4.6.1",
+    "license-check": "^1.1.5",
+    "mocha": "^3.4.2",
+    "mockery": "^2.0.0",
+    "nyc": "^11.3.0",
+    "sinon": "^4.0.1"
+  },
+  "dependencies": {
+    "composer-common": "0.17.4",
+    "config": "^1.24.0",
+    "debug": "^2.6.2"
+  },
+  "license-check-config": {
+    "src": [
+      "**/*.js",
+      "!./test/data/**/*",
+      "!./coverage/**/*",
+      "!./node_modules/**/*",
+      "!./out/**/*"
+    ],
+    "path": "header.txt",
+    "blocking": true,
+    "logInfo": false,
+    "logError": true
+  },
+  "nyc": {
+    "produce-source-map": "true",
+    "sourceMap": "inline",
+    "reporter": [
+      "lcov",
+      "text-summary",
+      "html",
+      "json"
+    ],
+    "include": [
+      "lib/**/*.js"
+    ],
+    "exclude": [],
+    "all": true,
+    "check-coverage": true,
+    "statements": 0,
+    "branches": 0,
+    "functions": 0,
+    "lines": 0
+  }
+}
