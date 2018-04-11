@@ -18,9 +18,9 @@
 const fs = require('fs');
 const app = require('express')();
 const bodyParser = require('body-parser');
-const Template = require('cicero-core').Template;
-const Clause = require('cicero-core').Clause;
-const Engine = require('cicero-engine').Engine;
+const Template = require('@accordproject/cicero-core').Template;
+const Clause = require('@accordproject/cicero-core').Clause;
+const Engine = require('@accordproject/cicero-engine').Engine;
 
 if(!process.env.CICERO_DIR) {
     throw new Error('You must set the CICERO_DIR environment variable.');
