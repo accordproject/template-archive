@@ -142,11 +142,11 @@ describe('Template', () => {
             const template = await Template.fromDirectory('./test/data/latedeliveryandpenalty');
             const types = template.getRequestTypes();
             types.should.be.eql([
-                'io.clause.latedeliveryandpenalty.LateDeliveryAndPenaltyRequest',
-                // TODO The second value comes from the compiled Jura.
+                // TODO The first value comes from the compiled Ergo.
                 // Change this to fully qualified type once this issue is fixed
-                // https://github.com/accordproject/jura/issues/19
+                // https://github.com/accordproject/ergo/issues/19
                 'Request',
+                'io.clause.latedeliveryandpenalty.LateDeliveryAndPenaltyRequest',
             ]);
         });
 
@@ -162,11 +162,11 @@ describe('Template', () => {
             const template = await Template.fromDirectory('./test/data/latedeliveryandpenalty');
             const types = template.getResponseTypes();
             types.should.be.eql([
-                'io.clause.latedeliveryandpenalty.LateDeliveryAndPenaltyResponse',
-                // TODO The second value comes from the compiled Jura.
+                // TODO The first value comes from the compiled Ergo.
                 // Change this to fully qualified type once this issue is fixed
-                // https://github.com/accordproject/jura/issues/19
+                // https://github.com/accordproject/ergo/issues/19
                 'Response',
+                'io.clause.latedeliveryandpenalty.LateDeliveryAndPenaltyResponse',
             ]);
         });
 

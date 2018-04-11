@@ -1,0 +1,8 @@
+namespace org.accordproject.helloworld
+
+contract HelloWorld over TemplateModel {
+   // Simple Clause
+   clause helloworld(request Request) : Response {
+     return new Response{ output: "Hello " ++ contract.name ++ " (" ++ request.input ++ ")" }
+  }
+}

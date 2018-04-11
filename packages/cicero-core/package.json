@@ -58,7 +58,7 @@
     "gunzip-maybe": "^1.4.1",
     "ietf-language-tag-regex": "^0.0.5",
     "jszip": "^3.1.4",
-    "jura-compiler": "^0.0.19",
+    "@accordproject/ergo-compiler": "^0.0.38",
     "minimatch": "^3.0.4",
     "moment": "^2.20.1",
     "moo": "^0.4.3",
