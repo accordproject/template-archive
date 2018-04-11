@@ -1,10 +1,13 @@
 {
-  "name": "generator-cicero-template",
+  "name": "@accordproject/generator-cicero-template",
   "version": "0.2.46",
   "description": "Code generator for a Cicero Template",
   "engines": {
     "node": ">=8",
     "npm": ">=3"
+  },
+  "publishConfig": {
+    "access": "public"
   },
   "author": "clause.io",
   "scripts": {
