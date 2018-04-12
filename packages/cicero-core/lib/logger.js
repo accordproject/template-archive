@@ -32,13 +32,16 @@ let logger = new(winston.Logger)({
             timestamp: tsFormat,
             level: 'info'
         }),
-        new(winston.transports.File)({
-            name: 'logs-file',
-            filename: `${logDir}/trace.log`,
-            level: env === 'development' ? 'debug' : 'info'
-        })
     ]
 });
+
+if(env === 'development'){
+    logger.add(winston.transports.File, {
+        name: 'logs-file',
+        filename: `${logDir}/trace.log`,
+        level: env === 'development' ? 'debug' : 'info'
+    });
+}
 
 logger.entry = logger.debug;
 logger.exit = logger.debug;

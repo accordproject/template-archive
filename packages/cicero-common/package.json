@@ -1,7 +1,7 @@
 {
-  "name": "@accordproject/cicero-core",
+  "name": "@accordproject/cicero-common",
   "version": "0.2.48",
-  "description": "Cicero Core - implementation of Accord Protocol Template Specification",
+  "description": "Cicero Common - implementation of Accord Protocol Template Specification",
   "engines": {
     "node": ">=8",
     "npm": ">=3"
@@ -9,12 +9,7 @@
   "publishConfig": {
     "access": "public"
   },
-  "files": [
-    "lib"
-  ],
-  "main": "index.js",
   "scripts": {
-    "prepare": "nearleyc ./lib/tdl.ne -o ./lib/tdl.js",
     "pretest": "npm run lint",
     "lint": "eslint .",
     "postlint": "npm run licchk",
@@ -44,21 +39,14 @@
     "eslint": "^4.6.1",
     "license-check": "^1.1.5",
     "mocha": "^3.4.2",
+    "mockery": "^2.0.0",
     "nyc": "^11.3.0",
-    "typescript": "^2.8.1"
+    "sinon": "^4.0.1"
   },
   "dependencies": {
     "composer-common": "0.17.4",
-    "debug": "^2.6.2",
-    "glob": "^7.1.2",
-    "ietf-language-tag-regex": "^0.0.5",
-    "jszip": "^3.1.4",
-    "@accordproject/ergo-compiler": "^0.0.38",
-    "minimatch": "^3.0.4",
-    "moo": "^0.4.3",
-    "nearley": "^2.12.1",
-    "winston": "^2.3.1",
-    "xregexp": "^4.0.0"
+    "config": "^1.24.0",
+    "debug": "^2.6.2"
   },
   "license-check-config": {
     "src": [
@@ -66,8 +54,7 @@
       "!./test/data/**/*",
       "!./coverage/**/*",
       "!./node_modules/**/*",
-      "!./out/**/*",
-      "!./lib/tdl.js"
+      "!./out/**/*"
     ],
     "path": "header.txt",
     "blocking": true,
@@ -86,14 +73,12 @@
     "include": [
       "lib/**/*.js"
     ],
-    "exclude": [
-      "lib/tdl.js"
-    ],
+    "exclude": [],
     "all": true,
     "check-coverage": true,
-    "statements": 86,
-    "branches": 64,
-    "functions": 88,
-    "lines": 85
+    "statements": 0,
+    "branches": 0,
+    "functions": 0,
+    "lines": 0
   }
 }

@@ -14,8 +14,8 @@
 
 'use strict';
 
-const Template = require('cicero-core').Template;
-const Clause = require('cicero-core').Clause;
+const Template = require('@accordproject/cicero-core').Template;
+const Clause = require('@accordproject/cicero-core').Clause;
 const Engine = require('../lib/engine');
 
 const chai = require('chai');
@@ -57,7 +57,7 @@ describe('EngineLatePenalty', () => {
             result.response.penalty.should.equal(110.00000000000001);
         });
     });
-    describe('#executejura', function () {
+    describe('#executeergo', function () {
 
         it('should execute a smart clause', async function () {
             const request = {

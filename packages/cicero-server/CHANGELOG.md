@@ -3,6 +3,22 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+<a name="0.2.48"></a>
+## [0.2.48](https://github.com/accordproject/cicero/compare/v0.2.47...v0.2.48) (2018-04-11)
+
+
+
+
+**Note:** Version bump only for package @accordproject/cicero-server
+
+<a name="0.2.47"></a>
+## [0.2.47](https://github.com/accordproject/cicero/compare/v0.2.46...v0.2.47) (2018-04-11)
+
+
+
+
+**Note:** Version bump only for package @accordproject/cicero-server
+
 <a name="0.2.46"></a>
 ## [0.2.46](https://github.com/accordproject/cicero/compare/v0.2.45...v0.2.46) (2018-03-06)
 

@@ -38,7 +38,7 @@ const nearleyGrammar = require('nearley/lib/nearley-language-bootstrapped');
 const templateGrammar = require('./tdl.js');
 const GrammarVisitor = require('./grammarvisitor');
 
-const Jura = require('jura-compiler/lib/jura');
+const Ergo = require('@accordproject/ergo-compiler/lib/ergo');
 
 const ENCODING = 'utf8';
 // Matches 'sample.txt' or 'sample_TAG.txt' where TAG is an IETF language tag (BCP 47)
@@ -406,7 +406,7 @@ class Template {
             let ctoModelFiles = [];
             let ctoModelFileNames = [];
             let jsScriptFiles = [];
-            let juraScriptFiles = [];
+            let ergoScriptFiles = [];
             let sampleTextFiles = {};
             let template;
             let readmeContents = null;
@@ -511,19 +511,19 @@ class Template {
                 });
             });
 
-            logger.debug(method, 'Looking for Jura files');
-            let juraFiles = zip.file(/lib\/.*\.jura$/); //Matches any file which is in the 'lib' folder and has a .jura extension
-            juraFiles.forEach(function (file) {
-                logger.debug(method, 'Found Jura file, loading it', file.name);
+            logger.debug(method, 'Looking for Ergo files');
+            let ergoFiles = zip.file(/lib\/.*\.ergo$/); //Matches any file which is in the 'lib' folder and has a .ergo extension
+            ergoFiles.forEach(function (file) {
+                logger.debug(method, 'Found Ergo file, loading it', file.name);
                 promise = promise.then(() => {
                     return file.async('string');
                 }).then((contents) => {
-                    logger.debug(method, 'Loaded Jura file');
+                    logger.debug(method, 'Loaded Ergo file');
                     let tempObj = {
                         'name': file.name,
                         'contents': contents
                     };
-                    juraScriptFiles.push(tempObj);
+                    ergoScriptFiles.push(tempObj);
                 });
             });
 
@@ -542,11 +542,11 @@ class Template {
                 });
                 logger.debug(method, 'Added JavaScript files to script manager');
 
-                juraScriptFiles.forEach(function (obj) {
-                    let juraObject = template.scriptManager.createScript(obj.name, 'jura', obj.contents);
-                    template.scriptManager.addScript(juraObject); // Adds all jura files to script manager
+                ergoScriptFiles.forEach(function (obj) {
+                    let ergoObject = template.scriptManager.createScript(obj.name, 'ergo', obj.contents);
+                    template.scriptManager.addScript(ergoObject); // Adds all ergo files to script manager
                 });
-                logger.debug(method, 'Added Jura files to script manager');
+                logger.debug(method, 'Added Ergo files to script manager');
 
                 // check the template model
                 template.getTemplateModel();
@@ -685,7 +685,7 @@ class Template {
      * @param {boolean} [options.modelFileGlob] - specify the glob pattern used to match
      * the model files to include. Defaults to **\/models/**\/*.cto
      * @param {boolean} [options.scriptGlob] - specify the glob pattern used to match
-     * the script files to include. Defaults to **\/lib/**\/*.+(js|jura)
+     * the script files to include. Defaults to **\/lib/**\/*.+(js|ergo)
      * @return {Promise} a Promise to the instantiated business network
      */
     static fromDirectory(path, options) {
@@ -703,7 +703,7 @@ class Template {
         }
 
         if (!options.scriptGlob) {
-            options.scriptGlob = '**/lib/**/*.+(js|jura)';
+            options.scriptGlob = '**/lib/**/*.+(js|ergo)';
         }
 
         const method = 'fromDirectory';
@@ -812,9 +812,10 @@ class Template {
                 },
                 process: function (path, contents) {
                     let filePath = fsPath.parse(path);
-                    if (filePath.ext.toLowerCase() === '.jura') {
-                        logger.debug(method, 'Compiling Jura to JavaScript ', path);
-                        contents = Jura.compileToJavaScript(contents,null,null,true);
+                    if (filePath.ext.toLowerCase() === '.ergo') {
+                        logger.debug(method, 'Compiling Ergo to JavaScript ', path);
+                        contents = Ergo.compileToJavaScript(contents,[],null,null,true);
+                        logger.debug('ERGO!\n'+contents+'\n');
                     }
                     const jsScript = template.getScriptManager().createScript(path, filePath.ext.toLowerCase(), contents);
                     scriptFiles.push(jsScript);

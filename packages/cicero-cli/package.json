@@ -1,10 +1,13 @@
 {
-  "name": "cicero-cli",
-  "version": "0.2.46",
+  "name": "@accordproject/cicero-cli",
+  "version": "0.2.48",
   "description": "Cicero CLI",
   "engines": {
     "node": ">=8",
     "npm": ">=3"
+  },
+  "publishConfig": {
+    "access": "public"
   },
   "bin": {
     "cicero": "./index.js"
@@ -42,8 +45,8 @@
     "nyc": "^11.6.0"
   },
   "dependencies": {
-    "cicero-core": "^0.2.46",
-    "cicero-engine": "^0.2.46",
+    "@accordproject/cicero-core": "^0.2.48",
+    "@accordproject/cicero-engine": "^0.2.48",
     "composer-common": "0.17.4",
     "yargs": "^9.0.1"
   },

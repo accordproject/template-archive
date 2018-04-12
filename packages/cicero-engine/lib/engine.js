@@ -15,7 +15,7 @@
 'use strict';
 
 const Logger = require('./logger');
-const logger = require('cicero-core').logger;
+const logger = require('@accordproject/cicero-core').logger;
 const ResourceValidator = require('composer-common/lib/serializer/resourcevalidator');
 
 const {
@@ -41,26 +41,26 @@ class Engine {
     }
 
     /**
-     * Compile and cache a clause with Jura logic
+     * Compile and cache a clause with Ergo logic
      * @param {Clause} clause  - the clause to compile
      * @private
      */
-    compileJuraClause(clause) {
-        let allJuraScripts = '';
+    compileErgoClause(clause) {
+        let allErgoScripts = '';
         let template = clause.getTemplate();
 
         template.getScriptManager().getScripts().forEach(function (element) {
-            if (element.getLanguage() === '.jura') {
-                allJuraScripts += element.getContents();
+            if (element.getLanguage() === '.ergo') {
+                allErgoScripts += element.getContents();
             }
         }, this);
 
-        if (allJuraScripts === '') {
-            throw new Error('Did not find any Jura logic');
+        if (allErgoScripts === '') {
+            throw new Error('Did not find any Ergo logic');
         }
-        allJuraScripts += this.buildJuraDispatchFunction(clause);
-        // console.log(allJuraScripts);
-        const script = new VMScript(allJuraScripts);
+        allErgoScripts += this.buildErgoDispatchFunction(clause);
+        // console.log(allErgoScripts);
+        const script = new VMScript(allErgoScripts);
         this.scripts[clause.getIdentifier()] = script;
     }
 
@@ -89,12 +89,12 @@ class Engine {
     }
 
     /**
-     * Generate the runtime dispatch logic for Jura
+     * Generate the runtime dispatch logic for Ergo
      * @param {Clause} clause  - the clause to compile
      * @return {string} the Javascript code for dispatch
      * @private
      */
-    buildJuraDispatchFunction(clause) {
+    buildErgoDispatchFunction(clause) {
         // get the function declarations of all functions
         // that have the @clause annotation
         const functionDeclarations = clause.getTemplate().getScriptManager().getScripts().map((ele) => {
@@ -117,9 +117,9 @@ class Engine {
         __dispatch(data,request);
 
         function __dispatch(data,request) {
-            // Jura dispatch call
-            let context = {this: data, request: serializer.toJSON(request), this: data, now: moment()};
-            return serializer.fromJSON(dispatch(context));
+            // Ergo dispatch call
+            let context = {request: serializer.toJSON(request), contract: data, state: {}, now: moment()};
+            return serializer.fromJSON(dispatch(context).response);
         } 
         `;
 
@@ -212,11 +212,11 @@ class Engine {
             if (template.logicjsonly) {
                 this.compileJsClause(clause);
             } else {
-                // Attempt jura compilation first
+                // Attempt ergo compilation first
                 try {
-                    this.compileJuraClause(clause);
+                    this.compileErgoClause(clause);
                 } catch(err) {
-                    logger.debug('Error compiling Jura logic, falling back to JavaScript'+err);
+                    logger.debug('Error compiling Ergo logic, falling back to JavaScript'+err);
                     this.compileJsClause(clause);
                 }
             }
@@ -246,8 +246,8 @@ class Engine {
         const Fs = require('fs');
         const Path = require('path');
         // XXX This needs to be cleaned up to properly load the runtime as a Node module XXX
-        const jurRuntime = Fs.readFileSync(Path.join(__dirname,'..','..','..','node_modules','jura-engine','lib','juraruntime.js'), 'utf8');
-        vm.run(jurRuntime);
+        const ergoRuntime = Fs.readFileSync(Path.join(__dirname,'..','..','..','node_modules','@accordproject','ergo-engine','lib','ergoruntime.js'), 'utf8');
+        vm.run(ergoRuntime);
 
         const response = vm.run(script);
         response.$validator = new ResourceValidator({permitResourcesForRelationships: true});
