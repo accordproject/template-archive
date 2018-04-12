@@ -108,9 +108,10 @@ class Commands {
      * @param {string} templatePath to the template directory
      * @param {string} samplePath to the sample file
      * @param {string} dataPath to the data file
+     * @param {boolean} forcejs forces JavaScript logic
      * @returns {object} Promise to the result of parsing
      */
-    static execute(templatePath, samplePath, dataPath) {
+    static execute(templatePath, samplePath, dataPath, forcejs) {
         let clause;
         const sampleText = fs.readFileSync(samplePath, 'utf8');
         const jsonData = JSON.parse(fs.readFileSync(dataPath, 'utf8'));
@@ -120,7 +121,7 @@ class Commands {
                 clause = new Clause(template);
                 clause.parse(sampleText);
                 const engine = new Engine();
-                return engine.execute(clause, jsonData);
+                return engine.execute(clause, jsonData, forcejs);
             })
             .catch((err) => {
                 logger.error(err);

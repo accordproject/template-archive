@@ -128,10 +128,19 @@ describe('cicero-cli', () => {
 
     describe('#execute', () => {
         it('should execute a clause using a template', async () => {
-            const response = await Commands.execute(template, sample, data);
+            const response = await Commands.execute(template, sample, data, true);
             response.response.$class.should.be.equal('org.accordproject.latedeliveryandpenalty.LateDeliveryAndPenaltyResponse');
             response.response.penalty.should.be.equal(4);
-            response.response.buyerMayTerminate.should.be.equal(false);
+            response.response.buyerMayTerminate.should.be.equal(true);
+        });
+    });
+
+    describe('#executeergo', () => {
+        it('should execute a clause in ergo using a template', async () => {
+            const response = await Commands.execute(template, sample, data, false);
+            response.response.$class.should.be.equal('org.accordproject.latedeliveryandpenalty.LateDeliveryAndPenaltyResponse');
+            response.response.penalty.should.be.equal(4);
+            response.response.buyerMayTerminate.should.be.equal(true);
         });
     });
 
