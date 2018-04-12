@@ -57,7 +57,7 @@ describe('EngineLatePenalty', () => {
             result.response.penalty.should.equal(110.00000000000001);
         });
     });
-    describe('#executejura', function () {
+    describe('#executeergo', function () {
 
         it('should execute a smart clause', async function () {
             const request = {
