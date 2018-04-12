@@ -42,12 +42,12 @@
     "chai": "^3.5.0",
     "chai-as-promised": "^6.0.0",
     "chai-things": "^0.2.0",
-    "eslint": "^4.6.1",
+    "eslint": "^4.19.1",
     "jsdoc": "^3.5.5",
     "license-check": "^1.1.5",
-    "mocha": "^3.4.2",
+    "mocha": "^5.0.5",
     "mockery": "^2.0.0",
-    "nyc": "^11.3.0",
+    "nyc": "^11.6.0",
     "sinon": "^4.0.1"
   },
   "dependencies": {
