@@ -7,7 +7,7 @@ This module includes useful command line utilities for working with Cicero. It s
 ## Installation
 
 ```
-npm install -g cicero-cli
+npm install -g @accordproject/cicero-cli
 ```
 
 ## Usage

@@ -6,7 +6,7 @@ the root CICERO_DIR. Clauses may be instantiated from JSON or TXT files loaded f
 ## Installation
 
 ```
-npm install -g cicero-server --save
+npm install -g @accordproject/cicero-server --save
 ```
 
 ## Run
