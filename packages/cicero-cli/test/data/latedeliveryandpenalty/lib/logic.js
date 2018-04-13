@@ -47,7 +47,7 @@ function execute(context) {
         res.penalty = penalty;
 
         // can we terminate?
-        if (diff > data.termination) {
+        if (diff > data.termination.amount) {
             logger.info('buyerMayTerminate.');
             res.buyerMayTerminate = true;
         }

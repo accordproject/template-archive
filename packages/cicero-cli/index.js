@@ -57,6 +57,11 @@ require('yargs')
             describe: 'path to the clause text',
             type: 'string'
         });
+        yargs.option('jsonly', {
+            describe: 'force javascript execution',
+            type: 'boolean',
+            default: false
+        });
         yargs.option('data', {
             describe: 'path to the request JSON data',
             type: 'string'
@@ -70,7 +75,7 @@ require('yargs')
             return;
         }
 
-        return Commands.execute(argv.template, argv.dsl, argv.data)
+        return Commands.execute(argv.template, argv.dsl, argv.data, argv.jsonly)
             .then((result) => {
                 logger.info(JSON.stringify(result));
             })
