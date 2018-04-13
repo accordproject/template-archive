@@ -44,8 +44,8 @@
   },
   "dependencies": {
     "@accordproject/cicero-core": "^0.2.50",
-    "@accordproject/ergo-compiler": "^0.0.39",
-    "@accordproject/ergo-engine": "^0.0.39",
+    "@accordproject/ergo-compiler": "^0.0.40",
+    "@accordproject/ergo-engine": "^0.0.40",
     "composer-common": "0.17.4",
     "config": "^1.24.0",
     "debug": "^2.6.2",

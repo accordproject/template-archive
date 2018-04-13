@@ -17,6 +17,7 @@
 const Logger = require('./logger');
 const logger = require('@accordproject/cicero-core').logger;
 const ResourceValidator = require('composer-common/lib/serializer/resourcevalidator');
+const ErgoEngine = require('@accordproject/ergo-engine/lib/ergo-engine');
 
 const {
     VM,
@@ -60,6 +61,7 @@ class Engine {
         }
         allErgoScripts += this.buildErgoDispatchFunction(clause);
         // console.log(allErgoScripts);
+        allErgoScripts = ErgoEngine.linkErgoRuntime(allErgoScripts);
         const script = new VMScript(allErgoScripts);
         this.scripts[clause.getIdentifier()] = script;
     }
@@ -243,11 +245,6 @@ class Engine {
         vm.freeze(tx, 'request'); // Second argument adds object to global.
         vm.freeze(data, 'data'); // Second argument adds object to global.
         vm.freeze(factory, 'factory'); // Second argument adds object to global.
-        const Fs = require('fs');
-        const Path = require('path');
-        // XXX This needs to be cleaned up to properly load the runtime as a Node module XXX
-        const ergoRuntime = Fs.readFileSync(Path.join(__dirname,'..','..','..','node_modules','@accordproject','ergo-engine','lib','ergoruntime.js'), 'utf8');
-        vm.run(ergoRuntime);
 
         const response = vm.run(script);
         response.$validator = new ResourceValidator({permitResourcesForRelationships: true});
