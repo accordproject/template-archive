@@ -15,16 +15,28 @@
 'use strict';
 const path = require('path');
 const assert = require('yeoman-assert');
-const helpers = require('yeoman-test');
+const yo = require('yeoman-test');
+const helpers = require('../generators/app/promptingHelpers');
 
 describe('generator-cicero-template:app', () => {
-    before(() => {
-        return helpers
+
+    it('creates files', async () => {
+        await yo
             .run(path.join(__dirname, '../generators/app'))
             .withPrompts({ templateName: 'test' }, { modeNamespace: 'foo' });
+        assert.file('./test/package.json');
     });
 
-    it('creates files', () => {
-        assert.file(['./test/package.json']);
+    describe('helpers', () => {
+
+        it('has a good template name', async () => {
+            assert(helpers.validateTemplateName('test'));
+        });
+        it('has a bad template name', async () => {
+            const response = helpers.validateTemplateName('TEST');
+            assert(typeof response === 'string');
+        });
+
     });
 });
+

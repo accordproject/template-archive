@@ -17,6 +17,7 @@ const Generator = require('yeoman-generator');
 const chalk = require('chalk');
 const yosay = require('yosay');
 const packageJson = require('../../package.json');
+const helper = require('./promptingHelpers');
 
 module.exports = class extends Generator {
 
@@ -35,7 +36,8 @@ module.exports = class extends Generator {
                 type: 'input',
                 name: 'templateName',
                 message: 'What is the name of your template?',
-                default: 'mytemplate'
+                default: 'mytemplate',
+                validate: helper.validateTemplateName
             },
             {
                 type: 'input',
