@@ -6,7 +6,7 @@ First, install [Yeoman](http://yeoman.io) and generator-cicero-template using [n
 
 ```bash
 npm install -g yo
-npm install -g generator-cicero-template
+npm install -g @accordproject/generator-cicero-template
 ```
 
 Then generate your new project:

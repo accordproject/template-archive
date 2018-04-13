@@ -40,7 +40,7 @@ These instructions were tested using:
 * node version 8.6.0
 
 ```
-npm install -g cicero-cli
+npm install -g @accordproject/cicero-cli
 ```
 
 ## Using an existing Template
@@ -142,7 +142,7 @@ Install the template generator:
 
 ```bash
 npm install -g yo
-npm install -g generator-cicero-template
+npm install -g @accordproject/generator-cicero-template
 ```
 
 Run the template generator:
@@ -150,7 +150,7 @@ Run the template generator:
 > If you have forked the `cicero-template-library` cd into that directory first.
 
 ```bash
-yo cicero-template
+yo @accordproject/cicero-template
 ```
 
 Give your generator a name (no spaces) and then supply a namespace for your template model (again, no spaces). The generator will then create the files and directories required for a basic template (based on the helloworld template).
