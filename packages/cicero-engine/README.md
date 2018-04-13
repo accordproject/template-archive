@@ -9,5 +9,5 @@ The current implementation is based on the `vm2` npm module, which provides (som
 ## Installation
 
 ```
-npm install cicero-engine --save
+npm install @accordproject/cicero-engine --save
 ```
