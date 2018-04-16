@@ -19,12 +19,6 @@ const fs = require('fs');
 const env = process.env.NODE_ENV || 'development';
 const tsFormat = () => (new Date()).toLocaleTimeString();
 
-const logDir = 'log';
-// Create the log directory if it does not exist
-if (!fs.existsSync(logDir)) {
-    fs.mkdirSync(logDir);
-}
-
 let logger = new(winston.Logger)({
     transports: [
         new(winston.transports.Console)({
@@ -36,6 +30,12 @@ let logger = new(winston.Logger)({
 });
 
 if(env === 'development'){
+    const logDir = 'log';
+    // Create the log directory if it does not exist
+    if (!fs.existsSync(logDir)) {
+        fs.mkdirSync(logDir);
+    }
+
     logger.add(winston.transports.File, {
         name: 'logs-file',
         filename: `${logDir}/trace.log`,
