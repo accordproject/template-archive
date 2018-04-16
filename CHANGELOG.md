@@ -3,6 +3,18 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+<a name="0.2.53"></a>
+## [0.2.53](https://github.com/accordproject/cicero/compare/v0.2.52...v0.2.53) (2018-04-16)
+
+
+### Bug Fixes
+
+* [#42](https://github.com/accordproject/cicero/issues/42) generator allows invalid package names ([fff2e1f](https://github.com/accordproject/cicero/commit/fff2e1f))
+* [#49](https://github.com/accordproject/cicero/issues/49) Update docs to use new [@accordproject](https://github.com/accordproject) scoped packages ([62437ae](https://github.com/accordproject/cicero/commit/62437ae))
+
+
+
+
 <a name="0.2.52"></a>
 ## [0.2.52](https://github.com/accordproject/cicero/compare/v0.2.51...v0.2.52) (2018-04-13)
 
