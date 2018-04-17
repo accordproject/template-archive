@@ -63,6 +63,10 @@ describe('Template', () => {
             return Template.fromDirectory('./test/data/no-concepts').should.be.rejectedWith('Failed to find the template model. Decorate a concept with @AccordTemplateModel("conga").');
         });
 
+        it('should throw an error if no model file is found', async () => {
+            return Template.fromDirectory('./test/data/no-model').should.be.rejectedWith('Failed to find a model file.');
+        });
+
         it('should throw an error if a package.json file does not exist', async () => {
             return (() => Template.fromDirectory('./test/data/no-packagejson')).should.throw('Failed to find package.json');
         });
