@@ -101,6 +101,7 @@ Before you submit your pull request consider the following guidelines:
 
 * Create your patch commit, **including appropriate test cases**.
 * Follow our [Coding Rules][developers.rules].
+* Ensure you provide a DCO sign-off for your commits using the -s option of git commit. For more information see https://github.com/probot/dco#how-it-works
 * If the changes affect public APIs, change or add relevant [documentation][developers.documentation].
 * Run the [unit][developers.tests-unit] and [E2E test][developers.tests-e2e] suites, and ensure that all tests
   pass.
