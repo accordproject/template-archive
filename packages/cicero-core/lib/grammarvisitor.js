@@ -93,7 +93,7 @@ YEAR -> DOUBLE_NUMBER DOUBLE_NUMBER
 {% (d) => {return '' + d[0] + d[1]}%}
 
 DATE -> MONTH "/" DAY "/" YEAR
-{% (d) => {return '' + d[0] + '/' + d[2] + '/' + d[4]}%}
+{% (d) => {return '' + d[4] + '-' + d[0] + '-' + d[2]}%}
 
 Word -> [\\S]:*
 {% (d) => {return d[0].join('');}%}
