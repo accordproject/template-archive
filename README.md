@@ -175,7 +175,10 @@ Your template expects to receive data as input and will produce data as output. 
 
 ### Edit the Logic of the Template
 
-Now edit the business logic of the template itself. At present this is expressed as ES 2015 JavaScript functions (other languages may be supported in the future). Open the file `lib/logic.js` and edit the `execute` method to perform the calculations your logic requires. Use the `context.request` and `context.data` properties to access the incoming request and the template data respectively, setting properties on `context.response` to be returned to the caller.
+Now edit the business logic of the template itself. At present the main language supported is ES 2015 JavaScript functions, with prototype support for Ergo (https://github.com/accordproject/ergo) a DSL for smart legal contract under development.
+
+- If using ES 2015 JavaScript: Open the file `lib/logic.js` and edit the `execute` method to perform the calculations your logic requires. Use the `context.request` and `context.data` properties to access the incoming request and the template data respectively, setting properties on `context.response` to be returned to the caller.
+- If using Ergo: Open the file `lib/logic.ergo` and edit the contract clause(s) to perform the calculations your logic requires. Use the parameter of that clause (usually `request`) and the built-in `contract` variable to access the incoming request and the template data respectively. Have your clause create an object (`new Response{ ...properties... }` where `Response` is the CTO transaction name for the response to be returned to the caller.
 
 ## Developing an Application
 
