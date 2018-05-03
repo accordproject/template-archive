@@ -183,18 +183,7 @@ from the main (upstream) repository:
     git pull --ff upstream master
     ```
 
-## <a name="cla"></a> Signing the Contributor License Agreement (CLA)
-
-Upon submmitting a Pull Request, a friendly bot will ask you to sign our CLA if you haven't done
-so before. Unfortunately, this is necessary for documentation changes, too.
-It's a quick process, we promise!
-
-* For individuals we have a [simple click-through form][individual-cla].
-* For corporations we'll need you to
-  [print, sign and one of scan+email, fax or mail the form][corporate-cla].
-
 [coc]: https://github.com/accordproject/code-of-conduct/blob/master/CODE_OF_CONDUCT.md
-[corporate-cla]: http://code.google.com/legal/corporate-cla-v1.0.html
 [developers]: DEVELOPERS.md
 [developers.commits]: DEVELOPERS.md#commits
 [developers.documentation]: DEVELOPERS.md#documentation
@@ -205,5 +194,4 @@ It's a quick process, we promise!
 [github-issues]: https://github.com/accordproject/cicero/issues
 [github-new-issue]: https://github.com/accordproject/cicero/issues/new
 [github]: https://github.com/accordproject/cicero
-[individual-cla]: http://code.google.com/legal/individual-cla-v1.0.html
 [stackoverflow]: http://stackoverflow.com/questions/tagged/cicero
