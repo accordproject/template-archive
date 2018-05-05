@@ -258,7 +258,9 @@ class Engine {
         const result = {
             'clause': clause.getIdentifier(),
             'request': request,
-            'response': template.getSerializer().toJSON(response.response, {convertResourcesToRelationships: true})
+            'response': template.getSerializer().toJSON(response.response, {convertResourcesToRelationships: true}),
+            'state': response.state,
+            'emit': response.emit
         };
 
         return result;
