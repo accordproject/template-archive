@@ -52,7 +52,8 @@ describe('EngineLatePenalty', () => {
                 'transactionId': '402c8f50-9e61-433e-a7c1-afe61c06ef00',
                 'timestamp': '2017-11-12T17:38:01.412Z'
             };
-            const result = await engine.execute(clause, request, true);
+            const state = {};
+            const result = await engine.execute(clause, request, state, true);
             result.should.not.be.null;
             result.response.penalty.should.equal(110.00000000000001);
         });
@@ -68,7 +69,8 @@ describe('EngineLatePenalty', () => {
                 'transactionId': '402c8f50-9e61-433e-a7c1-afe61c06ef00',
                 'timestamp': '2017-11-12T17:38:01.412Z'
             };
-            const result = await engine.execute(clause, request, false);
+            const state = {};
+            const result = await engine.execute(clause, request, state, false);
             result.should.not.be.null;
             result.response.penalty.should.equal(110);
         });
@@ -96,7 +98,8 @@ describe('EngineVolumeDiscount', () => {
                 '$class': 'org.accordproject.volumediscount.VolumeDiscountRequest',
                 'netAnnualChargeVolume': 0.4
             };
-            const result = await engine.execute(clause, request, true);
+            const state = {};
+            const result = await engine.execute(clause, request, state, true);
             result.should.not.be.null;
             result.response.discountRate.should.equal(3);
         });
@@ -124,7 +127,8 @@ describe('EngineHelloWorld', () => {
                 '$class': 'org.accordproject.helloworld.Request',
                 'input': 'Accord Project'
             };
-            const result = await engine.execute(clause, request, false);
+            const state = {};
+            const result = await engine.execute(clause, request, state, false);
             result.should.not.be.null;
             result.response.output.should.equal('Hello Fred Blogs (Accord Project)');
         });
@@ -137,7 +141,8 @@ describe('EngineHelloWorld', () => {
                     '$class': 'org.accordproject.helloworld.Request',
                     'input': 'Accord Project'
                 };
-                const result = await engine.execute(clause, request, true);
+                const state = {};
+                const result = await engine.execute(clause, request, state, true);
                 return result;
             } catch (err) {
                 err.should.be.Error;

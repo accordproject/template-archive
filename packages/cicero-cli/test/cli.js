@@ -28,7 +28,8 @@ const Commands = require('../lib/commands');
 describe('cicero-cli', () => {
     const template = path.resolve(__dirname, 'data/latedeliveryandpenalty/');
     const sample = path.resolve(__dirname, 'data/latedeliveryandpenalty/', 'sample.txt');
-    const data = path.resolve(__dirname, 'data/latedeliveryandpenalty/', 'data.json');
+    const request = path.resolve(__dirname, 'data/latedeliveryandpenalty/', 'request.json');
+    const state = path.resolve(__dirname, 'data/latedeliveryandpenalty/', 'state.json');
     const parseReponse = {
         '$class':'org.accordproject.latedeliveryandpenalty.TemplateModel',
         'forceMajeure':true,
@@ -60,52 +61,52 @@ describe('cicero-cli', () => {
                 _: ['parse'],
             });
             args.template.should.match(/cicero-cli\/test\/data\/latedeliveryandpenalty$/);
-            args.dsl.should.match(/sample.txt$/);
+            args.sample.should.match(/sample.txt$/);
         });
         it('all args specified', () => {
             process.chdir(path.resolve(__dirname, 'data/latedeliveryandpenalty/'));
             const args  = Commands.validateParseArgs({
                 _: ['parse'],
                 template: './',
-                dsl: 'sample.txt'
+                sample: 'sample.txt'
             });
             args.template.should.match(/cicero-cli\/test\/data\/latedeliveryandpenalty$/);
-            args.dsl.should.match(/sample.txt$/);
+            args.sample.should.match(/sample.txt$/);
         });
         it('all args specified, parent folder', () => {
             process.chdir(path.resolve(__dirname, 'data/'));
             const args  = Commands.validateParseArgs({
                 _: ['parse'],
                 template: 'latedeliveryandpenalty',
-                dsl: 'latedeliveryandpenalty/sample.txt'
+                sample: 'latedeliveryandpenalty/sample.txt'
             });
             args.template.should.match(/cicero-cli\/test\/data\/latedeliveryandpenalty$/);
-            args.dsl.should.match(/sample.txt$/);
+            args.sample.should.match(/sample.txt$/);
         });
-        it('all args specified, parent folder, no dsl', () => {
+        it('all args specified, parent folder, no sample', () => {
             process.chdir(path.resolve(__dirname, 'data/'));
             const args  = Commands.validateParseArgs({
                 _: ['parse'],
                 template: 'latedeliveryandpenalty',
             });
             args.template.should.match(/cicero-cli\/test\/data\/latedeliveryandpenalty$/);
-            args.dsl.should.match(/sample.txt$/);
+            args.sample.should.match(/sample.txt$/);
         });
-        it('all args specified, child folder, no dsl', () => {
+        it('all args specified, child folder, no sample', () => {
             process.chdir(path.resolve(__dirname, 'data/latedeliveryandpenalty/grammar'));
             const args  = Commands.validateParseArgs({
                 _: ['parse'],
                 template: '../',
             });
             args.template.should.match(/cicero-cli\/test\/data\/latedeliveryandpenalty$/);
-            args.dsl.should.match(/sample.txt$/);
+            args.sample.should.match(/sample.txt$/);
         });
         it('no flags specified', () => {
             const args  = Commands.validateParseArgs({
                 _: ['parse', path.resolve(__dirname, 'data/latedeliveryandpenalty/')],
             });
             args.template.should.match(/cicero-cli\/test\/data\/latedeliveryandpenalty$/);
-            args.dsl.should.match(/sample.txt$/);
+            args.sample.should.match(/sample.txt$/);
         });
         it('verbose flag specified', () => {
             process.chdir(path.resolve(__dirname, 'data/latedeliveryandpenalty/'));
@@ -124,14 +125,14 @@ describe('cicero-cli', () => {
             process.chdir(path.resolve(__dirname, 'data/latedeliveryandpenalty/'));
             (() => Commands.validateParseArgs({
                 _: ['parse'],
-                dsl: 'sample_en.txt'
-            })).should.throw('A sample text file is required. Try the --dsl flag or create a sample.txt in the root folder of your template.');
+                sample: 'sample_en.txt'
+            })).should.throw('A sample text file is required. Try the --sample flag or create a sample.txt in the root folder of your template.');
         });
     });
 
     describe('#execute', () => {
         it('should execute a clause using a template', async () => {
-            const response = await Commands.execute(template, sample, data, true);
+            const response = await Commands.execute(template, sample, request, state, true);
             response.response.$class.should.be.equal('org.accordproject.latedeliveryandpenalty.LateDeliveryAndPenaltyResponse');
             response.response.penalty.should.be.equal(4);
             response.response.buyerMayTerminate.should.be.equal(true);
@@ -140,7 +141,7 @@ describe('cicero-cli', () => {
 
     describe('#executeergo', () => {
         it('should execute a clause in ergo using a template', async () => {
-            const response = await Commands.execute(template, sample, data, false);
+            const response = await Commands.execute(template, sample, request, state, false);
             response.response.$class.should.be.equal('org.accordproject.latedeliveryandpenalty.LateDeliveryAndPenaltyResponse');
             response.response.penalty.should.be.equal(4);
             response.response.buyerMayTerminate.should.be.equal(true);
@@ -154,52 +155,52 @@ describe('cicero-cli', () => {
                 _: ['execute'],
             });
             args.template.should.match(/cicero-cli\/test\/data\/latedeliveryandpenalty$/);
-            args.dsl.should.match(/sample.txt$/);
+            args.sample.should.match(/sample.txt$/);
         });
         it('all args specified', () => {
             process.chdir(path.resolve(__dirname, 'data/latedeliveryandpenalty/'));
             const args  = Commands.validateExecuteArgs({
                 _: ['execute'],
                 template: './',
-                dsl: 'sample.txt'
+                sample: 'sample.txt'
             });
             args.template.should.match(/cicero-cli\/test\/data\/latedeliveryandpenalty$/);
-            args.dsl.should.match(/sample.txt$/);
+            args.sample.should.match(/sample.txt$/);
         });
         it('all args specified, parent folder', () => {
             process.chdir(path.resolve(__dirname, 'data/'));
             const args  = Commands.validateExecuteArgs({
                 _: ['execute'],
                 template: 'latedeliveryandpenalty',
-                dsl: 'latedeliveryandpenalty/sample.txt'
+                sample: 'latedeliveryandpenalty/sample.txt'
             });
             args.template.should.match(/cicero-cli\/test\/data\/latedeliveryandpenalty$/);
-            args.dsl.should.match(/sample.txt$/);
+            args.sample.should.match(/sample.txt$/);
         });
-        it('all args specified, parent folder, no dsl', () => {
+        it('all args specified, parent folder, no sample', () => {
             process.chdir(path.resolve(__dirname, 'data/'));
             const args  = Commands.validateExecuteArgs({
                 _: ['execute'],
                 template: 'latedeliveryandpenalty',
             });
             args.template.should.match(/cicero-cli\/test\/data\/latedeliveryandpenalty$/);
-            args.dsl.should.match(/sample.txt$/);
+            args.sample.should.match(/sample.txt$/);
         });
-        it('all args specified, child folder, no dsl', () => {
+        it('all args specified, child folder, no sample', () => {
             process.chdir(path.resolve(__dirname, 'data/latedeliveryandpenalty/grammar'));
             const args  = Commands.validateExecuteArgs({
                 _: ['execute'],
                 template: '../',
             });
             args.template.should.match(/cicero-cli\/test\/data\/latedeliveryandpenalty$/);
-            args.dsl.should.match(/sample.txt$/);
+            args.sample.should.match(/sample.txt$/);
         });
         it('no flags specified', () => {
             const args  = Commands.validateExecuteArgs({
                 _: ['execute', path.resolve(__dirname, 'data/latedeliveryandpenalty/')],
             });
             args.template.should.match(/cicero-cli\/test\/data\/latedeliveryandpenalty$/);
-            args.dsl.should.match(/sample.txt$/);
+            args.sample.should.match(/sample.txt$/);
         });
         it('verbose flag specified', () => {
             process.chdir(path.resolve(__dirname, 'data/latedeliveryandpenalty/'));
@@ -218,15 +219,15 @@ describe('cicero-cli', () => {
             process.chdir(path.resolve(__dirname, 'data/latedeliveryandpenalty/'));
             (() => Commands.validateExecuteArgs({
                 _: ['execute'],
-                dsl: 'sample_en.txt'
-            })).should.throw('A sample text file is required. Try the --dsl flag or create a sample.txt in the root folder of your template.');
+                sample: 'sample_en.txt'
+            })).should.throw('A sample text file is required. Try the --sample flag or create a sample.txt in the root folder of your template.');
         });
-        it('bad datajson', () => {
+        it('bad requestjson', () => {
             process.chdir(path.resolve(__dirname, 'data/latedeliveryandpenalty/'));
             (() => Commands.validateExecuteArgs({
                 _: ['execute'],
-                data: 'data1.json'
-            })).should.throw('A data file is required. Try the --data flag or create a data.json in the root folder of your template.');
+                request: 'request1.json'
+            })).should.throw('A request file is required. Try the --request flag or create a request.json in the root folder of your template.');
         });
     });
 

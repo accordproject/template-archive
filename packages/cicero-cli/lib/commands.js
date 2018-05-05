@@ -83,20 +83,20 @@ class Commands {
             isCiceroTemplate = packageJsonContents.engines && packageJsonContents.engines.cicero;
         }
 
-        if(!argv.dsl){
+        if(!argv.sample){
             logger.info('Loading a default sample.txt file.');
-            argv.dsl = path.resolve(argv.template,'sample.txt');
+            argv.sample = path.resolve(argv.template,'sample.txt');
         }
 
         if (argv.verbose) {
-            logger.info(`parse dsl ${argv.dsl} using a template ${argv.template}`);
+            logger.info(`parse sample ${argv.sample} using a template ${argv.template}`);
         }
 
-        let dslExists = fs.existsSync(argv.dsl);
+        let sampleExists = fs.existsSync(argv.sample);
         if(!packageJsonExists || !isCiceroTemplate){
             throw new Error(`${argv.template} is not a valid cicero template. Make sure that package.json exists and that it has a engines.cicero entry.`);
-        } else if (!dslExists){
-            throw new Error('A sample text file is required. Try the --dsl flag or create a sample.txt in the root folder of your template.');
+        } else if (!sampleExists){
+            throw new Error('A sample text file is required. Try the --sample flag or create a sample.txt in the root folder of your template.');
         } else {
             return argv;
         }
@@ -107,21 +107,23 @@ class Commands {
      *
      * @param {string} templatePath to the template directory
      * @param {string} samplePath to the sample file
-     * @param {string} dataPath to the data file
-     * @param {boolean} forcejs forces JavaScript logic
+     * @param {string} requestPath to the request file
+     * @param {string} statePath to the state file
+     * @param {boolean} forceJs forces JavaScript logic
      * @returns {object} Promise to the result of parsing
      */
-    static execute(templatePath, samplePath, dataPath, forcejs) {
+    static execute(templatePath, samplePath, requestPath, statePath, forceJs) {
         let clause;
         const sampleText = fs.readFileSync(samplePath, 'utf8');
-        const jsonData = JSON.parse(fs.readFileSync(dataPath, 'utf8'));
+        const requestJson = JSON.parse(fs.readFileSync(requestPath, 'utf8'));
+        const stateJson = JSON.parse(fs.readFileSync(statePath, 'utf8'));
 
         return Template.fromDirectory(templatePath)
             .then((template) => {
                 clause = new Clause(template);
                 clause.parse(sampleText);
                 const engine = new Engine();
-                return engine.execute(clause, jsonData, forcejs);
+                return engine.execute(clause, requestJson, stateJson, forceJs);
             })
             .catch((err) => {
                 logger.error(err);
@@ -155,28 +157,36 @@ class Commands {
         }
 
 
-        if(!argv.dsl){
+        if(!argv.sample){
             logger.info('Loading a default sample.txt file.');
-            argv.dsl = path.resolve(argv.template,'sample.txt');
+            argv.sample = path.resolve(argv.template,'sample.txt');
         }
 
-        if(!argv.data){
-            logger.info('Loading a default data.json file.');
-            argv.data = path.resolve(argv.template,'data.json');
+        if(!argv.request){
+            logger.info('Loading a default request.json file.');
+            argv.request = path.resolve(argv.template,'request.json');
+        }
+
+        if(!argv.state){
+            logger.info('Loading a default state.json file.');
+            argv.state = path.resolve(argv.template,'state.json');
         }
 
         if (argv.verbose) {
-            logger.info(`execute dsl ${argv.dsl} using a template ${argv.template} with data ${argv.data}`);
+            logger.info(`execute sample ${argv.sample} using a template ${argv.template} with request ${argv.request} with state ${argv.state}`);
         }
 
-        let dataExists = fs.existsSync(argv.data);
-        let dslExists = fs.existsSync(argv.dsl);
+        let sampleExists = fs.existsSync(argv.sample);
+        let requestExists = fs.existsSync(argv.request);
+        let stateExists = fs.existsSync(argv.state);
         if(!packageJsonExists || !isCiceroTemplate){
             throw new Error(`${argv.template} is not a valid cicero template. Make sure that package.json exists and that it has a engines.cicero entry.`);
-        } else if(!dataExists){
-            throw new Error('A data file is required. Try the --data flag or create a data.json in the root folder of your template.');
-        } else if (!dslExists){
-            throw new Error('A sample text file is required. Try the --dsl flag or create a sample.txt in the root folder of your template.');
+        } else if (!sampleExists){
+            throw new Error('A sample text file is required. Try the --sample flag or create a sample.txt in the root folder of your template.');
+        } else if(!requestExists){
+            throw new Error('A request file is required. Try the --request flag or create a request.json in the root folder of your template.');
+        } else if (!stateExists){
+            throw new Error('A state file file is required. Try the --state flag or create a state.txt in the root folder of your template.');
         } else {
             return argv;
         }

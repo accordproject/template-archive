@@ -66,14 +66,15 @@ Thank you!
 Sample.txt:
 
 ```
-Name of the person to greet: "Dan".
+Name of the person to greet: "Fred Blogs".
 Thank you!
 ```
 
 ```
 cd cicero-template-library
-cicero parse --template ./helloworld/ --dsl ./helloworld/sample.txt
-Setting clause data: {"$class":"io.clause.helloworld.TemplateModel","name":"Dan"}
+cicero parse --template ./helloworld/ --sample ./helloworld/sample.txt
+21:09:34 - info: Logging initialized. 2018-05-05T01:09:34.155Z
+21:09:34 - info: {"$class":"org.accordproject.helloworld.TemplateModel","name":"Fred Blogs"}
 ```
 
 Or, attempting to parse invalid data will result in line and column information for the syntax error.
@@ -81,14 +82,14 @@ Or, attempting to parse invalid data will result in line and column information 
 Sample.txt:
 
 ```
-FUBAR Name of the person to greet: "Dan".
+FUBAR Name of the person to greet: "Fred Blogs".
 Thank you!
 ```
 
 ```
 { Error: invalid syntax at line 1 col 1:
 
-  FUBAR  Name of the person to greet: "Dan".
+  FUBAR  Name of the person to greet: "Fred Blogs".
   ^
 Unexpected "F"
 ```
@@ -97,16 +98,16 @@ Unexpected "F"
 Use the `cicero execute` command to load a template from a directory on disk, instantiate a clause based on input text, and then invoke the clause using an incoming JSON payload.
 
 ```
-data.json:
+request.json:
 {
    "$class": "io.clause.helloworld.Request",
-   "input": "World"
+   "input": "Accord Project"
 }
 ```
 
 ```
 cd cicero-template-library
-cicero execute --template ./helloworld/ --dsl ./helloworld/sample.txt --data ./helloworld/data.json 
+cicero execute --template ./helloworld/ --dsl ./helloworld/sample.txt --request ./helloworld/request.json  --state ./helloworld/state.json 
 ```
 
 The results of execution (a JSON serialized object) are displayed. They include:

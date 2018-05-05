@@ -2,16 +2,16 @@ namespace org.accordproject.latedeliveryandpenalty
 
 // Imports CTO files
 import org.accordproject.contract.*
-import org.accordproject.latedeliveryandpenalty.*
-// Date and time library
-import ergo.moment.*
+  import org.accordproject.latedeliveryandpenalty.*
+  // Date and time library
+  import ergo.moment.*
 
-/* From template:
+  /* From template:
 Late Delivery and Penalty. In case of delayed delivery[{" except for Force Majeure cases,":? forceMajeure}] the Seller shall pay to the Buyer for every [{penaltyDuration}] of delay penalty amounting to [{penaltyPercentage}]% of the total value of the Equipment whose delivery has been delayed. Any fractional part of a [{fractionalPart}] is to be considered a full [{fractionalPart}]. The total amount of penalty shall not however, exceed [{capPercentage}]% of the total value of the Equipment involved in late delivery. If the delay is more than [{termination}], the Buyer is entitled to terminate this Contract.
  */
 
-// Declare a contract over a template model
-contract LateDeliveryAndPenalty over TemplateModel {
+  // Declare a contract over a template model
+  contract LateDeliveryAndPenalty over TemplateModel {
   // Clause checking for late delivery and calculating penalty
   clause latedeliveryandpenalty(request LateDeliveryAndPenaltyRequest) : LateDeliveryAndPenaltyResponse throws Error {
     // Guard against calling late delivery clause too early
@@ -21,10 +21,10 @@ contract LateDeliveryAndPenalty over TemplateModel {
     // Guard against force majeure
     enforce !contract.forceMajeure or !request.forceMajeure
     else
-      return new LateDeliveryAndPenaltyResponse{
-	penalty: 0.0,
-	buyerMayTerminate: true
-      };
+    return new LateDeliveryAndPenaltyResponse{
+      penalty: 0.0,
+      buyerMayTerminate: true
+    };
 
     // Calculate the time difference between current date and agreed upon date
     let diff = momentDiff(now,agreed);

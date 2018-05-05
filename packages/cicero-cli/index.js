@@ -19,18 +19,18 @@ const logger = require('@accordproject/cicero-core').logger;
 const Commands = require('./lib/commands');
 
 require('yargs')
-    .command('parse', 'parse dsl text using a template', (yargs) => {
+    .command('parse', 'parse sample text using a template', (yargs) => {
         yargs.option('template', {
             describe: 'path to the directory with the template',
             type: 'string'
         });
-        yargs.option('dsl', {
+        yargs.option('sample', {
             describe: 'path to the clause text',
             type: 'string'
         });
     }, (argv) => {
         if (argv.verbose) {
-            logger.info(`parse dsl ${argv.dsl} using a template ${argv.template}`);
+            logger.info(`parse sample ${argv.sample} using a template ${argv.template}`);
         }
 
         try {
@@ -40,7 +40,7 @@ require('yargs')
             return;
         }
 
-        return Commands.parse(argv.template, argv.dsl)
+        return Commands.parse(argv.template, argv.sample)
             .then((result) => {
                 logger.info(JSON.stringify(result));
             })
@@ -48,12 +48,12 @@ require('yargs')
                 logger.error(err.message + ' ' + JSON.stringify(err));
             });
     })
-    .command('execute', 'execute a clause with JSON data', (yargs) => {
+    .command('execute', 'execute a clause with JSON request', (yargs) => {
         yargs.option('template', {
             describe: 'path to the directory with the template',
             type: 'string'
         });
-        yargs.option('dsl', {
+        yargs.option('sample', {
             describe: 'path to the clause text',
             type: 'string'
         });
@@ -62,8 +62,12 @@ require('yargs')
             type: 'boolean',
             default: false
         });
-        yargs.option('data', {
-            describe: 'path to the request JSON data',
+        yargs.option('request', {
+            describe: 'path to the JSON request',
+            type: 'string'
+        });
+        yargs.option('state', {
+            describe: 'path to the JSON state',
             type: 'string'
         });
     }, (argv) => {
@@ -75,7 +79,7 @@ require('yargs')
             return;
         }
 
-        return Commands.execute(argv.template, argv.dsl, argv.data, argv.jsonly)
+        return Commands.execute(argv.template, argv.sample, argv.request, argv.state, argv.jsonly)
             .then((result) => {
                 logger.info(JSON.stringify(result));
             })

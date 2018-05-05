@@ -116,12 +116,13 @@ class Engine {
         }
 
         const code = `
-        __dispatch(data,request);
+        __dispatch(contract,request,state);
 
-        function __dispatch(data,request) {
+        function __dispatch(contract,request,state) {
             // Ergo dispatch call
-            let context = {request: serializer.toJSON(request), contract: data, state: {}, now: moment()};
-            return serializer.fromJSON(dispatch(context).response);
+            let context = {request: serializer.toJSON(request), state: state, contract: contract, clause: {}, now: moment()};
+            let result = dispatch(context);
+            return { response: serializer.fromJSON(result.response), state:result.state, emit: [] };
         } 
         `;
 
@@ -156,9 +157,9 @@ class Engine {
         }
 
         const head = `
-        __dispatch(data,request);
+        __dispatch(contract,request,state);
 
-        function __dispatch(data,request) {
+        function __dispatch(contract,request,state) {
             switch(request.getFullyQualifiedType()) {
         `;
 
@@ -170,9 +171,9 @@ class Engine {
                 let ns${n} = type${n}.substr(0, type${n}.lastIndexOf('.'));
                 let clazz${n} = type${n}.substr(type${n}.lastIndexOf('.')+1);
                 let response${n} = factory.newTransaction(ns${n}, clazz${n});
-                let context${n} = {request: request, response: response${n}, data: data};
+                let context${n} = {request: request, state: state, contract: contract, clause: {}, response: response${n}, emit: []};
                 ${ele.getName()}(context${n});
-                return context${n}.response;
+                return { response: context${n}.response, state: context${n}.state, emit: context${n}.emit };
             break;`;
         });
 
@@ -194,14 +195,16 @@ class Engine {
      * @param {Clause} clause  - the clause to execute
      * @param {object} request  - the request, a JS object that can be deserialized
      * using the Composer serializer.
-     * @param {boolean} forcejs  - whether to force JS logic.
+     * @param {object} state  - the contract state, a JS object that can be deserialized
+     * using the Composer serializer.
+     * @param {boolean} forceJs  - whether to force JS logic.
      * @return {Promise} a promise that resolves to a result for the clause
      * @private
      */
-    async execute(clause, request, forcejs) {
+    async execute(clause, request, state, forceJs) {
         // ensure the request is valid
         const template = clause.getTemplate();
-        template.logicjsonly = forcejs;
+        template.logicjsonly = forceJs;
         const tx = template.getSerializer().fromJSON(request, {validate: false, acceptResourcesForRelationships: true});
         tx.$validator = new ResourceValidator({permitResourcesForRelationships: true});
         tx.validate();
@@ -230,7 +233,7 @@ class Engine {
             throw new Error('Failed to created executable script for ' + clause.getIdentifier());
         }
 
-        const data = clause.getData();
+        const contract = clause.getData();
         const factory = template.getFactory();
         const vm = new VM({
             timeout: 1000,
@@ -242,18 +245,20 @@ class Engine {
         });
 
         // add immutables to the context
+        vm.freeze(contract, 'contract'); // Second argument adds object to global.
         vm.freeze(tx, 'request'); // Second argument adds object to global.
-        vm.freeze(data, 'data'); // Second argument adds object to global.
+        vm.freeze(state, 'state'); // Second argument adds object to global.
+
         vm.freeze(factory, 'factory'); // Second argument adds object to global.
 
         const response = vm.run(script);
-        response.$validator = new ResourceValidator({permitResourcesForRelationships: true});
-        response.validate();
+        response.response.$validator = new ResourceValidator({permitResourcesForRelationships: true});
+        response.response.validate();
 
         const result = {
             'clause': clause.getIdentifier(),
             'request': request,
-            'response': template.getSerializer().toJSON(response, {convertResourcesToRelationships: true})
+            'response': template.getSerializer().toJSON(response.response, {convertResourcesToRelationships: true})
         };
 
         return result;
