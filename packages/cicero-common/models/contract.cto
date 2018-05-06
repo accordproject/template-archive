@@ -9,10 +9,12 @@ namespace org.accordproject.contract
 concept State {
 }
 /* A contract is a concept -- This contains the contract data */
-concept Contract {
+asset Contract identified by contractId {
+  o String contractId
 }
 /* A clause is a concept -- This contains the clause data */
-concept Clause {
+asset Clause identified by clauseId {
+  o String clauseId
 }
 
 /**
@@ -34,11 +36,12 @@ concept Payload {
   o Request request
   o State state
 }
+
 /* If the call to a contract's clause succeeds, it returns a response, a list of events and a new state */
 concept Success {
   o Response response
-  o Action[] actions
   o State state
+  o Action[] actions
 }
 /* If the call to a contract's clause fails, it returns and error */ 
 concept Failure {
