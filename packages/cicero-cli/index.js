@@ -65,7 +65,7 @@ require('yargs')
         yargs.option('request', {
             describe: 'path to the JSON request',
             type: 'string'
-        });
+        }).array('request');
         yargs.option('state', {
             describe: 'path to the JSON state',
             type: 'string'

@@ -107,23 +107,37 @@ class Commands {
      *
      * @param {string} templatePath to the template directory
      * @param {string} samplePath to the sample file
-     * @param {string} requestPath to the request file
+     * @param {string[]} requestsPath to the array of request files
      * @param {string} statePath to the state file
-     * @param {boolean} forceJs forces JavaScript logic
-     * @returns {object} Promise to the result of parsing
+     * @param {boolean} forceJs to force JavaScript logic and disable Ergo
+     * @returns {object} Promise to the result of execution
      */
-    static execute(templatePath, samplePath, requestPath, statePath, forceJs) {
+    static execute(templatePath, samplePath, requestsPath, statePath, forceJs) {
         let clause;
         const sampleText = fs.readFileSync(samplePath, 'utf8');
-        const requestJson = JSON.parse(fs.readFileSync(requestPath, 'utf8'));
-        const stateJson = JSON.parse(fs.readFileSync(statePath, 'utf8'));
+        let requestsJson = [];
+        let stateJson;
+
+        for (let i = 0; i < requestsPath.length; i++) {
+            requestsJson.push(JSON.parse(fs.readFileSync(requestsPath[i], 'utf8')));
+        }
+        stateJson = JSON.parse(fs.readFileSync(statePath, 'utf8'));
 
         return Template.fromDirectory(templatePath)
             .then((template) => {
                 clause = new Clause(template);
                 clause.parse(sampleText);
                 const engine = new Engine();
-                return engine.execute(clause, requestJson, stateJson, forceJs);
+                // First execution to get the initial response
+                const firstRequest = requestsJson[0];
+                const initResponse = engine.execute(clause, firstRequest, stateJson, forceJs);
+                // Get all the other requests and chain execution through Promise.reduce()
+                const otherRequests = requestsJson.slice(1, requestsJson.length);
+                return otherRequests.reduce((promise,requestJson) => {
+                    return promise.then((result) => {
+                        return engine.execute(clause, requestJson, result.state, forceJs);
+                    });
+                }, initResponse);
             })
             .catch((err) => {
                 logger.error(err);
@@ -163,8 +177,8 @@ class Commands {
         }
 
         if(!argv.request){
-            logger.info('Loading a default request.json file.');
-            argv.request = path.resolve(argv.template,'request.json');
+            logger.info('Loading a single default request.json file.');
+            argv.request = [path.resolve(argv.template,'request.json')];
         }
 
         if(!argv.state){
@@ -177,7 +191,15 @@ class Commands {
         }
 
         let sampleExists = fs.existsSync(argv.sample);
-        let requestExists = fs.existsSync(argv.request);
+        // All requests should exist
+        let requestExists = true;
+        for (let i = 0; i < argv.request.length; i++) {
+            if (fs.existsSync(argv.request[i]) && requestExists) {
+                requestExists = true;
+            } else {
+                requestExists = false;
+            }
+        }
         let stateExists = fs.existsSync(argv.state);
         if(!packageJsonExists || !isCiceroTemplate){
             throw new Error(`${argv.template} is not a valid cicero template. Make sure that package.json exists and that it has a engines.cicero entry.`);

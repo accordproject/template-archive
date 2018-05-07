@@ -132,7 +132,7 @@ describe('cicero-cli', () => {
 
     describe('#execute', () => {
         it('should execute a clause using a template', async () => {
-            const response = await Commands.execute(template, sample, request, state, true);
+            const response = await Commands.execute(template, sample, [request], state, true);
             response.response.$class.should.be.equal('org.accordproject.latedeliveryandpenalty.LateDeliveryAndPenaltyResponse');
             response.response.penalty.should.be.equal(4);
             response.response.buyerMayTerminate.should.be.equal(true);
@@ -141,7 +141,7 @@ describe('cicero-cli', () => {
 
     describe('#executeergo', () => {
         it('should execute a clause in ergo using a template', async () => {
-            const response = await Commands.execute(template, sample, request, state, false);
+            const response = await Commands.execute(template, sample, [request], state, false);
             response.response.$class.should.be.equal('org.accordproject.latedeliveryandpenalty.LateDeliveryAndPenaltyResponse');
             response.response.penalty.should.be.equal(4);
             response.response.buyerMayTerminate.should.be.equal(true);
@@ -226,7 +226,7 @@ describe('cicero-cli', () => {
             process.chdir(path.resolve(__dirname, 'data/latedeliveryandpenalty/'));
             (() => Commands.validateExecuteArgs({
                 _: ['execute'],
-                request: 'request1.json'
+                request: ['request1.json']
             })).should.throw('A request file is required. Try the --request flag or create a request.json in the root folder of your template.');
         });
     });
