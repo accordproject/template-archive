@@ -21,13 +21,13 @@ const logger = require('../lib/logger');
 const lexer = moo.states({
     main: {
         varstart: {
-            match: '[{',
+            match: '{{',
             push: 'var',
         }, // push to the var state
-        // a chunk is everything up until '[{', even across newlines. We then trim off the '[{'
+        // a chunk is everything up until '{{', even across newlines. We then trim off the '{{'
         // we also push the lexer into the 'var' state
         Chunk: {
-            match: /[^]*?\[{/,
+            match: /[^]*?\{{/,
             lineBreaks: true,
             push: 'var',
             value: x => x.slice(0, -2)
@@ -41,7 +41,7 @@ const lexer = moo.states({
     },
     var: {
         varend: {
-            match: '}]',
+            match: '}}',
             pop: true
         }, // pop back to main state
         varid: /[a-zA-Z_][_a-zA-Z0-9]*/,
@@ -51,7 +51,7 @@ const lexer = moo.states({
     },
 });
 
-lexer.reset('[{v1}] \n one [{"foo":? v2}] [{v3}] two \n\nthree[{v4}]\nfour.');
+lexer.reset('{{v1}} \n one {{"foo":? v2}} {{v3}} two \n\nthree{{v4}}\nfour.');
 
 let n = lexer.next();
 

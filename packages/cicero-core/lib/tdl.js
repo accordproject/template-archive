@@ -18,10 +18,10 @@ const moo = require("moo");
 // in the text and the tokens inside the variables
 const lexer = moo.states({
     main: {
-        // a chunk is everything up until '[{', even across newlines. We then trim off the '[{'
+        // a chunk is everything up until '{{', even across newlines. We then trim off the '{{'
         // we also push the lexer into the 'var' state
         Chunk: {
-            match: /[^]*?\[{/,
+            match: /[^]*?\{{/,
             lineBreaks: true,
             push: 'var',
             value: x => x.slice(0, -2)
@@ -35,7 +35,7 @@ const lexer = moo.states({
     },
     var: {
         varend: {
-            match: '}]',
+            match: '}}',
             pop: true
         }, // pop back to main state
         varid: /[a-zA-Z_][_a-zA-Z0-9]*/,
@@ -56,25 +56,25 @@ var grammar = {
     {"name": "wschar", "symbols": [/[ \t\n\v\f]/], "postprocess": id},
     {"name": "dqstring$ebnf$1", "symbols": []},
     {"name": "dqstring$ebnf$1", "symbols": ["dqstring$ebnf$1", "dstrchar"], "postprocess": function arrpush(d) {return d[0].concat([d[1]]);}},
-    {"name": "dqstring", "symbols": [{"literal":"\""}, "dqstring$ebnf$1", {"literal":"\""}], "postprocess": function(d) {return d[1].join(""); }},
+    {"name": "dqstring", "symbols": {{"literal":"\""}, "dqstring$ebnf$1", {"literal":"\""}}, "postprocess": function(d) {return d[1].join(""); }},
     {"name": "sqstring$ebnf$1", "symbols": []},
     {"name": "sqstring$ebnf$1", "symbols": ["sqstring$ebnf$1", "sstrchar"], "postprocess": function arrpush(d) {return d[0].concat([d[1]]);}},
-    {"name": "sqstring", "symbols": [{"literal":"'"}, "sqstring$ebnf$1", {"literal":"'"}], "postprocess": function(d) {return d[1].join(""); }},
+    {"name": "sqstring", "symbols": {{"literal":"'"}, "sqstring$ebnf$1", {"literal":"'"}}, "postprocess": function(d) {return d[1].join(""); }},
     {"name": "btstring$ebnf$1", "symbols": []},
     {"name": "btstring$ebnf$1", "symbols": ["btstring$ebnf$1", /[^`]/], "postprocess": function arrpush(d) {return d[0].concat([d[1]]);}},
-    {"name": "btstring", "symbols": [{"literal":"`"}, "btstring$ebnf$1", {"literal":"`"}], "postprocess": function(d) {return d[1].join(""); }},
+    {"name": "btstring", "symbols": {{"literal":"`"}, "btstring$ebnf$1", {"literal":"`"}}, "postprocess": function(d) {return d[1].join(""); }},
     {"name": "dstrchar", "symbols": [/[^\\"\n]/], "postprocess": id},
-    {"name": "dstrchar", "symbols": [{"literal":"\\"}, "strescape"], "postprocess": 
+    {"name": "dstrchar", "symbols": {{"literal":"\\"}, "strescape"], "postprocess": 
         function(d) {
             return JSON.parse("\""+d.join("")+"\"");
         }
         },
     {"name": "sstrchar", "symbols": [/[^\\'\n]/], "postprocess": id},
-    {"name": "sstrchar", "symbols": [{"literal":"\\"}, "strescape"], "postprocess": function(d) { return JSON.parse("\""+d.join("")+"\""); }},
-    {"name": "sstrchar$string$1", "symbols": [{"literal":"\\"}, {"literal":"'"}], "postprocess": function joiner(d) {return d.join('');}},
+    {"name": "sstrchar", "symbols": {{"literal":"\\"}, "strescape"], "postprocess": function(d) { return JSON.parse("\""+d.join("")+"\""); }},
+    {"name": "sstrchar$string$1", "symbols": {{"literal":"\\"}, {"literal":"'"}}, "postprocess": function joiner(d) {return d.join('');}},
     {"name": "sstrchar", "symbols": ["sstrchar$string$1"], "postprocess": function(d) {return "'"; }},
     {"name": "strescape", "symbols": [/["\\\/bfnrt]/], "postprocess": id},
-    {"name": "strescape", "symbols": [{"literal":"u"}, /[a-fA-F0-9]/, /[a-fA-F0-9]/, /[a-fA-F0-9]/, /[a-fA-F0-9]/], "postprocess": 
+    {"name": "strescape", "symbols": {{"literal":"u"}, /[a-fA-F0-9]/, /[a-fA-F0-9]/, /[a-fA-F0-9]/, /[a-fA-F0-9]/], "postprocess": 
         function(d) {
             return d.join("");
         }

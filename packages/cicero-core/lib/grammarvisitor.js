@@ -186,7 +186,7 @@ DateTime -> DATE  {% id %}`);
             // populate all the properties
             classDeclaration.getProperties().forEach((property,index) => {
                 const sep = index < classDeclaration.getProperties().length-1 ? ',' : '';
-                parameters.writer.writeLine(3, `${property.getName()} : data[${index*2}]${sep}`);
+                parameters.writer.writeLine(3, `${property.getName()} : data[${index*2}}${sep}`);
             });
 
             parameters.writer.writeLine(2, '};');

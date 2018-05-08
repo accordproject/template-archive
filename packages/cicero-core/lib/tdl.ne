@@ -33,10 +33,10 @@ const moo = require("moo");
 // in the text and the tokens inside the variables
 const lexer = moo.states({
     main: {
-        // a chunk is everything up until '[{', even across newlines. We then trim off the '[{'
+        // a chunk is everything up until '{{', even across newlines. We then trim off the '{{'
         // we also push the lexer into the 'var' state
         Chunk: {
-            match: /[^]*?\[{/,
+            match: /[^]*?\{{/,
             lineBreaks: true,
             push: 'var',
             value: x => x.slice(0, -2)
@@ -50,7 +50,7 @@ const lexer = moo.states({
     },
     var: {
         varend: {
-            match: '}]',
+            match: '}}',
             pop: true
         }, // pop back to main state
         varid: /[a-zA-Z_][_a-zA-Z0-9]*/,
@@ -84,7 +84,7 @@ VARIABLE ->
     | BINDING {% id %} 
 
 # A Boolean binding set a boolean to true if a given optional string literal is present
-# [{"optional text":? booleanFieldName}]
+# {{"optional text":? booleanFieldName}}
 BOOLEAN_BINDING -> %varstring %varcond %varspace %varid %varend
 {% (data) => {
         return {
@@ -97,7 +97,7 @@ BOOLEAN_BINDING -> %varstring %varcond %varspace %varid %varend
 
 # Binds the variable to a field in the template model. The type of the variable
 # in the grammar is inferred from the type of the model element
-# [{fieldName}]
+# {{fieldName}}
 BINDING -> %varid %varend
 {% (data) => {
         return {

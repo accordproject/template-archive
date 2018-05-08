@@ -201,7 +201,7 @@ class Template {
 
         writer.write('\n');
         writer.writeLine(0, '{%');
-        writer.writeLine(0, `([${Object.keys(rules)}]) => {`);
+        writer.writeLine(0, `([${Object.keys(rules)}}) => {`);
         writer.writeLine(1, 'return {');
         writer.writeLine(3, `$class : "${templateModel.getFullyQualifiedName()}",`);
         templateModel.getProperties().forEach((property,index) => {

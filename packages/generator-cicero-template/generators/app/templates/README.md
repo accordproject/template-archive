@@ -9,7 +9,7 @@ Use the `cicero parse` command to load a template from a directory on disk and t
 Sample template.tem:
 
 ```
-Name of the person to greet: [{name}].
+Name of the person to greet: {{name}}.
 Thank you!
 ```
 
