@@ -28,8 +28,6 @@ transaction Request {}
 transaction Response {}
 /* An Error is a concept */
 concept ErrorResponse {}
-/* An action is a transaction -- actions could be external events or specify obligations */
-transaction Action {}
 /* A payload has contract data, a request and a state */
 concept Payload {
   o Contract contract  // the contract data (replaces current clause)
@@ -41,7 +39,7 @@ concept Payload {
 concept Success {
   o Response response
   o State state
-  o Action[] actions
+  o Event[] emit
 }
 /* If the call to a contract's clause fails, it returns and error */ 
 concept Failure {

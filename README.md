@@ -107,7 +107,7 @@ request.json:
 
 ```
 cd cicero-template-library
-cicero execute --template ./helloworld/ --dsl ./helloworld/sample.txt --request ./helloworld/request.json  --state ./helloworld/state.json 
+cicero execute --template ./helloworld/ --sample ./helloworld/sample.txt --request ./helloworld/request.json  --state ./helloworld/state.json 
 ```
 
 The results of execution (a JSON serialized object) are displayed. They include:
