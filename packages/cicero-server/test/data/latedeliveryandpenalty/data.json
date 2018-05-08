@@ -1,0 +1,1 @@
+{"$class":"org.accordproject.latedeliveryandpenalty.TemplateModel","forceMajeure":true,"penaltyDuration":{"$class":"org.accordproject.latedeliveryandpenalty.Duration","amount":9,"unit":"DAY"},"penaltyPercentage":7,"capPercentage":2,"termination":{"$class":"org.accordproject.latedeliveryandpenalty.Duration","amount":2,"unit":"WEEK"},"fractionalPart":"DAY"}

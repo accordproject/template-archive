@@ -19,7 +19,7 @@
     "lint": "eslint .",
     "postlint": "npm run licchk",
     "licchk": "license-check",
-    "test": "echo not implemented"
+    "test": "mocha && nyc mocha"
   },
   "repository": {
     "type": "git",
@@ -42,13 +42,15 @@
     "chai": "^3.5.0",
     "chai-as-promised": "^6.0.0",
     "chai-things": "^0.2.0",
+    "decache": "^4.4.0",
     "eslint": "^4.19.1",
     "jsdoc": "^3.5.5",
     "license-check": "^1.1.5",
-    "mocha": "^5.0.5",
+    "mocha": "^5.1.1",
     "mockery": "^2.0.0",
     "nyc": "^11.6.0",
-    "sinon": "^4.0.1"
+    "sinon": "^4.0.1",
+    "supertest": "^3.0.0"
   },
   "dependencies": {
     "@accordproject/cicero-core": "^0.3.0-0",
@@ -79,7 +81,7 @@
       "json"
     ],
     "include": [
-      "lib/**/*.js"
+      "app.js"
     ],
     "exclude": [],
     "all": true,
