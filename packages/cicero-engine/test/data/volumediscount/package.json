@@ -3,7 +3,7 @@
     "version": "0.0.6",
     "description": "A sample volume discount clause.",
     "engines": {
-        "cicero": "^0.2.28"
+        "cicero": "^0.3.0-0"
     },
     "scripts": {
         "test": "mocha",
