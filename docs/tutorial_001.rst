@@ -23,7 +23,7 @@ result will be a JSON serialized instance of the Template Mode:
 
 Sample template.tem::
 
-    Name of the person to greet: [{name}]. Thank you!
+    Name of the person to greet: {{name}}. Thank you!
 
 Sample.txt::
 
@@ -119,7 +119,7 @@ Edit the Template Grammar
 
 Start by editing the template grammar in the ``grammar/template.tem`` file. You will want to replace
 the text with something suitable for your template, introducing variables as required. The
-variables are marked-up using ``[{name}]``.
+variables are marked-up using ``{{name}}``.
 
 Edit the Template Model
 ------------------------

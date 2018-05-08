@@ -22,17 +22,17 @@ UTF-8 text with markup to introduce named variables.
 
 Here is a simple template grammar::
 
-   Late Delivery and Penalty. In case of delayed delivery[{" except for Force
-   Majeure cases,":? forceMajeure}] the Seller shall pay to the Buyer for every
-   [{penaltyDuration}] of delay penalty amounting to [{penaltyPercentage}]% of
+   Late Delivery and Penalty. In case of delayed delivery{{" except for Force
+   Majeure cases,":? forceMajeure}} the Seller shall pay to the Buyer for every
+   {{penaltyDuration}} of delay penalty amounting to {{penaltyPercentage}}% of
    the total value of the Equipment whose delivery has been delayed. Any
-   fractional part of a [{fractionalPart}] is to be considered a full
-   [{fractionalPart}]. The total amount of penalty shall not however, exceed
-   [{capPercentage}]% of the total value of the Equipment involved in late
-   delivery. If the delay is more than [{termination}], the Buyer is entitled to
+   fractional part of a {{fractionalPart}} is to be considered a full
+   {{fractionalPart}}. The total amount of penalty shall not however, exceed
+   {{capPercentage}}% of the total value of the Equipment involved in late
+   delivery. If the delay is more than {{termination}}, the Buyer is entitled to
    terminate this Contract.
 
-Variables in template grammars are enclosed in ``[{`` and ``}]``.
+Variables in template grammars are enclosed in ``{{`` and ``}}``.
 
 Template Model
 --------------
