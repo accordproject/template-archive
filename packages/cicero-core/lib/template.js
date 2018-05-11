@@ -84,10 +84,6 @@ class Template {
         this.templatizedGrammar = null;
         this.logicjsonly = false;
         this.logicboth = false;
-        this.parts = {
-            templateTextRules: [],
-            templateModelRules: []
-        };
     }
 
     /**
@@ -163,25 +159,37 @@ class Template {
         // parse the template grammar to generate a dynamic grammar
         const ast = parser.results[0];
         logger.debug('Template AST', ast);
-        this.createDynamicGrammar(ast, this.getTemplateModel(), 'ROOT');
+        const parts = {
+            textRules: [],
+            modelRules: []
+        };
+        this.buildGrammarRules(ast, this.getTemplateModel(), 'rule', parts);
 
         // generate the grammar for the model
         const parameters = {
-            writer: new Writer()
+            writer: new Writer(),
+            rules : []
         };
         const gv = new GrammarVisitor();
         this.getModelManager().accept(gv, parameters);
-        this.parts.modelRules = parameters.writer.getBuffer();
+        parts.modelRules.push(...parameters.rules);
+
+        parts.textRules.push({
+            prefix: 'ROOT',
+            class: false,
+            symbols: ['rule0'],
+            properties: false
+        });
 
         // combine the results
-        nunjucks.configure({
+        nunjucks.configure(fsPath.resolve(__dirname), {
             tags: {
                 blockStart: '<%',
                 blockEnd: '%>'
             },
             autoescape: false  // Required to allow nearley syntax strings
         });
-        const combined = nunjucks.render('./lib/template.ne', this.parts);
+        const combined = nunjucks.render('template.ne', parts);
         logger.debug('Generated template grammar' + combined);
 
         this.setGrammar(combined);
@@ -193,56 +201,64 @@ class Template {
      * @param {object} ast  - the AST from which to build the grammar
      * @param {ClassDeclaration} templateModel  - the type of the parent class for this AST
      * @param {String} prefix - A unique prefix for the grammar rules
+     * @param {Object} parts - Result object to acculumate rules
      */
-    createDynamicGrammar(ast, templateModel, prefix) {
+    buildGrammarRules(ast, templateModel, prefix, parts) {
         // now we create each subordinate rule in turn
         const rules = {};
-        let templateTextRules = {};
+        let textRules = {};
 
         // create the root rule, for the Template Model
-        templateTextRules.prefix = prefix;
-        templateTextRules.symbols = [];
+        textRules.prefix = prefix;
+        textRules.symbols = [];
         ast.data.forEach((element, index) => {
             // ignore empty chunks (issue #1) and missing optional last chunks
             if (element && (element.type !== 'Chunk' || element.value.length > 0)) {
                 logger.debug(`element ${prefix}${index} ${JSON.stringify(element)}`);
                 rules[prefix + index] = element;
-                templateTextRules.symbols.push(prefix + index);
+                textRules.symbols.push(prefix + index);
             }
         }, this);
 
         // create the root rule, for the Template Model
-        templateTextRules.fqn = templateModel.getFullyQualifiedName();
+        textRules.class = templateModel.getFullyQualifiedName();
         const identifier = templateModel.getIdentifierFieldName();
         if (identifier !== null) {
-            templateTextRules.identifier = `${identifier} : "${uuid.v4()}"`;
+            textRules.identifier = `${identifier} : "${uuid.v4()}"`;
         }
-        templateTextRules.properties = [];
+        textRules.properties = [];
         templateModel.getProperties().forEach((property, index) => {
             const sep = index < templateModel.getProperties().length - 1 ? ',' : '';
             const bindingIndex = this.findFirstBinding(property.getName(), ast.data);
             if (bindingIndex !== -1) { // ignore things like transactionId
                 // TODO (DCS) add !==null check for BooleanBinding
-                templateTextRules.properties.push(`${property.getName()} : ${prefix}${bindingIndex}${sep}`);
+                textRules.properties.push(`${property.getName()} : ${prefix}${bindingIndex}${sep}`);
             }
         });
 
-        let dynamicGrammar = '';
+        parts.textRules.push(textRules);
+
         for (let rule in rules) {
             const element = rules[rule];
-            dynamicGrammar += '\n';
             switch (element.type) {
             case 'Chunk':
             case 'LastChunk':
-                dynamicGrammar += `${rule} -> `;
-                dynamicGrammar += this.cleanChunk(element.value);
+                parts.modelRules.push({
+                    prefix: rule,
+                    class: false,
+                    symbols: [this.cleanChunk(element.value)],
+                    properties: false
+                });
                 break;
             case 'BooleanBinding':
-                dynamicGrammar += `${rule} -> `;
-                dynamicGrammar += `${element.string.value}:? {% (d) => {return d[0] !== null;}%} # ${element.fieldName.value}`;
+                parts.modelRules.push({
+                    prefix: rule,
+                    class: false,
+                    symbols: [`${element.string.value}:? {% (d) => {return d[0] !== null;}%} # ${element.fieldName.value}`],
+                    properties: false
+                });
                 break;
             case 'Binding':
-                dynamicGrammar += `${rule} -> `;
                 {
                     const propertyName = element.fieldName.value;
                     const property = templateModel.getProperty(propertyName);
@@ -276,7 +292,12 @@ class Template {
                     if (suffix === ':') {
                         suffix = '';
                     }
-                    dynamicGrammar += `${type}${suffix} ${action} # ${propertyName}`;
+                    parts.modelRules.push({
+                        prefix: rule,
+                        class: false,
+                        symbols: [`${type}${suffix} ${action} # ${propertyName}`],
+                        properties: false
+                    });
                 }
                 break;
             case 'ClauseBinding':
@@ -288,18 +309,19 @@ class Template {
                         throw new Error(`Template references a property '${propertyName}' that is not declared in the template model '${templateModel.getFullyQualifiedName()}'. Details: ${JSON.stringify(element)}`);
                     }
                     const clauseTemplateModel = this.getIntrospector().getClassDeclaration(property.getFullyQualifiedTypeName());
-                    this.createDynamicGrammar(clauseTemplate, clauseTemplateModel, propertyName);
-                    dynamicGrammar += `${rule} -> ${element.fieldName.value} {% id %}\n`;
-
+                    this.buildGrammarRules(clauseTemplate, clauseTemplateModel, propertyName, parts);
+                    parts.modelRules.push({
+                        prefix: rule,
+                        class: false,
+                        symbols: [`${element.fieldName.value} {% id %}\n`],
+                        properties: false
+                    });
                 }
                 break;
             default:
                 throw new Error(`Unrecognized type ${element.type}`);
             }
         }
-
-        this.parts.templateTextRules.unshift(templateTextRules);
-        this.parts.templateModelRules.unshift(dynamicGrammar);
     }
 
     /**

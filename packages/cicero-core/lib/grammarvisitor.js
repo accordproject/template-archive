@@ -121,7 +121,12 @@ class GrammarVisitor {
             result += property.accept(this,parameters);
         });
 
-        parameters.writer.writeLine(0, `${enumDeclaration.getName()} ->  ${result}`);
+        parameters.rules.push({
+            prefix: enumDeclaration.getName(),
+            symbols: [result],
+            properties: false
+        });
+
         return result;
     }
 
@@ -138,32 +143,32 @@ class GrammarVisitor {
         // do not visit the template model itself, as we need to generate
         // that from the template grammar, including all the source text.
         if(!classDeclaration.getDecorator('AccordTemplateModel') &&
+        // TODO (MCR) Why is the following line needed?
         // Ignore classes that have no fields
         classDeclaration.getProperties().length > 0) {
-            let result = '';
+            let result = [];
 
             // Walk over all of the properties of this class and its super classes.
             classDeclaration.getProperties().forEach((property) => {
                 if(result.length>0) {
-                    result += ' __ ';
+                    result.push(' __ ');
                 }
-                result += property.accept(this, parameters);
+                result.push(property.accept(this, parameters));
             });
-
-            parameters.writer.writeLine(0, `${classDeclaration.getName()} ->  ${result}
-{% (data) => {
-      return {
-         $class : "${classDeclaration.getFullyQualifiedName()}",`);
 
             // populate all the properties
+            const properties = [];
             classDeclaration.getProperties().forEach((property,index) => {
                 const sep = index < classDeclaration.getProperties().length-1 ? ',' : '';
-                parameters.writer.writeLine(3, `${property.getName()} : data[${index*2}]${sep}`);
+                properties.push(`${property.getName()} : data[${index*2}]${sep}`);
             });
 
-            parameters.writer.writeLine(2, '};');
-            parameters.writer.writeLine(1, '}');
-            parameters.writer.writeLine(0, '%}\n');
+            parameters.rules.push({
+                prefix: classDeclaration.getName(),
+                class: classDeclaration.getFullyQualifiedName(),
+                symbols: result,
+                properties
+            });
             return null;
         }
     }
