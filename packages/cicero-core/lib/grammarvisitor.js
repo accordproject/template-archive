@@ -77,36 +77,6 @@ class GrammarVisitor {
             modelFile.accept(this, parameters);
         });
 
-        // generate the primitive types
-        parameters.writer.writeLine(0,
-            `
-# Basic types
-NUMBER -> [0-9] 
-{% (d) => {return parseInt(d[0]);}%}
-
-DOUBLE_NUMBER -> NUMBER NUMBER
-{% (d) => {return '' + d[0] + d[1]}%}
-
-MONTH -> DOUBLE_NUMBER
-DAY -> DOUBLE_NUMBER
-YEAR -> DOUBLE_NUMBER DOUBLE_NUMBER
-{% (d) => {return '' + d[0] + d[1]}%}
-
-DATE -> MONTH "/" DAY "/" YEAR
-{% (d) => {return '' + d[4] + '-' + d[0] + '-' + d[2]}%}
-
-Word -> [\\S]:*
-{% (d) => {return d[0].join('');}%}
-
-BRACKET_PHRASE -> "[" Word (__ Word):* "]" {% ((d) => {return d[1] + ' ' + flatten(d[2]).join(" ");}) %}
-
-String -> dqstring {% id %}
-Double -> decimal {% id %}
-Integer -> int {% id %}
-Long -> int {% id %}
-Boolean -> "true" {% id %} | "false" {% id %}
-DateTime -> DATE  {% id %}`);
-
         return null;
     }
 

@@ -40,6 +40,7 @@ const GrammarVisitor = require('./grammarvisitor');
 const Ergo = require('@accordproject/ergo-compiler/lib/ergo');
 const version = require('../package.json').version;
 const uuid = require('uuid');
+const nunjucks = require('nunjucks');
 
 const ENCODING = 'utf8';
 // Matches 'sample.txt' or 'sample_TAG.txt' where TAG is an IETF language tag (BCP 47)
@@ -83,6 +84,10 @@ class Template {
         this.templatizedGrammar = null;
         this.logicjsonly = false;
         this.logicboth = false;
+        this.parts = {
+            templateTextRules: [],
+            templateModelRules: []
+        };
     }
 
     /**
@@ -149,58 +154,34 @@ class Template {
     buildGrammar(templatizedGrammar) {
 
         logger.debug('buildGrammar', templatizedGrammar);
-        const templateModel = this.getTemplateModel();
         const parser = new nearley.Parser(nearley.Grammar.fromCompiled(templateGrammar));
         parser.feed(templatizedGrammar);
         if (parser.results.length !== 1) {
             throw new Error('Ambigious parse!');
         }
 
-        // parse the template grammar
+        // parse the template grammar to generate a dynamic grammar
         const ast = parser.results[0];
         logger.debug('Template AST', ast);
-        const writer = new Writer();
+        this.createDynamicGrammar(ast, this.getTemplateModel(), 'ROOT');
 
-        writer.writeLine(0, '\n');
-        writer.writeLine(0, '# Dynamically Generated');
-        writer.writeLine(0, '@builtin "number.ne"');
-        writer.writeLine(0, '@builtin "string.ne"');
-        writer.writeLine(0, '@builtin "whitespace.ne"');
-        writer.writeLine(0, `@{%
-    function compact(v) {
-        if (Array.isArray(v)) {
-            return v.reduce((a, v) => (v === null || v === undefined || (v && v.length === 0) ) ? a : (a.push(v), a), []);
-        } else {
-            return v;
-        }
-    }
-
-    function flatten(v) {
-        let r;
-        if (Array.isArray(v)) {
-            r = v.reduce((a,v) => (a.push(...((v && Array.isArray(v)) ? flatten(v) : [v])), a), []);
-        } else {
-            r = v;
-        }
-        r = compact(r);
-        return r;
-        }
-%}`);
-        writer.writeLine(0, '\n');
-
-        let dynamicGrammar = this.createRules(ast, templateModel, writer, 'ROOT');
-
-        writer.writeLine(0, dynamicGrammar);
-        writer.writeLine(0, '\n');
-
-        // add the grammar for the model
+        // generate the grammar for the model
         const parameters = {
-            writer: writer
+            writer: new Writer()
         };
         const gv = new GrammarVisitor();
         this.getModelManager().accept(gv, parameters);
+        this.parts.modelRules = parameters.writer.getBuffer();
 
-        const combined = parameters.writer.getBuffer();
+        // combine the results
+        nunjucks.configure({
+            tags: {
+                blockStart: '<%',
+                blockEnd: '%>'
+            },
+            autoescape: false  // Required to allow nearley syntax strings
+        });
+        const combined = nunjucks.render('./lib/template.ne', this.parts);
         logger.debug('Generated template grammar' + combined);
 
         this.setGrammar(combined);
@@ -211,62 +192,44 @@ class Template {
      * Build grammar rules from a template
      * @param {object} ast  - the AST from which to build the grammar
      * @param {ClassDeclaration} templateModel  - the type of the parent class for this AST
-     * @param {Writer} writer  - Text buffer to collect grammar.
      * @param {String} prefix - A unique prefix for the grammar rules
-     * @returns {String} - the grammar text
      */
-    createRules(ast, templateModel, writer, prefix) {
+    createDynamicGrammar(ast, templateModel, prefix) {
         // now we create each subordinate rule in turn
         const rules = {};
+        let templateTextRules = {};
+
+        // create the root rule, for the Template Model
+        templateTextRules.prefix = prefix;
+        templateTextRules.symbols = [];
         ast.data.forEach((element, index) => {
             // ignore empty chunks (issue #1) and missing optional last chunks
             if (element && (element.type !== 'Chunk' || element.value.length > 0)) {
                 logger.debug(`element ${prefix}${index} ${JSON.stringify(element)}`);
                 rules[prefix + index] = element;
+                templateTextRules.symbols.push(prefix + index);
             }
         }, this);
 
         // create the root rule, for the Template Model
-        writer.write(`${prefix} -> `);
-        for (let rule in rules) {
-            writer.write(`${rule} `);
-        }
-        writer.write('\n');
-        writer.writeLine(0, '{%');
-        writer.writeLine(0, `([${Object.keys(rules)}]) => {`);
-        writer.writeLine(1, 'return {');
-        writer.writeLine(3, `$class : "${templateModel.getFullyQualifiedName()}",`);
+        templateTextRules.fqn = templateModel.getFullyQualifiedName();
         const identifier = templateModel.getIdentifierFieldName();
         if (identifier !== null) {
-            writer.writeLine(3, `${identifier} : "${uuid.v4()}",`);
+            templateTextRules.identifier = `${identifier} : "${uuid.v4()}"`;
         }
+        templateTextRules.properties = [];
         templateModel.getProperties().forEach((property, index) => {
             const sep = index < templateModel.getProperties().length - 1 ? ',' : '';
             const bindingIndex = this.findFirstBinding(property.getName(), ast.data);
             if (bindingIndex !== -1) { // ignore things like transactionId
                 // TODO (DCS) add !==null check for BooleanBinding
-                writer.writeLine(3, `${property.getName()} : ${prefix}${bindingIndex}${sep}`);
+                templateTextRules.properties.push(`${property.getName()} : ${prefix}${bindingIndex}${sep}`);
             }
         });
-        writer.writeLine(1, '};');
-        writer.writeLine(0, '}');
-        writer.writeLine(0, '%}\n');
-
-        return this.buildGrammarRules(rules, templateModel, writer);
-    }
-
-    /**
-     * Build grammar rules from a template
-     * @param {object} ast  - the AST from which to build the grammar
-     * @param {ClassDeclaration} templateModel  - the type of the parent class for this AST
-     * @param {Writer} writer  - Text buffer to collect grammar.
-     * @returns {String} - the grammar text
-     */
-    buildGrammarRules(ast, templateModel, writer) {
 
         let dynamicGrammar = '';
-        for (let rule in ast) {
-            const element = ast[rule];
+        for (let rule in rules) {
+            const element = rules[rule];
             dynamicGrammar += '\n';
             switch (element.type) {
             case 'Chunk':
@@ -325,16 +288,18 @@ class Template {
                         throw new Error(`Template references a property '${propertyName}' that is not declared in the template model '${templateModel.getFullyQualifiedName()}'. Details: ${JSON.stringify(element)}`);
                     }
                     const clauseTemplateModel = this.getIntrospector().getClassDeclaration(property.getFullyQualifiedTypeName());
-                    const clauseDynamicGrammar = this.createRules(clauseTemplate, clauseTemplateModel, writer, propertyName);
+                    this.createDynamicGrammar(clauseTemplate, clauseTemplateModel, propertyName);
                     dynamicGrammar += `${rule} -> ${element.fieldName.value} {% id %}\n`;
-                    dynamicGrammar += clauseDynamicGrammar;
+
                 }
                 break;
             default:
                 throw new Error(`Unrecognized type ${element.type}`);
             }
         }
-        return dynamicGrammar;
+
+        this.parts.templateTextRules.unshift(templateTextRules);
+        this.parts.templateModelRules.unshift(dynamicGrammar);
     }
 
     /**

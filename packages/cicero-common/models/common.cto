@@ -6,7 +6,8 @@ namespace org.accordproject.common
  */
 
 /* A state is a concept with a contract status */
-concept State {
+asset State identified by stateId {
+  o String stateId
 }
 /* A contract is a concept -- This contains the contract data */
 asset ContractModel identified by contractId {
@@ -27,7 +28,7 @@ transaction Request {}
 /* A response is a transaction */
 transaction Response {}
 /* An Error is a concept */
-concept ErrorResponse {}
+transaction ErrorResponse {}
 /* A payload has contract data, a request and a state */
 concept Payload {
   o ContractModel contract  // the contract data (replaces current clause)
