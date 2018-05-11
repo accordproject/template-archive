@@ -60,5 +60,35 @@ describe('GrammarVisitor', () => {
             const ast = Template.compileGrammar(generatedGrammar);
             ast.should.not.be.null;
         });
+
+        it('should generate grammar from a model with relationships', async () => {
+
+            const mm = new ModelManager();
+            if(mm.getModelFile('org.accordproject.common') === undefined){
+                const model = fs.readFileSync(path.resolve(__dirname, '../../cicero-common/models/', 'common.cto'), 'utf8');
+                mm.addModelFile(model, 'common.cto');
+            }
+
+            const test = fs.readFileSync(path.resolve(__dirname, 'data/copyright-license/models', 'model.cto'), 'utf8');
+            mm.addModelFile(test, 'model.cto', true);
+
+            await mm.updateExternalModels();
+            mm.validateModelFiles();
+
+            const writer = new Writer();
+            const parameters = {
+                writer: writer
+            };
+            const gv = new GrammarVisitor();
+            mm.accept(gv, parameters);
+
+            const generatedGrammar = parameters.writer.getBuffer();
+            generatedGrammar.should.not.be.null;
+            logger.debug('Generated grammar', generatedGrammar);
+
+            // check we can parse the generated grammar
+            const ast = Template.compileGrammar(generatedGrammar);
+            ast.should.not.be.null;
+        });
     });
 });

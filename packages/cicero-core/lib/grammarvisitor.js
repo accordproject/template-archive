@@ -55,7 +55,7 @@ class GrammarVisitor {
         } else if (thing instanceof EnumValueDeclaration) {
             return this.visitEnumValueDeclaration(thing, parameters);
         } else {
-            throw new Error('Unrecognised type: ' + typeof thing + ', value: ' + util.inspect(thing, { showHidden: true, depth: 2 }));
+            throw new Error('Unrecognised type: ' + typeof thing + ', value: ' + util.inspect(thing, { showHidden: true, depth: 1 }));
         }
     }
 
@@ -167,7 +167,9 @@ DateTime -> DATE  {% id %}`);
 
         // do not visit the template model itself, as we need to generate
         // that from the template grammar, including all the source text.
-        if(!classDeclaration.getDecorator('AccordTemplateModel')) {
+        if(!classDeclaration.getDecorator('AccordTemplateModel') &&
+        // Ignore classes that have no fields
+        classDeclaration.getProperties().length > 0) {
             let result = '';
 
             // Walk over all of the properties of this class and its super classes.

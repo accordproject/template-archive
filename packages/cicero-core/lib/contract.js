@@ -25,8 +25,8 @@ const TemplateInstance = require('./templateinstance.js');
  * @class
  * @memberof module:cicero-core
  */
-class Clause extends TemplateInstance {
+class Contract extends TemplateInstance {
 
 }
 
-module.exports = Clause;
+module.exports = Contract;

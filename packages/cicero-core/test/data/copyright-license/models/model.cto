@@ -1,0 +1,47 @@
+namespace org.accordproject.copyrightlicense
+
+import org.accordproject.common.ClauseModel
+
+/* Requesting a payment */
+transaction PaymentRequest {
+}
+
+/* PayOut response */
+transaction PayOut {
+  o Double amount
+}
+
+/* The template model  */
+@AccordTemplateModel("copyright-license")
+concept TemplateModel {
+  /* the effective date */
+  o DateTime effectiveDate
+
+  /* licensee */
+  o String licenseeName
+  o String licenseeState
+  o String licenseeEntityType
+  o String licenseeAddress
+
+  /* licensor */
+  o String licensorName
+  o String licensorState
+  o String licensorEntityType
+  o String licensorAddress
+
+  /* territory where license is granted */
+  o String territory
+
+  /* descriptions */
+  o String purposeDescription
+  o String workDescription
+
+  /* payment */
+  o PaymentClauseModel paymentClause
+}
+
+asset PaymentClauseModel extends ClauseModel {
+  o String amountText
+	o Double amount
+	o String paymentProcedure
+}

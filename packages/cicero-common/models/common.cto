@@ -1,4 +1,4 @@
-namespace org.accordproject.contract
+namespace org.accordproject.common
 
 /**
  * Contract data
@@ -9,11 +9,11 @@ namespace org.accordproject.contract
 concept State {
 }
 /* A contract is a concept -- This contains the contract data */
-asset Contract identified by contractId {
+asset ContractModel identified by contractId {
   o String contractId
 }
 /* A clause is a concept -- This contains the clause data */
-asset Clause identified by clauseId {
+asset ClauseModel identified by clauseId {
   o String clauseId
 }
 
@@ -30,7 +30,7 @@ transaction Response {}
 concept ErrorResponse {}
 /* A payload has contract data, a request and a state */
 concept Payload {
-  o Contract contract  // the contract data (replaces current clause)
+  o ContractModel contract  // the contract data (replaces current clause)
   o Request request
   o State state
 }

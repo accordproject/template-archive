@@ -39,6 +39,7 @@ const templateGrammar = require('./tdl.js');
 const GrammarVisitor = require('./grammarvisitor');
 const Ergo = require('@accordproject/ergo-compiler/lib/ergo');
 const version = require('../package.json').version;
+const uuid = require('uuid');
 
 const ENCODING = 'utf8';
 // Matches 'sample.txt' or 'sample_TAG.txt' where TAG is an IETF language tag (BCP 47)
@@ -48,7 +49,7 @@ const SAMPLE_FILE_REGEXP = xregexp('sample(_(' + IETF_REGEXP + '))?.txt$');
 // This code is derived from BusinessNetworkDefinition in Hyperleger Composer composer-common.
 
 /**
- * A template for a legal clause. A Template has a template model, request/response transaction types,
+ * A template for a legal clause or contract. A Template has a template model, request/response transaction types,
  * a template grammar (natural language for the template) as well as the business logic to execute the
  * template.
  * @class
@@ -62,12 +63,16 @@ class Template {
      * Note: Only to be called by framework code. Applications should
      * retrieve instances from {@link Template.fromArchive}.
      * @param {object} packageJson  - the JS object for package.json
-     * @param {String} readme  - the readme in markdown for the clause (optional)
+     * @param {String} readme  - the readme in markdown for the template (optional)
      * @param {object} samples - the sample text for the template in different locales
      */
     constructor(packageJson, readme, samples) {
 
         this.modelManager = new ModelManager();
+        if(this.modelManager.getModelFile('org.accordproject.common') === undefined){
+            const model = fs.readFileSync(fsPath.resolve(__dirname, '../../cicero-common/models/', 'common.cto'), 'utf8');
+            this.modelManager.addModelFile(model, 'common.cto');
+        }
         this.scriptManager = new ScriptManager(this.modelManager);
         this.introspector = new Introspector(this.modelManager);
         this.factory = new Factory(this.modelManager);
@@ -101,16 +106,16 @@ class Template {
     }
 
     /**
-     * Returns the identifier for this clause
-     * @return {String} the identifier of this clause
+     * Returns the identifier for this template
+     * @return {String} the identifier of this template
      */
     getIdentifier() {
         return this.getMetadata().getIdentifier();
     }
 
     /**
-     * Returns the metadata for this clause
-     * @return {kMetadata} the metadata for this clause
+     * Returns the metadata for this template
+     * @return {Metadata} the metadata for this template
      */
     getMetadata() {
         return this.metadata;
@@ -183,96 +188,7 @@ class Template {
 %}`);
         writer.writeLine(0, '\n');
 
-        // index all rules
-        const rules = {};
-        ast.data.forEach((element, index) => {
-            // ignore empty chunks (issue #1) and missing optional last chunks
-            if(element && (element.type !== 'Chunk' || element.value.length > 0) ) {
-                logger.debug(`element C${index} ${JSON.stringify(element)}`);
-                rules['C' + index] = element;
-            }
-        }, this);
-
-        // create the root rule
-        writer.write('ROOT -> ');
-        for (let rule in rules) {
-            writer.write(`${rule} `);
-        }
-
-        writer.write('\n');
-        writer.writeLine(0, '{%');
-        writer.writeLine(0, `([${Object.keys(rules)}]) => {`);
-        writer.writeLine(1, 'return {');
-        writer.writeLine(3, `$class : "${templateModel.getFullyQualifiedName()}",`);
-        templateModel.getProperties().forEach((property,index) => {
-            const sep = index < templateModel.getProperties().length-1 ? ',' : '';
-            const bindingIndex = this.findFirstBinding(property.getName(), ast.data);
-            if(bindingIndex !== -1) { // ignore things like transactionId
-                // TODO (DCS) add !==null check for BooleanBinding
-                writer.writeLine(3, `${property.getName()} : C${bindingIndex}${sep}`);
-            }
-        });
-        writer.writeLine(1, '};');
-        writer.writeLine(0, '}');
-        writer.writeLine(0, '%}\n');
-
-        // now we create each subordinate rule in turn
-        let dynamicGrammar = '';
-        for (let rule in rules) {
-            const element = rules[rule];
-            dynamicGrammar += '\n';
-            dynamicGrammar += `${rule} -> `;
-
-            switch (element.type) {
-            case 'Chunk':
-            case 'LastChunk':
-                dynamicGrammar += this.cleanChunk(element.value);
-                break;
-            case 'BooleanBinding':
-                dynamicGrammar += `${element.string.value}:? {% (d) => {return d[0] !== null;}%} # ${element.fieldName.value}`;
-                break;
-            case 'Binding': {
-                const propertyName = element.fieldName.value;
-                const property = templateModel.getProperty(propertyName);
-                if(!property) {
-                    throw new Error(`Template references a property '${propertyName}' that is not declared in the template model '${templateModel.getFullyQualifiedName()}'. Details: ${JSON.stringify(element)}`);
-                }
-                let type = property.getType();
-                // relationships need to be transformed into strings
-                if(property instanceof RelationshipDeclaration) {
-                    type = 'String';
-                }
-                let action = '{% id %}';
-
-                const decorator = property.getDecorator('AccordType');
-                if(decorator) {
-                    if( decorator.getArguments().length > 0) {
-                        type = decorator.getArguments()[0];
-                    }
-                    if( decorator.getArguments().length > 1) {
-                        action = decorator.getArguments()[1];
-                    }
-                }
-
-                let suffix = ':';
-                // TODO (DCS) need a serialization for arrays
-                if(property.isArray()) {
-                    throw new Error('Arrays are not yet supported!');
-                    // suffix += '+';
-                }
-                if(property.isOptional()) {
-                    suffix += '?';
-                }
-                if(suffix === ':') {
-                    suffix = '';
-                }
-                dynamicGrammar += `${type}${suffix} ${action} # ${propertyName}`;
-            }
-                break;
-            default:
-                throw new Error(`Unrecognized type ${element.type}`);
-            }
-        }
+        let dynamicGrammar = this.createRules(ast, templateModel, writer, 'ROOT');
 
         writer.writeLine(0, dynamicGrammar);
         writer.writeLine(0, '\n');
@@ -289,6 +205,136 @@ class Template {
 
         this.setGrammar(combined);
         this.templatizedGrammar = templatizedGrammar;
+    }
+
+    /**
+     * Build grammar rules from a template
+     * @param {object} ast  - the AST from which to build the grammar
+     * @param {ClassDeclaration} templateModel  - the type of the parent class for this AST
+     * @param {Writer} writer  - Text buffer to collect grammar.
+     * @param {String} prefix - A unique prefix for the grammar rules
+     * @returns {String} - the grammar text
+     */
+    createRules(ast, templateModel, writer, prefix) {
+        // now we create each subordinate rule in turn
+        const rules = {};
+        ast.data.forEach((element, index) => {
+            // ignore empty chunks (issue #1) and missing optional last chunks
+            if (element && (element.type !== 'Chunk' || element.value.length > 0)) {
+                logger.debug(`element ${prefix}${index} ${JSON.stringify(element)}`);
+                rules[prefix + index] = element;
+            }
+        }, this);
+
+        // create the root rule, for the Template Model
+        writer.write(`${prefix} -> `);
+        for (let rule in rules) {
+            writer.write(`${rule} `);
+        }
+        writer.write('\n');
+        writer.writeLine(0, '{%');
+        writer.writeLine(0, `([${Object.keys(rules)}]) => {`);
+        writer.writeLine(1, 'return {');
+        writer.writeLine(3, `$class : "${templateModel.getFullyQualifiedName()}",`);
+        const identifier = templateModel.getIdentifierFieldName();
+        if (identifier !== null) {
+            writer.writeLine(3, `${identifier} : "${uuid.v4()}",`);
+        }
+        templateModel.getProperties().forEach((property, index) => {
+            const sep = index < templateModel.getProperties().length - 1 ? ',' : '';
+            const bindingIndex = this.findFirstBinding(property.getName(), ast.data);
+            if (bindingIndex !== -1) { // ignore things like transactionId
+                // TODO (DCS) add !==null check for BooleanBinding
+                writer.writeLine(3, `${property.getName()} : ${prefix}${bindingIndex}${sep}`);
+            }
+        });
+        writer.writeLine(1, '};');
+        writer.writeLine(0, '}');
+        writer.writeLine(0, '%}\n');
+
+        return this.buildGrammarRules(rules, templateModel, writer);
+    }
+
+    /**
+     * Build grammar rules from a template
+     * @param {object} ast  - the AST from which to build the grammar
+     * @param {ClassDeclaration} templateModel  - the type of the parent class for this AST
+     * @param {Writer} writer  - Text buffer to collect grammar.
+     * @returns {String} - the grammar text
+     */
+    buildGrammarRules(ast, templateModel, writer) {
+
+        let dynamicGrammar = '';
+        for (let rule in ast) {
+            const element = ast[rule];
+            dynamicGrammar += '\n';
+            switch (element.type) {
+            case 'Chunk':
+            case 'LastChunk':
+                dynamicGrammar += `${rule} -> `;
+                dynamicGrammar += this.cleanChunk(element.value);
+                break;
+            case 'BooleanBinding':
+                dynamicGrammar += `${rule} -> `;
+                dynamicGrammar += `${element.string.value}:? {% (d) => {return d[0] !== null;}%} # ${element.fieldName.value}`;
+                break;
+            case 'Binding':
+                dynamicGrammar += `${rule} -> `;
+                {
+                    const propertyName = element.fieldName.value;
+                    const property = templateModel.getProperty(propertyName);
+                    if (!property) {
+                        throw new Error(`Template references a property '${propertyName}' that is not declared in the template model '${templateModel.getFullyQualifiedName()}'. Details: ${JSON.stringify(element)}`);
+                    }
+                    let type = property.getType();
+                    // relationships need to be transformed into strings
+                    if (property instanceof RelationshipDeclaration) {
+                        type = 'String';
+                    }
+                    let action = '{% id %}';
+                    const decorator = property.getDecorator('AccordType');
+                    if (decorator) {
+                        if (decorator.getArguments().length > 0) {
+                            type = decorator.getArguments()[0];
+                        }
+                        if (decorator.getArguments().length > 1) {
+                            action = decorator.getArguments()[1];
+                        }
+                    }
+                    let suffix = ':';
+                    // TODO (DCS) need a serialization for arrays
+                    if (property.isArray()) {
+                        throw new Error('Arrays are not yet supported!');
+                        // suffix += '+';
+                    }
+                    if (property.isOptional()) {
+                        suffix += '?';
+                    }
+                    if (suffix === ':') {
+                        suffix = '';
+                    }
+                    dynamicGrammar += `${type}${suffix} ${action} # ${propertyName}`;
+                }
+                break;
+            case 'ClauseBinding':
+                {
+                    const propertyName = element.fieldName.value;
+                    const clauseTemplate = element.template;
+                    const property = templateModel.getProperty(propertyName);
+                    if (!property) {
+                        throw new Error(`Template references a property '${propertyName}' that is not declared in the template model '${templateModel.getFullyQualifiedName()}'. Details: ${JSON.stringify(element)}`);
+                    }
+                    const clauseTemplateModel = this.getIntrospector().getClassDeclaration(property.getFullyQualifiedTypeName());
+                    const clauseDynamicGrammar = this.createRules(clauseTemplate, clauseTemplateModel, writer, propertyName);
+                    dynamicGrammar += `${rule} -> ${element.fieldName.value} {% id %}\n`;
+                    dynamicGrammar += clauseDynamicGrammar;
+                }
+                break;
+            default:
+                throw new Error(`Unrecognized type ${element.type}`);
+            }
+        }
+        return dynamicGrammar;
     }
 
     /**
@@ -319,7 +365,7 @@ class Template {
     findFirstBinding(propertyName, elements) {
         for(let n=0; n < elements.length; n++) {
             const element = elements[n];
-            if(element.type === 'Binding' || element.type === 'BooleanBinding') {
+            if(element !== null && ['Binding','BooleanBinding','ClauseBinding'].includes(element.type)) {
                 if(element.fieldName.value === propertyName) {
                     return n;
                 }
@@ -337,16 +383,16 @@ class Template {
     }
 
     /**
-     * Returns the name for this clause
-     * @return {String} the name of this clause
+     * Returns the name for this template
+     * @return {String} the name of this template
      */
     getName() {
         return this.getMetadata().getName();
     }
 
     /**
-     * Returns the version for this clause
-     * @return {String} the version of this clause. Use semver module
+     * Returns the version for this template
+     * @return {String} the version of this template. Use semver module
      * to parse.
      */
     getVersion() {
@@ -355,8 +401,8 @@ class Template {
 
 
     /**
-     * Returns the description for this clause
-     * @return {String} the description of this clause
+     * Returns the description for this template
+     * @return {String} the description of this template
      */
     getDescription() {
         return this.getMetadata().getDescription();
@@ -631,6 +677,10 @@ class Template {
             let fileName;
             // ignore the system namespace when creating an archive
             if (file.isSystemModelFile()) {
+                return;
+            }
+            // ignore Accord Project system models
+            if (file.getNamespace() === 'org.accordproject.common') {
                 return;
             }
             if (file.fileName === 'UNKNOWN' || file.fileName === null || !file.fileName) {

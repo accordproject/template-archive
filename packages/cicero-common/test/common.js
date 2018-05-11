@@ -26,7 +26,7 @@ const ModelManager = require('composer-common').ModelManager;
 const ModelFile = require('composer-common/lib/introspect/modelfile');
 
 describe('cicero-common', () => {
-    const contractCtoFile = Path.resolve(__dirname, '..', 'models','contract.cto');
+    const contractCtoFile = Path.resolve(__dirname, '..', 'models','common.cto');
     const contractCtoText = Fs.readFileSync(contractCtoFile, 'utf8');
     describe('#valid', () => {
         let modelManager = new ModelManager();
