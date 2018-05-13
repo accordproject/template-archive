@@ -859,7 +859,7 @@ class Template {
                     let filePath = fsPath.parse(path);
                     if (filePath.ext.toLowerCase() === '.ergo') {
                         logger.debug(method, 'Compiling Ergo to JavaScript ', path);
-                        contents = Ergo.compileToJavaScript(contents,[],null,null,true);
+                        contents = Ergo.compileToJavaScript(contents,[],true);
                         logger.debug('ERGO!\n'+contents+'\n');
                     }
                     const jsScript = template.getScriptManager().createScript(path, filePath.ext.toLowerCase(), contents);

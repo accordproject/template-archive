@@ -116,14 +116,7 @@ class Engine {
         }
 
         const code = `
-        __dispatch(contract,request,state);
-
-        function __dispatch(contract,request,state) {
-            // Ergo dispatch call
-            let context = {request: serializer.toJSON(request), state: state, contract: contract, clause: {}, now: moment()};
-            let result = dispatch(context);
-            return { response: serializer.fromJSON(result.response), state:result.state, emit: [] };
-        } 
+        __dispatch(contract,request,state,moment());
         `;
 
         logger.debug(code);
@@ -157,9 +150,9 @@ class Engine {
         }
 
         const head = `
-        __dispatch(contract,request,state);
+        __dispatch(contract,request,state,moment());
 
-        function __dispatch(contract,request,state) {
+        function __dispatch(contract,request,state,now) {
             switch(request.getFullyQualifiedType()) {
         `;
 
@@ -171,9 +164,9 @@ class Engine {
                 let ns${n} = type${n}.substr(0, type${n}.lastIndexOf('.'));
                 let clazz${n} = type${n}.substr(type${n}.lastIndexOf('.')+1);
                 let response${n} = factory.newTransaction(ns${n}, clazz${n});
-                let context${n} = {request: request, state: state, contract: contract, clause: {}, response: response${n}, emit: []};
+                let context${n} = {request: request, state: state, contract: contract, response: response${n}, emit: []};
                 ${ele.getName()}(context${n});
-                return { response: context${n}.response, state: context${n}.state, emit: context${n}.emit };
+                return { response: context${n}.response, state: context${n}.state, emit: context${n}.emit, now: now };
             break;`;
         });
 
