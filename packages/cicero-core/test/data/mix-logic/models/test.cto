@@ -1,0 +1,27 @@
+namespace org.accord.test
+
+
+enum Status {
+  o ON
+  o OFF
+}
+
+concept Child {
+  o String name
+}
+
+/**
+ * A test concept
+ */
+concept Foo {
+  o String bar
+  --> Participant p
+  --> Asset a
+  o Double d
+  o Long l
+  o DateTime t
+  o Boolean b
+  o Status s
+  o Integer i
+  o Child child
+}

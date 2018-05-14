@@ -73,6 +73,10 @@ describe('Template', () => {
             return Template.fromDirectory('./test/data/latedeliveryandpenalty').should.be.fulfilled;
         });
 
+        it('should throw error when logic mixes Ergo and JavaScript', async () => {
+            return Template.fromDirectory('./test/data/mix-logic').should.be.rejectedWith('Templates cannot mix Ergo and JS logic');
+        });
+
         it('should roundtrip a template', async function() {
             const template = await Template.fromDirectory('./test/data/latedeliveryandpenalty');
             template.getIdentifier().should.equal('latedeliveryandpenalty@0.0.1');
@@ -155,6 +159,12 @@ describe('Template', () => {
             const buffer = fs.readFileSync('./test/data/archives/no-packagejson.zip');
             return Template.fromArchive(buffer).should.be.rejectedWith('Failed to find package.json');
         });
+
+        it('should throw an error if a package.json file does not exist', async () => {
+            await writeZip('mix-logic');
+            const buffer = fs.readFileSync('./test/data/archives/mix-logic.zip');
+            return Template.fromArchive(buffer).should.be.rejectedWith('Templates cannot mix Ergo and JS logic');
+        });
     });
 
     describe('#getParser', () => {
@@ -225,6 +235,7 @@ describe('Template', () => {
             const template = await Template.fromDirectory('./test/data/no-logic');
             return (() => template.getRequestTypes()).should.throw('Did not find any function declarations with the @AccordClauseLogic annotation');
         });
+
     });
 
     describe('#getResponseTypes', () => {

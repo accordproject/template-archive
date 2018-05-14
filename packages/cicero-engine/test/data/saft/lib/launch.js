@@ -13,6 +13,7 @@
  */
 function onLaunch(context) {
     logger.info(context);    
+    logger.info('Launching SAFT');    
     var req = context.request;
     var res = context.response;
     var contract = context.contract;

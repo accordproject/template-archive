@@ -109,10 +109,9 @@ class Commands {
      * @param {string} samplePath to the sample file
      * @param {string[]} requestsPath to the array of request files
      * @param {string} statePath to the state file
-     * @param {boolean} forceJs to force JavaScript logic and disable Ergo
      * @returns {object} Promise to the result of execution
      */
-    static execute(templatePath, samplePath, requestsPath, statePath, forceJs) {
+    static execute(templatePath, samplePath, requestsPath, statePath) {
         let clause;
         const sampleText = fs.readFileSync(samplePath, 'utf8');
         let requestsJson = [];
@@ -130,12 +129,12 @@ class Commands {
                 const engine = new Engine();
                 // First execution to get the initial response
                 const firstRequest = requestsJson[0];
-                const initResponse = engine.execute(clause, firstRequest, stateJson, forceJs);
+                const initResponse = engine.execute(clause, firstRequest, stateJson);
                 // Get all the other requests and chain execution through Promise.reduce()
                 const otherRequests = requestsJson.slice(1, requestsJson.length);
                 return otherRequests.reduce((promise,requestJson) => {
                     return promise.then((result) => {
-                        return engine.execute(clause, requestJson, result.state, forceJs);
+                        return engine.execute(clause, requestJson, result.state);
                     });
                 }, initResponse);
             })

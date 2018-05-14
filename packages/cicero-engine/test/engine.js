@@ -53,7 +53,7 @@ describe('EngineLatePenalty', () => {
                 'timestamp': '2017-11-12T17:38:01.412Z'
             };
             const state = {};
-            const result = await engine.execute(clause, request, state, false);
+            const result = await engine.execute(clause, request, state);
             result.should.not.be.null;
             result.response.penalty.should.equal(110);
         });
@@ -82,7 +82,7 @@ describe('EngineVolumeDiscount', () => {
                 'netAnnualChargeVolume': 0.4
             };
             const state = {};
-            const result = await engine.execute(clause, request, state, true);
+            const result = await engine.execute(clause, request, state);
             result.should.not.be.null;
             result.response.discountRate.should.equal(3);
         });
@@ -96,7 +96,7 @@ describe('EngineVolumeDiscount', () => {
                 'netAnnualChargeVolume': 0.4
             };
             const state = {};
-            const result = await engine.execute(clause, request, state, false);
+            const result = await engine.execute(clause, request, state);
             result.should.not.be.null;
             result.response.discountRate.should.equal(3);
         });
@@ -125,7 +125,7 @@ describe('EngineHelloWorld', () => {
                 'input': 'Accord Project'
             };
             const state = {};
-            const result = await engine.execute(clause, request, state, false);
+            const result = await engine.execute(clause, request, state);
             result.should.not.be.null;
             result.response.output.should.equal('Hello Fred Blogs (Accord Project)');
         });
@@ -139,7 +139,7 @@ describe('EngineHelloWorld', () => {
                     'input': 'Accord Project'
                 };
                 const state = {};
-                const result = await engine.execute(clause, request, state, true);
+                const result = await engine.execute(clause, request, state);
                 return result;
             } catch (err) {
                 err.should.be.Error;
@@ -171,10 +171,42 @@ describe('EngineSaft', () => {
             request.exchangeRate = 100;
             const state = {};
             state.$class = 'org.accordproject.contract.State';
-            const result = await engine.execute(clause, request, state, true);
+            const result = await engine.execute(clause, request, state);
             result.should.not.be.null;
             result.response.tokenAmount.should.equal(100);
             result.response.tokenAddress.should.equal('Daniel Charles Selman');
         });
+    });
+});
+describe('BogusClauses', () => {
+    let engine;
+    let clause;
+    const testNoLogic = fs.readFileSync(path.resolve(__dirname, 'data/no-logic', 'sample.txt'), 'utf8');
+
+    beforeEach(async function () {
+        engine = new Engine();
+        const template = await Template.fromDirectory('./test/data/no-logic');
+        clause = new Clause(template);
+        clause.parse(testNoLogic);
+    });
+
+    afterEach(() => {});
+
+    it('should throw error when no annotation in JavaScript logic', async () => {
+        return (() => engine.buildDispatchFunction(clause)).should.throw('Did not find any function declarations with the @AccordClauseLogic annotation');
+    });
+    it('should throw an error when JavaScript logic is missing', async function() {
+        // Turn all JavaScript logic into something else
+        clause.getTemplate().getScriptManager().getScripts().forEach(function (element) {
+            if (element.getLanguage() === '.js') {
+                element.language = '.ergo';
+            }
+        }, this);
+        (() => engine.compileJsClause(clause)).should.throw('Did not find any JavaScript logic');
+    });
+    it('should throw an error when all logic is missing', async function() {
+        // Remove all scripts
+        clause.getTemplate().getScriptManager().scripts = {};
+        (() => engine.compileJsClause(clause)).should.throw('Did not find any JavaScript logic');
     });
 });

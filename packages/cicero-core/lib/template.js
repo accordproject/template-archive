@@ -81,7 +81,6 @@ class Template {
         this.grammar = null;
         this.grammarAst = null;
         this.templatizedGrammar = null;
-        this.logicjsonly = false;
         this.logicboth = false;
     }
 
@@ -545,7 +544,9 @@ class Template {
                     return file.async('string');
                 }).then((contents) => {
                     logger.debug(method, 'Loaded Ergo file');
-                    const compiledJS = Ergo.compileToJavaScript(contents,[],'javascript_cicero');
+                    // XXX TBD: Pass CTOs to Ergo compiler
+                    const ctos = [];
+                    const compiledJS = Ergo.compileToJavaScriptAndLink(contents,ctos,'javascript_cicero');
                     let tempObj = {
                         'name': file.name,
                         'contents': compiledJS
@@ -828,7 +829,7 @@ class Template {
 
             // find script files outside the npm install directory
             const scriptFiles = [];
-            let foundErgo, foundJs;
+            let foundErgo, foundJs = false;
             Template.processDirectory(path, {
                 accepts: function (file) {
                     return isFileInNodeModuleDir(file, path) === false && minimatch(file, options.scriptGlob, {
@@ -839,19 +840,21 @@ class Template {
                     return !isFileInNodeModuleDir(dir, path);
                 },
                 process: function (path, contents) {
-                    if(foundErgo && foundJs) {
-                        throw new Error('Templates cannot mix Ergo and JS logic');
-                    }
-
                     let filePath = fsPath.parse(path);
                     if (filePath.ext.toLowerCase() === '.ergo') {
                         logger.debug(method, 'Compiling Ergo to JavaScript ', path);
-                        contents = Ergo.compileToJavaScript(contents,[],'javascript_cicero');
+                        contents = Ergo.compileToJavaScriptAndLink(contents,[],'javascript_cicero');
                         logger.debug('Compiled Ergo to Javascript:\n'+contents+'\n');
-                        path += '.js';
-                        filePath.ext += '.js';
+                        path = path.substr(0, path.lastIndexOf('.')) + '.js';
+                        filePath.ext = '.js';
+                        if(foundJs) {
+                            throw new Error('Templates cannot mix Ergo and JS logic');
+                        }
                         foundErgo = true;
                     } else if (filePath.ext.toLowerCase() === '.js') {
+                        if(foundErgo) {
+                            throw new Error('Templates cannot mix Ergo and JS logic');
+                        }
                         foundJs = true;
                     }
                     const jsScript = template.getScriptManager().createScript(path, filePath.ext.toLowerCase(), contents);

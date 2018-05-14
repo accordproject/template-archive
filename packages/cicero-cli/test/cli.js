@@ -50,7 +50,7 @@ describe('cicero-cli', () => {
 
     describe('#parse', () => {
         it('should parse a clause using a template', () => {
-            return Commands.parse(template, sample, true).should.eventually.eql(parseReponse);
+            return Commands.parse(template, sample).should.eventually.eql(parseReponse);
         });
     });
 
@@ -132,7 +132,7 @@ describe('cicero-cli', () => {
 
     describe('#execute', () => {
         it('should execute a clause using a template', async () => {
-            const response = await Commands.execute(template, sample, [request], state, true);
+            const response = await Commands.execute(template, sample, [request], state);
             response.response.$class.should.be.equal('org.accordproject.latedeliveryandpenalty.LateDeliveryAndPenaltyResponse');
             response.response.penalty.should.be.equal(4);
             response.response.buyerMayTerminate.should.be.equal(true);
@@ -141,7 +141,7 @@ describe('cicero-cli', () => {
 
     describe('#executeergo', () => {
         it('should execute a clause in ergo using a template', async () => {
-            const response = await Commands.execute(template, sample, [request], state, false);
+            const response = await Commands.execute(template, sample, [request], state);
             response.response.$class.should.be.equal('org.accordproject.latedeliveryandpenalty.LateDeliveryAndPenaltyResponse');
             response.response.penalty.should.be.equal(4);
             response.response.buyerMayTerminate.should.be.equal(true);

@@ -17,7 +17,6 @@
 const Logger = require('./logger');
 const logger = require('@accordproject/cicero-core').logger;
 const ResourceValidator = require('composer-common/lib/serializer/resourcevalidator');
-const ErgoEngine = require('@accordproject/ergo-engine/lib/ergo-engine');
 
 const {
     VM,
@@ -42,31 +41,6 @@ class Engine {
     }
 
     /**
-     * Compile and cache a clause with Ergo logic
-     * @param {Clause} clause  - the clause to compile
-     * @private
-     */
-    compileErgoClause(clause) {
-        let allErgoScripts = '';
-        let template = clause.getTemplate();
-
-        template.getScriptManager().getScripts().forEach(function (element) {
-            if (element.getLanguage() === '.ergo.js') {
-                allErgoScripts += element.getContents();
-            }
-        }, this);
-
-        if (allErgoScripts === '') {
-            throw new Error('Did not find any Ergo logic');
-        }
-        allErgoScripts += this.buildDispatchFunction(clause,'ergo.js');
-        // logger.info(allErgoScripts);
-        allErgoScripts = ErgoEngine.linkErgoRuntime(allErgoScripts);
-        const script = new VMScript(allErgoScripts);
-        this.scripts[clause.getIdentifier()] = script;
-    }
-
-    /**
      * Compile and cache a clause with JavaScript logic
      * @param {Clause} clause  - the clause to compile
      * @private
@@ -84,8 +58,7 @@ class Engine {
         if (allJsScripts === '') {
             throw new Error('Did not find any JavaScript logic');
         }
-        allJsScripts += this.buildDispatchFunction(clause,'js');
-        // console.log(allJsScripts);
+        allJsScripts += this.buildDispatchFunction(clause);
         const script = new VMScript(allJsScripts);
         this.scripts[clause.getIdentifier()] = script;
     }
@@ -93,15 +66,14 @@ class Engine {
     /**
      * Generate the runtime dispatch logic
      * @param {Clause} clause - the clause to compile
-     * @param {String} lang - the language extension
      * @return {String} the dispatch code
      * @private
      */
-    buildDispatchFunction(clause, lang) {
+    buildDispatchFunction(clause) {
         // get the function declarations of all functions
         // that have the @clause annotation
         const functionDeclarations = clause.getTemplate().getScriptManager().getScripts().filter((ele) => {
-            return ele.getLanguage() === ('.'+lang);
+            return ele.getLanguage() === ('.js');
         }).map((ele) => {
             return ele.getFunctionDeclarations();
         })
@@ -159,14 +131,12 @@ class Engine {
      * using the Composer serializer.
      * @param {object} state  - the contract state, a JS object that can be deserialized
      * using the Composer serializer.
-     * @param {boolean} forceJs  - whether to force JS logic.
      * @return {Promise} a promise that resolves to a result for the clause
      * @private
      */
-    async execute(clause, request, state, forceJs) {
+    async execute(clause, request, state) {
         // ensure the request is valid
         const template = clause.getTemplate();
-        template.logicjsonly = forceJs;
         const tx = template.getSerializer().fromJSON(request, {validate: false, acceptResourcesForRelationships: true});
         tx.$validator = new ResourceValidator({permitResourcesForRelationships: true});
         tx.validate();
@@ -175,25 +145,8 @@ class Engine {
 
         let script = this.scripts[clause.getIdentifier()];
 
-        if (!script) {
-            if (template.logicjsonly) {
-                this.compileJsClause(clause);
-            } else {
-                // Attempt ergo compilation first
-                try {
-                    this.compileErgoClause(clause);
-                } catch(err) {
-                    logger.debug('Error compiling Ergo logic, falling back to JavaScript'+err);
-                    this.compileJsClause(clause);
-                }
-            }
-        }
-
+        this.compileJsClause(clause);
         script = this.scripts[clause.getIdentifier()];
-
-        if (!script) {
-            throw new Error('Failed to created executable script for ' + clause.getIdentifier());
-        }
 
         const contract = clause.getData();
         const factory = template.getFactory();
