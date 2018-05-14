@@ -219,8 +219,6 @@ class Template {
                 textRules.symbols.push(prefix + index);
             }
         }, this);
-
-        // create the root rule, for the Template Model
         textRules.class = templateModel.getFullyQualifiedName();
         const identifier = templateModel.getIdentifierFieldName();
         if (identifier !== null) {
@@ -235,9 +233,9 @@ class Template {
                 textRules.properties.push(`${property.getName()} : ${prefix}${bindingIndex}${sep}`);
             }
         });
-
         parts.textRules.push(textRules);
 
+        // Now create the child rules for each symbol in the root rule
         for (let rule in rules) {
             const element = rules[rule];
             switch (element.type) {
@@ -245,17 +243,13 @@ class Template {
             case 'LastChunk':
                 parts.modelRules.push({
                     prefix: rule,
-                    class: false,
                     symbols: [this.cleanChunk(element.value)],
-                    properties: false
                 });
                 break;
             case 'BooleanBinding':
                 parts.modelRules.push({
                     prefix: rule,
-                    class: false,
                     symbols: [`${element.string.value}:? {% (d) => {return d[0] !== null;}%} # ${element.fieldName.value}`],
-                    properties: false
                 });
                 break;
             case 'Binding':
@@ -294,9 +288,7 @@ class Template {
                     }
                     parts.modelRules.push({
                         prefix: rule,
-                        class: false,
                         symbols: [`${type}${suffix} ${action} # ${propertyName}`],
-                        properties: false
                     });
                 }
                 break;
@@ -312,9 +304,7 @@ class Template {
                     this.buildGrammarRules(clauseTemplate, clauseTemplateModel, propertyName, parts);
                     parts.modelRules.push({
                         prefix: rule,
-                        class: false,
                         symbols: [`${element.fieldName.value} {% id %}\n`],
-                        properties: false
                     });
                 }
                 break;

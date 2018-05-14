@@ -53,19 +53,13 @@ const lexer = moo.states({
             match: '}}',
             pop: true
         }, // pop back to main state
+        clause: /clause/,
+        end:  /end/,
+        external: /external/,
         varid: /[a-zA-Z_][_a-zA-Z0-9]*/,
         varstring: /".*?"/,
         varcond: /:\?/,
         varspace: / /,
-        clauseidstart: {
-            match: /#[a-zA-Z_][_a-zA-Z0-9]*/,
-            value: x => x.slice(1)
-        },
-        clauseidend: {
-            match: /\/[a-zA-Z_][_a-zA-Z0-9]*/,
-            value: x => x.slice(1)
-        },
-        clauseclose: /\//
     },
 });
 %}
@@ -108,30 +102,23 @@ CLAUSE_ITEM ->
       %Chunk {% id %} 
     | VARIABLE {% id %}
 
-CLAUSE_VARIABLE_INLINE -> %clauseidstart %varend CLAUSE_TEMPLATE %clauseidend %varend
-{% (data,l,reject) => {
-    // Check that opening and closing clause tags match
-    // Note: this line makes the parser non-context-free which degrades performance. 
-    // Is there a better way to do this check, perhaps in the lexer?
-    if(data[0].value !== data[3].value) {
-        return reject;
-    } else {
-        return {
-            type: 'ClauseBinding',
-            template: data[2],
-            fieldName: data[0]
-        }
+CLAUSE_VARIABLE_INLINE -> %clause %varspace %varid %varend CLAUSE_TEMPLATE %end %varspace %clause %varend
+{% (data) => {
+    return {
+        type: 'ClauseBinding',
+        template: data[4],
+        fieldName: data[2]
     }
 }
 %}
 
-# Binds the variable to a Clause in the template modegett. The type of the clause
+# Binds the variable to a Clause in the template model. The type of the clause
 # in the grammar is inferred from the type of the model element
-CLAUSE_VARIABLE_EXTERNAL -> %clauseidstart %clauseclose %varend
+CLAUSE_VARIABLE_EXTERNAL -> %external %varspace %clause %varspace %varid %varend
 {% (data) => {
     return {
         type: 'ClauseExternalBinding',
-        fieldName: data[0]
+        fieldName: data[4]
     }
 } 
 %}
