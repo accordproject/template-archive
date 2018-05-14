@@ -51,7 +51,7 @@ class Engine {
         let template = clause.getTemplate();
 
         template.getScriptManager().getScripts().forEach(function (element) {
-            if (element.getLanguage() === '.ergo') {
+            if (element.getLanguage() === '.ergo.js') {
                 allErgoScripts += element.getContents();
             }
         }, this);
@@ -59,7 +59,7 @@ class Engine {
         if (allErgoScripts === '') {
             throw new Error('Did not find any Ergo logic');
         }
-        allErgoScripts += this.buildDispatchFunction(clause,'ergo');
+        allErgoScripts += this.buildDispatchFunction(clause,'ergo.js');
         // logger.info(allErgoScripts);
         allErgoScripts = ErgoEngine.linkErgoRuntime(allErgoScripts);
         const script = new VMScript(allErgoScripts);

@@ -79,7 +79,7 @@ class Metadata {
 
         // Set defaults
         this.type = templateTypes.CONTRACT;
-        this.target = ciceroVersion;
+        this.targetVersion = ciceroVersion;
 
         if (packageJson.cicero && packageJson.cicero.template) {
             if(packageJson.cicero.template !== 'contract' &&
@@ -94,17 +94,17 @@ class Metadata {
             logger.warn('No cicero template type specified. Assuming that this is a contract template');
         }
 
-        if (packageJson.cicero && packageJson.cicero.target) {
-            if(!semver.valid(semver.coerce(packageJson.cicero.target))){
+        if (packageJson.cicero && packageJson.cicero.version) {
+            if(!semver.valid(semver.coerce(packageJson.cicero.version))){
                 throw new Error('The cicero target version must be a valid semantic version (semver) number.');
             }
-            this.target = packageJson.cicero.target;
+            this.targetVersion = packageJson.cicero.version;
         } else {
             logger.warn(`No cicero target version specified. Assuming compatibility with the current cicero version, ${ciceroVersion}`);
         }
 
         if (!this.satisfiesTargetVersion()){
-            logger.warn(`The given target version for this template (${this.target}) is not satisfied by the installed cicero version ${ciceroVersion}.`);
+            logger.warn(`The given target version for this template (${this.targetVersion}) is not satisfied by the installed cicero version ${ciceroVersion}.`);
         }
 
         logger.exit(method);
@@ -146,7 +146,7 @@ class Metadata {
      * @returns {string} the semantic version
      */
     getTargetVersion(){
-        return this.target;
+        return this.targetVersion;
     }
 
     /**

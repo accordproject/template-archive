@@ -61,7 +61,6 @@ describe('Static Parser', () => {
             (()=> parser.feed('foo {{ぴよ}}\n')).should.throw();
             parser.should.not.have.property('results');
         });
-
     });
 
     describe('Contract Template', () => {

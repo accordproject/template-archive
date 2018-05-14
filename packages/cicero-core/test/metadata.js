@@ -57,6 +57,33 @@ describe('Metadata', () => {
             }, {}, {})).should.throw('README must be a string');
         });
 
+        it('should throw an error if template isn\'t contract or clause', () => {
+            return (() => new Metadata({
+                name: 'template',
+                cicero: {template: 'other'},
+            }, null, {})).should.throw('A cicero template can only be either a "contract" or a "clause.');
+        });
+
+        it('should throw an error if target version is not valid semver ', () => {
+            return (() => new Metadata({
+                name: 'template',
+                cicero: {
+                    template: 'clause',
+                    version: 'BLAH'
+                },
+            }, null, {})).should.throw('The cicero target version must be a valid semantic version (semver) number.');
+        });
+
+        it('should throw a warning if target version is not valid semver for current version of cicero', () => {
+            new Metadata({
+                name: 'template',
+                cicero: {
+                    template: 'clause',
+                    version: '0.0.0'
+                },
+            }, null, {});
+        });
+
     });
 
     describe('#getSample(locale)', () => {
@@ -85,6 +112,30 @@ describe('Metadata', () => {
                 default: 'sample'
             });
             md.getSample().should.be.equal('sample');
+        });
+    });
+
+    describe('#getType', () => {
+
+        it('should return default type', () => {
+            const md = new Metadata({
+                name: 'template'
+            }, null, {});
+            md.getTemplateType().should.be.equal(0);
+        });
+        it('should return for explicit contract type', () => {
+            const md = new Metadata({
+                name: 'template',
+                cicero: {template: 'contract'},
+            }, null, {});
+            md.getTemplateType().should.be.equal(0);
+        });
+        it('should return default type', () => {
+            const md = new Metadata({
+                name: 'template',
+                cicero: {template: 'clause'},
+            }, null, {});
+            md.getTemplateType().should.be.equal(1);
         });
     });
 });

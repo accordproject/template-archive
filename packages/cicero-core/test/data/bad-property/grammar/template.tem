@@ -1,0 +1,1 @@
+{{participant}} agrees to spend {{currency}}{{amount}} conga coins on {{swag}}.

@@ -38,6 +38,7 @@
   },
   "homepage": "https://github.com/accordproject/cicero#readme",
   "devDependencies": {
+    "archiver": "^2.1.1",
     "chai": "^3.5.0",
     "chai-as-promised": "^6.0.0",
     "chai-things": "^0.2.0",

@@ -36,6 +36,21 @@ nunjucks.configure({
     },
     autoescape: false  // Required to allow nearley syntax strings
 });
+const ruleTemplate = `
+<% for r in modelRules %>
+{{ r.prefix }} -> <% for s in r.symbols -%>{{ s }} <% endfor %>
+<% if r.properties %>
+{% ( data ) => {
+    return {
+        $class: "{{ r.fqn }}",
+        <%- for p in r.properties %>
+        {{ p }}
+        <%- endfor %>
+    };
+}
+%}
+<% endif %>
+<% endfor %>`;
 
 describe('GrammarVisitor', () => {
 
@@ -66,22 +81,7 @@ describe('GrammarVisitor', () => {
             generatedGrammar.should.not.be.empty;
             logger.debug('Generated grammar', generatedGrammar);
 
-            const combined = nunjucks.renderString(`
-<% for r in modelRules %>
-{{ r.prefix }} -> <% for s in r.symbols -%>{{ s }} <% endfor %>
-<% if r.properties %>
-{% ( data ) => {
-    return {
-        $class: "{{ r.fqn }}",
-        <%- for p in r.properties %>
-        {{ p }}
-        <%- endfor %>
-    };
-}
-%}
-<% endif %>
-<% endfor %>
-            `, {modelRules: generatedGrammar});
+            const combined = nunjucks.renderString(ruleTemplate, {modelRules: generatedGrammar});
 
             // check we can parse the generated grammar
             const ast = Template.compileGrammar(combined);
@@ -114,26 +114,58 @@ describe('GrammarVisitor', () => {
             generatedGrammar.should.not.be.empty;
             logger.debug('Generated grammar', generatedGrammar);
 
-            const combined = nunjucks.renderString(`
-<% for r in modelRules %>
-{{ r.prefix }} -> <% for s in r.symbols -%>{{ s }} <% endfor %>
-<% if r.properties %>
-{% ( data ) => {
-    return {
-        $class: "{{ r.fqn }}",
-        <%- for p in r.properties %>
-        {{ p }}
-        <%- endfor %>
-    };
-}
-%}
-<% endif %>
-<% endfor %>
-            `, {modelRules: generatedGrammar});
+            const combined = nunjucks.renderString(ruleTemplate, {modelRules: generatedGrammar});
 
             // check we can parse the generated grammar
             const ast = Template.compileGrammar(combined);
             ast.should.not.be.null;
+        });
+
+        it('should generate grammar from a model with optional fields', async () => {
+
+            const mm = new ModelManager();
+            if(mm.getModelFile('org.accordproject.common') === undefined){
+                const model = fs.readFileSync(path.resolve(__dirname, '../../cicero-common/models/', 'common.cto'), 'utf8');
+                mm.addModelFile(model, 'common.cto');
+            }
+
+            const test = fs.readFileSync(path.resolve(__dirname, 'data/conga/models', 'model.cto'), 'utf8');
+            mm.addModelFile(test, 'model.cto', true);
+
+            await mm.updateExternalModels();
+            mm.validateModelFiles();
+
+            const writer = new Writer();
+            const parameters = {
+                writer: writer,
+                rules: []
+            };
+            const gv = new GrammarVisitor();
+            mm.accept(gv, parameters);
+
+            const generatedGrammar = parameters.rules;
+            generatedGrammar.should.not.be.empty;
+            logger.debug('Generated grammar', generatedGrammar);
+
+            const combined = nunjucks.renderString(ruleTemplate, {modelRules: generatedGrammar});
+
+            // check we can parse the generated grammar
+            const ast = Template.compileGrammar(combined);
+            ast.should.not.be.null;
+        });
+
+        it('should throw an error for unrecognized type', async () => {
+
+            /* eslint-disable */
+            class Thing {
+                accept(visitor, parameters) {
+                    visitor.visit(this,parameters);
+                }
+            }
+            /* eslint-enable */
+            const thing = new Thing();
+            const gv = new GrammarVisitor();
+            return (() => thing.accept(gv, {})).should.throw('Unrecognised type:');
         });
     });
 });

@@ -16,12 +16,49 @@
 
 const Template = require('../lib/template');
 const nearley = require('nearley');
+const fs = require('fs');
+const archiver = require('archiver');
 
 const chai = require('chai');
 
 chai.should();
 chai.use(require('chai-things'));
 chai.use(require('chai-as-promised'));
+
+/* eslint-disable */
+function waitForEvent(emitter, eventType) {
+    return new Promise((resolve) => {
+        emitter.once(eventType, resolve);
+    });
+}
+
+async function writeZip(template, ){
+    let output = fs.createWriteStream(`./test/data/archives/${template}.zip`);
+    let archive = archiver('zip', {
+        zlib: { level: 9 } // Sets the compression level.
+    });
+    // good practice to catch warnings (ie stat failures and other non-blocking errors)
+    archive.on('warning', function(err) {
+        if (err.code === 'ENOENT') {
+            // log warning
+        } else {
+            // throw error
+            throw err;
+        }
+    });
+
+    // good practice to catch this error explicitly
+    archive.on('error', function(err) {
+        throw err;
+    });
+
+    archive.pipe(output);
+    archive.directory(`test/data/${template}/`, false);
+    archive.finalize();
+
+    return await waitForEvent(output, 'close');
+}
+/* eslint-enable */
 
 describe('Template', () => {
 
@@ -36,7 +73,7 @@ describe('Template', () => {
             template.getIdentifier().should.equal('latedeliveryandpenalty@0.0.1');
             template.getModelManager().getModelFile('io.clause.latedeliveryandpenalty').should.not.be.null;
             template.getGrammar().should.not.be.null;
-            template.getScriptManager().getScripts().length.should.equal(2);
+            template.getScriptManager().getScripts().length.should.equal(1);
             template.getMetadata().getREADME().should.not.be.null;
             template.getName().should.equal('latedeliveryandpenalty');
             template.getDescription().should.equal('Late Delivery and Penalty. In case of delayed delivery except for Force Majeure cases, the Seller shall pay to the Buyer for every 9 DAY of delay penalty amounting to 7% of the total value of the Equipment whose delivery has been delayed. Any fractional part of a DAY is to be considered a full DAY. The total amount of penalty shall not however, exceed 2% of the total value of the Equipment involved in late delivery. If the delay is more than 2 WEEK, the Buyer is entitled to terminate this Contract.');
@@ -84,6 +121,35 @@ describe('Template', () => {
             return Template.fromDirectory('./test/data/with-node_modules').should.be.fulfilled;
         });
 
+        it('should throw an error for property that is not declared', () => {
+            return Template.fromDirectory('./test/data/bad-property').should.be.rejectedWith('Template references a property \'currency\' that is not declared in the template model');
+        });
+
+        it('should throw an error for clause property that is not declared', () => {
+            return Template.fromDirectory('./test/data/bad-copyright-license').should.be.rejectedWith('Template references a property \'badPaymentClause\' that is not declared in the template model');
+        });
+
+    });
+
+    describe('#fromArchive', () => {
+
+        it('should create a template from an archive', async () => {
+            await writeZip('latedeliveryandpenalty');
+            const buffer = fs.readFileSync('./test/data/archives/latedeliveryandpenalty.zip');
+            return Template.fromArchive(buffer).should.be.fulfilled;
+        });
+
+        it('should throw an error if multiple template models are found', async () => {
+            await writeZip('multiple-concepts');
+            const buffer = fs.readFileSync('./test/data/archives/multiple-concepts.zip');
+            return Template.fromArchive(buffer).should.be.rejectedWith('Found multiple concepts decorated with @AccordTemplateModel');
+        });
+
+        it('should throw an error if a package.json file does not exist', async () => {
+            await writeZip('no-packagejson');
+            const buffer = fs.readFileSync('./test/data/archives/no-packagejson.zip');
+            return Template.fromArchive(buffer).should.be.rejectedWith('Failed to find package.json');
+        });
     });
 
     describe('#getParser', () => {
@@ -147,7 +213,6 @@ describe('Template', () => {
             const types = template.getRequestTypes();
             types.should.be.eql([
                 'io.clause.latedeliveryandpenalty.LateDeliveryAndPenaltyRequest',
-                'io.clause.latedeliveryandpenalty.LateDeliveryAndPenaltyRequest',
             ]);
         });
 
@@ -163,7 +228,6 @@ describe('Template', () => {
             const template = await Template.fromDirectory('./test/data/latedeliveryandpenalty');
             const types = template.getResponseTypes();
             types.should.be.eql([
-                'io.clause.latedeliveryandpenalty.LateDeliveryAndPenaltyResponse',
                 'io.clause.latedeliveryandpenalty.LateDeliveryAndPenaltyResponse',
             ]);
         });
@@ -197,6 +261,17 @@ describe('Template', () => {
             packageJson.name = 'new_name';
             template.setPackageJson(packageJson);
             template.getMetadata().getPackageJson().name.should.be.equal('new_name');
+        });
+    });
+
+    describe('#accept', () => {
+
+        it('should accept a visitor', async () => {
+            const visitor = {
+                visit: function(thing, parameters){}
+            };
+            const template = await Template.fromDirectory('./test/data/latedeliveryandpenalty');
+            return (() => template.accept(visitor,{})).should.not.throw();
         });
     });
 });

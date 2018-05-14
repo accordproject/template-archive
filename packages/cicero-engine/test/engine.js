@@ -41,23 +41,6 @@ describe('EngineLatePenalty', () => {
 
     afterEach(() => {});
 
-    describe('#execute', function () {
-
-        it('should execute a smart clause', async function () {
-            const request = {
-                '$class': 'io.clause.latedeliveryandpenalty.LateDeliveryAndPenaltyRequest',
-                'forceMajeure': false,
-                'agreedDelivery': '2017-10-07T16:38:01.412Z',
-                'goodsValue': 200,
-                'transactionId': '402c8f50-9e61-433e-a7c1-afe61c06ef00',
-                'timestamp': '2017-11-12T17:38:01.412Z'
-            };
-            const state = {};
-            const result = await engine.execute(clause, request, state, true);
-            result.should.not.be.null;
-            result.response.penalty.should.equal(110.00000000000001);
-        });
-    });
     describe('#executeergo', function () {
 
         it('should execute a smart clause', async function () {
