@@ -59,8 +59,8 @@ class Engine {
         if (allErgoScripts === '') {
             throw new Error('Did not find any Ergo logic');
         }
-        allErgoScripts += this.buildErgoDispatchFunction(clause);
-        // console.log(allErgoScripts);
+        allErgoScripts += this.buildDispatchFunction(clause,'ergo');
+        // logger.info(allErgoScripts);
         allErgoScripts = ErgoEngine.linkErgoRuntime(allErgoScripts);
         const script = new VMScript(allErgoScripts);
         this.scripts[clause.getIdentifier()] = script;
@@ -84,56 +84,25 @@ class Engine {
         if (allJsScripts === '') {
             throw new Error('Did not find any JavaScript logic');
         }
-        allJsScripts += this.buildJsDispatchFunction(clause);
+        allJsScripts += this.buildDispatchFunction(clause,'js');
         // console.log(allJsScripts);
         const script = new VMScript(allJsScripts);
         this.scripts[clause.getIdentifier()] = script;
     }
 
     /**
-     * Generate the runtime dispatch logic for Ergo
-     * @param {Clause} clause  - the clause to compile
-     * @return {string} the Javascript code for dispatch
+     * Generate the runtime dispatch logic
+     * @param {Clause} clause - the clause to compile
+     * @param {String} lang - the language extension
+     * @return {String} the dispatch code
      * @private
      */
-    buildErgoDispatchFunction(clause) {
+    buildDispatchFunction(clause, lang) {
         // get the function declarations of all functions
         // that have the @clause annotation
-        const functionDeclarations = clause.getTemplate().getScriptManager().getScripts().map((ele) => {
-            return ele.getFunctionDeclarations();
-        })
-            .reduce((flat, next) => {
-                return flat.concat(next);
-            })
-            .filter((ele) => {
-                return ele.getDecorators().indexOf('AccordClauseLogic') >= 0;
-            }).map((ele) => {
-                return ele;
-            });
-
-        if (functionDeclarations.length === 0) {
-            throw new Error('Did not find any function declarations with the @AccordClauseLogic annotation');
-        }
-
-        const code = `
-        __dispatch(contract,request,state,moment());
-        `;
-
-        logger.debug(code);
-        return code;
-    }
-
-    /**
-     * Generate the runtime dispatch logic for JavaScript
-     * @param {Clause} clause  - the clause to compile
-     * @return {string} the Javascript code for dispatch
-     * @private
-     */
-    buildJsDispatchFunction(clause) {
-
-        // get the function declarations of all functions
-        // that have the @clause annotation
-        const functionDeclarations = clause.getTemplate().getScriptManager().getScripts().map((ele) => {
+        const functionDeclarations = clause.getTemplate().getScriptManager().getScripts().filter((ele) => {
+            return ele.getLanguage() === ('.'+lang);
+        }).map((ele) => {
             return ele.getFunctionDeclarations();
         })
             .reduce((flat, next) => {
@@ -164,9 +133,9 @@ class Engine {
                 let ns${n} = type${n}.substr(0, type${n}.lastIndexOf('.'));
                 let clazz${n} = type${n}.substr(type${n}.lastIndexOf('.')+1);
                 let response${n} = factory.newTransaction(ns${n}, clazz${n});
-                let context${n} = {request: request, state: state, contract: contract, response: response${n}, emit: []};
+                let context${n} = {request: request, state: state, contract: contract, response: response${n}, emit: [], now: now};
                 ${ele.getName()}(context${n});
-                return { response: context${n}.response, state: context${n}.state, emit: context${n}.emit, now: now };
+                return { response: context${n}.response, state: context${n}.state, emit: context${n}.emit };
             break;`;
         });
 

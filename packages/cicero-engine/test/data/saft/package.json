@@ -1,0 +1,20 @@
+{
+    "name": "saft",
+    "version": "0.1.1",
+    "description": "The SAFT contract is a futures contract where a person invests in a company in exchange for receiving utility tokens that may be used when a product launches.",
+    "scripts": {
+        "test": "mocha"
+    },
+    "engines": {
+        "cicero": "^0.3.0-0"
+    },
+    "devDependencies": {
+        "chai": "^4.1.2",
+        "chai-as-promised": "^7.1.1",
+        "chai-things": "^0.2.0",
+        "@accordproject/cicero-core": "^0.3.0-0",
+        "@accordproject/cicero-engine": "^0.3.0-0",
+        "mocha": "^4.0.1",
+        "moment": "^2.19.2"
+    }
+}

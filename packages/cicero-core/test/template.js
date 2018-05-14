@@ -142,10 +142,7 @@ describe('Template', () => {
             const template = await Template.fromDirectory('./test/data/latedeliveryandpenalty');
             const types = template.getRequestTypes();
             types.should.be.eql([
-                // TODO The first value comes from the compiled Ergo.
-                // Change this to fully qualified type once this issue is fixed
-                // https://github.com/accordproject/ergo/issues/19
-                'Request',
+                'io.clause.latedeliveryandpenalty.LateDeliveryAndPenaltyRequest',
                 'io.clause.latedeliveryandpenalty.LateDeliveryAndPenaltyRequest',
             ]);
         });
@@ -162,10 +159,7 @@ describe('Template', () => {
             const template = await Template.fromDirectory('./test/data/latedeliveryandpenalty');
             const types = template.getResponseTypes();
             types.should.be.eql([
-                // TODO The first value comes from the compiled Ergo.
-                // Change this to fully qualified type once this issue is fixed
-                // https://github.com/accordproject/ergo/issues/19
-                'Response',
+                'io.clause.latedeliveryandpenalty.LateDeliveryAndPenaltyResponse',
                 'io.clause.latedeliveryandpenalty.LateDeliveryAndPenaltyResponse',
             ]);
         });

@@ -49,7 +49,7 @@
   },
   "dependencies": {
     "@accordproject/cicero-common": "^0.2.54",
-    "@accordproject/ergo-compiler": "^0.0.42",
+    "@accordproject/ergo-compiler": "^0.0.43",
     "composer-common": "0.17.4",
     "debug": "^2.6.2",
     "glob": "^7.1.2",

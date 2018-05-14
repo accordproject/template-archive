@@ -104,6 +104,20 @@ describe('EngineVolumeDiscount', () => {
             result.response.discountRate.should.equal(3);
         });
     });
+
+    describe('#execute', function () {
+
+        it('should execute a smart clause falling back to JavaScript', async function () {
+            const request = {
+                '$class': 'org.accordproject.volumediscount.VolumeDiscountRequest',
+                'netAnnualChargeVolume': 0.4
+            };
+            const state = {};
+            const result = await engine.execute(clause, request, state, false);
+            result.should.not.be.null;
+            result.response.discountRate.should.equal(3);
+        });
+    });
 });
 describe('EngineHelloWorld', () => {
 
@@ -147,6 +161,37 @@ describe('EngineHelloWorld', () => {
             } catch (err) {
                 err.should.be.Error;
             }
+        });
+    });
+});
+describe('EngineSaft', () => {
+
+    let engine;
+    let clause;
+    const saftInput = fs.readFileSync(path.resolve(__dirname, 'data/saft', 'sample.txt'), 'utf8');
+
+    beforeEach(async function () {
+        engine = new Engine();
+        const template = await Template.fromDirectory('./test/data/saft');
+        clause = new Clause(template);
+        clause.parse(saftInput);
+    });
+
+    afterEach(() => {});
+
+    describe('#execute', function () {
+
+        it('should execute a smart clause', async function () {
+            const request = {};
+            const NS = 'org.accordproject.saft';
+            request.$class = `${NS}.Launch`;
+            request.exchangeRate = 100;
+            const state = {};
+            state.$class = 'org.accordproject.contract.State';
+            const result = await engine.execute(clause, request, state, true);
+            result.should.not.be.null;
+            result.response.tokenAmount.should.equal(100);
+            result.response.tokenAddress.should.equal('Daniel Charles Selman');
         });
     });
 });
