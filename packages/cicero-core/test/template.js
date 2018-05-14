@@ -33,6 +33,11 @@ function waitForEvent(emitter, eventType) {
 }
 
 async function writeZip(template, ){
+    try {
+        fs.mkdirSync('./test/data/archives');
+    } catch (err) {
+        if (err.code !== 'EEXIST') throw err;
+    }
     let output = fs.createWriteStream(`./test/data/archives/${template}.zip`);
     let archive = archiver('zip', {
         zlib: { level: 9 } // Sets the compression level.
