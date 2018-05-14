@@ -80,7 +80,7 @@ class Commands {
         let isCiceroTemplate = false;
         if(packageJsonExists){
             const packageJsonContents = JSON.parse(fs.readFileSync(path.resolve(argv.template,'package.json')),'utf8');
-            isCiceroTemplate = packageJsonContents.engines && packageJsonContents.engines.cicero;
+            isCiceroTemplate = packageJsonContents.cicero && packageJsonContents.cicero.version && packageJsonContents.cicero.template;
         }
 
         if(!argv.sample){
@@ -88,13 +88,13 @@ class Commands {
             argv.sample = path.resolve(argv.template,'sample.txt');
         }
 
-        if (argv.verbose) {
+        if(argv.verbose) {
             logger.info(`parse sample ${argv.sample} using a template ${argv.template}`);
         }
 
         let sampleExists = fs.existsSync(argv.sample);
         if(!packageJsonExists || !isCiceroTemplate){
-            throw new Error(`${argv.template} is not a valid cicero template. Make sure that package.json exists and that it has a engines.cicero entry.`);
+            throw new Error(`${argv.template} is not a valid cicero template. Make sure that package.json exists and that it has a cicero entry.`);
         } else if (!sampleExists){
             throw new Error('A sample text file is required. Try the --sample flag or create a sample.txt in the root folder of your template.');
         } else {
@@ -167,9 +167,8 @@ class Commands {
         let isCiceroTemplate = false;
         if(packageJsonExists){
             const packageJsonContents = JSON.parse(fs.readFileSync(path.resolve(argv.template,'package.json')),'utf8');
-            isCiceroTemplate = packageJsonContents.engines && packageJsonContents.engines.cicero;
+            isCiceroTemplate = packageJsonContents.cicero && packageJsonContents.cicero.version && packageJsonContents.cicero.template;
         }
-
 
         if(!argv.sample){
             logger.info('Loading a default sample.txt file.');
@@ -186,7 +185,7 @@ class Commands {
             argv.state = path.resolve(argv.template,'state.json');
         }
 
-        if (argv.verbose) {
+        if(argv.verbose) {
             logger.info(`execute sample ${argv.sample} using a template ${argv.template} with request ${argv.request} with state ${argv.state}`);
         }
 
@@ -202,7 +201,7 @@ class Commands {
         }
         let stateExists = fs.existsSync(argv.state);
         if(!packageJsonExists || !isCiceroTemplate){
-            throw new Error(`${argv.template} is not a valid cicero template. Make sure that package.json exists and that it has a engines.cicero entry.`);
+            throw new Error(`${argv.template} is not a valid cicero template. Make sure that package.json exists and that it has a cicero entry.`);
         } else if (!sampleExists){
             throw new Error('A sample text file is required. Try the --sample flag or create a sample.txt in the root folder of your template.');
         } else if(!requestExists){

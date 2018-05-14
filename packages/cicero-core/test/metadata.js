@@ -35,25 +35,29 @@ describe('Metadata', () => {
 
         it('should throw an error if samples is not provided', () => {
             (() => new Metadata({
-                name: 'template'
+                name: 'template',
+                cicero: {template: 'contract',version:'^0.3.0-0'}
             }, null)).should.throw('sample.txt is required');
         });
         it('should throw an error if samples is not an object', () => {
             (() => new Metadata({
-                name: 'template'
+                name: 'template',
+                cicero: {template: 'contract',version:'^0.3.0-0'}
             }, null, 'sample')).should.throw('sample.txt is required');
         });
 
         it('should throw an error if package.json does not contain a valid name', () => {
             (() => new Metadata({}, null, {})).should.throw('template name can only contain lowercase alphanumerics, _ or -');
             (() => new Metadata({
-                name: 'template (no 1.)'
+                name: 'template (no 1.)',
+                cicero: {template: 'contract',version:'^0.3.0-0'}
             }, null, {})).should.throw('template name can only contain lowercase alphanumerics, _ or -');
         });
 
         it('should throw an error if readme is not a string', () => {
             (() => new Metadata({
-                name: 'template'
+                name: 'template',
+                cicero: {template: 'contract',version:'^0.3.0-0'}
             }, {}, {})).should.throw('README must be a string');
         });
 
@@ -90,7 +94,8 @@ describe('Metadata', () => {
 
         it('should return requested sample', () => {
             const md = new Metadata({
-                name: 'template'
+                name: 'template',
+                cicero: {template: 'contract',version:'^0.3.0-0'}
             }, null, {
                 en: 'sample'
             });
@@ -98,7 +103,8 @@ describe('Metadata', () => {
         });
         it('should return null if sample is not in the samples', () => {
             const md = new Metadata({
-                name: 'template'
+                name: 'template',
+                cicero: {template: 'contract',version:'^0.3.0-0'}
             }, null, {});
             should.not.exist(md.getSample('en'));
             should.not.exist(md.getSample());
@@ -107,7 +113,8 @@ describe('Metadata', () => {
 
         it('should return default sample if locale not specified', () => {
             const md = new Metadata({
-                name: 'template'
+                name: 'template',
+                cicero: {template: 'contract',version:'^0.3.0-0'}
             }, null, {
                 default: 'sample'
             });
@@ -119,21 +126,22 @@ describe('Metadata', () => {
 
         it('should return default type', () => {
             const md = new Metadata({
-                name: 'template'
+                name: 'template',
+                cicero: {template: 'contract',version:'^0.3.0-0'}
             }, null, {});
             md.getTemplateType().should.be.equal(0);
         });
         it('should return for explicit contract type', () => {
             const md = new Metadata({
                 name: 'template',
-                cicero: {template: 'contract'},
+                cicero: {template: 'contract',version:'^0.3.0-0'}
             }, null, {});
             md.getTemplateType().should.be.equal(0);
         });
         it('should return default type', () => {
             const md = new Metadata({
                 name: 'template',
-                cicero: {template: 'clause'},
+                cicero: {template: 'clause',version:'^0.3.0-0'}
             }, null, {});
             md.getTemplateType().should.be.equal(1);
         });

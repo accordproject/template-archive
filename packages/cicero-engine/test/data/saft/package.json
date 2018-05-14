@@ -5,8 +5,9 @@
     "scripts": {
         "test": "mocha"
     },
-    "engines": {
-        "cicero": "^0.3.0-0"
+    "cicero": {
+      "template": "contract",
+      "version": "^0.3.0-0"
     },
     "devDependencies": {
         "chai": "^4.1.2",

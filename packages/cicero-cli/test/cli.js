@@ -119,7 +119,7 @@ describe('cicero-cli', () => {
             process.chdir(path.resolve(__dirname, 'data/'));
             (() => Commands.validateParseArgs({
                 _: ['parse'],
-            })).should.throw(' not a valid cicero template. Make sure that package.json exists and that it has a engines.cicero entry.');
+            })).should.throw(' not a valid cicero template. Make sure that package.json exists and that it has a cicero entry.');
         });
         it('bad sample.txt', () => {
             process.chdir(path.resolve(__dirname, 'data/latedeliveryandpenalty/'));
@@ -213,7 +213,7 @@ describe('cicero-cli', () => {
             process.chdir(path.resolve(__dirname, 'data/'));
             (() => Commands.validateExecuteArgs({
                 _: ['execute'],
-            })).should.throw(' not a valid cicero template. Make sure that package.json exists and that it has a engines.cicero entry.');
+            })).should.throw(' not a valid cicero template. Make sure that package.json exists and that it has a cicero entry.');
         });
         it('bad sample.txt', () => {
             process.chdir(path.resolve(__dirname, 'data/latedeliveryandpenalty/'));
