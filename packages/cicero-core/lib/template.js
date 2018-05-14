@@ -30,7 +30,6 @@ const ScriptManager = require('composer-common').ScriptManager;
 const Serializer = require('composer-common').Serializer;
 const Writer = require('composer-common').Writer;
 const logger = require('./logger');
-const semver = require('semver');
 const nearley = require('nearley');
 const compile = require('nearley/lib/compile');
 const generate = require('nearley/lib/generate');
@@ -38,7 +37,6 @@ const nearleyGrammar = require('nearley/lib/nearley-language-bootstrapped');
 const templateGrammar = require('./tdl.js');
 const GrammarVisitor = require('./grammarvisitor');
 const Ergo = require('@accordproject/ergo-compiler/lib/ergo');
-const version = require('../package.json').version;
 const uuid = require('uuid');
 const nunjucks = require('nunjucks');
 
@@ -55,6 +53,7 @@ const SAMPLE_FILE_REGEXP = xregexp('sample(_(' + IETF_REGEXP + '))?.txt$');
  * template.
  * @class
  * @public
+ * @abstract
  * @memberof module:cicero-core
  */
 class Template {
@@ -477,7 +476,6 @@ class Template {
             }).then((contents) => {
                 logger.debug(method, 'Loaded package.json');
                 packageJsonContents = JSON.parse(contents);
-                Template.validateTemplateVersion(packageJsonContents);
             });
 
             logger.debug(method, 'Loading grammar.ne');
@@ -586,22 +584,6 @@ class Template {
                 return template; // Returns template
             });
         });
-    }
-
-    /**
-     * @param {Object} contents - the JSON contents of this template's package.json file
-     * @private
-     */
-    static validateTemplateVersion(contents) {
-        if (contents.engines &&
-            contents.engines.cicero) {
-            if (!semver.satisfies(version, contents.engines.cicero)) {
-                throw new Error(`Template ${contents.name} is not compatible with this version of Cicero. Consider upgrading Cicero.`);
-            }
-        }
-        else {
-            throw new Error(`Missing engines declaration in package.json for template ${contents.name}`);
-        }
     }
 
     /**
@@ -770,7 +752,6 @@ class Template {
         }
 
         let packageJsonContents = fs.readFileSync(packageJsonPath, ENCODING);
-        Template.validateTemplateVersion(JSON.parse(packageJsonContents));
         logger.debug(method, 'Loaded package.json', packageJsonContents);
 
         logger.debug(method, 'Looking for sample files');

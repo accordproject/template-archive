@@ -1,7 +1,8 @@
 {
     "name": "copyright-license",
     "version": "0.0.1",
-    "engines": {
-        "cicero": "^0.3.0-0"
+    "cicero": {
+      "template": "contract",
+      "target": "^0.3.0-0"
     }
-  }
+}

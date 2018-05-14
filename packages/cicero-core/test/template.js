@@ -92,7 +92,11 @@ describe('Template', () => {
             const template = new Template({
                 'name': 'conga',
                 'version': '0.0.1',
-                'description': '"Dan Selman" agrees to spend 100.0 conga coins on "swag"'
+                'description': '"Dan Selman" agrees to spend 100.0 conga coins on "swag"',
+                'cicero': {
+                    'template': 'clause',
+                    'target': '^0.3.0-0'
+                }
             },
             null,
             {
@@ -193,36 +197,6 @@ describe('Template', () => {
             packageJson.name = 'new_name';
             template.setPackageJson(packageJson);
             template.getMetadata().getPackageJson().name.should.be.equal('new_name');
-        });
-    });
-
-    describe('#validateTemplateVersion', () => {
-        it('should throw for missing engines declaration', async () => {
-            const template = await Template.fromDirectory('./test/data/latedeliveryandpenalty');
-            const packageJson = template.getMetadata().getPackageJson();
-            delete packageJson.engines;
-            template.setPackageJson(packageJson);
-            const buffer = await template.toArchive();
-            buffer.should.not.be.null;
-            return Template.fromArchive(buffer).should.be.rejectedWith('Missing engines declaration in package.json for template latedeliveryandpenalty');
-        });
-        it('should throw for missing cicero engines declaration', async () => {
-            const template = await Template.fromDirectory('./test/data/latedeliveryandpenalty');
-            const packageJson = template.getMetadata().getPackageJson();
-            delete packageJson.engines.cicero;
-            template.setPackageJson(packageJson);
-            const buffer = await template.toArchive();
-            buffer.should.not.be.null;
-            return Template.fromArchive(buffer).should.be.rejectedWith('Missing engines declaration in package.json for template latedeliveryandpenalty');
-        });
-        it('should throw for in compatible version', async () => {
-            const template = await Template.fromDirectory('./test/data/latedeliveryandpenalty');
-            const packageJson = template.getMetadata().getPackageJson();
-            packageJson.engines.cicero = '=0.0.0';
-            template.setPackageJson(packageJson);
-            const buffer = await template.toArchive();
-            buffer.should.not.be.null;
-            return Template.fromArchive(buffer).should.be.rejectedWith('Template latedeliveryandpenalty is not compatible with this version of Cicero. Consider upgrading Cicero.');
         });
     });
 });
