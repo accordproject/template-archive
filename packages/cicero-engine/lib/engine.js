@@ -135,20 +135,25 @@ class Engine {
      * @private
      */
     async execute(clause, request, state) {
-        // ensure the request is valid
         const template = clause.getTemplate();
-        const tx = template.getSerializer().fromJSON(request, {validate: false, acceptResourcesForRelationships: true});
-        tx.$validator = new ResourceValidator({permitResourcesForRelationships: true});
-        tx.validate();
+        // ensure the request is valid
+        const validRequest = template.getSerializer().fromJSON(request, {validate: false, acceptResourcesForRelationships: true});
+        validRequest.$validator = new ResourceValidator({permitResourcesForRelationships: true});
+        validRequest.validate();
 
-        logger.debug('Engine processing ' + request.$class);
+        // ensure the state is valid
+        const validState = template.getSerializer().fromJSON(state, {validate: false, acceptResourcesForRelationships: true});
+        validState.$validator = new ResourceValidator({permitResourcesForRelationships: true});
+        validState.validate();
+
+        logger.debug('Engine processing request ' + request.$class + ' with state ' + state.$class);
 
         let script = this.scripts[clause.getIdentifier()];
 
         this.compileJsClause(clause);
         script = this.scripts[clause.getIdentifier()];
 
-        const contract = clause.getData();
+        const validContract = clause.getData();
         const factory = template.getFactory();
         const vm = new VM({
             timeout: 1000,
@@ -160,25 +165,40 @@ class Engine {
         });
 
         // add immutables to the context
-        vm.freeze(contract, 'contract'); // Second argument adds object to global.
-        vm.freeze(tx, 'request'); // Second argument adds object to global.
-        vm.freeze(state, 'state'); // Second argument adds object to global.
+        vm.freeze(validContract, 'contract'); // Second argument adds object to global.
+        vm.freeze(validRequest, 'request'); // Second argument adds object to global.
+        vm.freeze(validState, 'state'); // Second argument adds object to global.
 
         vm.freeze(factory, 'factory'); // Second argument adds object to global.
 
-        const response = vm.run(script);
-        response.response.$validator = new ResourceValidator({permitResourcesForRelationships: true});
-        response.response.validate();
+        // execute the logic
+        const result = vm.run(script);
 
-        const result = {
+        // ensure the response is valid
+        result.response.$validator = new ResourceValidator({permitResourcesForRelationships: true});
+        result.response.validate();
+        const responseResult = template.getSerializer().toJSON(result.response, {convertResourcesToRelationships: true});
+
+        // ensure the new state is valid
+        result.state.$validator = new ResourceValidator({permitResourcesForRelationships: true});
+        result.state.validate();
+        const stateResult = template.getSerializer().toJSON(result.state, {convertResourcesToRelationships: true});
+
+        // ensure all the emits are valid
+        let emitResult = [];
+        for (let i = 0; i < result.emit.length; i++) {
+            result.emit[i].$validator = new ResourceValidator({permitResourcesForRelationships: true});
+            result.emit[i].validate();
+            emitResult.push(template.getSerializer().toJSON(result.emit[i], {convertResourcesToRelationships: true}));
+        }
+
+        return {
             'clause': clause.getIdentifier(),
             'request': request,
-            'response': template.getSerializer().toJSON(response.response, {convertResourcesToRelationships: true}),
-            'state': response.state,
-            'emit': response.emit
+            'response': responseResult,
+            'state': stateResult,
+            'emit': emitResult,
         };
-
-        return result;
     }
 }
 

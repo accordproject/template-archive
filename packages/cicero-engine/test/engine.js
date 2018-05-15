@@ -44,15 +44,16 @@ describe('EngineLatePenalty', () => {
     describe('#executeergo', function () {
 
         it('should execute a smart clause', async function () {
-            const request = {
-                '$class': 'io.clause.latedeliveryandpenalty.LateDeliveryAndPenaltyRequest',
-                'forceMajeure': false,
-                'agreedDelivery': '2017-10-07T16:38:01.412Z',
-                'goodsValue': 200.00,
-                'transactionId': '402c8f50-9e61-433e-a7c1-afe61c06ef00',
-                'timestamp': '2017-11-12T17:38:01.412Z'
-            };
+            const request = {};
+            request.$class = 'io.clause.latedeliveryandpenalty.LateDeliveryAndPenaltyRequest';
+            request.forceMajeure = false;
+            request.agreedDelivery = '2017-10-07T16:38:01.412Z';
+            request.goodsValue = 200.00;
+            request.transactionId = '402c8f50-9e61-433e-a7c1-afe61c06ef00';
+            request.timestamp = '2017-11-12T17:38:01.412Z';
             const state = {};
+            state.$class = 'org.accordproject.common.State';
+            state.stateId = 'org.accordproject.common.State#1';
             const result = await engine.execute(clause, request, state);
             result.should.not.be.null;
             result.response.penalty.should.equal(110);
@@ -82,6 +83,8 @@ describe('EngineVolumeDiscount', () => {
                 'netAnnualChargeVolume': 0.4
             };
             const state = {};
+            state.$class = 'org.accordproject.common.State';
+            state.stateId = 'org.accordproject.common.State#1';
             const result = await engine.execute(clause, request, state);
             result.should.not.be.null;
             result.response.discountRate.should.equal(3);
@@ -96,6 +99,8 @@ describe('EngineVolumeDiscount', () => {
                 'netAnnualChargeVolume': 0.4
             };
             const state = {};
+            state.$class = 'org.accordproject.common.State';
+            state.stateId = 'org.accordproject.common.State#1';
             const result = await engine.execute(clause, request, state);
             result.should.not.be.null;
             result.response.discountRate.should.equal(3);
@@ -125,6 +130,8 @@ describe('EngineHelloWorld', () => {
                 'input': 'Accord Project'
             };
             const state = {};
+            state.$class = 'org.accordproject.common.State';
+            state.stateId = 'org.accordproject.common.State#1';
             const result = await engine.execute(clause, request, state);
             result.should.not.be.null;
             result.response.output.should.equal('Hello Fred Blogs (Accord Project)');
@@ -139,11 +146,46 @@ describe('EngineHelloWorld', () => {
                     'input': 'Accord Project'
                 };
                 const state = {};
+                state.$class = 'org.accordproject.common.State';
+                state.stateId = 'org.accordproject.common.State#1';
                 const result = await engine.execute(clause, request, state);
                 return result;
             } catch (err) {
                 err.should.be.Error;
             }
+        });
+    });
+});
+describe('EngineHelloEmit', () => {
+
+    let engine;
+    let clause;
+    const helloEmitInput = fs.readFileSync(path.resolve(__dirname, 'data/helloemit', 'sample.txt'), 'utf8');
+
+    beforeEach(async function () {
+        engine = new Engine();
+        const template = await Template.fromDirectory('./test/data/helloemit');
+        clause = new Clause(template);
+        clause.parse(helloEmitInput);
+    });
+
+    afterEach(() => {});
+
+    describe('#executeandemit', function () {
+
+        it('should execute a smart clause which emits', async function () {
+            const request = {
+                '$class': 'org.accordproject.helloemit.Request',
+                'input': 'Accord Project'
+            };
+            const state = {};
+            state.$class = 'org.accordproject.common.State';
+            state.stateId = 'org.accordproject.common.State#1';
+            const result = await engine.execute(clause, request, state);
+            result.should.not.be.null;
+            result.response.output.should.equal('Hello Fred Blogs (Accord Project)');
+            result.emit[0].$class.should.equal('org.accordproject.helloemit.Greeting');
+            result.emit[0].message.should.equal('Voila!');
         });
     });
 });
@@ -170,7 +212,8 @@ describe('EngineSaft', () => {
             request.$class = `${NS}.Launch`;
             request.exchangeRate = 100;
             const state = {};
-            state.$class = 'org.accordproject.contract.State';
+            state.$class = 'org.accordproject.common.State';
+            state.stateId = 'org.accordproject.common.State#1';
             const result = await engine.execute(clause, request, state);
             result.should.not.be.null;
             result.response.tokenAmount.should.equal(100);

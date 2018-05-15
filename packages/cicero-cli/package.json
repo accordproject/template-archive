@@ -48,7 +48,7 @@
   "dependencies": {
     "@accordproject/cicero-core": "^0.3.0-0",
     "@accordproject/cicero-engine": "^0.3.0-0",
-    "@accordproject/ergo-compiler": "^0.0.44",
+    "@accordproject/ergo-compiler": "^0.0.45",
     "composer-common": "0.17.4",
     "yargs": "^9.0.1"
   },
