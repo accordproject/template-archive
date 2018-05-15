@@ -13,8 +13,8 @@ Options::
     Options:
     --help         Show help                                             [boolean]
     --version      Show version number                                   [boolean]
-    --template     path to the directory with the template
-    --dsl          path to the clause text
+    --template     path to the directory with the template                [string]
+    --sample       path to the clause text                                [string]
     --verbose, -v                                                 [default: false]
 
 =============================
@@ -32,7 +32,12 @@ Options::
     Options:
     --help         Show help                                             [boolean]
     --version      Show version number                                   [boolean]
-    --template     path to the directory with the template
-    --dsl          path to the clause text
-    --data         path to the request JSON data
+    --template     path to the directory with the template                [string]
+    --sample       path to the clause text                                [string]
+    --request      path to the JSON request                                [array]
+    --state        path to the JSON state                                 [string]
     --verbose, -v                                                 [default: false]
+
+.. note:: The ``--request`` flag can be repeated to simulate consecutive calls to the contract. When used with a contract template, the state is persisted between requests.
+    
+    ``cicero execute --request request1.json --request request2.json``

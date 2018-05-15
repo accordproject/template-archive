@@ -31,7 +31,8 @@ Sample.txt::
 
 Parsing using the command line::
 
-    cd cicero-template-library cicero parse --template ./helloworld/ --dsl ./helloworld/sample.txt
+    cd cicero-template-library/helloworld
+    cicero parse --template ./ --sample ./helloworld/sample.txt
     Setting clause data: {"$class":"io.clause.helloworld.TemplateModel","name":"Dan"}
 
 Or, attempting to parse invalid data will result in line and column information for the syntax
@@ -51,7 +52,7 @@ Execute
 ^^^^^^^^
 
 Use the ``cicero execute`` command to load a template from a directory on disk,
-instantiate a clause based on input text, and then invoke the clause using an incoming JSON
+instantiate a clause or contract based on input text, and then invoke the clause or contract using an incoming JSON
 payload.
 
 data.json::
@@ -63,8 +64,8 @@ data.json::
 
 Commands::
 
-    cd cicero-template-library 
-    cicero execute --template ./helloworld/ --dsl ./helloworld/sample.txt --data ./helloworld/data.json
+    cd cicero-template-library
+    cicero execute ./helloworld
 
 The results of execution (a JSON serialized object) are displayed. They include: 
 
@@ -75,18 +76,27 @@ The results of execution (a JSON serialized object) are displayed. They include:
 Example::
 
     {
-        "clause":"helloworld@0.0.3-c8d9e40fe7c5a479d1a80bce2d2fdc3c8a240ceb44a031d38cbd619e9b795b60",
+        "clause":"helloworld@0.0.5-3119b65d48818b038883b0846738d34a61df5ac895093eb88003f07c96ee39c7",
         "request":{
-            "$class":"io.clause.helloworld.Request", "input":"World"
-        }, 
+            "$class":"org.accordproject.helloworld.Request",
+            "input":"Accord Project"
+        },
         "response":{
-            "$class":"io.clause.helloworld.Response", "output":"Hello Dan World",
-            "transactionId":"cf1dabb5-d604-4ffa-8a87-8333e77a735a",
-            "timestamp":"2017-10-31T10:47:42.055Z"
-        }
+            "$class":"org.accordproject.helloworld.Response",
+            "output":"Hello Fred Blogs Accord Project",
+            "transactionId":"06832070-9471-4e95-abc4-a718c2053ecf",
+            "timestamp":"2018-05-15T08:32:39.990Z"
+        },
+        "state":{
+            "$class":"org.accordproject.contract.State"
+        },
+        "emit":[]
     }
 
 Note that in the response data from the template has been combined with data from the request.
+Depending on the definition of your template logic, executing a clause or contract could modify the contract state
+or emit events. State allows a client application to store data such as contract stautus between requests.
+Events are side-effects that should have some action in the real-world, for example a payment obligation or a notification to a party.
 
 Creating a New Template
 ------------------------
@@ -135,7 +145,7 @@ are:
 - Double 
 - Boolean
 
- .. _`Hyperledger Composer Modeling Language`: https://hyperledger.github.io/composer/reference/cto_language.html
+ .. _`Hyperledger Composer Modeling Language`: https://hyperledger.github.io/composer/latest/reference/cto_language.html
 
 Edit the Request and Response Transaction Types
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^

@@ -44,11 +44,14 @@ package.json
 README.md
     A markdown file that describes the purpose and correct usage for the template
 
-data.json (optional)
+data.json
     A sample valid request transaction for the template
 
-sample.txt (optional)
-    A sample of DSL text that is valid for the template
+sample.txt
+    Sample text that is valid for the template
+
+state.json (optional)
+    A sample state object for the template
 
 grammar/template.tem
     The default template grammar for the template
@@ -58,7 +61,7 @@ models/
     and the Request and Response transactions.
 
 lib/
-    A collection of ES 2015 JavaScript files that implement the business logic for the template
+    Either a collection of ES 2015 JavaScript files, or Ergo files that implement the business logic for the template
 
 test/
     A collection of unit tests for the template
@@ -84,6 +87,36 @@ Unit Tests
 Templates should have unit tests that cover every line of code of their business logic. You may use any of the
 popular unit testing frameworks to implement the tests (mocha, chai, sinon etc). Please refer to the
 ``acceptance-of-delivery`` template for an example template with unit tests.
+
+package.json
+------------
+
+The package.json file must include a ``cicero`` element as in the example below. 
+
+    {
+        "name": "acceptance-of-delivery",
+        "version": "0.0.3",
+        "description": "This clause allows the receiver of goods to inspect them for a given time period after delivery.",
+        "author": "clause.io",
+        "license": "Apache-2.0",
+        "cicero": {
+            "template": "clause",
+            "version": "^0.3.0"
+        },
+    }
+
+``cicero`` properties
+^^^^^^^^^^^^^^^^^^^^^
+
+``template``
+    Is either ``"clause"`` or ``"contract"``, depending on the type of the template.
+    A clause is potentially reusable within a contract template.
+    A contract can contain references to clause templates.
+
+``version``
+    This version number corresponds to the version of Cicero that this template was designed for. 
+    This ensures that templates designed for older versions of Cicero raise warnings to the user if they are used within incompatible engines.
+    The format corresponds to the semver specification: https://semver.org/
 
 =============================
 Add a Template to a Library
@@ -115,12 +148,13 @@ clause and the transaction::
     // create the engine
     const engine = new Engine();
     const request = {'$class':'io.clause.latedeliveryandpenalty.LateDeliveryAndPenaltyRequest','forceMajeure':false,'agreedDelivery':'2017-10-07T16:38:01.412Z','goodsValue':200,'transactionId':'402c8f50-9e61-433e-a7c1-afe61c06ef00','timestamp':'2017-11-12T17:38:01.412Z'};
-    const result = await engine.execute(clause, request)
+    const state = { '$class' : 'org.accordproject.contract.State' };
+    const result = await engine.execute(clause, request, state);
 
 Hyperledger Composer
 ---------------------
 
-TBD
+See cicero-perishable-network for an example of calling a Cicero template from a Hyperledger Composer project, https://github.com/accordproject/cicero-perishable-network
 
 Hyperledger Fabric 1.1
 -----------------------
