@@ -80,7 +80,7 @@ class Commands {
         let isCiceroTemplate = false;
         if(packageJsonExists){
             const packageJsonContents = JSON.parse(fs.readFileSync(path.resolve(argv.template,'package.json')),'utf8');
-            isCiceroTemplate = packageJsonContents.cicero && packageJsonContents.cicero.version && packageJsonContents.cicero.template;
+            isCiceroTemplate = packageJsonContents.cicero;
         }
 
         if(!argv.sample){
@@ -120,7 +120,14 @@ class Commands {
         for (let i = 0; i < requestsPath.length; i++) {
             requestsJson.push(JSON.parse(fs.readFileSync(requestsPath[i], 'utf8')));
         }
-        stateJson = JSON.parse(fs.readFileSync(statePath, 'utf8'));
+        if(!fs.existsSync(statePath)) {
+            logger.warn('A state file was not provided, generating default state object. Try the --state flag or create a state.json in the root folder of your template.');
+            stateJson = {
+                '$class': 'org.accordproject.contract.State'
+            };
+        } else {
+            stateJson = JSON.parse(fs.readFileSync(statePath, 'utf8'));
+        }
 
         return Template.fromDirectory(templatePath)
             .then((template) => {
@@ -166,7 +173,7 @@ class Commands {
         let isCiceroTemplate = false;
         if(packageJsonExists){
             const packageJsonContents = JSON.parse(fs.readFileSync(path.resolve(argv.template,'package.json')),'utf8');
-            isCiceroTemplate = packageJsonContents.cicero && packageJsonContents.cicero.version && packageJsonContents.cicero.template;
+            isCiceroTemplate = packageJsonContents.cicero;
         }
 
         if(!argv.sample){
@@ -198,15 +205,12 @@ class Commands {
                 requestExists = false;
             }
         }
-        let stateExists = fs.existsSync(argv.state);
         if(!packageJsonExists || !isCiceroTemplate){
             throw new Error(`${argv.template} is not a valid cicero template. Make sure that package.json exists and that it has a cicero entry.`);
         } else if (!sampleExists){
             throw new Error('A sample text file is required. Try the --sample flag or create a sample.txt in the root folder of your template.');
         } else if(!requestExists){
             throw new Error('A request file is required. Try the --request flag or create a request.json in the root folder of your template.');
-        } else if (!stateExists){
-            throw new Error('A state file file is required. Try the --state flag or create a state.txt in the root folder of your template.');
         } else {
             return argv;
         }
