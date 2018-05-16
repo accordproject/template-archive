@@ -32,17 +32,17 @@ describe('Static Parser', () => {
 
     describe('Clause Template', () => {
         it('should parse a basic clause', () => {
-            (()=> parser.feed('foo {{bar_}}\n')).should.not.throw();
+            (()=> parser.feed('foo [{bar_}]\n')).should.not.throw();
             parser.results.should.not.be.empty;
         });
 
         it('should not parse a basic clause with invalid variable characters', () => {
-            (()=> parser.feed('foo {{bar!}}\n')).should.throw();
+            (()=> parser.feed('foo [{bar!}]\n')).should.throw();
             parser.should.not.have.property('results');
         });
 
         it('should parse a basic clause without a trailing carriage return', () => {
-            (()=> parser.feed('foo {{bar}}')).should.not.throw();
+            (()=> parser.feed('foo [{bar}]')).should.not.throw();
             parser.results.should.not.be.empty;
         });
 
@@ -53,55 +53,60 @@ describe('Static Parser', () => {
         });
 
         it('should parse a basic clause with unicode characters', () => {
-            (()=> parser.feed('ほげ {{bar}}\n')).should.not.throw();
+            (()=> parser.feed('ほげ [{bar}]\n')).should.not.throw();
             parser.should.not.be.empty;
         });
 
         it('should not parse a basic clause with unicode variable names', () => {
-            (()=> parser.feed('foo {{ぴよ}}\n')).should.throw();
+            (()=> parser.feed('foo [{ぴよ}]\n')).should.throw();
             parser.should.not.have.property('results');
         });
     });
 
     describe('Contract Template', () => {
         it('should parse a basic contract', () => {
-            (()=> parser.feed('foo {{clause bar}} foo {{end clause}}')).should.not.throw();
+            (()=> parser.feed('foo [{#bar}] foo [{/bar}]')).should.not.throw();
             parser.results.should.not.be.empty;
         });
 
         it('should parse a basic contract with a trailing carriage return', () => {
-            (()=> parser.feed('foo {{clause bar}} foo {{end clause}}\n')).should.not.throw();
+            (()=> parser.feed('foo [{#bar}] foo [{/bar}]\n')).should.not.throw();
             parser.results.should.not.be.empty;
         });
 
         it('should parse a basic contract with inline clause variables', () => {
-            (()=> parser.feed('a {{clause b}} c {{d}} {{end clause}}')).should.not.throw();
+            (()=> parser.feed('a [{#b}] c [{d}] [{/b}]')).should.not.throw();
             parser.results.should.not.be.empty;
         });
 
         it('should parse a contract with multiple inline clause variables', () => {
-            (()=> parser.feed('a {{clause b}} c {{d}} {{end clause}}{{clause e}} f {{g}} {{end clause}}')).should.not.throw();
+            (()=> parser.feed('a [{#b}] c [{d}] [{/b}][{#e}] f [{g}] [{/e}]')).should.not.throw();
             parser.results.should.not.be.empty;
         });
 
         it('should not parse a contract with overlapping inline clause variables', () => {
-            (()=> parser.feed('a {{#b}} c {{d}} {{#e}}{{/b}} f {{g}} {{/e}}')).should.throw();
+            (()=> parser.feed('a [{#b}] c [{d}] [{#e}][{/b}] f [{g}] [{/e}]')).should.throw();
             parser.should.not.have.property('results');
         });
 
         it('should not parse a contract with a nested external clause variables', () => {
-            (()=> parser.feed('a {{clause b}} c {{external clause d}} {{end clause}}')).should.throw();
+            (()=> parser.feed('a [{#b}] c [{#d/}] [{/b}]')).should.throw();
             parser.should.not.have.property('results');
         });
 
         it('should not parse a contract with a nested inline clause variables', () => {
-            (()=> parser.feed('a {{clause b}} c {{clause d}} {{end clause}} {{end clause}}')).should.throw();
+            (()=> parser.feed('a [{#b}] c [{#d}] [{/d}] [{/b}]')).should.throw();
             parser.should.not.have.property('results');
         });
 
         it('should parse a basic contract with external clause variables', () => {
-            (()=> parser.feed('a {{external clause b}}')).should.not.throw();
+            (()=> parser.feed('a [{#b/}]')).should.not.throw();
             parser.results.should.not.be.empty;
+        });
+
+        it('should not parse a contract with mismatched clause tags', () => {
+            parser.feed('foo [{#bar}] foo [{/foo}]');
+            parser.results.should.be.empty;
         });
     });
 });

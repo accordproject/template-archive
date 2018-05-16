@@ -33,10 +33,10 @@ const moo = require("moo");
 // in the text and the tokens inside the variables
 const lexer = moo.states({
     main: {
-        // a chunk is everything up until '{{', even across newlines. We then trim off the '{{'
+        // a chunk is everything up until '[{', even across newlines. We then trim off the '[{'
         // we also push the lexer into the 'var' state
         Chunk: {
-            match: /[^]*?\{{/,
+            match: /[^]*?\[{/,
             lineBreaks: true,
             push: 'var',
             value: x => x.slice(0, -2)
@@ -50,16 +50,22 @@ const lexer = moo.states({
     },
     var: {
         varend: {
-            match: '}}',
+            match: '}]',
             pop: true
         }, // pop back to main state
-        clause: /clause/,
-        end:  /end/,
-        external: /external/,
         varid: /[a-zA-Z_][_a-zA-Z0-9]*/,
         varstring: /".*?"/,
         varcond: /:\?/,
         varspace: / /,
+        clauseidstart: {
+            match: /#[a-zA-Z_][_a-zA-Z0-9]*/,
+            value: x => x.slice(1)
+        },
+        clauseidend: {
+            match: /\/[a-zA-Z_][_a-zA-Z0-9]*/,
+            value: x => x.slice(1)
+        },
+        clauseclose: /\//
     },
 });
 %}
@@ -102,23 +108,29 @@ CLAUSE_ITEM ->
       %Chunk {% id %} 
     | VARIABLE {% id %}
 
-CLAUSE_VARIABLE_INLINE -> %clause %varspace %varid %varend CLAUSE_TEMPLATE %end %varspace %clause %varend
-{% (data) => {
-    return {
-        type: 'ClauseBinding',
-        template: data[4],
-        fieldName: data[2]
+CLAUSE_VARIABLE_INLINE -> %clauseidstart %varend CLAUSE_TEMPLATE %clauseidend %varend
+{% (data,l,reject) => {
+    // Check that opening and closing clause tags match
+    // Note: this line makes the parser non-context-free
+    if(data[0].value !== data[3].value) {
+        return reject;
+    } else {
+        return {
+            type: 'ClauseBinding',
+            template: data[2],
+            fieldName: data[0]
+        }
     }
 }
 %}
 
 # Binds the variable to a Clause in the template model. The type of the clause
 # in the grammar is inferred from the type of the model element
-CLAUSE_VARIABLE_EXTERNAL -> %external %varspace %clause %varspace %varid %varend
+CLAUSE_VARIABLE_EXTERNAL -> %clauseidstart %clauseclose %varend
 {% (data) => {
     return {
         type: 'ClauseExternalBinding',
-        fieldName: data[4]
+        fieldName: data[0]
     }
 } 
 %}
@@ -129,7 +141,7 @@ VARIABLE ->
     | BINDING {% id %} 
 
 # A Boolean binding set a boolean to true if a given optional string literal is present
-# {{"optional text":? booleanFieldName}}
+# [{"optional text":? booleanFieldName}]
 BOOLEAN_BINDING -> %varstring %varcond %varspace %varid %varend
 {% (data) => {
         return {
@@ -142,7 +154,7 @@ BOOLEAN_BINDING -> %varstring %varcond %varspace %varid %varend
 
 # Binds the variable to a field in the template model. The type of the variable
 # in the grammar is inferred from the type of the model element
-# {{fieldName}}
+# [{fieldName}]
 BINDING -> %varid %varend
 {% (data) => {
         return {

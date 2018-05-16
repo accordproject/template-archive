@@ -19,10 +19,10 @@ const moo = require('moo');
 // in the text and the tokens inside the variables
 const lexer = moo.states({
     main: {
-        // a chunk is everything up until '{{', even across newlines. We then trim off the '{{'
+        // a chunk is everything up until '[{', even across newlines. We then trim off the '[{'
         // we also push the lexer into the 'var' state
         Chunk: {
-            match: /[^]*?\{{/,
+            match: /[^]*?\[{/,
             lineBreaks: true,
             push: 'var',
             value: x => x.slice(0, -2)
@@ -36,7 +36,7 @@ const lexer = moo.states({
     },
     var: {
         varend: {
-            match: '}}',
+            match: '}]',
             pop: true
         }, // pop back to main state
         varid: /[a-zA-Z_][_a-zA-Z0-9]*/,
@@ -48,7 +48,7 @@ const lexer = moo.states({
     },
 });
 
-lexer.reset('{{v1}} \n one {{"foo":? v2}} {{v3}} two \n\nthree{{v4}}\nfour. {{#v5}}five{{/v5}}');
+lexer.reset('[{v1}] \n one [{"foo":? v2}] [{v3}] two \n\nthree[{v4}]\nfour. [{#v5}]five[{/v5}]');
 
 let n = lexer.next();
 

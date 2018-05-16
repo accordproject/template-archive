@@ -18,10 +18,10 @@ const moo = require("moo");
 // in the text and the tokens inside the variables
 const lexer = moo.states({
     main: {
-        // a chunk is everything up until '{{', even across newlines. We then trim off the '{{'
+        // a chunk is everything up until '[{', even across newlines. We then trim off the '[{'
         // we also push the lexer into the 'var' state
         Chunk: {
-            match: /[^]*?\{{/,
+            match: /[^]*?\[{/,
             lineBreaks: true,
             push: 'var',
             value: x => x.slice(0, -2)
@@ -35,16 +35,22 @@ const lexer = moo.states({
     },
     var: {
         varend: {
-            match: '}}',
+            match: '}]',
             pop: true
         }, // pop back to main state
-        clause: /clause/,
-        end:  /end/,
-        external: /external/,
         varid: /[a-zA-Z_][_a-zA-Z0-9]*/,
         varstring: /".*?"/,
         varcond: /:\?/,
         varspace: / /,
+        clauseidstart: {
+            match: /#[a-zA-Z_][_a-zA-Z0-9]*/,
+            value: x => x.slice(1)
+        },
+        clauseidend: {
+            match: /\/[a-zA-Z_][_a-zA-Z0-9]*/,
+            value: x => x.slice(1)
+        },
+        clauseclose: /\//
     },
 });
 var grammar = {
@@ -111,18 +117,24 @@ var grammar = {
     {"name": "CONTRACT_ITEM", "symbols": ["CLAUSE_VARIABLE_EXTERNAL"], "postprocess": id},
     {"name": "CLAUSE_ITEM", "symbols": [(lexer.has("Chunk") ? {type: "Chunk"} : Chunk)], "postprocess": id},
     {"name": "CLAUSE_ITEM", "symbols": ["VARIABLE"], "postprocess": id},
-    {"name": "CLAUSE_VARIABLE_INLINE", "symbols": [(lexer.has("clause") ? {type: "clause"} : clause), (lexer.has("varspace") ? {type: "varspace"} : varspace), (lexer.has("varid") ? {type: "varid"} : varid), (lexer.has("varend") ? {type: "varend"} : varend), "CLAUSE_TEMPLATE", (lexer.has("end") ? {type: "end"} : end), (lexer.has("varspace") ? {type: "varspace"} : varspace), (lexer.has("clause") ? {type: "clause"} : clause), (lexer.has("varend") ? {type: "varend"} : varend)], "postprocess":  (data) => {
-            return {
-                type: 'ClauseBinding',
-                template: data[4],
-                fieldName: data[2]
+    {"name": "CLAUSE_VARIABLE_INLINE", "symbols": [(lexer.has("clauseidstart") ? {type: "clauseidstart"} : clauseidstart), (lexer.has("varend") ? {type: "varend"} : varend), "CLAUSE_TEMPLATE", (lexer.has("clauseidend") ? {type: "clauseidend"} : clauseidend), (lexer.has("varend") ? {type: "varend"} : varend)], "postprocess":  (data,l,reject) => {
+            // Check that opening and closing clause tags match
+            // Note: this line makes the parser non-context-free
+            if(data[0].value !== data[3].value) {
+                return reject;
+            } else {
+                return {
+                    type: 'ClauseBinding',
+                    template: data[2],
+                    fieldName: data[0]
+                }
             }
         }
         },
-    {"name": "CLAUSE_VARIABLE_EXTERNAL", "symbols": [(lexer.has("external") ? {type: "external"} : external), (lexer.has("varspace") ? {type: "varspace"} : varspace), (lexer.has("clause") ? {type: "clause"} : clause), (lexer.has("varspace") ? {type: "varspace"} : varspace), (lexer.has("varid") ? {type: "varid"} : varid), (lexer.has("varend") ? {type: "varend"} : varend)], "postprocess":  (data) => {
+    {"name": "CLAUSE_VARIABLE_EXTERNAL", "symbols": [(lexer.has("clauseidstart") ? {type: "clauseidstart"} : clauseidstart), (lexer.has("clauseclose") ? {type: "clauseclose"} : clauseclose), (lexer.has("varend") ? {type: "varend"} : varend)], "postprocess":  (data) => {
             return {
                 type: 'ClauseExternalBinding',
-                fieldName: data[4]
+                fieldName: data[0]
             }
         } 
         },
