@@ -22,28 +22,28 @@ UTF-8 text with markup to introduce named variables.
 
 Here is a simple template grammar for a smart clause::
 
-   Late Delivery and Penalty. In case of delayed delivery{{" except for Force
-   Majeure cases,":? forceMajeure}} the Seller shall pay to the Buyer for every
-   {{penaltyDuration}} of delay penalty amounting to {{penaltyPercentage}}% of
+   Late Delivery and Penalty. In case of delayed delivery[{" except for Force
+   Majeure cases,":? forceMajeure}] the Seller shall pay to the Buyer for every
+   [{penaltyDuration}] of delay penalty amounting to [{penaltyPercentage}]% of
    the total value of the Equipment whose delivery has been delayed. Any
-   fractional part of a {{fractionalPart}} is to be considered a full
-   {{fractionalPart}}. The total amount of penalty shall not however, exceed
-   {{capPercentage}}% of the total value of the Equipment involved in late
-   delivery. If the delay is more than {{termination}}, the Buyer is entitled to
+   fractional part of a [{fractionalPart}] is to be considered a full
+   [{fractionalPart}]. The total amount of penalty shall not however, exceed
+   [{capPercentage}]% of the total value of the Equipment involved in late
+   delivery. If the delay is more than [{termination}], the Buyer is entitled to
    terminate this Contract.
 
-Variables in template grammars are enclosed in ``{{`` and ``}}``.
+Variables in template grammars are enclosed in ``[{`` and ``}]``.
 
 Templates grammars for contracts can also contain references to clause templates for example::
 
     ...
     2. Copyright Notices. Licensee shall ensure that its use of the Work is marked with the appropriate copyright notices specified by Licensor in a reasonably prominent position in the order and manner provided by Licensor. Licensee shall abide by the copyright laws and what are considered to be sound practices for copyright notice provisions in the Territory. Licensee shall not use any copyright notices that conflict with, confuse, or negate the notices Licensor provides and requires hereunder.
 
-    3. {{clause paymentClause}}Payment. As consideration in full for the rights granted herein, Licensee shall pay Licensor a one-time fee in the amount of {{amountText}} US Dollars (US ${{amount}}) upon execution of this Agreement, payable as follows: {{paymentProcedure}}. {{end clause}} 
+    3. [{#paymentClause}]Payment. As consideration in full for the rights granted herein, Licensee shall pay Licensor a one-time fee in the amount of [{amountText}] US Dollars (US $[{amount}]) upon execution of this Agreement, payable as follows: [{paymentProcedure}]. [{/paymentClause}] 
 
     4. General. ...
 
-In-line clause references are enclosed with ``{{clause CLAUSE_NAME}}`` and ``{{end clause}}``. Where ``CLAUSE_NAME`` matches the identifier of the Clause given in the template model (see below). 
+In-line clause references are enclosed with ``[{#CLAUSE_NAME}]`` and ``[{/CLAUSE_NAME}]``. Where ``CLAUSE_NAME`` matches the identifier of the Clause given in the template model (see below). 
 
 Template Model
 --------------

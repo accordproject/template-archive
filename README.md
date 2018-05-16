@@ -59,7 +59,7 @@ Use the `cicero parse` command to load a template from a directory on disk and t
 Sample template.tem:
 
 ```
-Name of the person to greet: {{name}}.
+Name of the person to greet: [{name}].
 Thank you!
 ```
 
@@ -158,7 +158,7 @@ Give your generator a name (no spaces) and then supply a namespace for your temp
 
 ### Edit the Template Grammar
 
-Start by editing the template grammar in the `grammar/template.tem` file. You will want to replace the text with something suitable for your template, introducing variables as required. The variables are marked-up using `{{name}}`.
+Start by editing the template grammar in the `grammar/template.tem` file. You will want to replace the text with something suitable for your template, introducing variables as required. The variables are marked-up using `[{name}]`.
 
 ### Edit the Template Model
 

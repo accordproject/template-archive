@@ -78,17 +78,17 @@ The next step in making the clause executable is to relate the template model to
 Here is the marked-up template:
 
 ```
-Late Delivery and Penalty. In case of delayed delivery {{"except for Force Majeure cases,":? -> forceMajeure}} the Seller shall pay to the Buyer for every {{-> penaltyDuration}} of delay penalty amounting to {{-> penaltyPercentage}} of the total value of the Equipment whose delivery has been delayed. Any fractional part of a {{org.accord.base.TemporalUnit t}} is to be considered a full {{t}}. The total amount of penalty shall not however, exceed {{-> capPercentage}} of the total value of the Equipment involved in late delivery. If the delay is more than {{-> termination}}, the Buyer is entitled to terminate this Contract.
+Late Delivery and Penalty. In case of delayed delivery [{"except for Force Majeure cases,":? -> forceMajeure}] the Seller shall pay to the Buyer for every [{-> penaltyDuration}] of delay penalty amounting to [{-> penaltyPercentage}] of the total value of the Equipment whose delivery has been delayed. Any fractional part of a [{org.accord.base.TemporalUnit t}] is to be considered a full [{t}]. The total amount of penalty shall not however, exceed [{-> capPercentage}] of the total value of the Equipment involved in late delivery. If the delay is more than [{-> termination}], the Buyer is entitled to terminate this Contract.
 ```
 
-The marked-up template contains variables. Each variable starts with `{{` and ends with `}}`. Let’s take a look at each variable in turn.
-* **{{"except for Force Majeure cases,":? -> forceMajeure}}** : this variable definition is called a Boolean Assignment. It states that if the optional text “except for Force Majeure cases,” is present in the clause, then then Boolean forceMajeure property on the template model should be set to true. Otherwise the property will be set to false.
-* **{{-> penaltyDuration}}**  : this variable definition is a binding. It states that the variable is bound to the `penaltyDuration` property in the template model. Implicitly it also states that the variable is of type `Duration` because that is the type of `penaltyDuration` in the model.
-* **{{-> penaltyPercentage}}** : another variable binding, this time to the `penaltyPercentage` property in the model.
-* **{{org.accord.base.TemporalUnit t}}** : this is an assignment. Assignments allow variables to be bound that are not declared in the model. Here the variable is named `t` and is defined as a `TemporalUnit`.
-* **{{t}}** : the is a reference. References refer to previous assignments. In this case a constraint is introduced that the assignment and the reference have the same value.
-* **{{-> capPercentage}}** : this is a binding, setting the `capPercentage `property on the template model.
-* **{{-> termination}}** : this is a binding, setting the `termination` property on the template model.
+The marked-up template contains variables. Each variable starts with `[{` and ends with `}]`. Let’s take a look at each variable in turn.
+* **[{"except for Force Majeure cases,":? -> forceMajeure}]** : this variable definition is called a Boolean Assignment. It states that if the optional text “except for Force Majeure cases,” is present in the clause, then then Boolean forceMajeure property on the template model should be set to true. Otherwise the property will be set to false.
+* **[{-> penaltyDuration}]**  : this variable definition is a binding. It states that the variable is bound to the `penaltyDuration` property in the template model. Implicitly it also states that the variable is of type `Duration` because that is the type of `penaltyDuration` in the model.
+* **[{-> penaltyPercentage}]** : another variable binding, this time to the `penaltyPercentage` property in the model.
+* **[{org.accord.base.TemporalUnit t}]** : this is an assignment. Assignments allow variables to be bound that are not declared in the model. Here the variable is named `t` and is defined as a `TemporalUnit`.
+* **[{t}]** : the is a reference. References refer to previous assignments. In this case a constraint is introduced that the assignment and the reference have the same value.
+* **[{-> capPercentage}]** : this is a binding, setting the `capPercentage `property on the template model.
+* **[{-> termination}]** : this is a binding, setting the `termination` property on the template model.
 
 To recap, there are currently 4 types of variable:
 1. Boolean Binding: sets a boolean property in the model based on the presence of text in the clause
