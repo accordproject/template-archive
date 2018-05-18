@@ -3,6 +3,35 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+<a name="0.3.2"></a>
+## [0.3.2](https://github.com/accordproject/cicero/compare/v0.2.54...v0.3.2) (2018-05-18)
+
+
+### Bug Fixes
+
+* Fix package.json validation in cicero-cli and in tests ([a6cc7ee](https://github.com/accordproject/cicero/commit/a6cc7ee))
+
+
+### Features
+
+* Bump to 0.3.0-0 prerelease. Added semver check to templates ([9d2c100](https://github.com/accordproject/cicero/commit/9d2c100))
+* Complete revision to Ergo v JavaScript support; Switch to Ergo 0.0.44 ([a9fbdc8](https://github.com/accordproject/cicero/commit/a9fbdc8))
+* Convert to {{ }} notation from [{ }] ([a455a89](https://github.com/accordproject/cicero/commit/a455a89))
+* CTO validate for contract state and emitted events ([55683cb](https://github.com/accordproject/cicero/commit/55683cb))
+* Ergo and JS now use identical dispatch; Up Ergo 0.0.43 ([daa1d84](https://github.com/accordproject/cicero/commit/daa1d84))
+* Initial changes to execute for whole contract support ([9bd7525](https://github.com/accordproject/cicero/commit/9bd7525))
+* output state and emit are being returned ([4641edf](https://github.com/accordproject/cicero/commit/4641edf))
+* Revert to [{ ... }] template grammar syntax ([239889d](https://github.com/accordproject/cicero/commit/239889d))
+* Update to Ergo 0.0.42; Fix dispatch ([fb82a2b](https://github.com/accordproject/cicero/commit/fb82a2b))
+
+
+### BREAKING CHANGES
+
+* State added to cicero API
+
+
+
+
 <a name="0.3.1"></a>
 ## [0.3.1](https://github.com/accordproject/cicero/compare/v0.2.54...v0.3.1) (2018-05-18)
 

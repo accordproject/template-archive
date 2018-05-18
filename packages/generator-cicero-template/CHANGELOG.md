@@ -3,6 +3,26 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+<a name="0.3.2"></a>
+## [0.3.2](https://github.com/accordproject/cicero/compare/v0.2.54...v0.3.2) (2018-05-18)
+
+
+### Bug Fixes
+
+* Make package.json properties optional in CLI; yo generator now uses correct properties format ([9422053](https://github.com/accordproject/cicero/commit/9422053))
+
+
+### Features
+
+* Bump to 0.3.0-0 prerelease. Added semver check to templates ([9d2c100](https://github.com/accordproject/cicero/commit/9d2c100))
+* Complete revision to Ergo v JavaScript support; Switch to Ergo 0.0.44 ([a9fbdc8](https://github.com/accordproject/cicero/commit/a9fbdc8))
+* Convert to {{ }} notation from [{ }] ([a455a89](https://github.com/accordproject/cicero/commit/a455a89))
+* Revert to [{ ... }] template grammar syntax ([239889d](https://github.com/accordproject/cicero/commit/239889d))
+* Update to Ergo 0.0.42; Fix dispatch ([fb82a2b](https://github.com/accordproject/cicero/commit/fb82a2b))
+
+
+
+
 <a name="0.3.1"></a>
 ## [0.3.1](https://github.com/accordproject/cicero/compare/v0.2.54...v0.3.1) (2018-05-18)
 
