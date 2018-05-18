@@ -48,8 +48,8 @@ source_suffix = '.rst'
 master_doc = 'index'
 
 # General information about the project.
-project = u'Accord Cicero'
-copyright = u'2017, Clause Inc.'
+project = u'Accord Project, Cicero'
+copyright = u'2018, Clause Inc.'
 
 # The version info for the project you're documenting, acts as replacement for
 # |version| and |release|, also used in various other places throughout the

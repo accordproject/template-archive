@@ -15,6 +15,8 @@
 'use strict';
 
 const logger = require('./logger');
+const ciceroVersion = require('../package.json').version;
+const semver = require('semver');
 
 // This code is derived from BusinessNetworkMetadata in Hyperleger Composer composer-common.
 
@@ -69,6 +71,42 @@ class Metadata {
 
         this.readme = readme;
         this.samples = samples;
+
+        const templateTypes = {
+            CONTRACT: 0,
+            CLAUSE: 1
+        };
+
+        // Set defaults
+        this.type = templateTypes.CONTRACT;
+        this.targetVersion = ciceroVersion;
+
+        if (packageJson.cicero && packageJson.cicero.template) {
+            if(packageJson.cicero.template !== 'contract' &&
+            packageJson.cicero.template !== 'clause'){
+                throw new Error('A cicero template must be either a "contract" or a "clause".');
+            }
+
+            if(packageJson.cicero.template === 'clause'){
+                this.type = templateTypes.CLAUSE;
+            }
+        } else {
+            logger.warn('No cicero template type specified. Assuming that this is a contract template');
+        }
+
+        if (packageJson.cicero && packageJson.cicero.version) {
+            if(!semver.valid(semver.coerce(packageJson.cicero.version))){
+                throw new Error('The cicero target version must be a valid semantic version (semver) number.');
+            }
+            this.targetVersion = packageJson.cicero.version;
+        } else {
+            logger.warn(`No cicero target version specified. Assuming compatibility with the current cicero version, ${ciceroVersion}`);
+        }
+
+        if (!this.satisfiesTargetVersion()){
+            logger.warn(`The given target version for this template (${this.targetVersion}) is not satisfied by the installed cicero version ${ciceroVersion}.`);
+        }
+
         logger.exit(method);
     }
 
@@ -91,6 +129,32 @@ class Metadata {
             }
         }
         return true;
+    }
+
+    /**
+     * Returns either a 0 (for a contract template), or 1 (for a clause template)
+     * @returns {number} the template type
+     */
+    getTemplateType(){
+        return this.type;
+    }
+
+    /**
+     * Returns the target semantic version for this template.
+     * i.e. which version of cicero was this template built for?
+     * The version string conforms to the semver definition
+     * @returns {string} the semantic version
+     */
+    getTargetVersion(){
+        return this.targetVersion;
+    }
+
+    /**
+     * Only returns true if the current cicero version satisfies the target version of this template
+     * @returns {string} the semantic version
+     */
+    satisfiesTargetVersion(){
+        return semver.satisfies(ciceroVersion, this.getTargetVersion());
     }
 
     /**

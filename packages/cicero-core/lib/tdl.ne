@@ -57,26 +57,83 @@ const lexer = moo.states({
         varstring: /".*?"/,
         varcond: /:\?/,
         varspace: / /,
+        clauseidstart: {
+            match: /#[a-zA-Z_][_a-zA-Z0-9]*/,
+            value: x => x.slice(1)
+        },
+        clauseidend: {
+            match: /\/[a-zA-Z_][_a-zA-Z0-9]*/,
+            value: x => x.slice(1)
+        },
+        clauseclose: /\//
     },
 });
 %}
 
 @lexer lexer
 
-# A template is one or more items, followed by an optional LastChunk
-TEMPLATE -> ITEM:+ %LastChunk:?
+TEMPLATE -> 
+    # Only allow contract templates for now until we get to milestone 2
+    #  CLAUSE_TEMPLATE {% id %}
+    #|
+    CONTRACT_TEMPLATE {% id %}
+
+CONTRACT_TEMPLATE -> CONTRACT_ITEM:* %LastChunk:?
 {% (data) => {
         return {
-            type: 'Template',
+            type: 'ContractTemplate',
             data: flatten(data)
         };
     }
 %}
 
-# An item is either a chunk of text or an embedded variable
-ITEM -> 
+# A Clause is one or more items, followed by an optional LastChunk
+CLAUSE_TEMPLATE -> CLAUSE_ITEM:* %LastChunk:?
+{% (data) => {
+        return {
+            type: 'ClauseTemplate',
+            data: flatten(data)
+        };
+    }
+%}
+
+CONTRACT_ITEM -> 
       %Chunk {% id %} 
     | VARIABLE {% id %}
+    | CLAUSE_VARIABLE_INLINE {% id %}
+    | CLAUSE_VARIABLE_EXTERNAL {% id %}
+
+# An item is either a chunk of text or an embedded variable
+CLAUSE_ITEM -> 
+      %Chunk {% id %} 
+    | VARIABLE {% id %}
+
+CLAUSE_VARIABLE_INLINE -> %clauseidstart %varend CLAUSE_TEMPLATE %clauseidend %varend
+{% (data,l,reject) => {
+    // Check that opening and closing clause tags match
+    // Note: this line makes the parser non-context-free
+    if(data[0].value !== data[3].value) {
+        return reject;
+    } else {
+        return {
+            type: 'ClauseBinding',
+            template: data[2],
+            fieldName: data[0]
+        }
+    }
+}
+%}
+
+# Binds the variable to a Clause in the template model. The type of the clause
+# in the grammar is inferred from the type of the model element
+CLAUSE_VARIABLE_EXTERNAL -> %clauseidstart %clauseclose %varend
+{% (data) => {
+    return {
+        type: 'ClauseExternalBinding',
+        fieldName: data[0]
+    }
+} 
+%}
 
 # A variable may be one of the sub-types below
 VARIABLE -> 

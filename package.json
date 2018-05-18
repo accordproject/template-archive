@@ -29,7 +29,7 @@
     "pretest": "npm run doc",
     "test": "lerna run test",
     "doc": "jsdoc -t ./node_modules/jsdoc-sphinx/template/ -c jsdoc.json -r -d ../cicero-docs/docs/api --verbose",
-    "coverage": "istanbul-combine -d coverage -r lcov packages/cicero-cli/coverage/*.json packages/cicero-core/coverage/*.json  packages/cicero-engine/coverage/*.json packages/generator-cicero-template/coverage/*.json && cat ./coverage/lcov.info | coveralls"
+    "coverage": "istanbul-combine -d coverage -r lcov packages/cicero-cli/coverage/*.json packages/cicero-core/coverage/*.json  packages/cicero-engine/coverage/*.json packages/generator-cicero-template/coverage/*.json packages/cicero-server/coverage/*.json packages/cicero-common/coverage/*.json && cat ./coverage/lcov.info | coveralls"
   },
   "repository": {
     "type": "git",

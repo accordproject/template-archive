@@ -1,0 +1,24 @@
+namespace org.accordproject.helloemit
+
+transaction Request {
+  o String input
+}
+
+transaction Response {
+  o String output
+}
+
+event Greeting {
+  o String message
+}
+
+/**
+ * The template model
+ */
+@AccordTemplateModel("helloemit")
+concept TemplateModel {
+  /**
+   * The name for the clause
+   */
+  o String name
+}

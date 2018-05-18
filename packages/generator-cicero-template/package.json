@@ -1,6 +1,6 @@
 {
   "name": "@accordproject/generator-cicero-template",
-  "version": "0.2.54",
+  "version": "0.3.0",
   "description": "Code generator for a Cicero Template",
   "engines": {
     "node": ">=8",
@@ -45,10 +45,10 @@
     "eslint": "^4.19.1",
     "jsdoc": "^3.5.5",
     "license-check": "^1.1.5",
-    "mocha": "^5.0.5",
+    "mocha": "^5.1.1",
     "mocha-lcov-reporter": "^1.3.0",
     "mockery": "^2.0.0",
-    "nyc": "^11.6.0",
+    "nyc": "^11.7.2",
     "sinon": "^4.0.1",
     "yeoman-assert": "^3.1.0",
     "yeoman-test": "^1.7.0"

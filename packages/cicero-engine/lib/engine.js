@@ -17,7 +17,6 @@
 const Logger = require('./logger');
 const logger = require('@accordproject/cicero-core').logger;
 const ResourceValidator = require('composer-common/lib/serializer/resourcevalidator');
-const ErgoEngine = require('@accordproject/ergo-engine/lib/ergo-engine');
 
 const {
     VM,
@@ -42,31 +41,6 @@ class Engine {
     }
 
     /**
-     * Compile and cache a clause with Ergo logic
-     * @param {Clause} clause  - the clause to compile
-     * @private
-     */
-    compileErgoClause(clause) {
-        let allErgoScripts = '';
-        let template = clause.getTemplate();
-
-        template.getScriptManager().getScripts().forEach(function (element) {
-            if (element.getLanguage() === '.ergo') {
-                allErgoScripts += element.getContents();
-            }
-        }, this);
-
-        if (allErgoScripts === '') {
-            throw new Error('Did not find any Ergo logic');
-        }
-        allErgoScripts += this.buildErgoDispatchFunction(clause);
-        // console.log(allErgoScripts);
-        allErgoScripts = ErgoEngine.linkErgoRuntime(allErgoScripts);
-        const script = new VMScript(allErgoScripts);
-        this.scripts[clause.getIdentifier()] = script;
-    }
-
-    /**
      * Compile and cache a clause with JavaScript logic
      * @param {Clause} clause  - the clause to compile
      * @private
@@ -84,62 +58,23 @@ class Engine {
         if (allJsScripts === '') {
             throw new Error('Did not find any JavaScript logic');
         }
-        allJsScripts += this.buildJsDispatchFunction(clause);
-        // console.log(allJsScripts);
+        allJsScripts += this.buildDispatchFunction(clause);
         const script = new VMScript(allJsScripts);
         this.scripts[clause.getIdentifier()] = script;
     }
 
     /**
-     * Generate the runtime dispatch logic for Ergo
-     * @param {Clause} clause  - the clause to compile
-     * @return {string} the Javascript code for dispatch
+     * Generate the runtime dispatch logic
+     * @param {Clause} clause - the clause to compile
+     * @return {String} the dispatch code
      * @private
      */
-    buildErgoDispatchFunction(clause) {
+    buildDispatchFunction(clause) {
         // get the function declarations of all functions
         // that have the @clause annotation
-        const functionDeclarations = clause.getTemplate().getScriptManager().getScripts().map((ele) => {
-            return ele.getFunctionDeclarations();
-        })
-            .reduce((flat, next) => {
-                return flat.concat(next);
-            })
-            .filter((ele) => {
-                return ele.getDecorators().indexOf('AccordClauseLogic') >= 0;
-            }).map((ele) => {
-                return ele;
-            });
-
-        if (functionDeclarations.length === 0) {
-            throw new Error('Did not find any function declarations with the @AccordClauseLogic annotation');
-        }
-
-        const code = `
-        __dispatch(data,request);
-
-        function __dispatch(data,request) {
-            // Ergo dispatch call
-            let context = {request: serializer.toJSON(request), contract: data, state: {}, now: moment()};
-            return serializer.fromJSON(dispatch(context).response);
-        } 
-        `;
-
-        logger.debug(code);
-        return code;
-    }
-
-    /**
-     * Generate the runtime dispatch logic for JavaScript
-     * @param {Clause} clause  - the clause to compile
-     * @return {string} the Javascript code for dispatch
-     * @private
-     */
-    buildJsDispatchFunction(clause) {
-
-        // get the function declarations of all functions
-        // that have the @clause annotation
-        const functionDeclarations = clause.getTemplate().getScriptManager().getScripts().map((ele) => {
+        const functionDeclarations = clause.getTemplate().getScriptManager().getScripts().filter((ele) => {
+            return ele.getLanguage() === ('.js');
+        }).map((ele) => {
             return ele.getFunctionDeclarations();
         })
             .reduce((flat, next) => {
@@ -156,9 +91,9 @@ class Engine {
         }
 
         const head = `
-        __dispatch(data,request);
+        __dispatch(contract,request,state,moment());
 
-        function __dispatch(data,request) {
+        function __dispatch(contract,request,state,now) {
             switch(request.getFullyQualifiedType()) {
         `;
 
@@ -170,9 +105,9 @@ class Engine {
                 let ns${n} = type${n}.substr(0, type${n}.lastIndexOf('.'));
                 let clazz${n} = type${n}.substr(type${n}.lastIndexOf('.')+1);
                 let response${n} = factory.newTransaction(ns${n}, clazz${n});
-                let context${n} = {request: request, response: response${n}, data: data};
+                let context${n} = {request: request, state: state, contract: contract, response: response${n}, emit: [], now: now};
                 ${ele.getName()}(context${n});
-                return context${n}.response;
+                return { response: context${n}.response, state: context${n}.state, emit: context${n}.emit };
             break;`;
         });
 
@@ -194,43 +129,31 @@ class Engine {
      * @param {Clause} clause  - the clause to execute
      * @param {object} request  - the request, a JS object that can be deserialized
      * using the Composer serializer.
-     * @param {boolean} forcejs  - whether to force JS logic.
+     * @param {object} state  - the contract state, a JS object that can be deserialized
+     * using the Composer serializer.
      * @return {Promise} a promise that resolves to a result for the clause
      * @private
      */
-    async execute(clause, request, forcejs) {
-        // ensure the request is valid
+    async execute(clause, request, state) {
         const template = clause.getTemplate();
-        template.logicjsonly = forcejs;
-        const tx = template.getSerializer().fromJSON(request, {validate: false, acceptResourcesForRelationships: true});
-        tx.$validator = new ResourceValidator({permitResourcesForRelationships: true});
-        tx.validate();
+        // ensure the request is valid
+        const validRequest = template.getSerializer().fromJSON(request, {validate: false, acceptResourcesForRelationships: true});
+        validRequest.$validator = new ResourceValidator({permitResourcesForRelationships: true});
+        validRequest.validate();
 
-        logger.debug('Engine processing ' + request.$class);
+        // ensure the state is valid
+        const validState = template.getSerializer().fromJSON(state, {validate: false, acceptResourcesForRelationships: true});
+        validState.$validator = new ResourceValidator({permitResourcesForRelationships: true});
+        validState.validate();
+
+        logger.debug('Engine processing request ' + request.$class + ' with state ' + state.$class);
 
         let script = this.scripts[clause.getIdentifier()];
 
-        if (!script) {
-            if (template.logicjsonly) {
-                this.compileJsClause(clause);
-            } else {
-                // Attempt ergo compilation first
-                try {
-                    this.compileErgoClause(clause);
-                } catch(err) {
-                    logger.debug('Error compiling Ergo logic, falling back to JavaScript'+err);
-                    this.compileJsClause(clause);
-                }
-            }
-        }
-
+        this.compileJsClause(clause);
         script = this.scripts[clause.getIdentifier()];
 
-        if (!script) {
-            throw new Error('Failed to created executable script for ' + clause.getIdentifier());
-        }
-
-        const data = clause.getData();
+        const validContract = clause.getData();
         const factory = template.getFactory();
         const vm = new VM({
             timeout: 1000,
@@ -242,21 +165,40 @@ class Engine {
         });
 
         // add immutables to the context
-        vm.freeze(tx, 'request'); // Second argument adds object to global.
-        vm.freeze(data, 'data'); // Second argument adds object to global.
+        vm.freeze(validContract, 'contract'); // Second argument adds object to global.
+        vm.freeze(validRequest, 'request'); // Second argument adds object to global.
+        vm.freeze(validState, 'state'); // Second argument adds object to global.
+
         vm.freeze(factory, 'factory'); // Second argument adds object to global.
 
-        const response = vm.run(script);
-        response.$validator = new ResourceValidator({permitResourcesForRelationships: true});
-        response.validate();
+        // execute the logic
+        const result = vm.run(script);
 
-        const result = {
+        // ensure the response is valid
+        result.response.$validator = new ResourceValidator({permitResourcesForRelationships: true});
+        result.response.validate();
+        const responseResult = template.getSerializer().toJSON(result.response, {convertResourcesToRelationships: true});
+
+        // ensure the new state is valid
+        result.state.$validator = new ResourceValidator({permitResourcesForRelationships: true});
+        result.state.validate();
+        const stateResult = template.getSerializer().toJSON(result.state, {convertResourcesToRelationships: true});
+
+        // ensure all the emits are valid
+        let emitResult = [];
+        for (let i = 0; i < result.emit.length; i++) {
+            result.emit[i].$validator = new ResourceValidator({permitResourcesForRelationships: true});
+            result.emit[i].validate();
+            emitResult.push(template.getSerializer().toJSON(result.emit[i], {convertResourcesToRelationships: true}));
+        }
+
+        return {
             'clause': clause.getIdentifier(),
             'request': request,
-            'response': template.getSerializer().toJSON(response, {convertResourcesToRelationships: true})
+            'response': responseResult,
+            'state': stateResult,
+            'emit': emitResult,
         };
-
-        return result;
     }
 }
 

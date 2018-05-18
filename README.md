@@ -66,14 +66,15 @@ Thank you!
 Sample.txt:
 
 ```
-Name of the person to greet: "Dan".
+Name of the person to greet: "Fred Blogs".
 Thank you!
 ```
 
 ```
 cd cicero-template-library
-cicero parse --template ./helloworld/ --dsl ./helloworld/sample.txt
-Setting clause data: {"$class":"io.clause.helloworld.TemplateModel","name":"Dan"}
+cicero parse --template ./helloworld/ --sample ./helloworld/sample.txt
+21:09:34 - info: Logging initialized. 2018-05-05T01:09:34.155Z
+21:09:34 - info: {"$class":"org.accordproject.helloworld.TemplateModel","name":"Fred Blogs"}
 ```
 
 Or, attempting to parse invalid data will result in line and column information for the syntax error.
@@ -81,14 +82,14 @@ Or, attempting to parse invalid data will result in line and column information 
 Sample.txt:
 
 ```
-FUBAR Name of the person to greet: "Dan".
+FUBAR Name of the person to greet: "Fred Blogs".
 Thank you!
 ```
 
 ```
 { Error: invalid syntax at line 1 col 1:
 
-  FUBAR  Name of the person to greet: "Dan".
+  FUBAR  Name of the person to greet: "Fred Blogs".
   ^
 Unexpected "F"
 ```
@@ -97,16 +98,16 @@ Unexpected "F"
 Use the `cicero execute` command to load a template from a directory on disk, instantiate a clause based on input text, and then invoke the clause using an incoming JSON payload.
 
 ```
-data.json:
+request.json:
 {
    "$class": "io.clause.helloworld.Request",
-   "input": "World"
+   "input": "Accord Project"
 }
 ```
 
 ```
 cd cicero-template-library
-cicero execute --template ./helloworld/ --dsl ./helloworld/sample.txt --data ./helloworld/data.json 
+cicero execute --template ./helloworld/ --sample ./helloworld/sample.txt --request ./helloworld/request.json  --state ./helloworld/state.json 
 ```
 
 The results of execution (a JSON serialized object) are displayed. They include:
@@ -175,7 +176,7 @@ Your template expects to receive data as input and will produce data as output. 
 
 ### Edit the Logic of the Template
 
-Now edit the business logic of the template itself. At present this is expressed as ES 2015 JavaScript functions (other languages may be supported in the future). Open the file `lib/logic.js` and edit the `execute` method to perform the calculations your logic requires. Use the `context.request` and `context.data` properties to access the incoming request and the template data respectively, setting properties on `context.response` to be returned to the caller.
+Now edit the business logic of the template itself. At present this is expressed as either ES 2015 JavaScript functions or an [Ergo contract](https://ergo.accordproject.org). It is our intention to deprecate support for ES 2015 in the future. If you're using a JavaScript function, open the file `lib/logic.js` and edit the `execute` method to perform the calculations your logic requires. Use the `context.request` and `context.data` properties to access the incoming request and the template data respectively, setting properties on `context.response` to be returned to the caller.
 
 ## Developing an Application
 

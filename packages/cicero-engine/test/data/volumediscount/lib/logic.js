@@ -16,7 +16,7 @@ function execute(context) {
     logger.info(context);
     var req = context.request;
     var res = context.response;
-    var data = context.data;
+    var data = context.contract;
 
     // decision table
     var netAnnualChargeVolume = req.netAnnualChargeVolume;

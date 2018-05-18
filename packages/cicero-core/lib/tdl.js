@@ -42,6 +42,15 @@ const lexer = moo.states({
         varstring: /".*?"/,
         varcond: /:\?/,
         varspace: / /,
+        clauseidstart: {
+            match: /#[a-zA-Z_][_a-zA-Z0-9]*/,
+            value: x => x.slice(1)
+        },
+        clauseidend: {
+            match: /\/[a-zA-Z_][_a-zA-Z0-9]*/,
+            value: x => x.slice(1)
+        },
+        clauseclose: /\//
     },
 });
 var grammar = {
@@ -79,19 +88,56 @@ var grammar = {
             return d.join("");
         }
         },
-    {"name": "TEMPLATE$ebnf$1", "symbols": ["ITEM"]},
-    {"name": "TEMPLATE$ebnf$1", "symbols": ["TEMPLATE$ebnf$1", "ITEM"], "postprocess": function arrpush(d) {return d[0].concat([d[1]]);}},
-    {"name": "TEMPLATE$ebnf$2", "symbols": [(lexer.has("LastChunk") ? {type: "LastChunk"} : LastChunk)], "postprocess": id},
-    {"name": "TEMPLATE$ebnf$2", "symbols": [], "postprocess": function(d) {return null;}},
-    {"name": "TEMPLATE", "symbols": ["TEMPLATE$ebnf$1", "TEMPLATE$ebnf$2"], "postprocess":  (data) => {
+    {"name": "TEMPLATE", "symbols": ["CONTRACT_TEMPLATE"], "postprocess": id},
+    {"name": "CONTRACT_TEMPLATE$ebnf$1", "symbols": []},
+    {"name": "CONTRACT_TEMPLATE$ebnf$1", "symbols": ["CONTRACT_TEMPLATE$ebnf$1", "CONTRACT_ITEM"], "postprocess": function arrpush(d) {return d[0].concat([d[1]]);}},
+    {"name": "CONTRACT_TEMPLATE$ebnf$2", "symbols": [(lexer.has("LastChunk") ? {type: "LastChunk"} : LastChunk)], "postprocess": id},
+    {"name": "CONTRACT_TEMPLATE$ebnf$2", "symbols": [], "postprocess": function(d) {return null;}},
+    {"name": "CONTRACT_TEMPLATE", "symbols": ["CONTRACT_TEMPLATE$ebnf$1", "CONTRACT_TEMPLATE$ebnf$2"], "postprocess":  (data) => {
             return {
-                type: 'Template',
+                type: 'ContractTemplate',
                 data: flatten(data)
             };
         }
         },
-    {"name": "ITEM", "symbols": [(lexer.has("Chunk") ? {type: "Chunk"} : Chunk)], "postprocess": id},
-    {"name": "ITEM", "symbols": ["VARIABLE"], "postprocess": id},
+    {"name": "CLAUSE_TEMPLATE$ebnf$1", "symbols": []},
+    {"name": "CLAUSE_TEMPLATE$ebnf$1", "symbols": ["CLAUSE_TEMPLATE$ebnf$1", "CLAUSE_ITEM"], "postprocess": function arrpush(d) {return d[0].concat([d[1]]);}},
+    {"name": "CLAUSE_TEMPLATE$ebnf$2", "symbols": [(lexer.has("LastChunk") ? {type: "LastChunk"} : LastChunk)], "postprocess": id},
+    {"name": "CLAUSE_TEMPLATE$ebnf$2", "symbols": [], "postprocess": function(d) {return null;}},
+    {"name": "CLAUSE_TEMPLATE", "symbols": ["CLAUSE_TEMPLATE$ebnf$1", "CLAUSE_TEMPLATE$ebnf$2"], "postprocess":  (data) => {
+            return {
+                type: 'ClauseTemplate',
+                data: flatten(data)
+            };
+        }
+        },
+    {"name": "CONTRACT_ITEM", "symbols": [(lexer.has("Chunk") ? {type: "Chunk"} : Chunk)], "postprocess": id},
+    {"name": "CONTRACT_ITEM", "symbols": ["VARIABLE"], "postprocess": id},
+    {"name": "CONTRACT_ITEM", "symbols": ["CLAUSE_VARIABLE_INLINE"], "postprocess": id},
+    {"name": "CONTRACT_ITEM", "symbols": ["CLAUSE_VARIABLE_EXTERNAL"], "postprocess": id},
+    {"name": "CLAUSE_ITEM", "symbols": [(lexer.has("Chunk") ? {type: "Chunk"} : Chunk)], "postprocess": id},
+    {"name": "CLAUSE_ITEM", "symbols": ["VARIABLE"], "postprocess": id},
+    {"name": "CLAUSE_VARIABLE_INLINE", "symbols": [(lexer.has("clauseidstart") ? {type: "clauseidstart"} : clauseidstart), (lexer.has("varend") ? {type: "varend"} : varend), "CLAUSE_TEMPLATE", (lexer.has("clauseidend") ? {type: "clauseidend"} : clauseidend), (lexer.has("varend") ? {type: "varend"} : varend)], "postprocess":  (data,l,reject) => {
+            // Check that opening and closing clause tags match
+            // Note: this line makes the parser non-context-free
+            if(data[0].value !== data[3].value) {
+                return reject;
+            } else {
+                return {
+                    type: 'ClauseBinding',
+                    template: data[2],
+                    fieldName: data[0]
+                }
+            }
+        }
+        },
+    {"name": "CLAUSE_VARIABLE_EXTERNAL", "symbols": [(lexer.has("clauseidstart") ? {type: "clauseidstart"} : clauseidstart), (lexer.has("clauseclose") ? {type: "clauseclose"} : clauseclose), (lexer.has("varend") ? {type: "varend"} : varend)], "postprocess":  (data) => {
+            return {
+                type: 'ClauseExternalBinding',
+                fieldName: data[0]
+            }
+        } 
+        },
     {"name": "VARIABLE", "symbols": ["BOOLEAN_BINDING"], "postprocess": id},
     {"name": "VARIABLE", "symbols": ["BINDING"], "postprocess": id},
     {"name": "BOOLEAN_BINDING", "symbols": [(lexer.has("varstring") ? {type: "varstring"} : varstring), (lexer.has("varcond") ? {type: "varcond"} : varcond), (lexer.has("varspace") ? {type: "varspace"} : varspace), (lexer.has("varid") ? {type: "varid"} : varid), (lexer.has("varend") ? {type: "varend"} : varend)], "postprocess":  (data) => {

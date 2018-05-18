@@ -1,6 +1,6 @@
 {
   "name": "@accordproject/cicero-common",
-  "version": "0.2.54",
+  "version": "0.3.0",
   "description": "Cicero Common - implementation of Accord Protocol Template Specification",
   "engines": {
     "node": ">=8",
@@ -38,15 +38,11 @@
     "chai-things": "^0.2.0",
     "eslint": "^4.19.1",
     "license-check": "^1.1.5",
-    "mocha": "^5.0.5",
-    "mockery": "^2.0.0",
-    "nyc": "^11.6.0",
-    "sinon": "^4.0.1"
+    "mocha": "^5.1.1",
+    "nyc": "^11.7.2"
   },
   "dependencies": {
-    "composer-common": "0.17.4",
-    "config": "^1.24.0",
-    "debug": "^2.6.2"
+    "composer-common": "^0.19.5"
   },
   "license-check-config": {
     "src": [

@@ -41,34 +41,20 @@ describe('EngineLatePenalty', () => {
 
     afterEach(() => {});
 
-    describe('#execute', function () {
-
-        it('should execute a smart clause', async function () {
-            const request = {
-                '$class': 'io.clause.latedeliveryandpenalty.LateDeliveryAndPenaltyRequest',
-                'forceMajeure': false,
-                'agreedDelivery': '2017-10-07T16:38:01.412Z',
-                'goodsValue': 200,
-                'transactionId': '402c8f50-9e61-433e-a7c1-afe61c06ef00',
-                'timestamp': '2017-11-12T17:38:01.412Z'
-            };
-            const result = await engine.execute(clause, request, true);
-            result.should.not.be.null;
-            result.response.penalty.should.equal(110.00000000000001);
-        });
-    });
     describe('#executeergo', function () {
 
         it('should execute a smart clause', async function () {
-            const request = {
-                '$class': 'io.clause.latedeliveryandpenalty.LateDeliveryAndPenaltyRequest',
-                'forceMajeure': false,
-                'agreedDelivery': '2017-10-07T16:38:01.412Z',
-                'goodsValue': 200.00,
-                'transactionId': '402c8f50-9e61-433e-a7c1-afe61c06ef00',
-                'timestamp': '2017-11-12T17:38:01.412Z'
-            };
-            const result = await engine.execute(clause, request, false);
+            const request = {};
+            request.$class = 'io.clause.latedeliveryandpenalty.LateDeliveryAndPenaltyRequest';
+            request.forceMajeure = false;
+            request.agreedDelivery = '2017-10-07T16:38:01.412Z';
+            request.goodsValue = 200.00;
+            request.transactionId = '402c8f50-9e61-433e-a7c1-afe61c06ef00';
+            request.timestamp = '2017-11-12T17:38:01.412Z';
+            const state = {};
+            state.$class = 'org.accordproject.common.ContractState';
+            state.stateId = 'org.accordproject.common.ContractState#1';
+            const result = await engine.execute(clause, request, state);
             result.should.not.be.null;
             result.response.penalty.should.equal(110);
         });
@@ -96,7 +82,26 @@ describe('EngineVolumeDiscount', () => {
                 '$class': 'org.accordproject.volumediscount.VolumeDiscountRequest',
                 'netAnnualChargeVolume': 0.4
             };
-            const result = await engine.execute(clause, request, true);
+            const state = {};
+            state.$class = 'org.accordproject.common.ContractState';
+            state.stateId = 'org.accordproject.common.ContractState#1';
+            const result = await engine.execute(clause, request, state);
+            result.should.not.be.null;
+            result.response.discountRate.should.equal(3);
+        });
+    });
+
+    describe('#execute', function () {
+
+        it('should execute a smart clause falling back to JavaScript', async function () {
+            const request = {
+                '$class': 'org.accordproject.volumediscount.VolumeDiscountRequest',
+                'netAnnualChargeVolume': 0.4
+            };
+            const state = {};
+            state.$class = 'org.accordproject.common.ContractState';
+            state.stateId = 'org.accordproject.common.ContractState#1';
+            const result = await engine.execute(clause, request, state);
             result.should.not.be.null;
             result.response.discountRate.should.equal(3);
         });
@@ -124,7 +129,10 @@ describe('EngineHelloWorld', () => {
                 '$class': 'org.accordproject.helloworld.Request',
                 'input': 'Accord Project'
             };
-            const result = await engine.execute(clause, request, false);
+            const state = {};
+            state.$class = 'org.accordproject.common.ContractState';
+            state.stateId = 'org.accordproject.common.ContractState#1';
+            const result = await engine.execute(clause, request, state);
             result.should.not.be.null;
             result.response.output.should.equal('Hello Fred Blogs (Accord Project)');
         });
@@ -137,11 +145,111 @@ describe('EngineHelloWorld', () => {
                     '$class': 'org.accordproject.helloworld.Request',
                     'input': 'Accord Project'
                 };
-                const result = await engine.execute(clause, request, true);
+                const state = {};
+                state.$class = 'org.accordproject.common.ContractState';
+                state.stateId = 'org.accordproject.common.ContractState#1';
+                const result = await engine.execute(clause, request, state);
                 return result;
             } catch (err) {
                 err.should.be.Error;
             }
         });
+    });
+});
+describe('EngineHelloEmit', () => {
+
+    let engine;
+    let clause;
+    const helloEmitInput = fs.readFileSync(path.resolve(__dirname, 'data/helloemit', 'sample.txt'), 'utf8');
+
+    beforeEach(async function () {
+        engine = new Engine();
+        const template = await Template.fromDirectory('./test/data/helloemit');
+        clause = new Clause(template);
+        clause.parse(helloEmitInput);
+    });
+
+    afterEach(() => {});
+
+    describe('#executeandemit', function () {
+
+        it('should execute a smart clause which emits', async function () {
+            const request = {
+                '$class': 'org.accordproject.helloemit.Request',
+                'input': 'Accord Project'
+            };
+            const state = {};
+            state.$class = 'org.accordproject.common.ContractState';
+            state.stateId = 'org.accordproject.common.ContractState#1';
+            const result = await engine.execute(clause, request, state);
+            result.should.not.be.null;
+            result.response.output.should.equal('Hello Fred Blogs (Accord Project)');
+            result.emit[0].$class.should.equal('org.accordproject.helloemit.Greeting');
+            result.emit[0].message.should.equal('Voila!');
+        });
+    });
+});
+describe('EngineSaft', () => {
+
+    let engine;
+    let clause;
+    const saftInput = fs.readFileSync(path.resolve(__dirname, 'data/saft', 'sample.txt'), 'utf8');
+
+    beforeEach(async function () {
+        engine = new Engine();
+        const template = await Template.fromDirectory('./test/data/saft');
+        clause = new Clause(template);
+        clause.parse(saftInput);
+    });
+
+    afterEach(() => {});
+
+    describe('#execute', function () {
+
+        it('should execute a smart clause', async function () {
+            const request = {};
+            const NS = 'org.accordproject.saft';
+            request.$class = `${NS}.Launch`;
+            request.exchangeRate = 100;
+            const state = {};
+            state.$class = 'org.accordproject.common.ContractState';
+            state.stateId = 'org.accordproject.common.ContractState#1';
+            const result = await engine.execute(clause, request, state);
+            result.should.not.be.null;
+            result.response.tokenAmount.should.equal(100);
+            result.response.tokenAddress.should.equal('Daniel Charles Selman');
+        });
+    });
+});
+describe('BogusClauses', () => {
+    let engine;
+    let clause;
+    const testNoLogic = fs.readFileSync(path.resolve(__dirname, 'data/no-logic', 'sample.txt'), 'utf8');
+
+    beforeEach(async function () {
+        engine = new Engine();
+        const template = await Template.fromDirectory('./test/data/no-logic');
+        clause = new Clause(template);
+        clause.parse(testNoLogic);
+    });
+
+    afterEach(() => {});
+
+    it('should throw error when no annotation in JavaScript logic', async () => {
+        return (() => engine.buildDispatchFunction(clause)).should.throw('Did not find any function declarations with the @AccordClauseLogic annotation');
+    });
+    it('should throw an error when JavaScript logic is missing', async function() {
+        // Turn all JavaScript logic into something else
+        clause.getTemplate().getScriptManager().getScripts().forEach(function (element) {
+            if (element.getLanguage() === '.js') {
+                element.language = '.ergo';
+            }
+        }, this);
+        (() => engine.compileJsClause(clause)).should.throw('Did not find any JavaScript logic');
+    });
+    it('should throw an error when all logic is missing', async function() {
+        // Remove all scripts
+        clause.getTemplate().getScriptManager().scripts = {};
+        (() => engine.compileJsClause(clause)).should.throw('Did not find any JavaScript logic');
     });
 });

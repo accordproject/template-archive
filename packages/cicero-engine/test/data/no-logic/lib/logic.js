@@ -7,9 +7,8 @@
 /**
  * Execute the smart clause
  * @param {Context} context - the Accord context
- * @param {org.accordproject.latedeliveryandpenalty.LateDeliveryAndPenaltyRequest} context.request - the incoming request
- * @param {org.accordproject.latedeliveryandpenalty.LateDeliveryAndPenaltyResponse} context.response - the response
- * @AccordClauseLogic
+ * @param {io.clause.latedeliveryandpenalty.LateDeliveryAndPenaltyRequest} context.request - the incoming request
+ * @param {io.clause.latedeliveryandpenalty.LateDeliveryAndPenaltyResponse} context.response - the response
  */
 function execute(context) {
 
@@ -47,7 +46,7 @@ function execute(context) {
         res.penalty = penalty;
 
         // can we terminate?
-        if (diff > data.termination.amount) {
+        if (diff > data.termination) {
             logger.info('buyerMayTerminate.');
             res.buyerMayTerminate = true;
         }

@@ -47,7 +47,15 @@ app.set('port', PORT);
  * The data parameter is either a JSON data file or a TXT file that is used to create
  * the clause from the Template.
  *
+ * Stateless execution
+ * --------------------
  * The HTTP POST body is the request used for execution of the clause.
+ *
+ * Stateful execution
+ * --------------------
+ * If the body contains an object with two properties 'request' and 'state',
+ * then 'request' is used as the execution request,
+ * 'state' is used as the contract state.
  */
 app.post('/execute/:template/:data', async function (req, httpResponse, next) {
     console.log('Template: ' + req.params.template);
@@ -63,7 +71,17 @@ app.post('/execute/:template/:data', async function (req, httpResponse, next) {
             clause.parse(data.toString());
         }
         const engine = new Engine();
-        const result = await engine.execute(clause, req.body);
+        let result;
+        if(Object.keys(req.body).length === 2 &&
+        req.body.hasOwnProperty('request') &&
+        req.body.hasOwnProperty('state')) {
+            result = await engine.execute(clause, req.body.request, req.body.state);
+        } else {
+            // Add empty state in input, remove it on output
+            const state = { '$class' : 'org.accordproject.common.ContractState', 'stateId' : 'org.accordproject.common.ContractState#1' };
+            result = await engine.execute(clause, req.body, state);
+            delete result.state;
+        }
         httpResponse.send(result);
     }
     catch(err) {
@@ -71,6 +89,8 @@ app.post('/execute/:template/:data', async function (req, httpResponse, next) {
     }
 });
 
-app.listen(app.get('port'), function () {
+const server = app.listen(app.get('port'), function () {
     console.log('Server listening on port: ', app.get('port'));
 });
+
+module.exports = server;

@@ -55,7 +55,7 @@ class GrammarVisitor {
         } else if (thing instanceof EnumValueDeclaration) {
             return this.visitEnumValueDeclaration(thing, parameters);
         } else {
-            throw new Error('Unrecognised type: ' + typeof thing + ', value: ' + util.inspect(thing, { showHidden: true, depth: 2 }));
+            throw new Error('Unrecognised type: ' + typeof thing + ', value: ' + util.inspect(thing, { showHidden: true, depth: 1 }));
         }
     }
 
@@ -76,36 +76,6 @@ class GrammarVisitor {
         modelManager.getModelFiles().forEach((modelFile) => {
             modelFile.accept(this, parameters);
         });
-
-        // generate the primitive types
-        parameters.writer.writeLine(0,
-            `
-# Basic types
-NUMBER -> [0-9] 
-{% (d) => {return parseInt(d[0]);}%}
-
-DOUBLE_NUMBER -> NUMBER NUMBER
-{% (d) => {return '' + d[0] + d[1]}%}
-
-MONTH -> DOUBLE_NUMBER
-DAY -> DOUBLE_NUMBER
-YEAR -> DOUBLE_NUMBER DOUBLE_NUMBER
-{% (d) => {return '' + d[0] + d[1]}%}
-
-DATE -> MONTH "/" DAY "/" YEAR
-{% (d) => {return '' + d[4] + '-' + d[0] + '-' + d[2]}%}
-
-Word -> [\\S]:*
-{% (d) => {return d[0].join('');}%}
-
-BRACKET_PHRASE -> "[" Word (__ Word):* "]" {% ((d) => {return d[1] + ' ' + flatten(d[2]).join(" ");}) %}
-
-String -> dqstring {% id %}
-Double -> decimal {% id %}
-Integer -> int {% id %}
-Long -> int {% id %}
-Boolean -> "true" {% id %} | "false" {% id %}
-DateTime -> DATE  {% id %}`);
 
         return null;
     }
@@ -151,7 +121,12 @@ DateTime -> DATE  {% id %}`);
             result += property.accept(this,parameters);
         });
 
-        parameters.writer.writeLine(0, `${enumDeclaration.getName()} ->  ${result}`);
+        parameters.rules.push({
+            prefix: enumDeclaration.getName(),
+            symbols: [result],
+            properties: false
+        });
+
         return result;
     }
 
@@ -167,31 +142,33 @@ DateTime -> DATE  {% id %}`);
 
         // do not visit the template model itself, as we need to generate
         // that from the template grammar, including all the source text.
-        if(!classDeclaration.getDecorator('AccordTemplateModel')) {
-            let result = '';
+        if(!classDeclaration.getDecorator('AccordTemplateModel') &&
+        // TODO (MCR) Why is the following line needed?
+        // Ignore classes that have no fields
+        classDeclaration.getProperties().length > 0) {
+            let result = [];
 
             // Walk over all of the properties of this class and its super classes.
             classDeclaration.getProperties().forEach((property) => {
                 if(result.length>0) {
-                    result += ' __ ';
+                    result.push(' __ ');
                 }
-                result += property.accept(this, parameters);
+                result.push(property.accept(this, parameters));
             });
-
-            parameters.writer.writeLine(0, `${classDeclaration.getName()} ->  ${result}
-{% (data) => {
-      return {
-         $class : "${classDeclaration.getFullyQualifiedName()}",`);
 
             // populate all the properties
+            const properties = [];
             classDeclaration.getProperties().forEach((property,index) => {
                 const sep = index < classDeclaration.getProperties().length-1 ? ',' : '';
-                parameters.writer.writeLine(3, `${property.getName()} : data[${index*2}]${sep}`);
+                properties.push(`${property.getName()} : data[${index*2}]${sep}`);
             });
 
-            parameters.writer.writeLine(2, '};');
-            parameters.writer.writeLine(1, '}');
-            parameters.writer.writeLine(0, '%}\n');
+            parameters.rules.push({
+                prefix: classDeclaration.getName(),
+                class: classDeclaration.getFullyQualifiedName(),
+                symbols: result,
+                properties
+            });
             return null;
         }
     }

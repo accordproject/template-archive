@@ -147,10 +147,11 @@ describe('Clause', () => {
                 $class: 'org.accordproject.conga.TemplateModel',
                 participant: 'Dan Selman',
                 amount: 100.0,
-                swag: 'penguins'
+                swag: 'penguins',
+                maybeThing: 'thing'
             };
             clause.getData().should.eql(data);
-            clause.getIdentifier().should.equal('conga@0.0.1-e204ba22ff8e8fddb341da6d67041bfa74b84937c8fe01b1e9bd73b5375a9168');
+            clause.getIdentifier().should.equal('conga@0.0.1-6873b1a14258a44df9c96f16b9bdd9d97ecc93040f5ebc8967c7c04c104c2ccb');
         });
 
         it('should throw an error for empty text', async function() {

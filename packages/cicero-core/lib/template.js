@@ -30,15 +30,15 @@ const ScriptManager = require('composer-common').ScriptManager;
 const Serializer = require('composer-common').Serializer;
 const Writer = require('composer-common').Writer;
 const logger = require('./logger');
-
 const nearley = require('nearley');
 const compile = require('nearley/lib/compile');
 const generate = require('nearley/lib/generate');
 const nearleyGrammar = require('nearley/lib/nearley-language-bootstrapped');
 const templateGrammar = require('./tdl.js');
 const GrammarVisitor = require('./grammarvisitor');
-
 const Ergo = require('@accordproject/ergo-compiler/lib/ergo');
+const uuid = require('uuid');
+const nunjucks = require('nunjucks');
 
 const ENCODING = 'utf8';
 // Matches 'sample.txt' or 'sample_TAG.txt' where TAG is an IETF language tag (BCP 47)
@@ -48,11 +48,12 @@ const SAMPLE_FILE_REGEXP = xregexp('sample(_(' + IETF_REGEXP + '))?.txt$');
 // This code is derived from BusinessNetworkDefinition in Hyperleger Composer composer-common.
 
 /**
- * A template for a legal clause. A Template has a template model, request/response transaction types,
+ * A template for a legal clause or contract. A Template has a template model, request/response transaction types,
  * a template grammar (natural language for the template) as well as the business logic to execute the
  * template.
  * @class
  * @public
+ * @abstract
  * @memberof module:cicero-core
  */
 class Template {
@@ -62,12 +63,16 @@ class Template {
      * Note: Only to be called by framework code. Applications should
      * retrieve instances from {@link Template.fromArchive}.
      * @param {object} packageJson  - the JS object for package.json
-     * @param {String} readme  - the readme in markdown for the clause (optional)
+     * @param {String} readme  - the readme in markdown for the template (optional)
      * @param {object} samples - the sample text for the template in different locales
      */
     constructor(packageJson, readme, samples) {
 
         this.modelManager = new ModelManager();
+        if(this.modelManager.getModelFile('org.accordproject.common') === undefined){
+            const model = fs.readFileSync(fsPath.resolve(__dirname, '../../cicero-common/models/', 'common.cto'), 'utf8');
+            this.modelManager.addModelFile(model, 'common.cto');
+        }
         this.scriptManager = new ScriptManager(this.modelManager);
         this.introspector = new Introspector(this.modelManager);
         this.factory = new Factory(this.modelManager);
@@ -76,7 +81,6 @@ class Template {
         this.grammar = null;
         this.grammarAst = null;
         this.templatizedGrammar = null;
-        this.logicjsonly = false;
         this.logicboth = false;
     }
 
@@ -101,16 +105,16 @@ class Template {
     }
 
     /**
-     * Returns the identifier for this clause
-     * @return {String} the identifier of this clause
+     * Returns the identifier for this template
+     * @return {String} the identifier of this template
      */
     getIdentifier() {
         return this.getMetadata().getIdentifier();
     }
 
     /**
-     * Returns the metadata for this clause
-     * @return {kMetadata} the metadata for this clause
+     * Returns the metadata for this template
+     * @return {Metadata} the metadata for this template
      */
     getMetadata() {
         return this.metadata;
@@ -144,151 +148,168 @@ class Template {
     buildGrammar(templatizedGrammar) {
 
         logger.debug('buildGrammar', templatizedGrammar);
-        const templateModel = this.getTemplateModel();
         const parser = new nearley.Parser(nearley.Grammar.fromCompiled(templateGrammar));
         parser.feed(templatizedGrammar);
         if (parser.results.length !== 1) {
             throw new Error('Ambigious parse!');
         }
 
-        // parse the template grammar
+        // parse the template grammar to generate a dynamic grammar
         const ast = parser.results[0];
         logger.debug('Template AST', ast);
-        const writer = new Writer();
+        const parts = {
+            textRules: [],
+            modelRules: []
+        };
+        this.buildGrammarRules(ast, this.getTemplateModel(), 'rule', parts);
 
-        writer.writeLine(0, '\n');
-        writer.writeLine(0, '# Dynamically Generated');
-        writer.writeLine(0, '@builtin "number.ne"');
-        writer.writeLine(0, '@builtin "string.ne"');
-        writer.writeLine(0, '@builtin "whitespace.ne"');
-        writer.writeLine(0, `@{%
-    function compact(v) {
-        if (Array.isArray(v)) {
-            return v.reduce((a, v) => (v === null || v === undefined || (v && v.length === 0) ) ? a : (a.push(v), a), []);
-        } else {
-            return v;
-        }
+        // generate the grammar for the model
+        const parameters = {
+            writer: new Writer(),
+            rules : []
+        };
+        const gv = new GrammarVisitor();
+        this.getModelManager().accept(gv, parameters);
+        parts.modelRules.push(...parameters.rules);
+
+        parts.textRules.push({
+            prefix: 'ROOT',
+            class: false,
+            symbols: ['rule0'],
+            properties: false
+        });
+
+        // combine the results
+        nunjucks.configure(fsPath.resolve(__dirname), {
+            tags: {
+                blockStart: '<%',
+                blockEnd: '%>'
+            },
+            autoescape: false  // Required to allow nearley syntax strings
+        });
+        const combined = nunjucks.render('template.ne', parts);
+        logger.debug('Generated template grammar' + combined);
+
+        this.setGrammar(combined);
+        this.templatizedGrammar = templatizedGrammar;
     }
 
-    function flatten(v) {
-        let r;
-        if (Array.isArray(v)) {
-            r = v.reduce((a,v) => (a.push(...((v && Array.isArray(v)) ? flatten(v) : [v])), a), []);
-        } else {
-            r = v;
-        }
-        r = compact(r);
-        return r;
-        }
-%}`);
-        writer.writeLine(0, '\n');
-
-        // index all rules
+    /**
+     * Build grammar rules from a template
+     * @param {object} ast  - the AST from which to build the grammar
+     * @param {ClassDeclaration} templateModel  - the type of the parent class for this AST
+     * @param {String} prefix - A unique prefix for the grammar rules
+     * @param {Object} parts - Result object to acculumate rules
+     */
+    buildGrammarRules(ast, templateModel, prefix, parts) {
+        // now we create each subordinate rule in turn
         const rules = {};
+        let textRules = {};
+
+        // create the root rule, for the Template Model
+        textRules.prefix = prefix;
+        textRules.symbols = [];
         ast.data.forEach((element, index) => {
             // ignore empty chunks (issue #1) and missing optional last chunks
-            if(element && (element.type !== 'Chunk' || element.value.length > 0) ) {
-                logger.debug(`element C${index} ${JSON.stringify(element)}`);
-                rules['C' + index] = element;
+            if (element && (element.type !== 'Chunk' || element.value.length > 0)) {
+                logger.debug(`element ${prefix}${index} ${JSON.stringify(element)}`);
+                rules[prefix + index] = element;
+                textRules.symbols.push(prefix + index);
             }
         }, this);
-
-        // create the root rule
-        writer.write('ROOT -> ');
-        for (let rule in rules) {
-            writer.write(`${rule} `);
+        textRules.class = templateModel.getFullyQualifiedName();
+        const identifier = templateModel.getIdentifierFieldName();
+        if (identifier !== null) {
+            textRules.identifier = `${identifier} : "${uuid.v4()}"`;
         }
-
-        writer.write('\n');
-        writer.writeLine(0, '{%');
-        writer.writeLine(0, `([${Object.keys(rules)}]) => {`);
-        writer.writeLine(1, 'return {');
-        writer.writeLine(3, `$class : "${templateModel.getFullyQualifiedName()}",`);
-        templateModel.getProperties().forEach((property,index) => {
-            const sep = index < templateModel.getProperties().length-1 ? ',' : '';
+        textRules.properties = [];
+        templateModel.getProperties().forEach((property, index) => {
+            const sep = index < templateModel.getProperties().length - 1 ? ',' : '';
             const bindingIndex = this.findFirstBinding(property.getName(), ast.data);
-            if(bindingIndex !== -1) { // ignore things like transactionId
+            if (bindingIndex !== -1) { // ignore things like transactionId
                 // TODO (DCS) add !==null check for BooleanBinding
-                writer.writeLine(3, `${property.getName()} : C${bindingIndex}${sep}`);
+                textRules.properties.push(`${property.getName()} : ${prefix}${bindingIndex}${sep}`);
             }
         });
-        writer.writeLine(1, '};');
-        writer.writeLine(0, '}');
-        writer.writeLine(0, '%}\n');
+        parts.textRules.push(textRules);
 
-        // now we create each subordinate rule in turn
-        let dynamicGrammar = '';
+        // Now create the child rules for each symbol in the root rule
         for (let rule in rules) {
             const element = rules[rule];
-            dynamicGrammar += '\n';
-            dynamicGrammar += `${rule} -> `;
-
             switch (element.type) {
             case 'Chunk':
             case 'LastChunk':
-                dynamicGrammar += this.cleanChunk(element.value);
+                parts.modelRules.push({
+                    prefix: rule,
+                    symbols: [this.cleanChunk(element.value)],
+                });
                 break;
             case 'BooleanBinding':
-                dynamicGrammar += `${element.string.value}:? {% (d) => {return d[0] !== null;}%} # ${element.fieldName.value}`;
+                parts.modelRules.push({
+                    prefix: rule,
+                    symbols: [`${element.string.value}:? {% (d) => {return d[0] !== null;}%} # ${element.fieldName.value}`],
+                });
                 break;
-            case 'Binding': {
-                const propertyName = element.fieldName.value;
-                const property = templateModel.getProperty(propertyName);
-                if(!property) {
-                    throw new Error(`Template references a property '${propertyName}' that is not declared in the template model '${templateModel.getFullyQualifiedName()}'. Details: ${JSON.stringify(element)}`);
-                }
-                let type = property.getType();
-                // relationships need to be transformed into strings
-                if(property instanceof RelationshipDeclaration) {
-                    type = 'String';
-                }
-                let action = '{% id %}';
-
-                const decorator = property.getDecorator('AccordType');
-                if(decorator) {
-                    if( decorator.getArguments().length > 0) {
-                        type = decorator.getArguments()[0];
+            case 'Binding':
+                {
+                    const propertyName = element.fieldName.value;
+                    const property = templateModel.getProperty(propertyName);
+                    if (!property) {
+                        throw new Error(`Template references a property '${propertyName}' that is not declared in the template model '${templateModel.getFullyQualifiedName()}'. Details: ${JSON.stringify(element)}`);
                     }
-                    if( decorator.getArguments().length > 1) {
-                        action = decorator.getArguments()[1];
+                    let type = property.getType();
+                    // relationships need to be transformed into strings
+                    if (property instanceof RelationshipDeclaration) {
+                        type = 'String';
                     }
+                    let action = '{% id %}';
+                    const decorator = property.getDecorator('AccordType');
+                    if (decorator) {
+                        if (decorator.getArguments().length > 0) {
+                            type = decorator.getArguments()[0];
+                        }
+                        if (decorator.getArguments().length > 1) {
+                            action = decorator.getArguments()[1];
+                        }
+                    }
+                    let suffix = ':';
+                    // TODO (DCS) need a serialization for arrays
+                    if (property.isArray()) {
+                        throw new Error('Arrays are not yet supported!');
+                        // suffix += '+';
+                    }
+                    if (property.isOptional()) {
+                        suffix += '?';
+                    }
+                    if (suffix === ':') {
+                        suffix = '';
+                    }
+                    parts.modelRules.push({
+                        prefix: rule,
+                        symbols: [`${type}${suffix} ${action} # ${propertyName}`],
+                    });
                 }
-
-                let suffix = ':';
-                // TODO (DCS) need a serialization for arrays
-                if(property.isArray()) {
-                    throw new Error('Arrays are not yet supported!');
-                    // suffix += '+';
+                break;
+            case 'ClauseBinding':
+                {
+                    const propertyName = element.fieldName.value;
+                    const clauseTemplate = element.template;
+                    const property = templateModel.getProperty(propertyName);
+                    if (!property) {
+                        throw new Error(`Template references a property '${propertyName}' that is not declared in the template model '${templateModel.getFullyQualifiedName()}'. Details: ${JSON.stringify(element)}`);
+                    }
+                    const clauseTemplateModel = this.getIntrospector().getClassDeclaration(property.getFullyQualifiedTypeName());
+                    this.buildGrammarRules(clauseTemplate, clauseTemplateModel, propertyName, parts);
+                    parts.modelRules.push({
+                        prefix: rule,
+                        symbols: [`${element.fieldName.value} {% id %}\n`],
+                    });
                 }
-                if(property.isOptional()) {
-                    suffix += '?';
-                }
-                if(suffix === ':') {
-                    suffix = '';
-                }
-                dynamicGrammar += `${type}${suffix} ${action} # ${propertyName}`;
-            }
                 break;
             default:
                 throw new Error(`Unrecognized type ${element.type}`);
             }
         }
-
-        writer.writeLine(0, dynamicGrammar);
-        writer.writeLine(0, '\n');
-
-        // add the grammar for the model
-        const parameters = {
-            writer: writer
-        };
-        const gv = new GrammarVisitor();
-        this.getModelManager().accept(gv, parameters);
-
-        const combined = parameters.writer.getBuffer();
-        logger.debug('Generated template grammar' + combined);
-
-        this.setGrammar(combined);
-        this.templatizedGrammar = templatizedGrammar;
     }
 
     /**
@@ -319,7 +340,7 @@ class Template {
     findFirstBinding(propertyName, elements) {
         for(let n=0; n < elements.length; n++) {
             const element = elements[n];
-            if(element.type === 'Binding' || element.type === 'BooleanBinding') {
+            if(element !== null && ['Binding','BooleanBinding','ClauseBinding'].includes(element.type)) {
                 if(element.fieldName.value === propertyName) {
                     return n;
                 }
@@ -337,16 +358,16 @@ class Template {
     }
 
     /**
-     * Returns the name for this clause
-     * @return {String} the name of this clause
+     * Returns the name for this template
+     * @return {String} the name of this template
      */
     getName() {
         return this.getMetadata().getName();
     }
 
     /**
-     * Returns the version for this clause
-     * @return {String} the version of this clause. Use semver module
+     * Returns the version for this template
+     * @return {String} the version of this template. Use semver module
      * to parse.
      */
     getVersion() {
@@ -355,8 +376,8 @@ class Template {
 
 
     /**
-     * Returns the description for this clause
-     * @return {String} the description of this clause
+     * Returns the description for this template
+     * @return {String} the description of this template
      */
     getDescription() {
         return this.getMetadata().getDescription();
@@ -406,7 +427,6 @@ class Template {
             let ctoModelFiles = [];
             let ctoModelFileNames = [];
             let jsScriptFiles = [];
-            let ergoScriptFiles = [];
             let sampleTextFiles = {};
             let template;
             let readmeContents = null;
@@ -447,7 +467,7 @@ class Template {
             logger.debug(method, 'Loading package.json');
             let packageJson = zip.file('package.json');
             if (packageJson === null) {
-                throw Error('package.json must exist');
+                throw Error('Failed to find package.json');
             }
             promise = promise.then(() => {
                 return packageJson.async('string');
@@ -513,40 +533,44 @@ class Template {
 
             logger.debug(method, 'Looking for Ergo files');
             let ergoFiles = zip.file(/lib\/.*\.ergo$/); //Matches any file which is in the 'lib' folder and has a .ergo extension
+
+            if(jsFiles.length>0 && ergoFiles.length>0) {
+                throw new Error('Templates cannot mix Ergo and JS logic');
+            }
+
             ergoFiles.forEach(function (file) {
                 logger.debug(method, 'Found Ergo file, loading it', file.name);
                 promise = promise.then(() => {
                     return file.async('string');
                 }).then((contents) => {
                     logger.debug(method, 'Loaded Ergo file');
+                    // XXX TBD: Pass CTOs to Ergo compiler
+                    const ctos = [];
+                    const compiledJS = Ergo.compileToJavaScriptAndLink(contents,ctos,'javascript_cicero');
                     let tempObj = {
                         'name': file.name,
-                        'contents': contents
+                        'contents': compiledJS
                     };
-                    ergoScriptFiles.push(tempObj);
+                    jsScriptFiles.push(tempObj);
                 });
             });
 
-            return promise.then(() => {
+            return promise.then(async () => {
                 logger.debug(method, 'Loaded package.json');
                 template = new Template(packageJsonContents, readmeContents, sampleTextFiles);
 
                 logger.debug(method, 'Adding model files to model manager');
-                template.modelManager.addModelFiles(ctoModelFiles, ctoModelFileNames); // Adds all cto files to model manager
+                template.modelManager.addModelFiles(ctoModelFiles, ctoModelFileNames, true); // Adds all cto files to model manager
+                await template.modelManager.updateExternalModels();
+                template.modelManager.validateModelFiles();
 
                 logger.debug(method, 'Added model files to model manager');
                 logger.debug(method, 'Adding JavaScript files to script manager');
                 jsScriptFiles.forEach(function (obj) {
-                    let jsObject = template.scriptManager.createScript(obj.name, 'js', obj.contents);
+                    let jsObject = template.scriptManager.createScript(obj.name, '.js', obj.contents);
                     template.scriptManager.addScript(jsObject); // Adds all js files to script manager
                 });
                 logger.debug(method, 'Added JavaScript files to script manager');
-
-                ergoScriptFiles.forEach(function (obj) {
-                    let ergoObject = template.scriptManager.createScript(obj.name, 'ergo', obj.contents);
-                    template.scriptManager.addScript(ergoObject); // Adds all ergo files to script manager
-                });
-                logger.debug(method, 'Added Ergo files to script manager');
 
                 // check the template model
                 template.getTemplateModel();
@@ -614,6 +638,10 @@ class Template {
             let fileName;
             // ignore the system namespace when creating an archive
             if (file.isSystemModelFile()) {
+                return;
+            }
+            // ignore Accord Project system models
+            if (file.getNamespace() === 'org.accordproject.common') {
                 return;
             }
             if (file.fileName === 'UNKNOWN' || file.fileName === null || !file.fileName) {
@@ -801,6 +829,7 @@ class Template {
 
             // find script files outside the npm install directory
             const scriptFiles = [];
+            let foundErgo, foundJs = false;
             Template.processDirectory(path, {
                 accepts: function (file) {
                     return isFileInNodeModuleDir(file, path) === false && minimatch(file, options.scriptGlob, {
@@ -814,8 +843,19 @@ class Template {
                     let filePath = fsPath.parse(path);
                     if (filePath.ext.toLowerCase() === '.ergo') {
                         logger.debug(method, 'Compiling Ergo to JavaScript ', path);
-                        contents = Ergo.compileToJavaScript(contents,[],null,null,true);
-                        logger.debug('ERGO!\n'+contents+'\n');
+                        contents = Ergo.compileToJavaScriptAndLink(contents,[],'javascript_cicero');
+                        logger.debug('Compiled Ergo to Javascript:\n'+contents+'\n');
+                        path = path.substr(0, path.lastIndexOf('.')) + '.js';
+                        filePath.ext = '.js';
+                        if(foundJs) {
+                            throw new Error('Templates cannot mix Ergo and JS logic');
+                        }
+                        foundErgo = true;
+                    } else if (filePath.ext.toLowerCase() === '.js') {
+                        if(foundErgo) {
+                            throw new Error('Templates cannot mix Ergo and JS logic');
+                        }
+                        foundJs = true;
                     }
                     const jsScript = template.getScriptManager().createScript(path, filePath.ext.toLowerCase(), contents);
                     scriptFiles.push(jsScript);

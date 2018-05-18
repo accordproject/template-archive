@@ -1,5 +1,9 @@
 {
     "name": "conga",
     "version": "0.0.1",
-    "description": "\"Dan Selman\" agrees to spend 100.0 conga coins on \"swag\""
+    "description": "\"Dan Selman\" agrees to spend 100.0 conga coins on \"swag\"",
+    "cicero": {
+      "template": "clause",
+      "version": "^0.3.0-0"
+    }
   }

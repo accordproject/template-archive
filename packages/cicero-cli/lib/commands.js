@@ -80,23 +80,23 @@ class Commands {
         let isCiceroTemplate = false;
         if(packageJsonExists){
             const packageJsonContents = JSON.parse(fs.readFileSync(path.resolve(argv.template,'package.json')),'utf8');
-            isCiceroTemplate = packageJsonContents.engines && packageJsonContents.engines.cicero;
+            isCiceroTemplate = packageJsonContents.cicero;
         }
 
-        if(!argv.dsl){
+        if(!argv.sample){
             logger.info('Loading a default sample.txt file.');
-            argv.dsl = path.resolve(argv.template,'sample.txt');
+            argv.sample = path.resolve(argv.template,'sample.txt');
         }
 
-        if (argv.verbose) {
-            logger.info(`parse dsl ${argv.dsl} using a template ${argv.template}`);
+        if(argv.verbose) {
+            logger.info(`parse sample ${argv.sample} using a template ${argv.template}`);
         }
 
-        let dslExists = fs.existsSync(argv.dsl);
+        let sampleExists = fs.existsSync(argv.sample);
         if(!packageJsonExists || !isCiceroTemplate){
-            throw new Error(`${argv.template} is not a valid cicero template. Make sure that package.json exists and that it has a engines.cicero entry.`);
-        } else if (!dslExists){
-            throw new Error('A sample text file is required. Try the --dsl flag or create a sample.txt in the root folder of your template.');
+            throw new Error(`${argv.template} is not a valid cicero template. Make sure that package.json exists and that it has a cicero entry.`);
+        } else if (!sampleExists){
+            throw new Error('A sample text file is required. Try the --sample flag or create a sample.txt in the root folder of your template.');
         } else {
             return argv;
         }
@@ -107,21 +107,43 @@ class Commands {
      *
      * @param {string} templatePath to the template directory
      * @param {string} samplePath to the sample file
-     * @param {string} dataPath to the data file
-     * @param {boolean} forcejs forces JavaScript logic
-     * @returns {object} Promise to the result of parsing
+     * @param {string[]} requestsPath to the array of request files
+     * @param {string} statePath to the state file
+     * @returns {object} Promise to the result of execution
      */
-    static execute(templatePath, samplePath, dataPath, forcejs) {
+    static execute(templatePath, samplePath, requestsPath, statePath) {
         let clause;
         const sampleText = fs.readFileSync(samplePath, 'utf8');
-        const jsonData = JSON.parse(fs.readFileSync(dataPath, 'utf8'));
+        let requestsJson = [];
+        let stateJson;
+
+        for (let i = 0; i < requestsPath.length; i++) {
+            requestsJson.push(JSON.parse(fs.readFileSync(requestsPath[i], 'utf8')));
+        }
+        if(!fs.existsSync(statePath)) {
+            logger.warn('A state file was not provided, generating default state object. Try the --state flag or create a state.json in the root folder of your template.');
+            stateJson = {
+                '$class': 'org.accordproject.contract.State'
+            };
+        } else {
+            stateJson = JSON.parse(fs.readFileSync(statePath, 'utf8'));
+        }
 
         return Template.fromDirectory(templatePath)
             .then((template) => {
                 clause = new Clause(template);
                 clause.parse(sampleText);
                 const engine = new Engine();
-                return engine.execute(clause, jsonData, forcejs);
+                // First execution to get the initial response
+                const firstRequest = requestsJson[0];
+                const initResponse = engine.execute(clause, firstRequest, stateJson);
+                // Get all the other requests and chain execution through Promise.reduce()
+                const otherRequests = requestsJson.slice(1, requestsJson.length);
+                return otherRequests.reduce((promise,requestJson) => {
+                    return promise.then((result) => {
+                        return engine.execute(clause, requestJson, result.state);
+                    });
+                }, initResponse);
             })
             .catch((err) => {
                 logger.error(err);
@@ -151,32 +173,44 @@ class Commands {
         let isCiceroTemplate = false;
         if(packageJsonExists){
             const packageJsonContents = JSON.parse(fs.readFileSync(path.resolve(argv.template,'package.json')),'utf8');
-            isCiceroTemplate = packageJsonContents.engines && packageJsonContents.engines.cicero;
+            isCiceroTemplate = packageJsonContents.cicero;
         }
 
-
-        if(!argv.dsl){
+        if(!argv.sample){
             logger.info('Loading a default sample.txt file.');
-            argv.dsl = path.resolve(argv.template,'sample.txt');
+            argv.sample = path.resolve(argv.template,'sample.txt');
         }
 
-        if(!argv.data){
-            logger.info('Loading a default data.json file.');
-            argv.data = path.resolve(argv.template,'data.json');
+        if(!argv.request){
+            logger.info('Loading a single default request.json file.');
+            argv.request = [path.resolve(argv.template,'request.json')];
         }
 
-        if (argv.verbose) {
-            logger.info(`execute dsl ${argv.dsl} using a template ${argv.template} with data ${argv.data}`);
+        if(!argv.state){
+            logger.info('Loading a default state.json file.');
+            argv.state = path.resolve(argv.template,'state.json');
         }
 
-        let dataExists = fs.existsSync(argv.data);
-        let dslExists = fs.existsSync(argv.dsl);
+        if(argv.verbose) {
+            logger.info(`execute sample ${argv.sample} using a template ${argv.template} with request ${argv.request} with state ${argv.state}`);
+        }
+
+        let sampleExists = fs.existsSync(argv.sample);
+        // All requests should exist
+        let requestExists = true;
+        for (let i = 0; i < argv.request.length; i++) {
+            if (fs.existsSync(argv.request[i]) && requestExists) {
+                requestExists = true;
+            } else {
+                requestExists = false;
+            }
+        }
         if(!packageJsonExists || !isCiceroTemplate){
-            throw new Error(`${argv.template} is not a valid cicero template. Make sure that package.json exists and that it has a engines.cicero entry.`);
-        } else if(!dataExists){
-            throw new Error('A data file is required. Try the --data flag or create a data.json in the root folder of your template.');
-        } else if (!dslExists){
-            throw new Error('A sample text file is required. Try the --dsl flag or create a sample.txt in the root folder of your template.');
+            throw new Error(`${argv.template} is not a valid cicero template. Make sure that package.json exists and that it has a cicero entry.`);
+        } else if (!sampleExists){
+            throw new Error('A sample text file is required. Try the --sample flag or create a sample.txt in the root folder of your template.');
+        } else if(!requestExists){
+            throw new Error('A request file is required. Try the --request flag or create a request.json in the root folder of your template.');
         } else {
             return argv;
         }
