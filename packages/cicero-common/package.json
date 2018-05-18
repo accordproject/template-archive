@@ -1,6 +1,6 @@
 {
   "name": "@accordproject/cicero-common",
-  "version": "0.3.0",
+  "version": "0.3.4",
   "description": "Cicero Common - implementation of Accord Protocol Template Specification",
   "engines": {
     "node": ">=8",
