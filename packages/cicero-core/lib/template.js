@@ -40,6 +40,7 @@ const Ergo = require('@accordproject/ergo-compiler/lib/ergo');
 const uuid = require('uuid');
 const nunjucks = require('nunjucks');
 
+const common = require.resolve('@accordproject/cicero-common/models/common.cto');
 const ENCODING = 'utf8';
 // Matches 'sample.txt' or 'sample_TAG.txt' where TAG is an IETF language tag (BCP 47)
 const IETF_REGEXP = languageTagRegex({ exact: false }).toString().slice(1,-2);
@@ -70,7 +71,7 @@ class Template {
 
         this.modelManager = new ModelManager();
         if(this.modelManager.getModelFile('org.accordproject.common') === undefined){
-            const model = fs.readFileSync(fsPath.resolve(__dirname, '../../cicero-common/models/', 'common.cto'), 'utf8');
+            const model = fs.readFileSync(fsPath.resolve(common), ENCODING);
             this.modelManager.addModelFile(model, 'common.cto');
         }
         this.scriptManager = new ScriptManager(this.modelManager);
