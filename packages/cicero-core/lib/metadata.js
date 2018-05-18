@@ -84,7 +84,7 @@ class Metadata {
         if (packageJson.cicero && packageJson.cicero.template) {
             if(packageJson.cicero.template !== 'contract' &&
             packageJson.cicero.template !== 'clause'){
-                throw new Error('A cicero template can only be either a "contract" or a "clause.');
+                throw new Error('A cicero template must be either a "contract" or a "clause".');
             }
 
             if(packageJson.cicero.template === 'clause'){

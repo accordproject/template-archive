@@ -52,8 +52,8 @@ describe('EngineLatePenalty', () => {
             request.transactionId = '402c8f50-9e61-433e-a7c1-afe61c06ef00';
             request.timestamp = '2017-11-12T17:38:01.412Z';
             const state = {};
-            state.$class = 'org.accordproject.common.State';
-            state.stateId = 'org.accordproject.common.State#1';
+            state.$class = 'org.accordproject.common.ContractState';
+            state.stateId = 'org.accordproject.common.ContractState#1';
             const result = await engine.execute(clause, request, state);
             result.should.not.be.null;
             result.response.penalty.should.equal(110);
@@ -83,8 +83,8 @@ describe('EngineVolumeDiscount', () => {
                 'netAnnualChargeVolume': 0.4
             };
             const state = {};
-            state.$class = 'org.accordproject.common.State';
-            state.stateId = 'org.accordproject.common.State#1';
+            state.$class = 'org.accordproject.common.ContractState';
+            state.stateId = 'org.accordproject.common.ContractState#1';
             const result = await engine.execute(clause, request, state);
             result.should.not.be.null;
             result.response.discountRate.should.equal(3);
@@ -99,8 +99,8 @@ describe('EngineVolumeDiscount', () => {
                 'netAnnualChargeVolume': 0.4
             };
             const state = {};
-            state.$class = 'org.accordproject.common.State';
-            state.stateId = 'org.accordproject.common.State#1';
+            state.$class = 'org.accordproject.common.ContractState';
+            state.stateId = 'org.accordproject.common.ContractState#1';
             const result = await engine.execute(clause, request, state);
             result.should.not.be.null;
             result.response.discountRate.should.equal(3);
@@ -130,8 +130,8 @@ describe('EngineHelloWorld', () => {
                 'input': 'Accord Project'
             };
             const state = {};
-            state.$class = 'org.accordproject.common.State';
-            state.stateId = 'org.accordproject.common.State#1';
+            state.$class = 'org.accordproject.common.ContractState';
+            state.stateId = 'org.accordproject.common.ContractState#1';
             const result = await engine.execute(clause, request, state);
             result.should.not.be.null;
             result.response.output.should.equal('Hello Fred Blogs (Accord Project)');
@@ -146,8 +146,8 @@ describe('EngineHelloWorld', () => {
                     'input': 'Accord Project'
                 };
                 const state = {};
-                state.$class = 'org.accordproject.common.State';
-                state.stateId = 'org.accordproject.common.State#1';
+                state.$class = 'org.accordproject.common.ContractState';
+                state.stateId = 'org.accordproject.common.ContractState#1';
                 const result = await engine.execute(clause, request, state);
                 return result;
             } catch (err) {
@@ -179,8 +179,8 @@ describe('EngineHelloEmit', () => {
                 'input': 'Accord Project'
             };
             const state = {};
-            state.$class = 'org.accordproject.common.State';
-            state.stateId = 'org.accordproject.common.State#1';
+            state.$class = 'org.accordproject.common.ContractState';
+            state.stateId = 'org.accordproject.common.ContractState#1';
             const result = await engine.execute(clause, request, state);
             result.should.not.be.null;
             result.response.output.should.equal('Hello Fred Blogs (Accord Project)');
@@ -212,8 +212,8 @@ describe('EngineSaft', () => {
             request.$class = `${NS}.Launch`;
             request.exchangeRate = 100;
             const state = {};
-            state.$class = 'org.accordproject.common.State';
-            state.stateId = 'org.accordproject.common.State#1';
+            state.$class = 'org.accordproject.common.ContractState';
+            state.stateId = 'org.accordproject.common.ContractState#1';
             const result = await engine.execute(clause, request, state);
             result.should.not.be.null;
             result.response.tokenAmount.should.equal(100);

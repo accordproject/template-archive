@@ -65,7 +65,7 @@ describe('Metadata', () => {
             return (() => new Metadata({
                 name: 'template',
                 cicero: {template: 'other'},
-            }, null, {})).should.throw('A cicero template can only be either a "contract" or a "clause.');
+            }, null, {})).should.throw('A cicero template must be either a "contract" or a "clause".');
         });
 
         it('should throw an error if target version is not valid semver ', () => {

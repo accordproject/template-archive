@@ -1,4 +1,4 @@
 {
-    "$class": "org.accordproject.common.State",
-    "stateId" : "org.accordproject.common.State#1"
+    "$class": "org.accordproject.common.ContractState",
+    "stateId" : "org.accordproject.common.ContractState#1"
 }

@@ -6,8 +6,9 @@ namespace org.accordproject.common
  */
 
 /* A state is a concept with a contract status */
-asset State identified by stateId {
+asset ContractState identified by stateId {
   o String stateId
+  --> ContractModel contract optional
 }
 /* A contract is a concept -- This contains the contract data */
 asset ContractModel identified by contractId {
@@ -27,19 +28,19 @@ asset ClauseModel identified by clauseId {
 transaction Request {}
 /* A response is a transaction */
 transaction Response {}
-/* An Error is a concept */
+/* An Error is a transaction */
 transaction ErrorResponse {}
 /* A payload has contract data, a request and a state */
 concept Payload {
-  o ContractModel contract  // the contract data (replaces current clause)
+  o ContractModel contract  // the contract data
   o Request request
-  o State state
+  o ContractState state
 }
 
 /* If the call to a contract's clause succeeds, it returns a response, a list of events and a new state */
 concept Success {
   o Response response
-  o State state
+  o ContractState state
   o Event[] emit
 }
 /* If the call to a contract's clause fails, it returns and error */ 
