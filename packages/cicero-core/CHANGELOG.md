@@ -3,6 +3,62 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+<a name="0.3.8"></a>
+## [0.3.8](https://github.com/accordproject/cicero/compare/v0.2.54...v0.3.8) (2018-05-19)
+
+
+### Bug Fixes
+
+* Create ./data/test/archives directory if missing ([e508957](https://github.com/accordproject/cicero/commit/e508957))
+* Fix [#99](https://github.com/accordproject/cicero/issues/99) ([44f4b8f](https://github.com/accordproject/cicero/commit/44f4b8f))
+* Fix package.json validation in cicero-cli and in tests ([a6cc7ee](https://github.com/accordproject/cicero/commit/a6cc7ee))
+* Make package.json properties optional in CLI; yo generator now uses correct properties format ([9422053](https://github.com/accordproject/cicero/commit/9422053))
+
+
+### Features
+
+* Add contract / template annotation in package.json ([5726710](https://github.com/accordproject/cicero/commit/5726710))
+* Bump to 0.3.0-0 prerelease. Added semver check to templates ([9d2c100](https://github.com/accordproject/cicero/commit/9d2c100))
+* Complete revision to Ergo v JavaScript support; Switch to Ergo 0.0.44 ([a9fbdc8](https://github.com/accordproject/cicero/commit/a9fbdc8))
+* Convert to {{ }} notation from [{ }] ([a455a89](https://github.com/accordproject/cicero/commit/a455a89))
+* CTO validate for contract state and emitted events ([55683cb](https://github.com/accordproject/cicero/commit/55683cb))
+* Ergo and JS now use identical dispatch; Up Ergo 0.0.43 ([daa1d84](https://github.com/accordproject/cicero/commit/daa1d84))
+* keyword-based declaration of inline clauses ([5bd3811](https://github.com/accordproject/cicero/commit/5bd3811))
+* Revert to [{ ... }] template grammar syntax ([239889d](https://github.com/accordproject/cicero/commit/239889d))
+* Stateful API for clause-server ([de8cb08](https://github.com/accordproject/cicero/commit/de8cb08))
+* Update to Ergo 0.0.42; Fix dispatch ([fb82a2b](https://github.com/accordproject/cicero/commit/fb82a2b))
+
+
+
+
+<a name="0.3.7"></a>
+## [0.3.7](https://github.com/accordproject/cicero/compare/v0.2.54...v0.3.7) (2018-05-19)
+
+
+### Bug Fixes
+
+* Create ./data/test/archives directory if missing ([e508957](https://github.com/accordproject/cicero/commit/e508957))
+* Fix [#99](https://github.com/accordproject/cicero/issues/99) ([44f4b8f](https://github.com/accordproject/cicero/commit/44f4b8f))
+* Fix package.json validation in cicero-cli and in tests ([a6cc7ee](https://github.com/accordproject/cicero/commit/a6cc7ee))
+* Make package.json properties optional in CLI; yo generator now uses correct properties format ([9422053](https://github.com/accordproject/cicero/commit/9422053))
+
+
+### Features
+
+* Add contract / template annotation in package.json ([5726710](https://github.com/accordproject/cicero/commit/5726710))
+* Bump to 0.3.0-0 prerelease. Added semver check to templates ([9d2c100](https://github.com/accordproject/cicero/commit/9d2c100))
+* Complete revision to Ergo v JavaScript support; Switch to Ergo 0.0.44 ([a9fbdc8](https://github.com/accordproject/cicero/commit/a9fbdc8))
+* Convert to {{ }} notation from [{ }] ([a455a89](https://github.com/accordproject/cicero/commit/a455a89))
+* CTO validate for contract state and emitted events ([55683cb](https://github.com/accordproject/cicero/commit/55683cb))
+* Ergo and JS now use identical dispatch; Up Ergo 0.0.43 ([daa1d84](https://github.com/accordproject/cicero/commit/daa1d84))
+* keyword-based declaration of inline clauses ([5bd3811](https://github.com/accordproject/cicero/commit/5bd3811))
+* Revert to [{ ... }] template grammar syntax ([239889d](https://github.com/accordproject/cicero/commit/239889d))
+* Stateful API for clause-server ([de8cb08](https://github.com/accordproject/cicero/commit/de8cb08))
+* Update to Ergo 0.0.42; Fix dispatch ([fb82a2b](https://github.com/accordproject/cicero/commit/fb82a2b))
+
+
+
+
 <a name="0.3.6"></a>
 ## [0.3.6](https://github.com/accordproject/cicero/compare/v0.3.5...v0.3.6) (2018-05-18)
 
