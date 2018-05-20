@@ -28,6 +28,10 @@ require('yargs')
             describe: 'path to the clause text',
             type: 'string'
         });
+        yargs.option('out', {
+            describe: 'path to the output file',
+            type: 'string'
+        });
     }, (argv) => {
         if (argv.verbose) {
             logger.info(`parse sample ${argv.sample} using a template ${argv.template}`);
@@ -40,7 +44,7 @@ require('yargs')
             return;
         }
 
-        return Commands.parse(argv.template, argv.sample)
+        return Commands.parse(argv.template, argv.sample, argv.out)
             .then((result) => {
                 logger.info(JSON.stringify(result));
             })

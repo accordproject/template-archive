@@ -40,9 +40,10 @@ class Commands {
      *
      * @param {string} templatePath to the template directory
      * @param {string} samplePath to the sample file
+     * @param {string} outPath to the contract file
      * @returns {object} Promise to the result of parsing
      */
-    static parse(templatePath, samplePath) {
+    static parse(templatePath, samplePath, outPath) {
         let clause;
         const sampleText = fs.readFileSync(samplePath, 'utf8');
 
@@ -50,6 +51,10 @@ class Commands {
             .then((template) => {
                 clause = new Clause(template);
                 clause.parse(sampleText);
+                if (outPath) {
+                    logger.info('Creating file: ' + outPath);
+                    fs.writeFileSync(outPath, JSON.stringify(clause.getData()));
+                }
                 return clause.getData();
             })
             .catch((err) => {
