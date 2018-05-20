@@ -30,6 +30,7 @@ describe('cicero-cli', () => {
     const sample = path.resolve(__dirname, 'data/latedeliveryandpenalty/', 'sample.txt');
     const request = path.resolve(__dirname, 'data/latedeliveryandpenalty/', 'request.json');
     const state = path.resolve(__dirname, 'data/latedeliveryandpenalty/', 'state.json');
+    const contract = path.resolve(__dirname, 'data/latedeliveryandpenalty/', 'contract.json');
     const parseReponse = {
         '$class':'org.accordproject.latedeliveryandpenalty.TemplateModel',
         'forceMajeure':true,
@@ -50,7 +51,13 @@ describe('cicero-cli', () => {
 
     describe('#parse', () => {
         it('should parse a clause using a template', () => {
-            return Commands.parse(template, sample).should.eventually.eql(parseReponse);
+            return Commands.parse(template, sample, null).should.eventually.eql(parseReponse);
+        });
+    });
+
+    describe('#parsesave', () => {
+        it('should parse a clause using a template and save to a JSON file', () => {
+            return Commands.parse(template, sample, contract).should.eventually.eql(parseReponse);
         });
     });
 
