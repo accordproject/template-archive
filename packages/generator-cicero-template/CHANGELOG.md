@@ -3,6 +3,14 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+<a name="0.3.12"></a>
+## [0.3.12](https://github.com/accordproject/cicero/compare/v0.3.11...v0.3.12) (2018-05-23)
+
+
+
+
+**Note:** Version bump only for package @accordproject/generator-cicero-template
+
 <a name="0.3.8"></a>
 ## [0.3.8](https://github.com/accordproject/cicero/compare/v0.2.54...v0.3.8) (2018-05-19)
 
