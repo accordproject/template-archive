@@ -547,7 +547,7 @@ class Template {
                     logger.debug(method, 'Loaded Ergo file');
                     const compiled = Ergo.compileToJavaScriptAndLink(contents,ctoModelFiles,'javascript_cicero');
                     if (compiled.hasOwnProperty('error')) {
-                        throw new Error('Error in: ' + file + ' [' + compiled.error.message + ']');
+                        throw new Error('In: ' + file + ' [' + Ergo.ergoErrorToString(compiled.error) + ']');
                     } else {
                         let tempObj = {
                             'name': file.name,
@@ -848,7 +848,7 @@ class Template {
                         logger.debug(method, 'Compiling Ergo to JavaScript ', path);
                         const compiled = Ergo.compileToJavaScriptAndLink(contents,modelFiles,'javascript_cicero');
                         if (compiled.hasOwnProperty('error')) {
-                            throw new Error('Error in: ' + path + ' [' + compiled.error.message + ']');
+                            throw new Error('In: ' + path + ' [' + Ergo.ergoErrorToString(compiled.error) + ']');
                         } else {
                             contents = compiled.success;
                         }
