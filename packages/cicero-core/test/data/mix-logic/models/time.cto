@@ -1,0 +1,21 @@
+namespace org.accordproject.time
+
+/**
+ * Units for a duration. 24 hour days are assumed.
+ */
+enum TemporalUnit {
+  o SECOND
+  o MINUTE
+  o HOUR
+  o DAY
+  o WEEK
+  o YEAR
+}
+
+/**
+ * A duration. For example, 6 hours.
+ */
+concept Duration {
+  o Long amount
+  o TemporalUnit unit
+}

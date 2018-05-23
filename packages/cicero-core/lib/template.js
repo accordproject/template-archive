@@ -545,14 +545,16 @@ class Template {
                     return file.async('string');
                 }).then((contents) => {
                     logger.debug(method, 'Loaded Ergo file');
-                    // XXX TBD: Pass CTOs to Ergo compiler
-                    const ctos = [];
-                    const compiledJS = Ergo.compileToJavaScriptAndLink(contents,ctos,'javascript_cicero');
-                    let tempObj = {
-                        'name': file.name,
-                        'contents': compiledJS
-                    };
-                    jsScriptFiles.push(tempObj);
+                    const compiled = Ergo.compileToJavaScriptAndLink(contents,ctoModelFiles,'javascript_cicero');
+                    if (compiled.hasOwnProperty('error')) {
+                        throw new Error('Error in: ' + file + ' [' + compiled.error.message + ']');
+                    } else {
+                        let tempObj = {
+                            'name': file.name,
+                            'contents': compiled.success
+                        };
+                        jsScriptFiles.push(tempObj);
+                    }
                 });
             });
 
@@ -844,7 +846,12 @@ class Template {
                     let filePath = fsPath.parse(path);
                     if (filePath.ext.toLowerCase() === '.ergo') {
                         logger.debug(method, 'Compiling Ergo to JavaScript ', path);
-                        contents = Ergo.compileToJavaScriptAndLink(contents,[],'javascript_cicero');
+                        const compiled = Ergo.compileToJavaScriptAndLink(contents,modelFiles,'javascript_cicero');
+                        if (compiled.hasOwnProperty('error')) {
+                            throw new Error('Error in: ' + path + ' [' + compiled.error.message + ']');
+                        } else {
+                            contents = compiled.success;
+                        }
                         logger.debug('Compiled Ergo to Javascript:\n'+contents+'\n');
                         path = path.substr(0, path.lastIndexOf('.')) + '.js';
                         filePath.ext = '.js';
