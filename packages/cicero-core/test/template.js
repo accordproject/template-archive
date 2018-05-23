@@ -77,6 +77,10 @@ describe('Template', () => {
             return Template.fromDirectory('./test/data/mix-logic').should.be.rejectedWith('Templates cannot mix Ergo and JS logic');
         });
 
+        it('should throw error when Ergo logic does not parse', async () => {
+            return Template.fromDirectory('./test/data/bad-logic').should.be.rejectedWith('Error in: test/data/bad-logic/lib/logic.ergo [At line 18 column 11: syntax error]');
+        });
+
         it('should roundtrip a template', async function() {
             const template = await Template.fromDirectory('./test/data/latedeliveryandpenalty');
             template.getIdentifier().should.equal('latedeliveryandpenalty@0.0.1');

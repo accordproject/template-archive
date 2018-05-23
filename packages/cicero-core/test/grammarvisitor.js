@@ -60,6 +60,9 @@ describe('GrammarVisitor', () => {
 
             const mm = new ModelManager();
 
+            const timemodel = fs.readFileSync(path.resolve(__dirname, 'data/latedeliveryandpenalty/models', 'time.cto'), 'utf8');
+            mm.addModelFile(timemodel, 'time.cto', true);
+
             const model = fs.readFileSync(path.resolve(__dirname, 'data/latedeliveryandpenalty/models', 'model.cto'), 'utf8');
             mm.addModelFile(model, 'model.cto', true);
 
