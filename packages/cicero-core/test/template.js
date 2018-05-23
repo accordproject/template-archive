@@ -78,7 +78,7 @@ describe('Template', () => {
         });
 
         it('should throw error when Ergo logic does not parse', async () => {
-            return Template.fromDirectory('./test/data/bad-logic').should.be.rejectedWith('Error in: test/data/bad-logic/lib/logic.ergo [At line 18 column 11: syntax error]');
+            return Template.fromDirectory('./test/data/bad-logic').should.be.rejectedWith('In: test/data/bad-logic/lib/logic.ergo [Parse error at line 18 character 11]');
         });
 
         it('should roundtrip a template', async function() {
