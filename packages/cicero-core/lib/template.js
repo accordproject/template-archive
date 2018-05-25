@@ -69,6 +69,11 @@ class Template {
      */
     constructor(packageJson, readme, samples) {
 
+        // XXX Patch/Hack for backward compatibility with old templates XXX
+        if (!packageJson.cicero) {
+            packageJson.cicero = { 'template': 'clause', 'version': '^0.3.0' };
+        }
+
         this.modelManager = new ModelManager();
         if(this.modelManager.getModelFile('org.accordproject.common') === undefined){
             const model = fs.readFileSync(fsPath.resolve(common), ENCODING);
@@ -1122,7 +1127,6 @@ class Template {
         logger.debug(types);
         return types;
     }
-
 }
 
 module.exports = Template;

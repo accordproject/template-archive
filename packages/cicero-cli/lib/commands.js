@@ -84,7 +84,11 @@ class Commands {
         const packageJsonExists = fs.existsSync(path.resolve(argv.template,'package.json'));
         let isCiceroTemplate = false;
         if(packageJsonExists){
-            const packageJsonContents = JSON.parse(fs.readFileSync(path.resolve(argv.template,'package.json')),'utf8');
+            let packageJsonContents = JSON.parse(fs.readFileSync(path.resolve(argv.template,'package.json')),'utf8');
+            // XXX Patch/Hack for backward compatibility with old templates XXX
+            if (!packageJsonContents.cicero) {
+                packageJsonContents.cicero = { 'template': 'clause', 'version': '^0.3.0' };
+            }
             isCiceroTemplate = packageJsonContents.cicero;
         }
 
@@ -177,7 +181,12 @@ class Commands {
         const packageJsonExists = fs.existsSync(path.resolve(argv.template,'package.json'));
         let isCiceroTemplate = false;
         if(packageJsonExists){
-            const packageJsonContents = JSON.parse(fs.readFileSync(path.resolve(argv.template,'package.json')),'utf8');
+            let packageJsonContents = JSON.parse(fs.readFileSync(path.resolve(argv.template,'package.json')),'utf8');
+            // XXX Patch/Hack for backward compatibility with old templates XXX
+            if (!packageJsonContents.cicero) {
+                packageJsonContents.cicero = { 'template': 'clause', 'version': '^0.3.0' };
+            }
+
             isCiceroTemplate = packageJsonContents.cicero;
         }
 

@@ -91,9 +91,9 @@ class Engine {
         }
 
         const head = `
-        __dispatch(contract,request,state,moment());
+        __dispatch(contract,data,request,state,moment());
 
-        function __dispatch(contract,request,state,now) {
+        function __dispatch(contract,data,request,state,now) {
             switch(request.getFullyQualifiedType()) {
         `;
 
@@ -105,7 +105,7 @@ class Engine {
                 let ns${n} = type${n}.substr(0, type${n}.lastIndexOf('.'));
                 let clazz${n} = type${n}.substr(type${n}.lastIndexOf('.')+1);
                 let response${n} = factory.newTransaction(ns${n}, clazz${n});
-                let context${n} = {request: request, state: state, contract: contract, response: response${n}, emit: [], now: now};
+                let context${n} = {request: request, state: state, contract: contract, data: data, response: response${n}, emit: [], now: now};
                 ${ele.getName()}(context${n});
                 return { response: context${n}.response, state: context${n}.state, emit: context${n}.emit };
             break;`;
@@ -166,6 +166,7 @@ class Engine {
 
         // add immutables to the context
         vm.freeze(validContract, 'contract'); // Second argument adds object to global.
+        vm.freeze(validContract, 'data'); // Second argument adds object to global.
         vm.freeze(validRequest, 'request'); // Second argument adds object to global.
         vm.freeze(validState, 'state'); // Second argument adds object to global.
 
