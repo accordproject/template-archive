@@ -1,18 +1,20 @@
 {
   "devDependencies": {
-    "colors": "^1.1.2",
-    "concurrently": "^3.5.1",
-    "coveralls": "^3.0.1",
-    "istanbul-combine": "^0.3.0",
-    "istanbul-merge": "^1.1.1",
-    "jsdoc": "^3.5.5",
+    "colors": "1.1.2",
+    "concurrently": "3.5.1",
+    "coveralls": "3.0.1",
+    "istanbul-combine": "0.3.0",
+    "istanbul-merge": "1.1.1",
+    "jsdoc": "3.5.5",
     "jsdoc-sphinx": "0.0.6",
-    "lerna": "^2.8.0",
-    "license-check": "^1.1.5",
-    "moment": "^2.20.1",
-    "semver": "^5.5.0",
-    "sleep-promise": "^2.0.0",
-    "source-map-support": "^0.5.3"
+    "lerna": "2.8.0",
+    "license-check": "1.1.5",
+    "moment": "2.20.1",
+    "semver": "5.5.0",
+    "sleep-promise": "2.0.0",
+    "source-map-support": "0.5.3",
+    "licensecheck": "1.3.0",
+    "license-check-and-add": "2.3.1"
   },
   "engines": {
     "node": ">=8",
@@ -20,16 +22,23 @@
   },
   "name": "cicero",
   "description": "You must install [Lerna](https://lernajs.io) to build this multi-package repository.",
-  "version": "0.3.11",
+  "version": "0.3.12",
   "main": "index.js",
   "private": true,
   "scripts": {
-    "postinstall": "npm run bootstrap",
-    "bootstrap": "lerna bootstrap",
-    "pretest": "npm run doc",
-    "test": "lerna run test",
     "doc": "jsdoc -t ./node_modules/jsdoc-sphinx/template/ -c jsdoc.json -r -d ../cicero-docs/docs/api --verbose",
-    "coverage": "istanbul-combine -d coverage -r lcov packages/cicero-cli/coverage/*.json packages/cicero-core/coverage/*.json  packages/cicero-engine/coverage/*.json packages/generator-cicero-template/coverage/*.json packages/cicero-server/coverage/*.json packages/cicero-common/coverage/*.json && cat ./coverage/lcov.info | coveralls"
+    "coverage": "istanbul-combine -d coverage -r lcov packages/cicero-cli/coverage/*.json packages/cicero-core/coverage/*.json  packages/cicero-engine/coverage/*.json packages/generator-cicero-template/coverage/*.json packages/cicero-server/coverage/*.json packages/cicero-common/coverage/*.json && cat ./coverage/lcov.info | coveralls",
+    "postinstall": "npm run pkgcheck && npm run bootstrap",
+    "bootstrap": "lerna bootstrap",
+    "pretest": "npm run doc && npm run depcheck && npm run licchk",
+    "test": "lerna run test",
+    "publish": "./scripts/manualrelease.sh",
+    "repoclean": "lerna clean",
+    "licchk": "license-check-and-add",
+    "pkgcheck": "node ./scripts/pkgcheck.js",
+    "pkgstamp": "node ./scripts/pkgstamp.js",
+    "pkgbump": "node ./scripts/pkgbump.js && node ./scripts/pkgcheck.js --fix",
+    "depcheck": "node ./scripts/depcheck.js"
   },
   "repository": {
     "type": "git",
@@ -41,5 +50,73 @@
     "contract"
   ],
   "author": "accordproject.org",
-  "license": "Apache-2.0"
+  "license": "Apache-2.0",
+  "license-check-and-add-config": {
+    "folder": ".",
+    "license": "LICENSE",
+    "exact_paths_method": "EXCLUDE",
+    "exact_paths": [
+      ".git",
+      "node_modules",
+      "packages",
+      "softhsm",
+      "build.cfg",
+      "ISSUE_TEMPLATE.md",
+      "NOTICES.md",
+      "PULL_REQUEST_TEMPLATE.md",
+      "LICENSE",
+      "README.rst",
+      "markdown-license.txt",
+      "docs/"
+    ],
+    "file_type_method": "EXCLUDE",
+    "file_types": [
+      ".yml",
+      ".log",
+      ".enc",
+      ".xmind",
+      ".deb",
+      ".vo",
+      ".glob",
+      ".aux",
+      ".v.d",
+      ".ctoj",
+      ".ml",
+      ".mli",
+      ".depends",
+      ".annot",
+      ".byte",
+      ".cmi",
+      ".cmo",
+      ".tem",
+      ".txt",
+      ".config",
+      ".coq_modules"
+    ],
+    "insert_license": false,
+    "license_formats": {
+      "js|ergo|cto": {
+        "prepend": "/*",
+        "append": " */",
+        "eachLine": {
+          "prepend": " * "
+        }
+      },
+      "v|atd|mll|mly": {
+        "prepend": "*",
+        "append": " *)",
+        "eachLine": {
+          "prepend": " * "
+        }
+      },
+      "gitattributes|cfg|ocp-indent": {
+        "eachLine": {
+          "prepend": "# "
+        }
+      },
+      "md": {
+        "file": "markdown-license.txt"
+      }
+    }
+  }
 }
