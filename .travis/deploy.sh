@@ -66,21 +66,6 @@ else
     _exit "Unknown build focus" 1 
 fi
 
-# Hold onto the version number
-export VERSION=$(node -e "console.log(require('${DIR}/package.json').version)")
-
-# Publish with tag
-echo "Pushing with tag ${TAG}"
-lerna exec -- npm publish --tag="${TAG}" 2>&1
-
-# Check that all required modules have been published to npm and are retrievable
-for j in ${NPM_MODULES}; do
-    # check the next in the list
-    while ! npm view ${j}@${VERSION} | grep dist-tags > /dev/null 2>&1; do
-        sleep 10
-    done
-done
-
 ## Stable releases only; both latest and next then clean up git, and bump version number
 if [[ "${BUILD_RELEASE}" = "stable" ]]; then
 
@@ -101,5 +86,22 @@ if [[ "${BUILD_RELEASE}" = "stable" ]]; then
     git push origin master
 
 fi
+
+# Hold onto the version number
+export VERSION=$(node -e "console.log(require('${DIR}/package.json').version)")
+
+# Publish with tag
+echo "Pushing with tag ${TAG}"
+lerna exec -- npm publish --tag="${TAG}" 2>&1
+
+# Check that all required modules have been published to npm and are retrievable
+for j in ${NPM_MODULES}; do
+    # check the next in the list
+    while ! npm view ${j}@${VERSION} | grep dist-tags > /dev/null 2>&1; do
+        sleep 10
+    done
+done
+
+
 
 _exit "All complete" 0
