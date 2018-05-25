@@ -57,7 +57,7 @@
     "jszip": "3.1.5",
     "minimatch": "3.0.4",
     "moo": "0.4.3",
-    "nearley": "2.12.1",
+    "nearley": "2.13.0",
     "nunjucks": "3.1.2",
     "semver": "5.5.0",
     "uuid": "3.2.1",
