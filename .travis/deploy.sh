@@ -31,11 +31,6 @@ if [[ "${TRAVIS_REPO_SLUG}" != accordproject* ]]; then
     _exit "Skipping deploy; wrong repository slug." 0
 fi
 
-# Check that this is the main repository.
-if [[ "${TRAVIS_BRANCH}" != master ]]; then
-    _exit "Skipping deploy; Not a master branch build." 0
-fi
-
 ## Start of release process
 
 # Set the NPM access token we will use to publish.
