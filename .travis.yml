@@ -20,7 +20,7 @@ deploy:
       - 'if [ "$TRAVIS_PULL_REQUEST" = "false" ]; then bash ./.travis/deploy.sh; fi'
     skip_cleanup: true
     on:
-      branch: master
+      all_branches: true
       repo: accordproject/cicero
 after_failure: tail -n +1 -- /home/travis/.npm/_logs/*-debug.log
 after_success: npm run coverage
