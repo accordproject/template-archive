@@ -1,6 +1,6 @@
 {
   "name": "@accordproject/cicero-core",
-  "version": "0.3.14",
+  "version": "0.3.15",
   "description": "Cicero Core - implementation of Accord Protocol Template Specification",
   "engines": {
     "node": ">=8",
@@ -48,7 +48,7 @@
     "nyc": "11.7.2"
   },
   "dependencies": {
-    "@accordproject/cicero-common": "0.3.14",
+    "@accordproject/cicero-common": "0.3.15",
     "@accordproject/ergo-compiler": "0.0.48",
     "composer-common": "0.19.6",
     "debug": "2.6.2",
