@@ -47,7 +47,8 @@ class Logger {
             keys.forEach(function(key) {
                 let element = obj[key];
                 if(element.getType) {
-                    printable[key] = this.serializer.toJSON(element, {validate: false, permitResourcesForRelationships: true});
+                    // TODO (DCS) call toJSON once that works for concepts
+                    printable[key] = element.getFullyQualifiedType();
                 }
                 else {
                     printable[key] = element;

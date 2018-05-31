@@ -153,7 +153,7 @@ class Engine {
         this.compileJsClause(clause);
         script = this.scripts[clause.getIdentifier()];
 
-        const validContract = clause.getData();
+        const validContract = clause.getDataAsComposerObject();
         const factory = template.getFactory();
         const vm = new VM({
             timeout: 1000,

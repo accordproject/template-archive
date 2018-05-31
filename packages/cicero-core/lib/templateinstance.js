@@ -40,12 +40,14 @@ class TemplateInstance {
         }
         this.template = template;
         this.data = null;
+        this.composerData = null;
     }
 
     /**
      * Set the data for the clause
      * @param {object} data  - the data for the clause, must be an instance of the
-     * template model for the clause's template
+     * template model for the clause's template. This should be a plain JS object
+     * and will be deserialized and validated into the Composer object before assignment.
      */
     setData(data) {
         // verify that data is an instance of the template model
@@ -57,19 +59,32 @@ class TemplateInstance {
 
         // downloadExternalDependencies the data using the template model
         logger.debug('Setting clause data: ' + JSON.stringify(data));
-        const resource = this.template.getSerializer().fromJSON(data);
+        const resource = this.getTemplate().getSerializer().fromJSON(data);
         resource.validate();
 
-        // passed validation!
+        // save the data
         this.data = data;
+
+        // save the composer data
+        this.composerData = resource;
     }
 
     /**
-     * Get the data for the clause
+     * Get the data for the clause. This is a plain JS object. To retrieve the Composer
+     * object call getComposerData().
      * @return {object} - the data for the clause, or null if it has not been set
      */
     getData() {
         return this.data;
+    }
+
+    /**
+     * Get the data for the clause. This is a Composer object. To retrieve the
+     * plain JS object suitable for serialization call toJSON() and retrieve the `data` property.
+     * @return {object} - the data for the clause, or null if it has not been set
+     */
+    getDataAsComposerObject() {
+        return this.composerData;
     }
 
     /**
@@ -107,7 +122,7 @@ class TemplateInstance {
         let hash = '';
 
         if (this.data) {
-            const textToHash = JSON.stringify(this.data);
+            const textToHash = JSON.stringify(this.getData());
             const hasher = crypto.createHash('sha256');
             hasher.update(textToHash);
             hash = '-' + hasher.digest('hex');
