@@ -28,7 +28,7 @@ contract LateDeliveryAndPenalty over TemplateModel {
     ;
 
     // Calculate the time difference between current date and agreed upon date
-    define variable diff = momentDiff(now,agreed);
+    define variable diff = momentDiffDays(now,agreed);
     // Penalty formula
     define variable penalty =
       (diff / contract.penaltyDuration.amount) * contract.penaltyPercentage/100.0 * request.goodsValue;
