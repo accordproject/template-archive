@@ -42,7 +42,7 @@
     "nyc": "11.7.2"
   },
   "dependencies": {
-    "composer-common": "0.19.6"
+    "composer-common": "0.19.8-20180603041248"
   },
   "license-check-config": {
     "src": [

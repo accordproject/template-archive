@@ -44,7 +44,7 @@
   },
   "dependencies": {
     "@accordproject/cicero-core": "0.3.16",
-    "composer-common": "0.19.6",
+    "composer-common": "0.19.8-20180603041248",
     "moment": "2.20.1",
     "vm2": "3.5.0"
   },
