@@ -53,8 +53,8 @@
     "supertest": "3.0.0"
   },
   "dependencies": {
-    "@accordproject/cicero-core": "0.3.17",
-    "@accordproject/cicero-engine": "0.3.17",
+    "@accordproject/cicero-core": "0.4.0",
+    "@accordproject/cicero-engine": "0.4.0",
     "express": "4.16.2"
   },
   "license-check-config": {
