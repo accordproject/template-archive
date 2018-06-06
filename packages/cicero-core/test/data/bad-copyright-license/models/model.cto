@@ -1,19 +1,22 @@
 namespace org.accordproject.copyrightlicense
 
-import org.accordproject.common.ClauseModel
+import org.accordproject.cicero.contract.AccordContract from https://models.accordproject.org/cicero/contract.cto
+import org.accordproject.cicero.contract.AccordClause from https://models.accordproject.org/cicero/contract.cto
+
+import org.accordproject.cicero.runtime.Request from https://models.accordproject.org/cicero/runtime.cto
+import org.accordproject.cicero.runtime.Response from https://models.accordproject.org/cicero/runtime.cto
 
 /* Requesting a payment */
-transaction PaymentRequest {
+transaction PaymentRequest extends Request {
 }
 
 /* PayOut response */
-transaction PayOut {
+transaction PayOut extends Response {
   o Double amount
 }
 
 /* The template model  */
-@AccordTemplateModel("copyright-license")
-concept TemplateModel {
+asset CopyrightLicenseContract extends AccordContract {
   /* the effective date */
   o DateTime effectiveDate
 
@@ -37,10 +40,10 @@ concept TemplateModel {
   o String workDescription
 
   /* payment */
-  o PaymentClauseModel paymentClause
+  o PaymentClause paymentClause
 }
 
-asset PaymentClauseModel extends ClauseModel {
+asset PaymentClause extends AccordClause {
   o String amountText
 	o Double amount
 	o String paymentProcedure

@@ -4,6 +4,6 @@
     "description": "Name of the person to greet: \"Dan\".\nThank you!",
     "cicero": {
       "version": "^<%= data.engineVersion %>",
-      "template": "clause"
+      "template": "contract"
     }
   }

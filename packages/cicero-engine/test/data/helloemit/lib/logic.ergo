@@ -2,8 +2,8 @@ namespace org.accordproject.helloemit
 
 contract HelloWorld over TemplateModel {
    // Simple Clause
-   clause helloworld(request : Request) : Response {
+   clause helloworld(request : MyRequest) : MyResponse {
      emit new Greeting{ message: "Voila!" };
-     return new Response{ output: "Hello " ++ contract.name ++ " (" ++ request.input ++ ")" }
+     return new MyResponse{ output: "Hello " ++ contract.name ++ " (" ++ request.input ++ ")" }
   }
 }

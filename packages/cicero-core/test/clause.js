@@ -54,20 +54,21 @@ describe('Clause', () => {
             // check that we can set/get a valid template model
             const data = {
                 $class: 'io.clause.latedeliveryandpenalty.TemplateModel',
+                clauseId: 'c0884078-882d-42e0-87d6-4cc824b4f194',
                 forceMajeure: false,
                 penaltyDuration : {
                     $class : 'org.accordproject.time.Duration',
                     amount : 1,
-                    unit : 'DAY'
+                    unit : 'days'
                 },
                 penaltyPercentage : 10,
                 capPercentage : 50,
                 termination : {
                     $class : 'org.accordproject.time.Duration',
                     amount : 10,
-                    unit : 'DAY'
+                    unit : 'days'
                 },
-                fractionalPart : 'DAY'
+                fractionalPart : 'days'
             };
             clause.setData(data);
             clause.getData().should.eql(data);
@@ -92,20 +93,21 @@ describe('Clause', () => {
             const clause = new Clause(template);
             const data = {
                 $class: 'io.clause.latedeliveryandpenalty.TemplateModel',
+                clauseId: 'c0884078-882d-42e0-87d6-4cc824b4f194',
                 forceMajeure: false,
                 penaltyDuration : {
                     $class : 'org.accordproject.time.Duration',
                     amount : 1,
-                    unit : 'DAY'
+                    unit : 'days'
                 },
                 penaltyPercentage : 10,
                 capPercentage : 50,
                 termination : {
                     $class : 'org.accordproject.time.Duration',
                     amount : 10,
-                    unit : 'DAY'
+                    unit : 'days'
                 },
-                fractionalPart : 'DAY'
+                fractionalPart : 'days'
             };
             clause.setData(data);
             clause.toJSON().should.eql({
@@ -125,21 +127,23 @@ describe('Clause', () => {
                 $class: 'io.clause.latedeliveryandpenalty.TemplateModel',
                 capPercentage: 2,
                 forceMajeure: true,
-                fractionalPart : 'DAY',
+                fractionalPart : 'days',
                 penaltyDuration: {
                     $class: 'org.accordproject.time.Duration',
                     amount: 9,
-                    unit: 'DAY'
+                    unit: 'days'
                 },
                 penaltyPercentage: 7,
                 termination: {
                     $class: 'org.accordproject.time.Duration',
                     amount: 2,
-                    unit: 'WEEK',
+                    unit: 'weeks',
                 }
             };
+            // remove the generated clause id
+            delete clause.getData().clauseId;
             clause.getData().should.eql(data);
-            clause.getIdentifier().should.equal('latedeliveryandpenalty@0.0.1-68cf586ba281f947a8b6e15fe0f8773ad877396167bd2bd91d481b348607d79b');
+            clause.getIdentifier().should.equal('latedeliveryandpenalty@0.0.1-0ee76aefdd19d6863f2f1642182f506b1ac8e5c4be2a005c00dd13bbf36fe63c');
         });
 
         it('should be able to set the data from conga natural language text', async function() {
@@ -153,6 +157,7 @@ describe('Clause', () => {
                 swag: 'penguins',
                 maybeThing: 'thing'
             };
+            delete clause.getData().clauseId;
             clause.getData().should.eql(data);
             clause.getIdentifier().should.equal('conga@0.0.1-6873b1a14258a44df9c96f16b9bdd9d97ecc93040f5ebc8967c7c04c104c2ccb');
         });
