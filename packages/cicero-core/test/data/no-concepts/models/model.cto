@@ -1,9 +1,14 @@
 namespace org.accordproject.conga
 
+import org.accordproject.cicero.contract.AccordClause from https://models.accordproject.org/cicero/contract.cto
+import org.accordproject.cicero.runtime.Request from https://models.accordproject.org/cicero/runtime.cto
+import org.accordproject.cicero.runtime.Response from https://models.accordproject.org/cicero/runtime.cto
+
 /**
  * Defines the data model for the Conga template.
  */
-concept TemplateModel {
+asset TemplateModel identified by id {
+  o String id
   o Double amount
   o String swag
   --> Participant participant
@@ -12,13 +17,13 @@ concept TemplateModel {
 /**
  * Defines the input data required by the template
  */
-transaction Payup {
+transaction Payup extends Request {
 }
 
 /**
  * Defines the output data for the template
  */
-transaction Response {
+transaction CongaResponse extends Response {
   o String name
   o Double amount
 }

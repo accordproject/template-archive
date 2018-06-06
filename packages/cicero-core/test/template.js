@@ -91,7 +91,7 @@ describe('Template', () => {
             template.getName().should.equal('latedeliveryandpenalty');
             template.getDescription().should.equal('Late Delivery and Penalty. In case of delayed delivery except for Force Majeure cases, the Seller shall pay to the Buyer for every 9 DAY of delay penalty amounting to 7% of the total value of the Equipment whose delivery has been delayed. Any fractional part of a DAY is to be considered a full DAY. The total amount of penalty shall not however, exceed 2% of the total value of the Equipment involved in late delivery. If the delay is more than 2 WEEK, the Buyer is entitled to terminate this Contract.');
             template.getVersion().should.equal('0.0.1');
-            template.getMetadata().getSample().should.equal('Late Delivery and Penalty. In case of delayed delivery except for Force Majeure cases, the Seller shall pay to the Buyer for every 9 DAY of delay penalty amounting to 7% of the total value of the Equipment whose delivery has been delayed. Any fractional part of a DAY is to be considered a full DAY. The total amount of penalty shall not however, exceed 2% of the total value of the Equipment involved in late delivery. If the delay is more than 2 WEEK, the Buyer is entitled to terminate this Contract.');
+            template.getMetadata().getSample().should.equal('Late Delivery and Penalty. In case of delayed delivery except for Force Majeure cases, the Seller shall pay to the Buyer for every 9 days of delay penalty amounting to 7% of the total value of the Equipment whose delivery has been delayed. Any fractional part of a days is to be considered a full days. The total amount of penalty shall not however, exceed 2% of the total value of the Equipment involved in late delivery. If the delay is more than 2 weeks, the Buyer is entitled to terminate this Contract.');
             const buffer = await template.toArchive();
             buffer.should.not.be.null;
             const template2 = await Template.fromArchive(buffer);
@@ -106,11 +106,11 @@ describe('Template', () => {
         });
 
         it('should throw an error if multiple template models are found', async () => {
-            return Template.fromDirectory('./test/data/multiple-concepts').should.be.rejectedWith('Found multiple concepts decorated with @AccordTemplateModel');
+            return Template.fromDirectory('./test/data/multiple-concepts').should.be.rejectedWith('Found multiple instances of org.accordproject.cicero.contract.AccordClause in conga. The model for the template must contain a single asset that extends org.accordproject.cicero.contract.AccordClause.');
         });
 
         it('should throw an error if no template models are found', async () => {
-            return Template.fromDirectory('./test/data/no-concepts').should.be.rejectedWith('Failed to find the template model. Decorate a concept with @AccordTemplateModel("conga").');
+            return Template.fromDirectory('./test/data/no-concepts').should.be.rejectedWith('Failed to find an asset that extends org.accordproject.cicero.contract.AccordClause in conga. The model for the template must contain a single asset that extends org.accordproject.cicero.contract.AccordClause.');
         });
 
         it('should throw an error if a package.json file does not exist', async () => {
@@ -148,14 +148,14 @@ describe('Template', () => {
 
         it('should create a template from an archive', async () => {
             await writeZip('latedeliveryandpenalty');
-            const buffer = fs.readFileSync('./test/data/archives/latedeliveryandpenalty.zip');
+            const buffer = fs.readFileSync('./test/data/archives/latedeliveryandpenalty@0.0.1.cta');
             return Template.fromArchive(buffer).should.be.fulfilled;
         });
 
         it('should throw an error if multiple template models are found', async () => {
             await writeZip('multiple-concepts');
             const buffer = fs.readFileSync('./test/data/archives/multiple-concepts.zip');
-            return Template.fromArchive(buffer).should.be.rejectedWith('Found multiple concepts decorated with @AccordTemplateModel');
+            return Template.fromArchive(buffer).should.be.rejectedWith('Found multiple instances of org.accordproject.cicero.contract.AccordClause in conga. The model for the template must contain a single asset that extends org.accordproject.cicero.contract.AccordClause.');
         });
 
         it('should throw an error if a package.json file does not exist', async () => {
@@ -164,7 +164,7 @@ describe('Template', () => {
             return Template.fromArchive(buffer).should.be.rejectedWith('Failed to find package.json');
         });
 
-        it('should throw an error if a package.json file does not exist', async () => {
+        it('should throw an error if mix of Ergo and JS logic', async () => {
             await writeZip('mix-logic');
             const buffer = fs.readFileSync('./test/data/archives/mix-logic.zip');
             return Template.fromArchive(buffer).should.be.rejectedWith('Templates cannot mix Ergo and JS logic');
@@ -180,7 +180,7 @@ describe('Template', () => {
                 'description': '"Dan Selman" agrees to spend 100.0 conga coins on "swag"',
                 'cicero': {
                     'template': 'clause',
-                    'version': '^0.3.0-0'
+                    'version': '^0.4.0'
                 }
             },
             null,

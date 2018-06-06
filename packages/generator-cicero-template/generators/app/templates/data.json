@@ -1,4 +1,4 @@
 {
-    "$class": "<%= data.modelNamespace %>.Request",
+    "$class": "<%= data.modelNamespace %>.MyRequest",
     "input": "World"
 }

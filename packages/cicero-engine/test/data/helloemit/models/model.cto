@@ -1,10 +1,13 @@
 namespace org.accordproject.helloemit
 
-transaction Request {
+import org.accordproject.cicero.contract.* from https://models.accordproject.org/cicero/contract.cto
+import org.accordproject.cicero.runtime.* from https://models.accordproject.org/cicero/runtime.cto
+
+transaction MyRequest extends Request {
   o String input
 }
 
-transaction Response {
+transaction MyResponse extends Response {
   o String output
 }
 
@@ -15,8 +18,7 @@ event Greeting {
 /**
  * The template model
  */
-@AccordTemplateModel("helloemit")
-concept TemplateModel {
+asset TemplateModel extends AccordClause {
   /**
    * The name for the clause
    */
