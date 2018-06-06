@@ -48,9 +48,9 @@
     "nyc": "11.7.2"
   },
   "dependencies": {
-    "@accordproject/cicero-common": "0.3.14",
-    "@accordproject/ergo-compiler": "0.0.48",
-    "composer-common": "0.19.6",
+    "@accordproject/cicero-common": "0.3.17",
+    "@accordproject/ergo-compiler": "0.0.62",
+    "composer-common": "0.19.8-20180603041248",
     "debug": "2.6.2",
     "glob": "7.1.2",
     "ietf-language-tag-regex": "0.0.5",
