@@ -148,7 +148,7 @@ describe('Template', () => {
 
         it('should create a template from an archive', async () => {
             await writeZip('latedeliveryandpenalty');
-            const buffer = fs.readFileSync('./test/data/archives/latedeliveryandpenalty@0.0.1.cta');
+            const buffer = fs.readFileSync('./test/data/latedeliveryandpenalty.cta');
             return Template.fromArchive(buffer).should.be.fulfilled;
         });
 
