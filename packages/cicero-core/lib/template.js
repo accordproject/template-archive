@@ -1173,6 +1173,35 @@ class Template {
         logger.debug(types);
         return types;
     }
+
+    /**
+     * Provides a list of the emit types that of this Template. Types use the fully-qualified form.
+     * @return {Array} a list of the response types
+     */
+    getEmitTypes() {
+        const functionDeclarations = this.getScriptManager().getScripts().map((ele) => {
+            return ele.getFunctionDeclarations();
+        })
+            .reduce((flat, next) => {
+                return flat.concat(next);
+            })
+            .filter((ele) => {
+                return ele.getDecorators().indexOf('AccordClauseLogic') >= 0;
+            }).map((ele) => {
+                return ele;
+            });
+
+        if (functionDeclarations.length === 0) {
+            throw new Error('Did not find any function declarations with the @AccordClauseLogic annotation');
+        }
+
+        let types = [];
+        functionDeclarations.forEach((ele, n) => {
+            types.push(ele.getParameterTypes()[3]);
+        });
+        logger.debug(types);
+        return types;
+    }
 }
 
 module.exports = Template;
