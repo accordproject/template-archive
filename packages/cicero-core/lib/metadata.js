@@ -100,11 +100,13 @@ class Metadata {
             }
             this.targetVersion = packageJson.cicero.version;
         } else {
-            logger.warn(`No cicero target version specified. Assuming compatibility with the current cicero version, ${ciceroVersion}`);
+            throw new Error('package.json is missing the cicero.version property.');
         }
 
         if (!this.satisfiesTargetVersion()){
-            logger.warn(`The given target version for this template (${this.targetVersion}) is not satisfied by the installed cicero version ${ciceroVersion}.`);
+            const msg = `The template targets Cicero (${this.targetVersion}) but the Cicero version is ${ciceroVersion}.`;
+            logger.error(msg);
+            throw new Error(msg);
         }
 
         logger.exit(method);

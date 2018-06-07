@@ -52,6 +52,32 @@ require('yargs')
                 logger.error(err.message + ' ' + JSON.stringify(err));
             });
     })
+    .command('archive', 'archive a template directory', (yargs) => {
+        yargs.option('template', {
+            describe: 'path to the directory with the template',
+            type: 'string'
+        });
+        yargs.option('archiveFile', {
+            describe: 'file name for the archive',
+            type: 'string'
+        });
+    }, (argv) => {
+        if (argv.verbose) {
+            logger.info(`archive the template in the directory ${argv.template} into the file ${argv.archiveFile}`);
+        }
+
+        try {
+            argv = Commands.validateArchiveArgs(argv);
+        } catch (err){
+            logger.error(err.message);
+            return;
+        }
+
+        return Commands.archive(argv.template, argv.archiveFile)
+            .catch((err) => {
+                logger.error(err.message + ' ' + JSON.stringify(err));
+            });
+    })
     .command('execute', 'execute a clause with JSON request', (yargs) => {
         yargs.option('template', {
             describe: 'path to the directory with the template',

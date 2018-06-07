@@ -40,13 +40,12 @@ const Ergo = require('@accordproject/ergo-compiler/lib/ergo');
 const uuid = require('uuid');
 const nunjucks = require('nunjucks');
 
-const common = require.resolve('@accordproject/cicero-common/models/common.cto');
 const ENCODING = 'utf8';
 // Matches 'sample.txt' or 'sample_TAG.txt' where TAG is an IETF language tag (BCP 47)
 const IETF_REGEXP = languageTagRegex({ exact: false }).toString().slice(1,-2);
 const SAMPLE_FILE_REGEXP = xregexp('sample(_(' + IETF_REGEXP + '))?.txt$');
 
-// This code is derived from BusinessNetworkDefinition in Hyperleger Composer composer-common.
+// This code is derived from BusinessNetworkDefinition in Hyperledger Composer composer-common.
 
 /**
  * A template for a legal clause or contract. A Template has a template model, request/response transaction types,
@@ -69,16 +68,7 @@ class Template {
      */
     constructor(packageJson, readme, samples) {
 
-        // XXX Patch/Hack for backward compatibility with old templates XXX
-        if (!packageJson.cicero) {
-            packageJson.cicero = { 'template': 'clause', 'version': '^0.3.0' };
-        }
-
         this.modelManager = new ModelManager();
-        if(this.modelManager.getModelFile('org.accordproject.common') === undefined){
-            const model = fs.readFileSync(fsPath.resolve(common), ENCODING);
-            this.modelManager.addModelFile(model, 'common.cto');
-        }
         this.scriptManager = new ScriptManager(this.modelManager);
         this.introspector = new Introspector(this.modelManager);
         this.factory = new Factory(this.modelManager);
@@ -91,20 +81,50 @@ class Template {
     }
 
     /**
+     * Check to see if a ClassDeclaration is an instance of the specified fully qualified
+     * type name.
+     * @param {ClassDeclaration} classDeclaration The class to test
+     * @param {String} fqt The fully qualified type name.
+     * @returns {boolean} True if classDeclaration an instance of the specified fully
+     * qualified type name, false otherwise.
+     */
+    static instanceOf(classDeclaration, fqt) {
+        // Check to see if this is an exact instance of the specified type.
+        if (classDeclaration.getFullyQualifiedName() === fqt) {
+            return true;
+        }
+        // Now walk the class hierachy looking to see if it's an instance of the specified type.
+        let superTypeDeclaration = classDeclaration.getSuperTypeDeclaration();
+        while (superTypeDeclaration) {
+            if (superTypeDeclaration.getFullyQualifiedName() === fqt) {
+                return true;
+            }
+            superTypeDeclaration = superTypeDeclaration.getSuperTypeDeclaration();
+        }
+        return false;
+    }
+
+    /**
      * Returns the template model for the template
      * @throws {Error} if no template model is found, or multiple template models are found
      * @returns {ClassDeclaration} the template model for the template
      */
     getTemplateModel() {
+
+        let modelType = 'org.accordproject.cicero.contract.AccordContract';
+
+        if(this.getMetadata().getPackageJson().cicero.template !== 'contract') {
+            modelType = 'org.accordproject.cicero.contract.AccordClause';
+        }
+
         const templateModels = this.getIntrospector().getClassDeclarations().filter((item) => {
-            const templateDecorator = item.getDecorator('AccordTemplateModel');
-            return (templateDecorator !== null && this.metadata.getName() === templateDecorator.getArguments()[0]);
+            return !item.isAbstract() && Template.instanceOf(item,modelType);
         });
 
         if (templateModels.length > 1) {
-            throw new Error(`Found multiple concepts decorated with @AccordTemplateModel("${this.metadata.getName()}").`);
+            throw new Error(`Found multiple instances of ${modelType} in ${this.metadata.getName()}. The model for the template must contain a single asset that extends ${modelType}.`);
         } else if (templateModels.length === 0) {
-            throw new Error(`Failed to find the template model. Decorate a concept with @AccordTemplateModel("${this.metadata.getName()}").`);
+            throw new Error(`Failed to find an asset that extends ${modelType} in ${this.metadata.getName()}. The model for the template must contain a single asset that extends ${modelType}.`);
         } else {
             return templateModels[0];
         }
@@ -157,7 +177,7 @@ class Template {
         const parser = new nearley.Parser(nearley.Grammar.fromCompiled(templateGrammar));
         parser.feed(templatizedGrammar);
         if (parser.results.length !== 1) {
-            throw new Error('Ambigious parse!');
+            throw new Error('Ambiguous parse!');
         }
 
         // parse the template grammar to generate a dynamic grammar
@@ -306,9 +326,22 @@ class Template {
                     }
                     const clauseTemplateModel = this.getIntrospector().getClassDeclaration(property.getFullyQualifiedTypeName());
                     this.buildGrammarRules(clauseTemplate, clauseTemplateModel, propertyName, parts);
+                    let suffix = ':';
+                    // TODO (DCS) need a serialization for arrays
+                    if (property.isArray()) {
+                        throw new Error('Arrays are not yet supported!');
+                        // suffix += '+';
+                    }
+                    if (property.isOptional()) {
+                        suffix += '?';
+                    }
+                    if (suffix === ':') {
+                        suffix = '';
+                    }
+
                     parts.modelRules.push({
                         prefix: rule,
-                        symbols: [`${element.fieldName.value} {% id %}\n`],
+                        symbols: [`${element.fieldName.value}${suffix} {% id %}\n`],
                     });
                 }
                 break;
@@ -798,6 +831,13 @@ class Template {
         const modelFiles = [];
         const modelFileNames = [];
 
+        // ensure all the contract and runtime types are in the model manager
+        // because the user may not have imported state for example
+        modelFiles.push(`namespace org.accordproject.system
+        import org.accordproject.cicero.contract.* from https://models.accordproject.org/cicero/contract.cto
+        import org.accordproject.cicero.runtime.* from https://models.accordproject.org/cicero/runtime.cto`);
+        modelFileNames.push('cicerosystem.cto');
+
         // define a help function that will filter out files
         // that are inside a node_modules directory under the path
         // we are processing
@@ -851,7 +891,13 @@ class Template {
                     let filePath = fsPath.parse(path);
                     if (filePath.ext.toLowerCase() === '.ergo') {
                         logger.debug(method, 'Compiling Ergo to JavaScript ', path);
-                        const compiled = Ergo.compileToJavaScriptAndLink(contents,modelFiles,'javascript_cicero');
+                        // re-get the updated modelfiles from the modelmanager (includes external dependencies)
+                        const newModelFiles = [];
+                        for( const mf of template.getModelManager().getModelFiles() ) {
+                            newModelFiles.push(mf.getDefinitions());
+                        }
+
+                        const compiled = Ergo.compileToJavaScriptAndLink(contents,newModelFiles,'javascript_cicero');
                         if (compiled.hasOwnProperty('error')) {
                             throw new Error('In: ' + path + ' [' + Ergo.ergoErrorToString(compiled.error) + ']');
                         } else {

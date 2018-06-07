@@ -60,13 +60,13 @@ describe('GrammarVisitor', () => {
 
             const mm = new ModelManager();
 
-            const timemodel = fs.readFileSync(path.resolve(__dirname, 'data/latedeliveryandpenalty/models', 'time.cto'), 'utf8');
+            const timemodel = fs.readFileSync(path.resolve(__dirname, 'data/models', 'time.cto'), 'utf8');
             mm.addModelFile(timemodel, 'time.cto', true);
 
-            const model = fs.readFileSync(path.resolve(__dirname, 'data/latedeliveryandpenalty/models', 'model.cto'), 'utf8');
+            const model = fs.readFileSync(path.resolve(__dirname, 'data/models', 'model.cto'), 'utf8');
             mm.addModelFile(model, 'model.cto', true);
 
-            const test = fs.readFileSync(path.resolve(__dirname, 'data/latedeliveryandpenalty/models', 'test.cto'), 'utf8');
+            const test = fs.readFileSync(path.resolve(__dirname, 'data/models', 'test.cto'), 'utf8');
             mm.addModelFile(test, 'test.cto', true);
 
             await mm.updateExternalModels();
@@ -95,11 +95,14 @@ describe('GrammarVisitor', () => {
 
             const mm = new ModelManager();
             if(mm.getModelFile('org.accordproject.common') === undefined){
-                const model = fs.readFileSync(path.resolve(__dirname, '../../cicero-common/models/', 'common.cto'), 'utf8');
-                mm.addModelFile(model, 'common.cto');
+                const model = fs.readFileSync(path.resolve(__dirname, 'data/models', 'common.cto'), 'utf8');
+                mm.addModelFile(model, 'common.cto', true);
             }
 
-            const test = fs.readFileSync(path.resolve(__dirname, 'data/copyright-license/models', 'model.cto'), 'utf8');
+            const timeModel = fs.readFileSync(path.resolve(__dirname, 'data/models', 'time.cto'), 'utf8');
+            mm.addModelFile(timeModel, 'time.cto', true);
+
+            const test = fs.readFileSync(path.resolve(__dirname, 'data/models', 'model.cto'), 'utf8');
             mm.addModelFile(test, 'model.cto', true);
 
             await mm.updateExternalModels();
@@ -128,7 +131,7 @@ describe('GrammarVisitor', () => {
 
             const mm = new ModelManager();
             if(mm.getModelFile('org.accordproject.common') === undefined){
-                const model = fs.readFileSync(path.resolve(__dirname, '../../cicero-common/models/', 'common.cto'), 'utf8');
+                const model = fs.readFileSync(path.resolve(__dirname, 'data/models', 'common.cto'), 'utf8');
                 mm.addModelFile(model, 'common.cto');
             }
 

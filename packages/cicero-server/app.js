@@ -78,7 +78,7 @@ app.post('/execute/:template/:data', async function (req, httpResponse, next) {
             result = await engine.execute(clause, req.body.request, req.body.state);
         } else {
             // Add empty state in input, remove it on output
-            const state = { '$class' : 'org.accordproject.common.ContractState', 'stateId' : 'org.accordproject.common.ContractState#1' };
+            const state = { '$class' : 'org.accordproject.cicero.contract.AccordContractState', 'stateId' : 'ehlo' };
             result = await engine.execute(clause, req.body, state);
             delete result.state;
         }

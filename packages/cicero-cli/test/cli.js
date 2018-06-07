@@ -35,29 +35,33 @@ describe('cicero-cli', () => {
         '$class':'org.accordproject.latedeliveryandpenalty.TemplateModel',
         'forceMajeure':true,
         'penaltyDuration':{
-            '$class':'org.accordproject.latedeliveryandpenalty.Duration',
+            '$class':'org.accordproject.time.Duration',
             'amount':9,
-            'unit':'DAY'
+            'unit':'days'
         },
         'penaltyPercentage':7,
         'capPercentage':2,
         'termination':{
-            '$class':'org.accordproject.latedeliveryandpenalty.Duration',
+            '$class':'org.accordproject.time.Duration',
             'amount':2,
-            'unit':'WEEK'
+            'unit':'weeks'
         },
-        'fractionalPart':'DAY'
+        'fractionalPart':'days'
     };
 
     describe('#parse', () => {
-        it('should parse a clause using a template', () => {
-            return Commands.parse(template, sample, null).should.eventually.eql(parseReponse);
+        it('should parse a clause using a template', async () => {
+            const result = await Commands.parse(template, sample, null);
+            delete result.clauseId;
+            result.should.eql(parseReponse);
         });
     });
 
-    describe('#parsesave', () => {
-        it('should parse a clause using a template and save to a JSON file', () => {
-            return Commands.parse(template, sample, contract).should.eventually.eql(parseReponse);
+    describe('#parsesave', async () => {
+        it('should parse a clause using a template and save to a JSON file', async () => {
+            const result = await Commands.parse(template, sample, contract);
+            delete result.clauseId;
+            result.should.eql(parseReponse);
         });
     });
 

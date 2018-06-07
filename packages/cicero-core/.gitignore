@@ -61,4 +61,5 @@ typings/
 # dotenv environment variables file
 .env
 
+# dynamically created archives
 test/data/archives/

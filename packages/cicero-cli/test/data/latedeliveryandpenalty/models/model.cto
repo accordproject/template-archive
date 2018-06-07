@@ -1,32 +1,15 @@
 namespace org.accordproject.latedeliveryandpenalty
 
-/**
- * Units for a duration. 24 hour days are assumed.
- */
-enum TemporalUnit {
-  o SECOND
-  o MINUTE
-  o HOUR
-  o DAY
-  o WEEK
-  o YEAR
-}
-
-/**
- * A duration. For example, 6 hours.
- */
-concept Duration {
-  o Long amount
-  o TemporalUnit unit
-}
+import org.accordproject.cicero.contract.* from https://models.accordproject.org/cicero/contract.cto
+import org.accordproject.cicero.runtime.* from https://models.accordproject.org/cicero/runtime.cto
+import org.accordproject.time.* from https://models.accordproject.org/time.cto
 
 /**
  * Defines the data model for the LateDeliveryAndPenalty template.
  * This defines the structure of the abstract syntax tree that the parser for the template
  * must generate from input source text.
  */
-@AccordTemplateModel("latedeliveryandpenalty")
-concept TemplateModel {
+asset TemplateModel extends AccordClause {
   /**
    * Does the clause include a force majeure provision?
    */
@@ -61,7 +44,7 @@ concept TemplateModel {
 /**
  * Defines the input data required by the template
  */
-transaction LateDeliveryAndPenaltyRequest {
+transaction LateDeliveryAndPenaltyRequest extends Request {
 
   /**
    * Are we in a force majeure situation? 
@@ -87,7 +70,7 @@ transaction LateDeliveryAndPenaltyRequest {
 /**
  * Defines the output data for the template
  */
-transaction LateDeliveryAndPenaltyResponse {
+transaction LateDeliveryAndPenaltyResponse extends Response {
   /**
    * The penalty to be paid by the seller
    */

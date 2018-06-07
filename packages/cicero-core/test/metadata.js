@@ -79,15 +79,14 @@ describe('Metadata', () => {
         });
 
         it('should throw a warning if target version is not valid semver for current version of cicero', () => {
-            new Metadata({
+            return (() => new Metadata({
                 name: 'template',
                 cicero: {
                     template: 'clause',
                     version: '0.0.0'
                 },
-            }, null, {});
+            }, null, {})).should.throw('The template targets Cicero (0.0.0) but the Cicero version is 0.4.0');
         });
-
     });
 
     describe('#getSample(locale)', () => {
@@ -95,7 +94,7 @@ describe('Metadata', () => {
         it('should return requested sample', () => {
             const md = new Metadata({
                 name: 'template',
-                cicero: {template: 'contract',version:'^0.3.0-0'}
+                cicero: {template: 'contract',version:'^0.4.0-0'}
             }, null, {
                 en: 'sample'
             });
@@ -104,7 +103,7 @@ describe('Metadata', () => {
         it('should return null if sample is not in the samples', () => {
             const md = new Metadata({
                 name: 'template',
-                cicero: {template: 'contract',version:'^0.3.0-0'}
+                cicero: {template: 'contract',version:'^0.4.0-0'}
             }, null, {});
             should.not.exist(md.getSample('en'));
             should.not.exist(md.getSample());
@@ -114,7 +113,7 @@ describe('Metadata', () => {
         it('should return default sample if locale not specified', () => {
             const md = new Metadata({
                 name: 'template',
-                cicero: {template: 'contract',version:'^0.3.0-0'}
+                cicero: {template: 'contract',version:'^0.4.0-0'}
             }, null, {
                 default: 'sample'
             });
@@ -127,21 +126,21 @@ describe('Metadata', () => {
         it('should return default type', () => {
             const md = new Metadata({
                 name: 'template',
-                cicero: {template: 'contract',version:'^0.3.0-0'}
+                cicero: {template: 'contract',version:'^0.4.0-0'}
             }, null, {});
             md.getTemplateType().should.be.equal(0);
         });
         it('should return for explicit contract type', () => {
             const md = new Metadata({
                 name: 'template',
-                cicero: {template: 'contract',version:'^0.3.0-0'}
+                cicero: {template: 'contract',version:'^0.4.0-0'}
             }, null, {});
             md.getTemplateType().should.be.equal(0);
         });
         it('should return default type', () => {
             const md = new Metadata({
                 name: 'template',
-                cicero: {template: 'clause',version:'^0.3.0-0'}
+                cicero: {template: 'clause',version:'^0.4.0-0'}
             }, null, {});
             md.getTemplateType().should.be.equal(1);
         });

@@ -1,14 +1,19 @@
 namespace io.clause.latedeliveryandpenalty
 
-import org.accordproject.time.* from github://accordproject/models/master/time.cto
+import org.accordproject.time.TemporalUnit from https://models.accordproject.org/time.cto
+import org.accordproject.time.Duration from https://models.accordproject.org/time.cto
+
+import org.accordproject.cicero.contract.AccordContract from https://models.accordproject.org/cicero/contract.cto
+import org.accordproject.cicero.contract.AccordClause from https://models.accordproject.org/cicero/contract.cto
+import org.accordproject.cicero.runtime.Request from https://models.accordproject.org/cicero/runtime.cto
+import org.accordproject.cicero.runtime.Response from https://models.accordproject.org/cicero/runtime.cto
 
 /**
  * Defines the data model for the LateDeliveryAndPenalty template.
  * This defines the structure of the abstract syntax tree that the parser for the template
  * must generate from input source text.
  */
-@AccordTemplateModel("latedeliveryandpenalty")
-concept TemplateModel {
+asset TemplateModel extends AccordClause {
   /**
    * Does the clause include a force majeure provision?
    */
@@ -43,7 +48,7 @@ concept TemplateModel {
 /**
  * Defines the input data required by the template
  */
-transaction LateDeliveryAndPenaltyRequest {
+transaction LateDeliveryAndPenaltyRequest extends Request {
 
   /**
    * Are we in a force majeure situation? 
@@ -69,7 +74,7 @@ transaction LateDeliveryAndPenaltyRequest {
 /**
  * Defines the output data for the template
  */
-transaction LateDeliveryAndPenaltyResponse {
+transaction LateDeliveryAndPenaltyResponse extends Response {
   /**
    * The penalty to be paid by the seller
    */

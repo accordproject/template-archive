@@ -3,12 +3,15 @@
  */
 namespace org.accordproject.saft
 
-import org.accordproject.us.state.*
+import org.accordproject.cicero.contract.* from https://models.accordproject.org/cicero/contract.cto
+import org.accordproject.cicero.runtime.* from https://models.accordproject.org/cicero/runtime.cto
+import org.accordproject.usa.state.State from https://models.accordproject.org/usa/state.cto
+import org.accordproject.money.CurrencyCode from https://models.accordproject.org/money.cto
 
 /**
  * The network has launched!
  */
-transaction Launch {
+transaction Launch extends Request {
   /**
    * The exchange rate to use
    */
@@ -18,7 +21,7 @@ transaction Launch {
 /**
  * The network has been terminated. :-(
  */
-transaction Terminate {
+transaction Terminate extends Request {
 
   /**
    * How many funds remain, we need to reimburse them
@@ -34,7 +37,7 @@ transaction Terminate {
 /**
  * Whether the network launches or terminates, we need to payout
  */
-transaction Payout {
+transaction Payout extends Response {
 
   /**
    * The amount to payout
@@ -58,18 +61,9 @@ enum CompanyType {
 }
 
 /**
- * The currencies supported
- */
-enum Currency {
-  o USD
-  o EUR
-}
-
-/**
  * Defines the data model for the Saft template.
  */
-@AccordTemplateModel("saft")
-concept TemplateModel {
+asset TemplateModel extends AccordContract {
   /**
    * The name of the token to be sold
    */
@@ -103,7 +97,7 @@ concept TemplateModel {
   /**
    * The currency for the purchase
    */
-  o Currency currency
+  o CurrencyCode currency
 
   /**
    * The minimum amount that needs to be raised
