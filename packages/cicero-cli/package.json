@@ -48,9 +48,9 @@
   "dependencies": {
     "@accordproject/cicero-core": "0.4.0",
     "@accordproject/cicero-engine": "0.4.0",
-    "@accordproject/ergo-compiler": "0.0.62",
-    "composer-common": "0.19.8-20180603041248",
-    "uuid": "^3.2.1",
+    "@accordproject/ergo-compiler": "0.0.63",
+    "composer-common": "0.19.8",
+    "uuid": "3.2.1",
     "yargs": "9.0.1"
   },
   "license-check-config": {
