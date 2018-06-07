@@ -27,6 +27,7 @@ const JavaVisitor = CodeGen.JavaVisitor;
 const JSONSchemaVisitor = CodeGen.JSONSchemaVisitor;
 const PlantUMLVisitor = CodeGen.PlantUMLVisitor;
 const TypescriptVisitor = CodeGen.TypescriptVisitor;
+const uuidv4 = require('uuid/v4');
 
 /**
  * Utility class that implements the commands exposed by the Cicero CLI.
@@ -132,7 +133,9 @@ class Commands {
         if(!fs.existsSync(statePath)) {
             logger.warn('A state file was not provided, generating default state object. Try the --state flag or create a state.json in the root folder of your template.');
             stateJson = {
-                '$class': 'org.accordproject.contract.State'
+                '$class': 'org.accordproject.cicero.contract.AccordContractState',
+                stateId: uuidv4()
+
             };
         } else {
             stateJson = JSON.parse(fs.readFileSync(statePath, 'utf8'));
