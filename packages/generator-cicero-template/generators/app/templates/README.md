@@ -22,7 +22,7 @@ Thank you!
 
 ```
 cicero parse --template ./<%= data.templateName %>/ --dsl ./<%= data.templateName %>/sample.txt
-Setting clause data: {"$class":"io.clause.helloworld.TemplateModel","name":"Dan"}
+Setting clause data: {"$class":"io.clause.helloworld.MyContract","name":"Dan"}
 ```
 
 Or, attempting to parse invalid data will result in line and column information for the syntax error.
@@ -48,7 +48,7 @@ Use the `cicero execute` command to load a template from a directory on disk, in
 ```
 data.json:
 {
-   "$class": "<%= data.modelNamespace %>.Request",
+   "$class": "<%= data.modelNamespace %>.MyRequest",
    "input": "World"
 }
 ```

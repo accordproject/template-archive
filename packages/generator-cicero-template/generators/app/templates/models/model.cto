@@ -1,20 +1,22 @@
 namespace <%= data.modelNamespace %>
 
-transaction Request {
+import org.accordproject.cicero.contract.* from https://models.accordproject.org/cicero/contract.cto
+import org.accordproject.cicero.runtime.* from https://models.accordproject.org/cicero/runtime.cto
+
+transaction MyRequest extends Request {
   o String input
 }
 
-transaction Response {
+transaction MyResponse extends Response {
   o String output
 }
 
 /**
- * The template model
+ * The model for the contract
  */
-@AccordTemplateModel("<%= data.templateName %>")
-transaction TemplateModel { // TODO (DCS) this should be a concept, but blocked by https://github.com/hyperledger/composer/issues/2472
+asset MyContract extends AccordContract {
   /**
-   * The name for the clause
+   * The name for the contract
    */
   o String name
 }

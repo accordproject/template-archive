@@ -2,7 +2,7 @@ namespace org.accordproject.latedeliveryandpenalty
 
 // Imports CTO files
 import org.accordproject.contract.*
-import org.accordproject.latedeliveryandpenalty.*
+import io.clause.latedeliveryandpenalty.*
 // Date and time library
 import ergo.moment.*
 
