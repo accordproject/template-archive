@@ -9,6 +9,7 @@
  * @param {Context} context - the Accord context
  * @param {io.clause.saft.Terminate} context.request - the incoming request
  * @param {io.clause.saft.Payout} context.response - the response
+ * @param {Event} context.emit - the emitted events
  * @AccordClauseLogic
  */
 function onTerminate(context) {

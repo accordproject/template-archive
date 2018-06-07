@@ -252,10 +252,26 @@ describe('Template', () => {
             ]);
         });
 
-        it('should throw error when no logic is defined', async () => {
-            const template = await Template.fromDirectory('./test/data/no-logic');
-            return (() => template.getResponseTypes()).should.throw('Did not find any function declarations with the @AccordClauseLogic annotation');
+    });
+
+    describe('#getEmitTypes', () => {
+
+        it('should return default emit type for single accordclauselogic function', async () => {
+            const template = await Template.fromDirectory('./test/data/latedeliveryandpenalty');
+            const types = template.getEmitTypes();
+            types.should.be.eql([
+                'Event',
+            ]);
         });
+
+        it('should return emit type for single accordclauselogic function', async () => {
+            const template = await Template.fromDirectory('./test/data/helloemit');
+            const types = template.getEmitTypes();
+            types.should.be.eql([
+                'org.accordproject.helloemit.Greeting',
+            ]);
+        });
+
     });
 
     describe('#getFactory', () => {
