@@ -9,6 +9,7 @@
  * @param {Context} context - the Accord context
  * @param {org.accordproject.latedeliveryandpenalty.LateDeliveryAndPenaltyRequest} context.request - the incoming request
  * @param {org.accordproject.latedeliveryandpenalty.LateDeliveryAndPenaltyResponse} context.response - the response
+ * @param {Event} context.emit - the emitted events
  * @AccordClauseLogic
  */
 function execute(context) {

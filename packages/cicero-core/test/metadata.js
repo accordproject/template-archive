@@ -85,7 +85,7 @@ describe('Metadata', () => {
                     template: 'clause',
                     version: '0.0.0'
                 },
-            }, null, {})).should.throw('The template targets Cicero (0.0.0) but the Cicero version is 0.4.0');
+            }, null, {})).should.throw('The template targets Cicero (0.0.0) but the Cicero version is ');
         });
     });
 

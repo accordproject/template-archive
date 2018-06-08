@@ -9,6 +9,7 @@
  * @param {Context} context - the Accord context
  * @param {org.accordproject.saft.Launch} context.request - the incoming request
  * @param {org.accordproject.saft.Payout} context.response - the response
+ * @param {Event} context.emit - the emitted events
  * @AccordClauseLogic
  */
 function onLaunch(context) {
