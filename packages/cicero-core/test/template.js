@@ -98,6 +98,7 @@ describe('Template', () => {
             template2.getIdentifier().should.equal(template.getIdentifier());
             template2.getModelManager().getModelFile('io.clause.latedeliveryandpenalty').should.not.be.null;
             template2.getGrammar().should.not.be.null;
+            template2.getTemplatizedGrammar().should.equal(template.getTemplatizedGrammar());
             template2.getScriptManager().getScripts().length.should.equal(template.getScriptManager().getScripts().length);
             template2.getMetadata().getREADME().should.equal(template.getMetadata().getREADME());
             template2.getMetadata().getSamples().should.eql(template.getMetadata().getSamples());

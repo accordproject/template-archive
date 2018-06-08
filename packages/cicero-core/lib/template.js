@@ -389,11 +389,19 @@ class Template {
     }
 
     /**
-     * Get the grammar for the template
+     * Get the (compiled) grammar for the template
      * @return {String} - the grammar for the template
      */
     getGrammar() {
         return this.grammar;
+    }
+
+    /**
+     * Returns the templatized grammar
+     * @return {String} the contents of the templatized grammar
+     */
+    getTemplatizedGrammar() {
+        return this.templatizedGrammar;
     }
 
     /**
@@ -645,10 +653,11 @@ class Template {
         zip.file('grammar/', null, Object.assign({}, options, {
             dir: true
         }));
-        if (this.grammar) {
-            zip.file('grammar/grammar.ne', this.grammar, options);
-        } else {
+
+        if (this.templatizedGrammar) {
             zip.file('grammar/template.tem', this.templatizedGrammar, options);
+        } else {
+            zip.file('grammar/grammar.ne', this.grammar, options);
         }
 
         // save the README.md if present
