@@ -657,7 +657,7 @@ class Template {
         if (this.templatizedGrammar) {
             zip.file('grammar/template.tem', this.templatizedGrammar, options);
         } else {
-            zip.file('grammar/template.ne', this.grammar, options);
+            zip.file('grammar/grammar.ne', this.grammar, options);
         }
 
         // save the README.md if present
