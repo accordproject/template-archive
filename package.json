@@ -7,7 +7,7 @@
     "istanbul-merge": "1.1.1",
     "jsdoc": "3.5.5",
     "jsdoc-sphinx": "0.0.6",
-    "lerna": "2.8.0",
+    "lerna": "2.11.0",
     "license-check": "1.1.5",
     "moment": "2.20.1",
     "semver": "5.5.0",
