@@ -1,0 +1,20 @@
+namespace org.accordproject.purchaseorder
+
+asset Product identified by partNumber {
+  o String partNumber
+  o String name
+  o Double quantity
+  o Double unitPrice
+}
+
+asset OrderItem identified by partNumber {
+  o String partNumber
+  o Double quantity
+}
+
+concept PurchaseOrder {
+  o Product[] products
+  o String deliveryLocation
+  o DateTime deliveryDate
+}
+
