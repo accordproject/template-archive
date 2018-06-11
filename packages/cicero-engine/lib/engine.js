@@ -38,6 +38,7 @@ class Engine {
      */
     constructor() {
         this.scripts = {};
+        this.initScripts = {};
     }
 
     /**
@@ -47,11 +48,13 @@ class Engine {
      */
     compileJsClause(clause) {
         let allJsScripts = '';
+        let allJsInitScripts = '';
         let template = clause.getTemplate();
 
         template.getScriptManager().getScripts().forEach(function (element) {
             if (element.getLanguage() === '.js') {
                 allJsScripts += element.getContents();
+                allJsInitScripts += element.getContents();
             }
         }, this);
 
@@ -59,8 +62,11 @@ class Engine {
             throw new Error('Did not find any JavaScript logic');
         }
         allJsScripts += this.buildDispatchFunction(clause);
+        allJsInitScripts += this.buildInitFunction(clause);
         const script = new VMScript(allJsScripts);
+        const initScript = new VMScript(allJsInitScripts);
         this.scripts[clause.getIdentifier()] = script;
+        this.initScripts[clause.getIdentifier()] = initScript;
     }
 
     /**
@@ -125,6 +131,63 @@ class Engine {
     }
 
     /**
+     * Generate the initialization logic
+     * @param {Clause} clause - the clause to compile
+     * @return {String} the initialization code
+     * @private
+     */
+    buildInitFunction(clause) {
+        // get the function declarations of all functions
+        // that have the @clause annotation
+        const functionDeclarations = clause.getTemplate().getScriptManager().getScripts().filter((ele) => {
+            return ele.getLanguage() === ('.js');
+        }).map((ele) => {
+            return ele.getFunctionDeclarations();
+        })
+            .reduce((flat, next) => {
+                return flat.concat(next);
+            })
+            .filter((ele) => {
+                return ele.getDecorators().indexOf('AccordClauseLogicInit') >= 0;
+            }).map((ele) => {
+                return ele;
+            });
+
+        if (functionDeclarations.length > 1) {
+            throw new Error('Shoult have at most one function declaration with the @AccordClauseLogicInit annotation');
+        }
+
+        const head = `
+        __init(contract,data,request,moment());
+
+        function __init(contract,data,request,now) {
+        `;
+
+        let methods = '';
+        if (functionDeclarations.length === 0) {
+            methods += `
+                return { response: null, state: { '$class': 'org.accordproject.cicero.contract.AccordContractState', 'stateId' : '1' }, emit: [] };`;
+        } else {
+            const ele = functionDeclarations[0];
+            methods += `
+                let type0 = '${ele.getParameterTypes()[2]}';
+                let ns0 = type0.substr(0, type0.lastIndexOf('.'));
+                let clazz0 = type0.substr(type0.lastIndexOf('.')+1);
+                let response0 = factory.newTransaction(ns0, clazz0);
+                let context0 = {request: request, contract: contract, data: data, response: response0, emit: [], now: now};
+                ${ele.getName()}(context0);
+                return { response: context0.response, state: context0.state, emit: context0.emit };`;
+        }
+        const tail = `
+        }
+        `;
+
+        const code = head + methods + tail;
+        logger.debug(code);
+        return code;
+    }
+
+    /**
      * Execute a clause, passing in the request object
      * @param {Clause} clause  - the clause to execute
      * @param {object} request  - the request, a JS object that can be deserialized
@@ -169,6 +232,76 @@ class Engine {
         vm.freeze(validContract, 'data'); // Second argument adds object to global.
         vm.freeze(validRequest, 'request'); // Second argument adds object to global.
         vm.freeze(validState, 'state'); // Second argument adds object to global.
+
+        vm.freeze(factory, 'factory'); // Second argument adds object to global.
+
+        // execute the logic
+        const result = vm.run(script);
+
+        // ensure the response is valid
+        result.response.$validator = new ResourceValidator({permitResourcesForRelationships: true});
+        result.response.validate();
+        const responseResult = template.getSerializer().toJSON(result.response, {convertResourcesToRelationships: true});
+
+        // ensure the new state is valid
+        result.state.$validator = new ResourceValidator({permitResourcesForRelationships: true});
+        result.state.validate();
+        const stateResult = template.getSerializer().toJSON(result.state, {convertResourcesToRelationships: true});
+
+        // ensure all the emits are valid
+        let emitResult = [];
+        for (let i = 0; i < result.emit.length; i++) {
+            result.emit[i].$validator = new ResourceValidator({permitResourcesForRelationships: true});
+            result.emit[i].validate();
+            emitResult.push(template.getSerializer().toJSON(result.emit[i], {convertResourcesToRelationships: true}));
+        }
+
+        return {
+            'clause': clause.getIdentifier(),
+            'request': request,
+            'response': responseResult,
+            'state': stateResult,
+            'emit': emitResult,
+        };
+    }
+
+    /**
+     * Initialize a clause, passing in the request object
+     * @param {Clause} clause  - the clause to execute
+     * @param {object} request  - the request, a JS object that can be deserialized
+     * using the Composer serializer.
+     * @return {Promise} a promise that resolves to a result for the clause initialization
+     * @private
+     */
+    async init(clause, request) {
+        const template = clause.getTemplate();
+        // ensure the request is valid
+        const validRequest = template.getSerializer().fromJSON(request, {validate: false, acceptResourcesForRelationships: true});
+        validRequest.$validator = new ResourceValidator({permitResourcesForRelationships: true});
+        validRequest.validate();
+
+        logger.debug('Engine processing initialization request ' + request.$class);
+
+        let script = this.initScripts[clause.getIdentifier()];
+
+        this.compileJsClause(clause);
+        script = this.initScripts[clause.getIdentifier()];
+
+        const validContract = clause.getDataAsComposerObject();
+        const factory = template.getFactory();
+        const vm = new VM({
+            timeout: 1000,
+            sandbox: {
+                moment: require('moment'),
+                serializer:template.getSerializer(),
+                logger: new Logger(template.getSerializer())
+            }
+        });
+
+        // add immutables to the context
+        vm.freeze(validContract, 'contract'); // Second argument adds object to global.
+        vm.freeze(validContract, 'data'); // Second argument adds object to global.
+        vm.freeze(validRequest, 'request'); // Second argument adds object to global.
 
         vm.freeze(factory, 'factory'); // Second argument adds object to global.
 

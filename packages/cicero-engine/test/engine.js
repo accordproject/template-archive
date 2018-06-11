@@ -253,3 +253,69 @@ describe('BogusClauses', () => {
         (() => engine.compileJsClause(clause)).should.throw('Did not find any JavaScript logic');
     });
 });
+describe('EngineInstallmentSale', () => {
+
+    let engine;
+    let clause;
+    const testLatePenaltyInput = fs.readFileSync(path.resolve(__dirname, 'data/installment-sale', 'sample.txt'), 'utf8');
+
+    beforeEach(async function () {
+        engine = new Engine();
+        const template = await Template.fromDirectory('./test/data/installment-sale');
+        clause = new Clause(template);
+        clause.parse(testLatePenaltyInput);
+    });
+
+    afterEach(() => {});
+
+    describe('#executeergo', function () {
+
+        it('should execute a smart clause', async function () {
+            const request = {};
+            request.$class = 'org.accordproject.installmentsale.Installment';
+            request.amount = 2500.00;
+            const state = {};
+            state.$class = 'org.accordproject.installmentsale.InstallmentSaleState';
+            state.stateId = 'org.accordproject.installmentsale.InstallmentSaleState#1';
+            state.status = 'WaitingForFirstDayOfNextMonth';
+            state.balance_remaining = 10000.00;
+            state.total_paid = 0.00;
+            state.next_payment_month = 3.0;
+            const result = await engine.execute(clause, request, state);
+            result.should.not.be.null;
+            result.response.balance.should.equal(7612.499999999999);
+            result.state.balance_remaining.should.equal(7612.499999999999);
+            result.state.total_paid.should.equal(2500.00);
+        });
+
+        it('should initialize a smart clause', async function () {
+            const request = {};
+            request.$class = 'org.accordproject.installmentsale.InitializeRequest';
+            request.firstMonth = 1.0;
+            const result = await engine.init(clause, request);
+            result.should.not.be.null;
+            result.response.should.not.be.null;
+            result.state.balance_remaining.should.equal(10000.00);
+            result.state.total_paid.should.equal(0.0);
+        });
+
+        it('should initialize a smart clause and execute one installment', async function () {
+            const request = {};
+            request.$class = 'org.accordproject.installmentsale.InitializeRequest';
+            request.firstMonth = 1.0;
+            const result = await engine.init(clause, request);
+            result.should.not.be.null;
+            result.response.should.not.be.null;
+            result.state.balance_remaining.should.equal(10000.00);
+            result.state.total_paid.should.equal(0.0);
+            const request1 = {};
+            request1.$class = 'org.accordproject.installmentsale.Installment';
+            request1.amount = 2500.00;
+            const result1 = await engine.execute(clause, request1, result.state);
+            result1.should.not.be.null;
+            result1.response.balance.should.equal(7612.499999999999);
+            result1.state.balance_remaining.should.equal(7612.499999999999);
+            result1.state.total_paid.should.equal(2500.00);
+        });
+    });
+});
