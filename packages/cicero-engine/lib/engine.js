@@ -166,7 +166,7 @@ class Engine {
         let methods = '';
         if (functionDeclarations.length === 0) {
             methods += `
-                return { response: null, state: { '$class': 'org.accordproject.cicero.contract.AccordContractState', 'stateId' : '1' }, emit: [] };`;
+                return { response: serializer.fromJSON({ '$class': 'org.accordproject.cicero.runtime.Response' }, {validate: false, acceptResourcesForRelationships: true}), state: serializer.fromJSON({ '$class': 'org.accordproject.cicero.contract.AccordContractState', 'stateId' : 'org.accordproject.cicero.contract.AccordContractState#1' }, {validate: false, acceptResourcesForRelationships: true}), emit: [] };`;
         } else {
             const ele = functionDeclarations[0];
             methods += `
