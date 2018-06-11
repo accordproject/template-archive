@@ -136,6 +136,24 @@ describe('EngineHelloWorld', () => {
             result.should.not.be.null;
             result.response.output.should.equal('Hello Fred Blogs (Accord Project)');
         });
+
+        it('should execute a smart clause with state initialization', async function () {
+            const request = {
+                '$class': 'org.accordproject.cicero.runtime.Request'
+            };
+            const result = await engine.init(clause, request);
+            result.state.should.not.be.null;
+            const state = result.state;
+            state.$class.should.equal('org.accordproject.cicero.contract.AccordContractState');
+            state.stateId.should.equal('org.accordproject.cicero.contract.AccordContractState#1');
+            const request1 = {
+                '$class': 'org.accordproject.helloworld.MyRequest',
+                'input': 'Accord Project'
+            };
+            const result1 = await engine.execute(clause, request1, state);
+            result1.should.not.be.null;
+            result1.response.output.should.equal('Hello Fred Blogs (Accord Project)');
+        });
     });
     describe('#execute2', function () {
 
@@ -253,7 +271,7 @@ describe('BogusClauses', () => {
         (() => engine.compileJsClause(clause)).should.throw('Did not find any JavaScript logic');
     });
 });
-describe('EngineInstallmentSale', () => {
+describe('EngineInstallmentSaleJs', () => {
 
     let engine;
     let clause;
@@ -268,7 +286,73 @@ describe('EngineInstallmentSale', () => {
 
     afterEach(() => {});
 
-    describe('#executeergo', function () {
+    describe('#execute', function () {
+
+        it('should execute a smart clause', async function () {
+            const request = {};
+            request.$class = 'org.accordproject.installmentsale.Installment';
+            request.amount = 2500.00;
+            const state = {};
+            state.$class = 'org.accordproject.installmentsale.InstallmentSaleState';
+            state.stateId = 'org.accordproject.installmentsale.InstallmentSaleState#1';
+            state.status = 'WaitingForFirstDayOfNextMonth';
+            state.balance_remaining = 10000.00;
+            state.total_paid = 0.00;
+            state.next_payment_month = 3.0;
+            const result = await engine.execute(clause, request, state);
+            result.should.not.be.null;
+            result.response.balance.should.equal(7612.499999999999);
+            result.state.balance_remaining.should.equal(7612.499999999999);
+            result.state.total_paid.should.equal(2500.00);
+        });
+
+        it('should initialize a smart clause', async function () {
+            const request = {};
+            request.$class = 'org.accordproject.installmentsale.InitializeRequest';
+            request.firstMonth = 1.0;
+            const result = await engine.init(clause, request);
+            result.should.not.be.null;
+            result.response.should.not.be.null;
+            result.state.balance_remaining.should.equal(10000.00);
+            result.state.total_paid.should.equal(0.0);
+        });
+
+        it('should initialize a smart clause and execute one installment', async function () {
+            const request = {};
+            request.$class = 'org.accordproject.installmentsale.InitializeRequest';
+            request.firstMonth = 1.0;
+            const result = await engine.init(clause, request);
+            result.should.not.be.null;
+            result.response.should.not.be.null;
+            result.state.balance_remaining.should.equal(10000.00);
+            result.state.total_paid.should.equal(0.0);
+            const request1 = {};
+            request1.$class = 'org.accordproject.installmentsale.Installment';
+            request1.amount = 2500.00;
+            const result1 = await engine.execute(clause, request1, result.state);
+            result1.should.not.be.null;
+            result1.response.balance.should.equal(7612.499999999999);
+            result1.state.balance_remaining.should.equal(7612.499999999999);
+            result1.state.total_paid.should.equal(2500.00);
+        });
+    });
+});
+describe('EngineInstallmentSaleErgo', () => {
+
+    let engine;
+    let clause;
+    const testLatePenaltyInput = fs.readFileSync(path.resolve(__dirname, 'data/installment-sale-ergo', 'sample.txt'), 'utf8');
+
+    beforeEach(async function () {
+        engine = new Engine();
+        const template = await Template.fromDirectory('./test/data/installment-sale-ergo');
+        clause = new Clause(template);
+        clause.parse(testLatePenaltyInput);
+    });
+
+    afterEach(() => {});
+
+    describe('#execute', function () {
 
         it('should execute a smart clause', async function () {
             const request = {};

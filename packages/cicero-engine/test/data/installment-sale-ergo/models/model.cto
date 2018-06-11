@@ -4,10 +4,10 @@ import org.accordproject.cicero.contract.* from https://models.accordproject.org
 import org.accordproject.cicero.runtime.* from https://models.accordproject.org/cicero/runtime.cto
 import org.accordproject.money.MonetaryAmount from https://models.accordproject.org/money.cto
 
-import org.accordproject.purchaseorder.*
-
-transaction Initialize {
+transaction InitializeRequest {
   o Double firstMonth
+}
+transaction InitializeResponse {
 }
 
 transaction Installment extends Request {
@@ -33,10 +33,6 @@ enum ContractStatus {
  */
 concept MyObligation {
   o String party
-}
-concept DeliveryObligation extends MyObligation {
-  o DateTime expectedDelivery
-  o OrderItem[] deliverables
 }
 concept PurchaseObligation extends MyObligation {
   o Double requiredPurchase
