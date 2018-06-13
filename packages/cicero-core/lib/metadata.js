@@ -77,8 +77,14 @@ class Metadata {
             CLAUSE: 1
         };
 
+        const languageTypes = {
+            ERGO: 0,
+            JAVASCRIPT: 1
+        };
+
         // Set defaults
         this.type = templateTypes.CONTRACT;
+        this.language = languageTypes.ERGO;
         this.targetVersion = ciceroVersion;
 
         if (packageJson.cicero && packageJson.cicero.template) {
@@ -92,6 +98,19 @@ class Metadata {
             }
         } else {
             logger.warn('No cicero template type specified. Assuming that this is a contract template');
+        }
+
+        if (packageJson.cicero && packageJson.cicero.language) {
+            if(packageJson.cicero.language !== 'ergo' &&
+            packageJson.cicero.language !== 'javascript'){
+                throw new Error('A cicero template language must be either "ergo" or "javascript".');
+            }
+
+            if(packageJson.cicero.language === 'javascript'){
+                this.language = templateTypes.JAVASCRIPT;
+            }
+        } else {
+            logger.warn('No cicero template language specified. Assuming that this is an ergo template');
         }
 
         if (packageJson.cicero && packageJson.cicero.version) {
@@ -139,6 +158,14 @@ class Metadata {
      */
     getTemplateType(){
         return this.type;
+    }
+
+    /**
+     * Returns either a 0 (for an ergo template), or 1 (for a javascript template)
+     * @returns {number} the template language
+     */
+    getLanguage(){
+        return this.language;
     }
 
     /**

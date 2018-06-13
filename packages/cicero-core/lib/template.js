@@ -67,7 +67,6 @@ class Template {
      * @param {object} samples - the sample text for the template in different locales
      */
     constructor(packageJson, readme, samples) {
-
         this.modelManager = new ModelManager();
         this.scriptManager = new ScriptManager(this.modelManager);
         this.introspector = new Introspector(this.modelManager);
@@ -77,7 +76,6 @@ class Template {
         this.grammar = null;
         this.grammarAst = null;
         this.templatizedGrammar = null;
-        this.logicboth = false;
     }
 
     /**
@@ -901,6 +899,9 @@ class Template {
                     if (filePath.ext.toLowerCase() === '.ergo') {
                         logger.debug(method, 'Compiling Ergo to JavaScript ', path);
                         // re-get the updated modelfiles from the modelmanager (includes external dependencies)
+                        if (template.getMetadata().getLanguage() === 1) {
+                            logger.warn('Template is declared as javascript, but this is an ergo template');
+                        }
                         const newModelFiles = [];
                         for( const mf of template.getModelManager().getModelFiles() ) {
                             newModelFiles.push(mf.getDefinitions());
