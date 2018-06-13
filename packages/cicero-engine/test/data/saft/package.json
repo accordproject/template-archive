@@ -7,6 +7,7 @@
     },
     "cicero": {
       "template": "contract",
+      "language": "ergo",
       "version": "^0.4.0"
     },
     "devDependencies": {

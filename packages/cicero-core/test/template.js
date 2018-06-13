@@ -181,6 +181,7 @@ describe('Template', () => {
                 'description': '"Dan Selman" agrees to spend 100.0 conga coins on "swag"',
                 'cicero': {
                     'template': 'clause',
+                    'language': 'ergo',
                     'version': '^0.4.0'
                 }
             },

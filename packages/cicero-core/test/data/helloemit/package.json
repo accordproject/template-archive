@@ -4,6 +4,7 @@
     "description": "This is the Hello World of Accord Protocol Templates with Emit.",
     "cicero": {
       "template": "clause",
+      "language": "ergo",
       "version": "^0.4.0"
     },
     "scripts": {
