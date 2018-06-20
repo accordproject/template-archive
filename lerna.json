@@ -1,9 +1,9 @@
 {
-  "lerna": "2.8.0",
+  "lerna": "2.11.0",
   "packages": [
     "packages/*"
   ],
-  "version": "0.4.0",
+  "version": "0.4.4",
   "hoist": true,
   "command": {
     "publish": {

@@ -40,7 +40,6 @@ const Ergo = require('@accordproject/ergo-compiler/lib/ergo');
 const uuid = require('uuid');
 const nunjucks = require('nunjucks');
 
-// const common = require.resolve('@accordproject/cicero-common/models/common.cto');
 const ENCODING = 'utf8';
 // Matches 'sample.txt' or 'sample_TAG.txt' where TAG is an IETF language tag (BCP 47)
 const IETF_REGEXP = languageTagRegex({ exact: false }).toString().slice(1,-2);
@@ -68,7 +67,6 @@ class Template {
      * @param {object} samples - the sample text for the template in different locales
      */
     constructor(packageJson, readme, samples) {
-
         this.modelManager = new ModelManager();
         this.scriptManager = new ScriptManager(this.modelManager);
         this.introspector = new Introspector(this.modelManager);
@@ -78,7 +76,6 @@ class Template {
         this.grammar = null;
         this.grammarAst = null;
         this.templatizedGrammar = null;
-        this.logicboth = false;
     }
 
     /**
@@ -390,11 +387,19 @@ class Template {
     }
 
     /**
-     * Get the grammar for the template
+     * Get the (compiled) grammar for the template
      * @return {String} - the grammar for the template
      */
     getGrammar() {
         return this.grammar;
+    }
+
+    /**
+     * Returns the templatized grammar
+     * @return {String} the contents of the templatized grammar
+     */
+    getTemplatizedGrammar() {
+        return this.templatizedGrammar;
     }
 
     /**
@@ -646,10 +651,11 @@ class Template {
         zip.file('grammar/', null, Object.assign({}, options, {
             dir: true
         }));
-        if (this.grammar) {
-            zip.file('grammar/grammar.ne', this.grammar, options);
-        } else {
+
+        if (this.templatizedGrammar) {
             zip.file('grammar/template.tem', this.templatizedGrammar, options);
+        } else {
+            zip.file('grammar/grammar.ne', this.grammar, options);
         }
 
         // save the README.md if present
@@ -893,6 +899,9 @@ class Template {
                     if (filePath.ext.toLowerCase() === '.ergo') {
                         logger.debug(method, 'Compiling Ergo to JavaScript ', path);
                         // re-get the updated modelfiles from the modelmanager (includes external dependencies)
+                        if (template.getMetadata().getLanguage() === 1) {
+                            logger.warn('Template is declared as javascript, but this is an ergo template');
+                        }
                         const newModelFiles = [];
                         for( const mf of template.getModelManager().getModelFiles() ) {
                             newModelFiles.push(mf.getDefinitions());
@@ -1170,6 +1179,35 @@ class Template {
         let types = [];
         functionDeclarations.forEach((ele, n) => {
             types.push(ele.getParameterTypes()[2]);
+        });
+        logger.debug(types);
+        return types;
+    }
+
+    /**
+     * Provides a list of the emit types that of this Template. Types use the fully-qualified form.
+     * @return {Array} a list of the response types
+     */
+    getEmitTypes() {
+        const functionDeclarations = this.getScriptManager().getScripts().map((ele) => {
+            return ele.getFunctionDeclarations();
+        })
+            .reduce((flat, next) => {
+                return flat.concat(next);
+            })
+            .filter((ele) => {
+                return ele.getDecorators().indexOf('AccordClauseLogic') >= 0;
+            }).map((ele) => {
+                return ele;
+            });
+
+        if (functionDeclarations.length === 0) {
+            throw new Error('Did not find any function declarations with the @AccordClauseLogic annotation');
+        }
+
+        let types = [];
+        functionDeclarations.forEach((ele, n) => {
+            types.push(ele.getParameterTypes()[3]);
         });
         logger.debug(types);
         return types;

@@ -4,6 +4,7 @@
     "description": "A sample volume discount clause.",
     "cicero": {
       "template": "clause",
+      "language": "ergo",
       "version": "^0.4.0"
     },
     "scripts": {

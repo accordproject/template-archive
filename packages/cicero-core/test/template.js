@@ -98,6 +98,7 @@ describe('Template', () => {
             template2.getIdentifier().should.equal(template.getIdentifier());
             template2.getModelManager().getModelFile('io.clause.latedeliveryandpenalty').should.not.be.null;
             template2.getGrammar().should.not.be.null;
+            template2.getTemplatizedGrammar().should.equal(template.getTemplatizedGrammar());
             template2.getScriptManager().getScripts().length.should.equal(template.getScriptManager().getScripts().length);
             template2.getMetadata().getREADME().should.equal(template.getMetadata().getREADME());
             template2.getMetadata().getSamples().should.eql(template.getMetadata().getSamples());
@@ -148,7 +149,7 @@ describe('Template', () => {
 
         it('should create a template from an archive', async () => {
             await writeZip('latedeliveryandpenalty');
-            const buffer = fs.readFileSync('./test/data/archives/latedeliveryandpenalty@0.0.1.cta');
+            const buffer = fs.readFileSync('./test/data/latedeliveryandpenalty.cta');
             return Template.fromArchive(buffer).should.be.fulfilled;
         });
 
@@ -180,6 +181,7 @@ describe('Template', () => {
                 'description': '"Dan Selman" agrees to spend 100.0 conga coins on "swag"',
                 'cicero': {
                     'template': 'clause',
+                    'language': 'ergo',
                     'version': '^0.4.0'
                 }
             },
@@ -252,10 +254,26 @@ describe('Template', () => {
             ]);
         });
 
-        it('should throw error when no logic is defined', async () => {
-            const template = await Template.fromDirectory('./test/data/no-logic');
-            return (() => template.getResponseTypes()).should.throw('Did not find any function declarations with the @AccordClauseLogic annotation');
+    });
+
+    describe('#getEmitTypes', () => {
+
+        it('should return default emit type for single accordclauselogic function', async () => {
+            const template = await Template.fromDirectory('./test/data/latedeliveryandpenalty');
+            const types = template.getEmitTypes();
+            types.should.be.eql([
+                'Event',
+            ]);
         });
+
+        it('should return emit type for single accordclauselogic function', async () => {
+            const template = await Template.fromDirectory('./test/data/helloemit');
+            const types = template.getEmitTypes();
+            types.should.be.eql([
+                'org.accordproject.helloemit.Greeting',
+            ]);
+        });
+
     });
 
     describe('#getFactory', () => {

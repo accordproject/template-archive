@@ -10,7 +10,7 @@ before_install: |
 install: |
   set -e
   date
-  npm install -g lerna
+  npm install -g lerna@^2.11.0
   lerna bootstrap 2>&1
   date
 script: lerna run test 2>&1
