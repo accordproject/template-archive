@@ -262,7 +262,7 @@ describe('Template', () => {
             const template = await Template.fromDirectory('./test/data/latedeliveryandpenalty');
             const types = template.getEmitTypes();
             types.should.be.eql([
-                'Event',
+                'org.hyperledger.composer.system.Event',
             ]);
         });
 
@@ -271,6 +271,26 @@ describe('Template', () => {
             const types = template.getEmitTypes();
             types.should.be.eql([
                 'org.accordproject.helloemit.Greeting',
+            ]);
+        });
+
+    });
+
+    describe('#getStateTypes', () => {
+
+        it('should return default emit type for single accordclauselogic function', async () => {
+            const template = await Template.fromDirectory('./test/data/latedeliveryandpenalty');
+            const types = template.getStateTypes();
+            types.should.be.eql([
+                'org.accordproject.cicero.contract.AccordContractState',
+            ]);
+        });
+
+        it('should return emit type for single accordclauselogic function', async () => {
+            const template = await Template.fromDirectory('./test/data/helloemit');
+            const types = template.getStateTypes();
+            types.should.be.eql([
+                'org.accordproject.helloemit.HelloWorldState',
             ]);
         });
 

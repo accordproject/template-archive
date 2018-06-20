@@ -1,0 +1,5 @@
+{
+    "$class": "org.accordproject.helloemit.HelloWorldState",
+    "stateId": "org.accordproject.helloemit.HelloWorldState#0",
+		"counter" : 0
+}
