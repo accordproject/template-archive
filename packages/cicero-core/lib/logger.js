@@ -15,16 +15,47 @@
 'use strict';
 
 const winston = require('winston');
+const jsome = require('jsome');
 const fs = require('fs');
 const env = process.env.NODE_ENV || 'development';
 const tsFormat = () => (new Date()).toLocaleTimeString();
 
-let logger = new(winston.Logger)({
+/**
+ * Helper function to test is a string is a stringified version of a JSON object
+ * @param {string} str - the input string to test
+ * @returns {boolean} - true iff the string can be parsed as JSON
+ */
+function isJSON(str) {
+    try {
+        return (JSON.parse(str) && !!str);
+    } catch (e) {
+        return false;
+    }
+}
+
+jsome.params.lintable = true;
+
+const jsonColor = winston.format.printf(info => {
+    if(typeof info.message === 'object') {
+        return `${tsFormat()} - ${info.level}:
+${jsome.getColoredString(info.message, null, 2)}`;
+    } else if(isJSON(info.message)) {
+        return `${tsFormat()} - ${info.level}:
+${jsome.getColoredString(JSON.parse(info.message), null, 2)}`;
+    }
+    return `${tsFormat()} - ${info.level}: ${info.message}`;
+
+});
+let logger = winston.createLogger({
     transports: [
-        new(winston.transports.Console)({
+        new winston.transports.Console({
             colorize: true,
             timestamp: tsFormat,
-            level: 'info'
+            level: 'info',
+            format: winston.format.combine(
+                winston.format.colorize(),
+                jsonColor
+            ),
         }),
     ]
 });
@@ -36,15 +67,14 @@ if(env === 'development'){
         fs.mkdirSync(logDir);
     }
 
-    logger.add(winston.transports.File, {
+    logger.add(new winston.transports.File({
         name: 'logs-file',
         filename: `${logDir}/trace.log`,
         level: env === 'development' ? 'debug' : 'info'
-    });
+    }));
 }
 
 logger.entry = logger.debug;
 logger.exit = logger.debug;
 
-logger.log('info', 'Logging initialized.', new Date());
 module.exports = logger;
