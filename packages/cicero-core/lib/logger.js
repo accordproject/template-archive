@@ -15,7 +15,7 @@
 'use strict';
 
 const winston = require('winston');
-require('node-json-color-stringify');
+const jsome = require('jsome');
 const fs = require('fs');
 const env = process.env.NODE_ENV || 'development';
 const tsFormat = () => (new Date()).toLocaleTimeString();
@@ -33,13 +33,15 @@ function isJSON(str) {
     }
 }
 
+jsome.params.lintable = true;
+
 const jsonColor = winston.format.printf(info => {
     if(typeof info.message === 'object') {
         return `${tsFormat()} - ${info.level}:
-${JSON.colorStringify(info.message, null, 2)}`;
+${jsome.getColoredString(info.message, null, 2)}`;
     } else if(isJSON(info.message)) {
         return `${tsFormat()} - ${info.level}:
-${JSON.colorStringify(JSON.parse(info.message), null, 2)}`;
+${jsome.getColoredString(JSON.parse(info.message), null, 2)}`;
     }
     return `${tsFormat()} - ${info.level}: ${info.message}`;
 
