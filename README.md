@@ -1,6 +1,5 @@
 # Cicero
 
-[![Documentation Status](https://readthedocs.org/projects/accordcicero/badge/?version=latest)](http://accordcicero.readthedocs.io/en/latest/?badge=latest)
 [![Build Status](https://travis-ci.org/accordproject/cicero.svg?branch=master)](https://travis-ci.org/accordproject/cicero)
 [![Coverage Status](https://coveralls.io/repos/github/accordproject/cicero/badge.svg?branch=master)](https://coveralls.io/github/accordproject/cicero?branch=master)
 [![lerna](https://img.shields.io/badge/maintained%20with-lerna-cc00ff.svg)](https://lernajs.io/)
