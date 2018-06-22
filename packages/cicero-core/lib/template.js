@@ -27,6 +27,7 @@ const RelationshipDeclaration = require('composer-common').RelationshipDeclarati
 const Introspector = require('composer-common').Introspector;
 const ModelManager = require('composer-common').ModelManager;
 const ScriptManager = require('composer-common').ScriptManager;
+const DefaultArchiveLoader = require('./loaders/defaultarchiveloader');
 const Serializer = require('composer-common').Serializer;
 const Writer = require('composer-common').Writer;
 const logger = require('./logger');
@@ -460,8 +461,8 @@ class Template {
 
 
     /**
-     * Create a Clause from an archive.
-     * @param {Buffer} Buffer  - the Buffer to a zip archive
+     * Create a template from an archive.
+     * @param {Buffer} Buffer  - the Buffer to a zip or cta archive
      * @return {Promise} a Promise to the instantiated business network
      */
     static fromArchive(Buffer) {
@@ -632,6 +633,19 @@ class Template {
                 logger.exit(method, template.toString());
                 return template; // Returns template
             });
+        });
+    }
+
+    /**
+     * Create a template from an URL.
+     * @param {String} url  - the URL to a zip or cta archive
+     * @param {object} options - additional options
+     * @return {Promise} a Promise to the instantiated business network
+     */
+    static fromUrl(url, options) {
+        const http = new DefaultArchiveLoader();
+        return http.load(url, options).then(function (Buffer) {
+            return Template.fromArchive(Buffer);
         });
     }
 
