@@ -1,6 +1,6 @@
 namespace org.accordproject.helloemit
 
-contract HelloWorld over TemplateModel {
+contract HelloWorld over TemplateModel state HelloWorldState {
    // Simple Clause
    clause helloworld(request : MyRequest) : MyResponse emits Greeting {
      emit new Greeting{ message: "Voila!" };

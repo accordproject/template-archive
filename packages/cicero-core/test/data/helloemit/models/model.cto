@@ -15,6 +15,10 @@ event Greeting {
   o String message
 }
 
+asset HelloWorldState extends AccordContractState {
+  o Double counter
+}
+
 /**
  * The template model
  */
