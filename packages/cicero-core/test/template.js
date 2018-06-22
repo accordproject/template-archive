@@ -335,6 +335,13 @@ describe('Template', () => {
 
     });
 
+    describe('#getHash', () => {
+        it('should return a SHA-256 hash', async () => {
+            const template = await Template.fromDirectory('./test/data/latedeliveryandpenalty');
+            template.getHash().should.equal('e1809dbd8d58a405c651f7bae7efb12189ce661a66a69d1f1794000ce3d79c9d');
+        });
+    });
+
     describe('#getFactory', () => {
         it('should return a Factory', async () => {
             const Factory = require('composer-common').Factory;
