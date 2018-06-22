@@ -273,7 +273,6 @@ class Commands {
                 template.getModelManager().accept(visitor, parameters);
             })
             .catch((err) => {
-                console.log(err.message);
                 logger.error(err);
             });
     }
