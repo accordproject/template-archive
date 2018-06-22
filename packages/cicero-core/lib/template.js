@@ -27,6 +27,7 @@ const RelationshipDeclaration = require('composer-common').RelationshipDeclarati
 const Introspector = require('composer-common').Introspector;
 const ModelManager = require('composer-common').ModelManager;
 const ScriptManager = require('composer-common').ScriptManager;
+const DefaultArchiveLoader = require('./loaders/defaultarchiveloader');
 const Serializer = require('composer-common').Serializer;
 const Writer = require('composer-common').Writer;
 const logger = require('./logger');
@@ -460,8 +461,8 @@ class Template {
 
 
     /**
-     * Create a Clause from an archive.
-     * @param {Buffer} Buffer  - the Buffer to a zip archive
+     * Create a template from an archive.
+     * @param {Buffer} Buffer  - the Buffer to a zip or cta archive
      * @return {Promise} a Promise to the instantiated business network
      */
     static fromArchive(Buffer) {
@@ -632,6 +633,19 @@ class Template {
                 logger.exit(method, template.toString());
                 return template; // Returns template
             });
+        });
+    }
+
+    /**
+     * Create a template from an URL.
+     * @param {String} url  - the URL to a zip or cta archive
+     * @param {object} options - additional options
+     * @return {Promise} a Promise to the instantiated business network
+     */
+    static fromUrl(url, options) {
+        const http = new DefaultArchiveLoader();
+        return http.load(url, options).then(function (Buffer) {
+            return Template.fromArchive(Buffer);
         });
     }
 
@@ -1156,7 +1170,7 @@ class Template {
     }
 
     /**
-     * Provides a list of the return types that of this Template. Types use the fully-qualified form.
+     * Provides a list of the response types that are returned by this Template. Types use the fully-qualified form.
      * @return {Array} a list of the response types
      */
     getResponseTypes() {
@@ -1185,8 +1199,8 @@ class Template {
     }
 
     /**
-     * Provides a list of the emit types that of this Template. Types use the fully-qualified form.
-     * @return {Array} a list of the response types
+     * Provides a list of the emit types that are emitted by this Template. Types use the fully-qualified form.
+     * @return {Array} a list of the emit types
      */
     getEmitTypes() {
         const functionDeclarations = this.getScriptManager().getScripts().map((ele) => {
@@ -1208,6 +1222,35 @@ class Template {
         let types = [];
         functionDeclarations.forEach((ele, n) => {
             types.push(ele.getParameterTypes()[3]);
+        });
+        logger.debug(types);
+        return types;
+    }
+
+    /**
+     * Provides a list of the state types that are expected by this Template. Types use the fully-qualified form.
+     * @return {Array} a list of the state types
+     */
+    getStateTypes() {
+        const functionDeclarations = this.getScriptManager().getScripts().map((ele) => {
+            return ele.getFunctionDeclarations();
+        })
+            .reduce((flat, next) => {
+                return flat.concat(next);
+            })
+            .filter((ele) => {
+                return ele.getDecorators().indexOf('AccordClauseLogic') >= 0;
+            }).map((ele) => {
+                return ele;
+            });
+
+        if (functionDeclarations.length === 0) {
+            throw new Error('Did not find any function declarations with the @AccordClauseLogic annotation');
+        }
+
+        let types = [];
+        functionDeclarations.forEach((ele, n) => {
+            types.push(ele.getParameterTypes()[4]);
         });
         logger.debug(types);
         return types;

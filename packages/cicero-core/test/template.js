@@ -172,6 +172,35 @@ describe('Template', () => {
         });
     });
 
+    describe('#fromUrl', () => {
+
+        it('should create a template from an archive at a given URL', async () => {
+            const url = 'https://templates.accordproject.org/archives/acceptance-of-delivery@0.2.0.cta';
+            return Template.fromUrl(url, null).should.be.fulfilled;
+        });
+
+        it('should create a template from an archive at a given AP URL', async () => {
+            const url = 'ap://acceptance-of-delivery@0.2.0#hash';
+            return Template.fromUrl(url, null).should.be.fulfilled;
+        });
+
+        it('should create a template from an archive at a given github URL', async () => {
+            const url = 'github://accordproject/cicero-template-library/master/build/archives/acceptance-of-delivery@0.2.0.cta';
+            return Template.fromUrl(url, {'encoding':null,'headers':{'Accept': '*/*','Accept-Encoding': 'deflate, gzip'}}).should.be.fulfilled;
+        });
+
+        it('should throw an error if creating a template from a wrong URL', async () => {
+            const url = 'https://templates.accordproject.org/archives/doesnotexist@0.2.0.cta';
+            return Template.fromUrl(url, null).should.be.rejectedWith('Request to URL [https://templates.accordproject.org/archives/doesnotexist@0.2.0.cta] returned with error code: 404');
+        });
+
+        it('should throw an error if creating a template from a github URL to an archive with the wrong Cicero version', async () => {
+            const url = 'github://accordproject/cicero-template-library/master/build/archives/acceptance-of-delivery@0.0.3.cta';
+            return Template.fromUrl(url, {'encoding':null,'headers':{'Accept': '*/*','Accept-Encoding': 'deflate, gzip'}}).should.be.rejectedWith('The template targets Cicero (^0.3.0) but the Cicero version is');
+        });
+
+    });
+
     describe('#getParser', () => {
 
         it('should throw an error if called before calling setGrammar or buildGrammar', async () => {
@@ -258,20 +287,50 @@ describe('Template', () => {
 
     describe('#getEmitTypes', () => {
 
-        it('should return default emit type for single accordclauselogic function', async () => {
+        it('should return the default emit type for a clause without emit type declaration', async () => {
             const template = await Template.fromDirectory('./test/data/latedeliveryandpenalty');
             const types = template.getEmitTypes();
             types.should.be.eql([
-                'Event',
+                'org.hyperledger.composer.system.Event',
             ]);
         });
 
-        it('should return emit type for single accordclauselogic function', async () => {
+        it('should return emit type when declared in a clause', async () => {
             const template = await Template.fromDirectory('./test/data/helloemit');
             const types = template.getEmitTypes();
             types.should.be.eql([
                 'org.accordproject.helloemit.Greeting',
             ]);
+        });
+
+        it('should throw error when no logic is defined', async () => {
+            const template = await Template.fromDirectory('./test/data/no-logic');
+            return (() => template.getEmitTypes()).should.throw('Did not find any function declarations with the @AccordClauseLogic annotation');
+        });
+
+    });
+
+    describe('#getStateTypes', () => {
+
+        it('should return the default state type for a clause without state type declaration', async () => {
+            const template = await Template.fromDirectory('./test/data/latedeliveryandpenalty');
+            const types = template.getStateTypes();
+            types.should.be.eql([
+                'org.accordproject.cicero.contract.AccordContractState',
+            ]);
+        });
+
+        it('should return state type when declared in a clause', async () => {
+            const template = await Template.fromDirectory('./test/data/helloemit');
+            const types = template.getStateTypes();
+            types.should.be.eql([
+                'org.accordproject.helloemit.HelloWorldState',
+            ]);
+        });
+
+        it('should throw error when no logic is defined', async () => {
+            const template = await Template.fromDirectory('./test/data/no-logic');
+            return (() => template.getStateTypes()).should.throw('Did not find any function declarations with the @AccordClauseLogic annotation');
         });
 
     });

@@ -48,11 +48,13 @@
     "nyc": "11.7.2"
   },
   "dependencies": {
-    "@accordproject/ergo-compiler": "0.0.66",
+    "@accordproject/ergo-compiler": "0.0.67",
     "composer-common": "0.19.8",
+    "axios": "0.17.1",
     "debug": "2.6.2",
     "glob": "7.1.2",
     "ietf-language-tag-regex": "0.0.5",
+    "jsome": "^2.5.0",
     "jszip": "3.1.5",
     "minimatch": "3.0.4",
     "moo": "0.4.3",
@@ -60,7 +62,7 @@
     "nunjucks": "3.1.2",
     "semver": "5.5.0",
     "uuid": "3.2.1",
-    "winston": "2.4.1",
+    "winston": "^3.0.0",
     "xregexp": "4.1.1"
   },
   "license-check-config": {
