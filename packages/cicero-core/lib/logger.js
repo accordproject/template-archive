@@ -15,6 +15,8 @@
 'use strict';
 
 const winston = require('winston');
+const { LEVEL, MESSAGE } = require('triple-beam');
+const jsonStringify = require('fast-safe-stringify');
 const jsome = require('jsome');
 const fs = require('fs');
 const env = process.env.NODE_ENV || 'development';
@@ -35,27 +37,68 @@ function isJSON(str) {
 
 jsome.params.lintable = true;
 
-const jsonColor = winston.format.printf(info => {
-    if(typeof info.message === 'object') {
-        return `${tsFormat()} - ${info.level}:
-${jsome.getColoredString(info.message, null, 2)}`;
-    } else if(isJSON(info.message)) {
-        return `${tsFormat()} - ${info.level}:
-${jsome.getColoredString(JSON.parse(info.message), null, 2)}`;
+const jsonColor =  winston.format(info => {
+    const padding = info.padding && info.padding[info.level] || '';
+
+    if(info[LEVEL] === 'error' && info.stack) {
+        info[MESSAGE] = `${tsFormat()} - ${info.level}:${padding} ${info.message}\n${info.stack}`;
+        return info;
     }
-    return `${tsFormat()} - ${info.level}: ${info.message}`;
+
+    if (info[LEVEL] === 'info') {
+        if(typeof info.message === 'object') {
+            info[MESSAGE] = `${tsFormat()} - ${info.level}:${padding}\n${jsome.getColoredString(info.message, null, 2)}`;
+        } else if(isJSON(info.message)) {
+            info[MESSAGE] =`${tsFormat()} - ${info.level}:${padding}\n${jsome.getColoredString(JSON.parse(info.message), null, 2)}`;
+        } else {
+            info[MESSAGE] = `${tsFormat()} - ${info.level}:${padding} ${info.message}`;
+        }
+        return info;
+    }
+
+    const stringifiedRest = jsonStringify(Object.assign({}, info, {
+        level: undefined,
+        message: undefined,
+        splat: undefined
+    }));
+
+    if (stringifiedRest !== '{}') {
+        info[MESSAGE] = `${tsFormat()} - ${info.level}:${padding} ${info.message} ${stringifiedRest}`;
+    } else {
+        info[MESSAGE] = `${tsFormat()} - ${info.level}:${padding} ${info.message}`;
+    }
+    return info;
 
 });
+
+const enumerateErrorFormat = winston.format(info => {
+    if (info.message instanceof Error) {
+        info.message = Object.assign({
+            message: info.message.message,
+            stack: info.message.stack
+        }, info.message);
+    }
+
+    if (info instanceof Error) {
+        return Object.assign({
+            message: info.message,
+            stack: info.stack
+        }, info);
+    }
+
+    return info;
+});
+
 let logger = winston.createLogger({
+    format: winston.format.combine(
+        winston.format.json(),
+        enumerateErrorFormat(),
+        winston.format.colorize(),
+        jsonColor(),
+    ),
     transports: [
         new winston.transports.Console({
-            colorize: true,
-            timestamp: tsFormat,
             level: 'info',
-            format: winston.format.combine(
-                winston.format.colorize(),
-                jsonColor
-            ),
         }),
     ]
 });
