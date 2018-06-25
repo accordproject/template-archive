@@ -40,6 +40,8 @@ const GrammarVisitor = require('./grammarvisitor');
 const Ergo = require('@accordproject/ergo-compiler/lib/ergo');
 const uuid = require('uuid');
 const nunjucks = require('nunjucks');
+const crypto = require('crypto');
+let stringify = require('json-stable-stringify');
 
 const ENCODING = 'utf8';
 // Matches 'sample.txt' or 'sample_TAG.txt' where TAG is an IETF language tag (BCP 47)
@@ -643,10 +645,51 @@ class Template {
      * @return {Promise} a Promise to the instantiated business network
      */
     static fromUrl(url, options) {
-        const http = new DefaultArchiveLoader();
-        return http.load(url, options).then(function (Buffer) {
-            return Template.fromArchive(Buffer);
+        const loader = new DefaultArchiveLoader();
+        return loader.load(url, options).then(function (buffer) {
+            return Template.fromArchive(buffer);
         });
+    }
+
+    /**
+     * Gets a content based SHA-256 hash for this template
+     * @return {string} the SHA-256 hash in hex format
+     */
+    getHash() {
+        const content = {};
+        content.metadata = this.getMetadata();
+        if(this.templatizedGrammar) {
+            content.templatizedGrammar = this.templatizedGrammar;
+        }
+        else {
+            // do not include the generated grammar because
+            // the contents is not deterministic
+            content.grammar = this.grammar;
+        }
+        content.models = {};
+        content.scripts = {};
+
+        let modelManager = this.getModelManager();
+        let modelFiles = modelManager.getModelFiles();
+        modelFiles.forEach(function (file) {
+            if (file.isSystemModelFile()) {
+                return;
+            }
+            if (file.getNamespace() === 'org.accordproject.common') {
+                return;
+            }
+            content.models[file.getNamespace()] = file.definitions;
+        });
+
+        let scriptManager = this.getScriptManager();
+        let scriptFiles = scriptManager.getScripts();
+        scriptFiles.forEach(function (file) {
+            content.scripts[file.getName()] = file.contents;
+        });
+
+        const hasher = crypto.createHash('sha256');
+        hasher.update(stringify(content));
+        return hasher.digest('hex');
     }
 
     /**
