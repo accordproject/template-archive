@@ -1141,32 +1141,7 @@ class Template {
      * @return {Array} a list of the request types
      */
     getRequestTypes() {
-        // get the function declarations of all functions
-        // that have the @clause annotation
-        const functionDeclarations = this.getScriptManager().getScripts().map((ele) => {
-            return ele.getFunctionDeclarations();
-        })
-            .reduce((flat, next) => {
-                return flat.concat(next);
-            })
-            .filter((ele) => {
-                return ele.getDecorators().indexOf('AccordClauseLogic') >= 0;
-            }).map((ele) => {
-                return ele;
-            });
-
-        if (functionDeclarations.length === 0) {
-            throw new Error('Did not find any function declarations with the @AccordClauseLogic annotation');
-        }
-
-        let types = [];
-
-        functionDeclarations.forEach((ele, n) => {
-            types.push(ele.getParameterTypes()[1]);
-        });
-
-        logger.debug(types);
-        return types;
+        return this.extractFuncDeclParameter(1);
     }
 
     /**
@@ -1174,28 +1149,7 @@ class Template {
      * @return {Array} a list of the response types
      */
     getResponseTypes() {
-        const functionDeclarations = this.getScriptManager().getScripts().map((ele) => {
-            return ele.getFunctionDeclarations();
-        })
-            .reduce((flat, next) => {
-                return flat.concat(next);
-            })
-            .filter((ele) => {
-                return ele.getDecorators().indexOf('AccordClauseLogic') >= 0;
-            }).map((ele) => {
-                return ele;
-            });
-
-        if (functionDeclarations.length === 0) {
-            throw new Error('Did not find any function declarations with the @AccordClauseLogic annotation');
-        }
-
-        let types = [];
-        functionDeclarations.forEach((ele, n) => {
-            types.push(ele.getParameterTypes()[2]);
-        });
-        logger.debug(types);
-        return types;
+        return this.extractFuncDeclParameter(2);
     }
 
     /**
@@ -1203,28 +1157,7 @@ class Template {
      * @return {Array} a list of the emit types
      */
     getEmitTypes() {
-        const functionDeclarations = this.getScriptManager().getScripts().map((ele) => {
-            return ele.getFunctionDeclarations();
-        })
-            .reduce((flat, next) => {
-                return flat.concat(next);
-            })
-            .filter((ele) => {
-                return ele.getDecorators().indexOf('AccordClauseLogic') >= 0;
-            }).map((ele) => {
-                return ele;
-            });
-
-        if (functionDeclarations.length === 0) {
-            throw new Error('Did not find any function declarations with the @AccordClauseLogic annotation');
-        }
-
-        let types = [];
-        functionDeclarations.forEach((ele, n) => {
-            types.push(ele.getParameterTypes()[3]);
-        });
-        logger.debug(types);
-        return types;
+        return this.extractFuncDeclParameter(3);
     }
 
     /**
@@ -1232,25 +1165,39 @@ class Template {
      * @return {Array} a list of the state types
      */
     getStateTypes() {
-        const functionDeclarations = this.getScriptManager().getScripts().map((ele) => {
-            return ele.getFunctionDeclarations();
-        })
-            .reduce((flat, next) => {
+        return this.extractFuncDeclParameter(4);
+    }
+
+    /**
+     * Helper method to retrieve types from a function declarations
+     * @param {number} index the parameter index for the function declaration
+     *  1 - Request Types
+     *  2 - Return Types
+     *  3 - Emit Types
+     *  4 - State Types
+     * @returns {Array} a list of types
+     * @private
+     */
+    extractFuncDeclParameter(index) {
+        const functionDeclarations = this.getScriptManager().getScripts()
+            .map((ele) => {
+                return ele.getFunctionDeclarations();
+            }).reduce((flat, next) => {
                 return flat.concat(next);
-            })
-            .filter((ele) => {
+            }).filter((ele) => {
                 return ele.getDecorators().indexOf('AccordClauseLogic') >= 0;
             }).map((ele) => {
                 return ele;
             });
-
         if (functionDeclarations.length === 0) {
             throw new Error('Did not find any function declarations with the @AccordClauseLogic annotation');
         }
-
         let types = [];
         functionDeclarations.forEach((ele, n) => {
-            types.push(ele.getParameterTypes()[4]);
+            const type = ele.getParameterTypes()[index];
+            if (type) {
+                types.push(type);
+            }
         });
         logger.debug(types);
         return types;
