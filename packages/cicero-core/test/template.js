@@ -78,7 +78,7 @@ describe('Template', () => {
         });
 
         it('should throw error when Ergo logic does not parse', async () => {
-            return Template.fromDirectory('./test/data/bad-logic').should.be.rejectedWith('In: test/data/bad-logic/lib/logic.ergo [Parse error at line 18 character 11]');
+            return Template.fromDirectory('./test/data/bad-logic').should.be.rejectedWith('In: test/data/bad-logic/lib/logic.ergo [Parse error at line 14 character 4]');
         });
 
         it('should roundtrip a template', async function() {
@@ -338,7 +338,7 @@ describe('Template', () => {
     describe('#getHash', () => {
         it('should return a SHA-256 hash', async () => {
             const template = await Template.fromDirectory('./test/data/latedeliveryandpenalty');
-            template.getHash().should.equal('e1809dbd8d58a405c651f7bae7efb12189ce661a66a69d1f1794000ce3d79c9d');
+            template.getHash().should.equal('6d10d666cdb58af6a6dce7bf895084d28ada9c4e8697961f803b3dc6b6b7beb2');
         });
     });
 
