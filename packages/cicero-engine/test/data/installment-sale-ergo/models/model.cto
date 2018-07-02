@@ -53,7 +53,7 @@ asset InstallmentSaleState extends AccordContractState {
 /**
  * The template model
  */
-asset InstallmentSale extends AccordContract {
+asset InstallmentSaleContract extends AccordContract {
   o String BUYER
 	o String SELLER
   o Double INITIAL_DUE
