@@ -18,6 +18,9 @@ const NodeCache = require('node-cache');
 const Template = require('./template');
 const logger = require('./logger');
 const rp = require('request-promise-native');
+const crypto = require('crypto');
+const stringify = require('json-stable-stringify');
+const semver = require('semver');
 
 const globalTemplateCache = new NodeCache({ stdTTL: 600, useClones: false });
 const globalTemplateIndexCache = new NodeCache({ stdTTL: 600, useClones: false });
@@ -53,11 +56,46 @@ class TemplateLibrary {
     }
 
     /**
+     * Returns a template index that only contains the latest version
+     * of each template
+     *
+     * @param {object} templateIndex - the template index
+     * @returns {object} a new template index that only contains the latest version of each template
+     */
+    static filterTemplateIndex(templateIndex) {
+        const result = {};
+        const nameToVersion = {};
+
+        // build a map of the latest version of each template
+        for(let template of Object.keys(templateIndex)) {
+            const atIndex = template.indexOf('@');
+            const name = template.substring(0,atIndex);
+            const version  = template.substring(atIndex+1);
+
+            const existingVersion = nameToVersion[name];
+
+            if(!existingVersion || semver.lt(existingVersion, version)) {
+                nameToVersion[name] = version;
+            }
+        }
+
+        // now build the result
+        for(let name in nameToVersion) {
+            const id = `${name}@${nameToVersion[name]}`;
+            result[id] = templateIndex[id];
+        }
+
+        return result;
+    }
+
+    /**
      * Gets the metadata for all the templates in the template library
+     * @param {object} [options] - the (optional) options
+     * @param {object} [options.latestVersion] - only return the latest version of each template
      * @return {Promise} promise to a template index
      */
-    async getTemplateIndex() {
-        const cacheKey = this.getTemplateIndexCacheKey();
+    async getTemplateIndex(options) {
+        const cacheKey = this.getTemplateIndexCacheKey(options);
         if (cacheKey) {
             const result = globalTemplateIndexCache.get(cacheKey);
             if (result) {
@@ -66,7 +104,7 @@ class TemplateLibrary {
             }
         }
 
-        const options = {
+        const httpOptions = {
             uri: `${this.url}/template-library.json`,
             headers: {
                 'User-Agent': 'clause',
@@ -74,9 +112,13 @@ class TemplateLibrary {
             json: true, // Automatically parses the JSON string in the response
         };
 
-        logger.info('Loading template library from', options.uri);
-        return rp(options)
+        logger.info('Loading template library from', httpOptions.uri);
+        return rp(httpOptions)
             .then((templateIndex) => {
+
+                if(options && options.latestVersion) {
+                    templateIndex = TemplateLibrary.filterTemplateIndex(templateIndex);
+                }
 
                 if (cacheKey) {
                     globalTemplateIndexCache.set(cacheKey, templateIndex);
@@ -168,10 +210,18 @@ class TemplateLibrary {
 
     /**
      * Returns the cache key used to cache the template index.
+     * @param {object} [options] - the (optional) options
      * @returns {string} the cache key or null if the index should not be cached
      */
-    getTemplateIndexCacheKey() {
-        return `${this.url}/template-library.json`;
+    getTemplateIndexCacheKey(options) {
+        let prefix = '';
+        if(options) {
+            const hasher = crypto.createHash('sha256');
+            hasher.update(stringify(options));
+            prefix = `${hasher.digest('hex')}-`;
+        }
+
+        return `${this.url}/${prefix}template-library.json`;
     }
 
     /**
