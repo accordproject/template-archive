@@ -44,13 +44,19 @@ describe('TemplateLibrary', () => {
             const templateIndex = await templateLibrary.getTemplateIndex();
             templateIndex.should.have.property('helloworld@0.2.0');
         });
+
+        it('should retrieve index for latest versions', async function() {
+            const templateLibrary = new TemplateLibrary();
+            const templateIndex = await templateLibrary.getTemplateIndex({latestVersion: true});
+            templateIndex.should.not.have.property('helloworld@0.0.5');
+        });
     });
 
     describe('#getTemplate', () => {
 
         it('should retrieve a template', async function() {
             const templateLibrary = new TemplateLibrary();
-            const template = await templateLibrary.getTemplate('ap://helloworld@0.2.0#hash');
+            const template = await templateLibrary.getTemplate('ap://helloworld@0.2.0#bf7346e1f60a721f5641b03f1747f0de78c181c10cbb1d27c4caeb9f2957cfa0');
             template.getIdentifier().should.equal('helloworld@0.2.0');
         });
     });
@@ -69,6 +75,12 @@ describe('TemplateLibrary', () => {
             const templateLibrary = new TemplateLibrary();
             const key = templateLibrary.getTemplateIndexCacheKey();
             key.should.equal('https://templates.accordproject.org/template-library.json');
+        });
+
+        it('should get a cache key for the index based on options', async function() {
+            const templateLibrary = new TemplateLibrary();
+            const key = templateLibrary.getTemplateIndexCacheKey({'foo' : true});
+            key.should.equal('https://templates.accordproject.org/ce35fd691fe6c26448191f4528e1ffefb1aa198ed17897c8a92cd012aa1c3719-template-library.json');
         });
     });
 
