@@ -1232,9 +1232,6 @@ class Template {
             }).map((ele) => {
                 return ele;
             });
-        if (functionDeclarations.length === 0) {
-            throw new Error('Did not find any function declarations with the @AccordClauseLogic annotation');
-        }
         let types = [];
         functionDeclarations.forEach((ele, n) => {
             const type = ele.getParameterTypes()[index];
