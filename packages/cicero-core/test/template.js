@@ -69,6 +69,10 @@ describe('Template', () => {
 
     describe('#fromDirectory', () => {
 
+        it('should create a template from a directory no logic', () => {
+            return Template.fromDirectory('./test/data/no-logic').should.be.fulfilled;
+        });
+
         it('should create a template from a directory', () => {
             return Template.fromDirectory('./test/data/latedeliveryandpenalty').should.be.fulfilled;
         });
@@ -78,7 +82,7 @@ describe('Template', () => {
         });
 
         it('should throw error when Ergo logic does not parse', async () => {
-            return Template.fromDirectory('./test/data/bad-logic').should.be.rejectedWith('In: test/data/bad-logic/lib/logic.ergo [Parse error at line 18 character 11]');
+            return Template.fromDirectory('./test/data/bad-logic').should.be.rejectedWith('In: test/data/bad-logic/lib/logic.ergo [Parse error at line 14 character 4]');
         });
 
         it('should roundtrip a template', async function() {
@@ -225,6 +229,11 @@ describe('Template', () => {
             const template = await Template.fromDirectory('./test/data/latedeliveryandpenalty');
             return template.getParser().should.be.an.instanceof(nearley.Parser);
         });
+
+        it('should return a parser object for no logic', async () => {
+            const template = await Template.fromDirectory('./test/data/no-logic');
+            return template.getParser().should.be.an.instanceof(nearley.Parser);
+        });
     });
 
     describe('#setSamples', () => {
@@ -266,11 +275,11 @@ describe('Template', () => {
             ]);
         });
 
-        it('should throw error when no logic is defined', async () => {
+        it('should return empty array when no logic is defined', async () => {
             const template = await Template.fromDirectory('./test/data/no-logic');
-            return (() => template.getRequestTypes()).should.throw('Did not find any function declarations with the @AccordClauseLogic annotation');
+            const types = template.getRequestTypes();
+            types.should.be.eql([]);
         });
-
     });
 
     describe('#getResponseTypes', () => {
@@ -283,6 +292,11 @@ describe('Template', () => {
             ]);
         });
 
+        it('should return empty array when no logic is defined', async () => {
+            const template = await Template.fromDirectory('./test/data/no-logic');
+            const types = template.getRequestTypes();
+            types.should.be.eql([]);
+        });
     });
 
     describe('#getEmitTypes', () => {
@@ -303,11 +317,11 @@ describe('Template', () => {
             ]);
         });
 
-        it('should throw error when no logic is defined', async () => {
+        it('should return empty array when no logic is defined', async () => {
             const template = await Template.fromDirectory('./test/data/no-logic');
-            return (() => template.getEmitTypes()).should.throw('Did not find any function declarations with the @AccordClauseLogic annotation');
+            const types = template.getEmitTypes();
+            types.should.be.eql([]);
         });
-
     });
 
     describe('#getStateTypes', () => {
@@ -328,11 +342,11 @@ describe('Template', () => {
             ]);
         });
 
-        it('should throw error when no logic is defined', async () => {
+        it('should return empty array when no logic is defined', async () => {
             const template = await Template.fromDirectory('./test/data/no-logic');
-            return (() => template.getStateTypes()).should.throw('Did not find any function declarations with the @AccordClauseLogic annotation');
+            const types = template.getStateTypes();
+            types.should.be.eql([]);
         });
-
     });
 
     describe('#getHash', () => {
