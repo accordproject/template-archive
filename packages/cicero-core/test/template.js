@@ -337,8 +337,8 @@ describe('Template', () => {
 
     describe('#getHash', () => {
         it('should return a SHA-256 hash', async () => {
-            const template = await Template.fromDirectory('./test/data/latedeliveryandpenalty');
-            template.getHash().should.equal('e1809dbd8d58a405c651f7bae7efb12189ce661a66a69d1f1794000ce3d79c9d');
+            const template = await Template.fromArchive(fs.readFileSync('./test/data/latedeliveryandpenalty.cta'));
+            template.getHash().should.equal('3a9311865b9d50ab4913a0780b1482fb5712c0619e7611e3728629894c9f7ca6');
         });
     });
 
