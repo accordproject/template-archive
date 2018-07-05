@@ -50,8 +50,9 @@
   "dependencies": {
     "@accordproject/ergo-compiler": "0.1.1",
     "axios": "0.17.1",
-    "composer-common": "0.19.8",
-    "debug": "2.6.2",
+    "composer-common": "0.19.12",
+    "debug": "^3.1.0",
+    "fast-safe-stringify": "^2.0.4",
     "glob": "7.1.2",
     "ietf-language-tag-regex": "0.0.5",
     "jsome": "2.5.0",

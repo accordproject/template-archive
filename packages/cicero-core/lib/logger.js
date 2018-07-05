@@ -26,6 +26,7 @@ const tsFormat = () => (new Date()).toLocaleTimeString();
  * Helper function to test is a string is a stringified version of a JSON object
  * @param {string} str - the input string to test
  * @returns {boolean} - true iff the string can be parsed as JSON
+ * @private
  */
 function isJSON(str) {
     try {
