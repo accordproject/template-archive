@@ -19,7 +19,7 @@
     "lint": "eslint .",
     "postlint": "npm run licchk",
     "licchk": "license-check",
-    "test": "mocha --recursive && nyc mocha --recursive"
+    "test": "mocha && nyc mocha"
   },
   "repository": {
     "type": "git",
@@ -39,15 +39,13 @@
   "homepage": "https://github.com/accordproject/cicero#readme",
   "devDependencies": {
     "archiver": "2.1.1",
-    "chai": "^4.1.2",
-    "chai-as-promised": "^6.0.0",
-    "chai-properties": "^1.3.0",
-    "chai-things": "^0.2.0",
+    "chai": "3.5.0",
+    "chai-as-promised": "6.0.0",
+    "chai-things": "0.2.0",
     "eslint": "4.19.1",
     "license-check": "1.1.5",
     "mocha": "5.1.1",
-    "nyc": "11.7.2",
-    "sinon": "^6.1.0"
+    "nyc": "11.7.2"
   },
   "dependencies": {
     "@accordproject/ergo-compiler": "0.0.69",
@@ -69,9 +67,6 @@
     "request": "2.87.0",
     "request-promise-native": "1.0.5",
     "semver": "5.5.0",
-    "stream-to-string": "^1.1.0",
-    "streamifier": "^0.1.1",
-    "tar-fs": "^1.16.3",
     "triple-beam": "1.3.0",
     "uuid": "3.2.1",
     "winston": "3.0.0",
