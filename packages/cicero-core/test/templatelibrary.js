@@ -50,6 +50,21 @@ describe('TemplateLibrary', () => {
             const templateIndex = await templateLibrary.getTemplateIndex({latestVersion: true});
             templateIndex.should.not.have.property('helloworld@0.0.5');
         });
+
+        it('should retrieve index for cicero version 0.3.0', async function() {
+            const templateLibrary = new TemplateLibrary();
+            const templateIndex = await templateLibrary.getTemplateIndex({ciceroVersion: '0.3.0'});
+            templateIndex.should.have.property('helloworld@0.0.5');
+            templateIndex.should.not.have.property('helloworld@0.2.0');
+        });
+
+        it('should retrieve latest version index for cicero version 0.4.4', async function() {
+            const templateLibrary = new TemplateLibrary();
+            const templateIndex = await templateLibrary.getTemplateIndex({latestVersion: true, ciceroVersion: '0.4.4'});
+            templateIndex.should.not.have.property('helloworld@0.0.5');
+            templateIndex.should.not.have.property('helloworld@0.2.0');
+            templateIndex.should.have.property('helloworld@0.2.1');
+        });
     });
 
     describe('#getTemplate', () => {

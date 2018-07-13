@@ -48,9 +48,9 @@
     "nyc": "11.7.2"
   },
   "dependencies": {
-    "@accordproject/ergo-compiler": "0.0.69",
+    "@accordproject/ergo-compiler": "0.1.2",
     "axios": "0.17.1",
-    "composer-common": "0.19.8",
+    "composer-common": "0.19.12",
     "debug": "2.6.2",
     "dotenv": "^6.0.0",
     "glob": "7.1.2",
