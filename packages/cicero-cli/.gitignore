@@ -60,3 +60,7 @@ typings/
 # dotenv environment variables file
 .env
 
+# test output
+test/data/latedeliveryandpenalty/contract.json
+
+
