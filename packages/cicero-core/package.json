@@ -1,6 +1,6 @@
 {
   "name": "@accordproject/cicero-core",
-  "version": "0.4.6",
+  "version": "0.4.5",
   "description": "Cicero Core - implementation of Accord Protocol Template Specification",
   "engines": {
     "node": ">=8",
@@ -51,9 +51,10 @@
     "@accordproject/ergo-compiler": "0.1.2",
     "axios": "0.17.1",
     "composer-common": "0.19.12",
-    "debug": "^3.1.0",
-    "fast-safe-stringify": "^2.0.4",
+    "debug": "2.6.2",
+    "dotenv": "^6.0.0",
     "glob": "7.1.2",
+    "gunzip-maybe": "^1.4.1",
     "ietf-language-tag-regex": "0.0.5",
     "jsome": "2.5.0",
     "json-stable-stringify": "1.0.1",
