@@ -9,11 +9,11 @@ contract LateDeliveryAndPenalty over TemplateModel {
     // Guard against calling late delivery clause too early
     let agreed = request.agreedDelivery;
     enforce momentIsBefore(agreed,now()) else
-    throw new ErrorResponse{ message : "Cannot exercise late delivery before delivery date" }
+    throw ErrorResponse{ message : "Cannot exercise late delivery before delivery date" }
     ;
     // Guard against force majeure
     enforce !contract.forceMajeure or !request.forceMajeure else
-    return new LateDeliveryAndPenaltyResponse{
+    return LateDeliveryAndPenaltyResponse{
       penalty: 0.0,
       buyerMayTerminate: true
     }
@@ -27,7 +27,7 @@ contract LateDeliveryAndPenalty over TemplateModel {
     // Penalty may be capped
     let capped = min([penalty,contract.capPercentage * request.goodsValue / 100.0]);
     // Return the response with the penalty and termination determination
-    return new LateDeliveryAndPenaltyResponse{
+    return LateDeliveryAndPenaltyResponse{
       penalty: capped,
       buyerMayTerminate: diff > contract.termination.amount
     }

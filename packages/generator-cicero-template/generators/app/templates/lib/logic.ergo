@@ -17,6 +17,6 @@ namespace <%= data.modelNamespace %>
 contract MyLogic over MyContract {
   // Simple Clause
   clause helloworld(request : MyRequest) : MyResponse {
-    return new MyResponse{ output: "Hello " ++ contract.name ++ " " ++ request.input }
+    return MyResponse{ output: "Hello " ++ contract.name ++ " " ++ request.input }
   }
 }
