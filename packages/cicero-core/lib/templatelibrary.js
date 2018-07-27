@@ -44,7 +44,7 @@ class TemplateLibrary {
      */
     constructor(url) {
         this.url = url || 'https://templates.accordproject.org';
-        logger.info('Creating TemplateLibrary');
+        logger.info('Creating TemplateLibrary for ' + this.url);
     }
 
     /**
@@ -62,7 +62,7 @@ class TemplateLibrary {
      * @param {object} templateIndex - the template index
      * @returns {object} a new template index that only contains the latest version of each template
      */
-    static filterTemplateIndex(templateIndex) {
+    static filterTemplateIndexLatestVersion(templateIndex) {
         const result = {};
         const nameToVersion = {};
 
@@ -89,9 +89,35 @@ class TemplateLibrary {
     }
 
     /**
+     * Returns a template index that only contains the latest version
+     * of each template
+     *
+     * @param {object} templateIndex - the template index
+     * @param {string} ciceroVersion - the cicero version in semver format
+     * @returns {object} a new template index that only contains the templates that are semver compatible
+     * with the cicero version specified
+     */
+    static filterTemplateIndexCiceroVersion(templateIndex, ciceroVersion) {
+        const result = {};
+
+        // build a map of the templates that are compatible with the cicero version
+        for(let key of Object.keys(templateIndex)) {
+            const template = templateIndex[key];
+
+            if(semver.satisfies(ciceroVersion, template.ciceroVersion)) {
+                result[key] = template;
+            }
+        }
+
+        return result;
+    }
+
+    /**
      * Gets the metadata for all the templates in the template library
      * @param {object} [options] - the (optional) options
      * @param {object} [options.latestVersion] - only return the latest version of each template
+     * @param {object} [options.ciceroVersion] - semver filter on the cicero engine version. E.g. pass 0.4.6 to
+     * only return templates that are compatible with Cicero version 0.4.6
      * @return {Promise} promise to a template index
      */
     async getTemplateIndex(options) {
@@ -117,7 +143,11 @@ class TemplateLibrary {
             .then((templateIndex) => {
 
                 if(options && options.latestVersion) {
-                    templateIndex = TemplateLibrary.filterTemplateIndex(templateIndex);
+                    templateIndex = TemplateLibrary.filterTemplateIndexLatestVersion(templateIndex);
+                }
+
+                if(options && options.ciceroVersion) {
+                    templateIndex = TemplateLibrary.filterTemplateIndexCiceroVersion(templateIndex, options.ciceroVersion);
                 }
 
                 if (cacheKey) {
