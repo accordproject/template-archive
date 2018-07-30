@@ -48,7 +48,7 @@ const stringify = require('json-stable-stringify');
 // We can't always import it in Cicero because precompiling is not supported server-side!
 // https://github.com/mozilla/nunjucks/issues/1065
 if(process.browser){
-    require('compiled_template');
+    require('./compiled_template');
 }
 
 const ENCODING = 'utf8';
