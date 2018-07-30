@@ -3,3 +3,4 @@ node_modules
 out
 lib/tdl.js
 test/data
+lib/compiled_template.js
