@@ -14,7 +14,7 @@
   ],
   "main": "index.js",
   "scripts": {
-    "prepare": "nearleyc ./lib/tdl.ne -o ./lib/tdl.js",
+    "prepare": "nearleyc ./lib/tdl.ne -o ./lib/tdl.js && node scripts/nunjucks-precompile.js",
     "pretest": "npm run lint",
     "lint": "eslint .",
     "postlint": "npm run licchk",
@@ -79,7 +79,8 @@
       "!./coverage/**/*",
       "!./node_modules/**/*",
       "!./out/**/*",
-      "!./lib/tdl.js"
+      "!./lib/tdl.js",
+      "!./lib/compiled_template.js"
     ],
     "path": "header.txt",
     "blocking": true,
@@ -99,7 +100,9 @@
       "lib/**/*.js"
     ],
     "exclude": [
-      "lib/tdl.js"
+      "lib/tdl.js",
+      "scripts/**/*.js",
+      "lib/compiled_template.js"
     ],
     "all": true,
     "check-coverage": true,

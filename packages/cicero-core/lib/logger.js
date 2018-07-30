@@ -104,7 +104,9 @@ let logger = winston.createLogger({
     ]
 });
 
-if(env === 'development'){
+// Only write log files to disk if we're running in development
+// and not in a browser (webpack or browserify)
+if(env === 'development' && !process.browser){
     const logDir = 'log';
     // Create the log directory if it does not exist
     if (!fs.existsSync(logDir)) {
