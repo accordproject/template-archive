@@ -100,7 +100,9 @@
       "lib/**/*.js"
     ],
     "exclude": [
-      "lib/tdl.js"
+      "lib/tdl.js",
+      "scripts/**/*.js",
+      "lib/compiled_template.js"
     ],
     "all": true,
     "check-coverage": true,
