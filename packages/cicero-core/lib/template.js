@@ -41,7 +41,15 @@ const Ergo = require('@accordproject/ergo-compiler/lib/ergo');
 const uuid = require('uuid');
 const nunjucks = require('nunjucks');
 const crypto = require('crypto');
-let stringify = require('json-stable-stringify');
+const stringify = require('json-stable-stringify');
+
+// This required because only compiled nunjucks templates are supported browser-side
+// https://mozilla.github.io/nunjucks/api.html#browser-usage
+// We can't always import it in Cicero because precompiling is not supported server-side!
+// https://github.com/mozilla/nunjucks/issues/1065
+if(process.browser){
+    require('compiled_template');
+}
 
 const ENCODING = 'utf8';
 // Matches 'sample.txt' or 'sample_TAG.txt' where TAG is an IETF language tag (BCP 47)
