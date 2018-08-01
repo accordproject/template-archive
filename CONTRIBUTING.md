@@ -12,7 +12,6 @@ today! Here are the guidelines we'd like you to follow:
 * [Improving Documentation](#docs)
 * [Issue Submission Guidelines](#submit)
 * [Pull Request Submission Guidelines](#submit-pr)
-* [Signing the CLA](#cla)
 
 ## <a name="coc"></a> Code of Conduct
 
@@ -111,9 +110,9 @@ Before you submit your pull request consider the following guidelines:
   automatically generated from these messages.
 
     ```shell
-    git commit -a
+    git commit -s -a
     ```
-  Note: the optional commit `-a` command line option will automatically "add" and "rm" edited files.
+  Note: the optional commit `-a` command line option will automatically "add" and "rm" edited files. The `-s` command line option signs your commit using your GitHub registered email address. We require all commits to be signed.
 
 * Before creating the Pull Request, package and run all tests a last time:
 
