@@ -22,7 +22,7 @@ Using Cicero you can take any existing natural language text (typically a clause
 
 We are an open community and welcome both lawyers and technologists to work on the specifications and code. If you would like to get involved please join the Accord #technology-wg Slack channel by signing up here: https://www.accordproject.org.
 
-[Accord Technology Working Group weekly meeting](
+[Accord Project Technology Working Group weekly meeting](
 https://calendar.google.com/calendar/event?action=TEMPLATE&tmeid=MjZvYzIzZHVrYnI1aDVzbjZnMHJqYmtwaGlfMjAxNzExMTVUMjEwMDAwWiBkYW5AY2xhdXNlLmlv&tmsrc=dan%40clause.io)
 
 ## Structure of the Code Repository
