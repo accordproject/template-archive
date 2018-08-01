@@ -1,6 +1,7 @@
 coverage
 node_modules
 out
+umd
 lib/tdl.js
 test/data
 lib/compiled_template.js
