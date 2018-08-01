@@ -15,7 +15,8 @@
   "main": "index.js",
   "scripts": {
     "build": "webpack --config webpack.config.js --mode production",
-    "prepare": "nearleyc ./lib/tdl.ne -o ./lib/tdl.js && node scripts/nunjucks-precompile.js && npm run build",
+    "prepublishOnly": "npm run build",
+    "prepare": "nearleyc ./lib/tdl.ne -o ./lib/tdl.js && node scripts/nunjucks-precompile.js",
     "pretest": "npm run lint",
     "lint": "eslint .",
     "postlint": "npm run licchk",
