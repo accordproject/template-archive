@@ -10,7 +10,8 @@
     "access": "public"
   },
   "files": [
-    "lib"
+    "lib",
+    "umd"
   ],
   "main": "index.js",
   "scripts": {
