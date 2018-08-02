@@ -22,7 +22,7 @@
   },
   "name": "cicero",
   "description": "You must install [Lerna](https://lernajs.io) to build this multi-package repository.",
-  "version": "0.4.8",
+  "version": "0.5.0",
   "main": "index.js",
   "private": true,
   "scripts": {
@@ -38,6 +38,7 @@
     "pkgcheck": "node ./scripts/pkgcheck.js",
     "pkgstamp": "node ./scripts/pkgstamp.js",
     "pkgbump": "node ./scripts/pkgbump.js && node ./scripts/pkgcheck.js --fix",
+    "pkgset": "node ./scripts/pkgset.js",
     "depcheck": "node ./scripts/depcheck.js"
   },
   "repository": {
