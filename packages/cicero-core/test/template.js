@@ -179,23 +179,23 @@ describe('Template', () => {
     describe('#fromUrl', () => {
 
         it('should create a template from an archive at a given URL', async () => {
-            const url = 'https://templates.accordproject.org/archives/acceptance-of-delivery@0.2.0.cta';
+            const url = 'https://templates.accordproject.org/archives/acceptance-of-delivery@0.4.0.cta';
             return Template.fromUrl(url, null).should.be.fulfilled;
         });
 
         it('should create a template from an archive at a given AP URL', async () => {
-            const url = 'ap://acceptance-of-delivery@0.2.0#hash';
+            const url = 'ap://acceptance-of-delivery@0.4.0#hash';
             return Template.fromUrl(url, null).should.be.fulfilled;
         });
 
         it('should create a template from an archive at a given github URL', async () => {
-            const url = 'github://accordproject/cicero-template-library/master/build/archives/acceptance-of-delivery@0.2.0.cta';
+            const url = 'github://accordproject/cicero-template-library/master/build/archives/acceptance-of-delivery@0.4.0.cta';
             return Template.fromUrl(url, {'encoding':null,'headers':{'Accept': '*/*','Accept-Encoding': 'deflate, gzip'}}).should.be.fulfilled;
         });
 
         it('should throw an error if creating a template from a wrong URL', async () => {
-            const url = 'https://templates.accordproject.org/archives/doesnotexist@0.2.0.cta';
-            return Template.fromUrl(url, null).should.be.rejectedWith('Request to URL [https://templates.accordproject.org/archives/doesnotexist@0.2.0.cta] returned with error code: 404');
+            const url = 'https://templates.accordproject.org/archives/doesnotexist@0.3.0.cta';
+            return Template.fromUrl(url, null).should.be.rejectedWith('Request to URL [https://templates.accordproject.org/archives/doesnotexist@0.3.0.cta] returned with error code: 404');
         });
 
         it('should throw an error if creating a template from a github URL to an archive with the wrong Cicero version', async () => {
@@ -215,7 +215,7 @@ describe('Template', () => {
                 'cicero': {
                     'template': 'clause',
                     'language': 'ergo',
-                    'version': '^0.4.0'
+                    'version': '^0.5.0'
                 }
             },
             null,
@@ -352,7 +352,7 @@ describe('Template', () => {
     describe('#getHash', () => {
         it('should return a SHA-256 hash', async () => {
             const template = await Template.fromDirectory('./test/data/latedeliveryandpenalty');
-            template.getHash().should.equal('1675e0d354ceb91ec9b3fdcd33a8d62127425d7f48e31c892c18be2ba6ee9fe4');
+            template.getHash().should.equal('04fb59a60a81b940a4afc1eeff93d05718114667d44622c78d3b5458598e248e');
         });
     });
 
