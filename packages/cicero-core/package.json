@@ -85,7 +85,8 @@
       "!./node_modules/**/*",
       "!./out/**/*",
       "!./lib/tdl.js",
-      "!./lib/compiled_template.js"
+      "!./lib/compiled_template.js",
+      "!./umd/cicero.js"
     ],
     "path": "header.txt",
     "blocking": true,
