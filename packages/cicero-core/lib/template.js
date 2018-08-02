@@ -600,7 +600,7 @@ class Template {
                     return file.async('string');
                 }).then((contents) => {
                     logger.debug(method, 'Loaded Ergo file');
-                    const compiled = Ergo.compileToJavaScriptAndLink(contents,ctoModelFiles,'javascript_cicero');
+                    const compiled = Ergo.compileToJavaScriptAndLink([contents],ctoModelFiles,'javascript_cicero');
                     if (compiled.hasOwnProperty('error')) {
                         throw new Error('In: ' + file + ' [' + Ergo.ergoErrorToString(compiled.error) + ']');
                     } else {
@@ -972,7 +972,7 @@ class Template {
                             newModelFiles.push(mf.getDefinitions());
                         }
 
-                        const compiled = Ergo.compileToJavaScriptAndLink(contents,newModelFiles,'javascript_cicero');
+                        const compiled = Ergo.compileToJavaScriptAndLink([contents],newModelFiles,'javascript_cicero');
                         if (compiled.hasOwnProperty('error')) {
                             throw new Error('In: ' + path + ' [' + Ergo.ergoErrorToString(compiled.error) + ']');
                         } else {

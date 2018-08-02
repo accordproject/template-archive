@@ -352,7 +352,7 @@ describe('Template', () => {
     describe('#getHash', () => {
         it('should return a SHA-256 hash', async () => {
             const template = await Template.fromDirectory('./test/data/latedeliveryandpenalty');
-            template.getHash().should.equal('0811c3e923bcc51244a787656a276ae7a77a5a86fd6645578607a812f9d446fc');
+            template.getHash().should.equal('1675e0d354ceb91ec9b3fdcd33a8d62127425d7f48e31c892c18be2ba6ee9fe4');
         });
     });
 
