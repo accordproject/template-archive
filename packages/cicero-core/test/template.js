@@ -215,7 +215,7 @@ describe('Template', () => {
                 'cicero': {
                     'template': 'clause',
                     'language': 'ergo',
-                    'version': '^0.4.0'
+                    'version': '^0.5.0'
                 }
             },
             null,
