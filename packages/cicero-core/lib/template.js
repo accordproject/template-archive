@@ -959,10 +959,10 @@ class Template {
                 acceptsDir: function (dir) {
                     return !isFileInNodeModuleDir(dir, path);
                 },
-                process: function (path, contents) {
-                    let filePath = fsPath.parse(path);
-                    if (filePath.ext.toLowerCase() === '.ergo') {
-                        logger.debug(method, 'Compiling Ergo to JavaScript ', path);
+                process: function (filePath, contents) {
+                    let pathObj = fsPath.parse(filePath);
+                    if (pathObj.ext.toLowerCase() === '.ergo') {
+                        logger.debug(method, 'Compiling Ergo to JavaScript ', filePath);
                         // re-get the updated modelfiles from the modelmanager (includes external dependencies)
                         if (template.getMetadata().getLanguage() === 1) {
                             logger.warn('Template is declared as javascript, but this is an ergo template');
@@ -974,24 +974,28 @@ class Template {
 
                         const compiled = Ergo.compileToJavaScriptAndLink([contents],newModelFiles,'javascript_cicero');
                         if (compiled.hasOwnProperty('error')) {
-                            throw new Error('In: ' + path + ' [' + Ergo.ergoErrorToString(compiled.error) + ']');
+                            throw new Error('In: ' + filePath + ' [' + Ergo.ergoErrorToString(compiled.error) + ']');
                         } else {
                             contents = compiled.success;
                         }
                         logger.debug('Compiled Ergo to Javascript:\n'+contents+'\n');
-                        path = path.substr(0, path.lastIndexOf('.')) + '.js';
-                        filePath.ext = '.js';
+                        filePath = filePath.substr(0, filePath.lastIndexOf('.')) + '.js';
+                        pathObj.ext = '.js';
                         if(foundJs) {
                             throw new Error('Templates cannot mix Ergo and JS logic');
                         }
                         foundErgo = true;
-                    } else if (filePath.ext.toLowerCase() === '.js') {
+                    } else if (pathObj.ext.toLowerCase() === '.js') {
                         if(foundErgo) {
                             throw new Error('Templates cannot mix Ergo and JS logic');
                         }
                         foundJs = true;
                     }
-                    const jsScript = template.getScriptManager().createScript(path, filePath.ext.toLowerCase(), contents);
+                    // Make paths for the script manager relative to the root folder of the template
+                    const resolvedPath = fsPath.resolve(path);
+                    const resolvedFilePath = fsPath.resolve(filePath);
+                    const truncatedPath = resolvedFilePath.replace(resolvedPath+'/', '');
+                    const jsScript = template.getScriptManager().createScript(truncatedPath, pathObj.ext.toLowerCase(), contents);
                     scriptFiles.push(jsScript);
                     logger.debug(method, 'Found script file ', path);
                 }
