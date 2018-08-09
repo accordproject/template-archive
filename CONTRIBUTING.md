@@ -89,7 +89,7 @@ make it easier to understand and categorize the issue.
 ## <a name="submit-pr"></a> Pull Request Submission Guidelines
 Before you submit your pull request consider the following guidelines:
 
-* Search [GitHub](https://github.com/accordproject/cicero/pulls) for an open or closed Pull Request
+* Search [GitHub][pulls] for an open or closed Pull Request
   that relates to your submission. You don't want to duplicate effort.
 * Create the [development environment][developers.setup]
 * Make your changes in a new git branch:
@@ -127,7 +127,7 @@ Before you submit your pull request consider the following guidelines:
     ```
 
 * In GitHub, send a pull request to `cicero:master`. This will trigger the check of the
-[Contributor License Agreement](#cla) and the Travis integration.
+[Developer Certificate of Origin](https://github.com/probot/dco#how-it-works) and the Travis integration.
 
 * If you find that the Travis integration has failed, look into the logs on Travis to find out
 if your changes caused test failures, the commit message was malformed etc. If you find that the
@@ -182,7 +182,8 @@ from the main (upstream) repository:
     git pull --ff upstream master
     ```
 
-[coc]: https://github.com/accordproject/code-of-conduct/blob/master/CODE_OF_CONDUCT.md
+[coc]: https://github.com/accordproject/docs/blob/master/Accord%20Project%20Code%20of%20Conduct.pdf
+[dco]: https://developercertificate.org/
 [developers]: DEVELOPERS.md
 [developers.commits]: DEVELOPERS.md#commits
 [developers.documentation]: DEVELOPERS.md#documentation
@@ -194,6 +195,7 @@ from the main (upstream) repository:
 [github-new-issue]: https://github.com/accordproject/cicero/issues/new
 [github]: https://github.com/accordproject/cicero
 [stackoverflow]: http://stackoverflow.com/questions/tagged/cicero
+[pulls]: https://github.com/accordproject/cicero/pulls
 
 ## License <a name="license"></a>
 Accord Project source code files are made available under the Apache License, Version 2.0 (Apache-2.0), located in the LICENSE file. Accord Project documentation files are made available under the Creative Commons Attribution 4.0 International License (CC-BY-4.0), available at http://creativecommons.org/licenses/by/4.0/.
