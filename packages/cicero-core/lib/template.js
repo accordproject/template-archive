@@ -619,7 +619,6 @@ class Template {
 
                 logger.debug(method, 'Adding model files to model manager');
                 template.modelManager.addModelFiles(ctoModelFiles, ctoModelFileNames, true); // Adds all cto files to model manager
-                await template.modelManager.updateExternalModels();
                 template.modelManager.validateModelFiles();
 
                 logger.debug(method, 'Added model files to model manager');
@@ -751,10 +750,6 @@ class Template {
             let fileName;
             // ignore the system namespace when creating an archive
             if (file.isSystemModelFile()) {
-                return;
-            }
-            // ignore Accord Project system models
-            if (file.getNamespace() === 'org.accordproject.common') {
                 return;
             }
             if (file.fileName === 'UNKNOWN' || file.fileName === null || !file.fileName) {

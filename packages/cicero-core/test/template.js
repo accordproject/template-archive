@@ -32,7 +32,7 @@ function waitForEvent(emitter, eventType) {
     });
 }
 
-async function writeZip(template, ){
+async function writeZip(template){
     try {
         fs.mkdirSync('./test/data/archives');
     } catch (err) {
