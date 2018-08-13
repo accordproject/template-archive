@@ -619,7 +619,6 @@ class Template {
 
                 logger.debug(method, 'Adding model files to model manager');
                 template.modelManager.addModelFiles(ctoModelFiles, ctoModelFileNames, true); // Adds all cto files to model manager
-                await template.modelManager.updateExternalModels();
                 template.modelManager.validateModelFiles();
 
                 logger.debug(method, 'Added model files to model manager');
