@@ -752,10 +752,6 @@ class Template {
             if (file.isSystemModelFile()) {
                 return;
             }
-            // ignore Accord Project system models
-            if (file.getNamespace() === 'org.accordproject.common') {
-                return;
-            }
             if (file.fileName === 'UNKNOWN' || file.fileName === null || !file.fileName) {
                 fileName = file.namespace + '.cto';
             } else {
