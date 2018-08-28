@@ -117,7 +117,8 @@ class TemplateInstance {
     /**
      * Generates the natural language text for a clause; combining the text from the template
      * and the clause data.
-     * @returns {object} the ast for the template grammar
+     * @returns {string} the natural language text for the clause; created by combining the structure of
+     * the template with the JSON data for the clause.
      */
     generateText() {
         if(!this.composerData) {
