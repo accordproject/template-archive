@@ -21,7 +21,11 @@
   const flatten = d => {
     return d.reduce(
       (a, b) => {
-        return a.concat(b);
+          if(b) {
+            return a.concat(b);
+          } else {
+              return a;
+          }
       },
       []
     );

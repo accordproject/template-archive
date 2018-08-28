@@ -87,6 +87,7 @@ class Template {
         this.grammar = null;
         this.grammarAst = null;
         this.templatizedGrammar = null;
+        this.templateAst = null;
     }
 
     /**
@@ -168,6 +169,18 @@ class Template {
     }
 
     /**
+     * Gets the AST for the template
+     * @return {object} the AST for the template
+     */
+    getTemplateAst() {
+        if (!this.grammarAst) {
+            throw new Error('Must call setGrammar or buildGrammar before calling getTemplateAst');
+        }
+
+        return this.templateAst;
+    }
+
+    /**
      * Set the grammar for the template
      * @param {String} grammar  - the grammar for the template
      */
@@ -191,6 +204,7 @@ class Template {
 
         // parse the template grammar to generate a dynamic grammar
         const ast = parser.results[0];
+        this.templateAst = ast;
         logger.debug('Template AST', ast);
         const parts = {
             textRules: [],

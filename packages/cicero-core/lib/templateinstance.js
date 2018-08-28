@@ -16,6 +16,7 @@
 
 const logger = require('./logger');
 const crypto = require('crypto');
+const RelationshipDeclaration = require('composer-common').RelationshipDeclaration;
 
 /**
  * A TemplateInstance is an instance of a Clause or Contract template. It is executable business logic, linked to
@@ -112,6 +113,149 @@ class TemplateInstance {
 
         this.setData(ast);
     }
+
+    /**
+     * Generates the natural language text for a clause; combining the text from the template
+     * and the clause data.
+     * @returns {string} the natural language text for the clause; created by combining the structure of
+     * the template with the JSON data for the clause.
+     */
+    generateText() {
+        if(!this.composerData) {
+            throw new Error('Data has not been set. Call setData or parse before calling this method.');
+        }
+
+        const ast = this.getTemplate().getTemplateAst();
+        // console.log('AST: ' + JSON.stringify(ast, null, 4));
+
+        let result = '';
+
+        for(let n=0; n < ast.data.length; n++) {
+            const thing = ast.data[n];
+
+            switch(thing.type) {
+            case 'LastChunk':
+            case 'Chunk':
+                result += thing.value;
+                break;
+
+            case 'BooleanBinding': {
+                const property = this.getTemplate().getTemplateModel().getProperty(thing.fieldName.value);
+                if(this.composerData[property.getName()]) {
+                    result += thing.string.value.substring(1,thing.string.value.length-1);
+                }
+            }
+                break;
+
+            case 'Binding': {
+                const property = this.getTemplate().getTemplateModel().getProperty(thing.fieldName.value);
+                result += this.convertPropertyToString(property, this.composerData[property.getName()]);
+            }
+                break;
+
+            default:
+                throw new Error('Unrecognized item: ' + thing.type);
+            }
+        }
+
+        return result;
+    }
+
+    /**
+     * Converts a composer object to a string
+     * @param {ClassDeclaration} clazz - the composer classdeclaration
+     * @param {object} obj - the instance to convert
+     * @returns {string} the parseable string representation of the object
+     * @private
+     */
+    convertClassToString(clazz, obj) {
+        const properties = clazz.getProperties();
+        let result = '';
+        for(let n=0; n < properties.length; n++) {
+            const child = properties[n];
+            result += this.convertPropertyToString(child, obj[child.getName()]);
+
+            if(n < properties.length-1) {
+                result += ' ';
+            }
+        }
+
+        return result;
+    }
+
+    /**
+     * Returns a MM/dd/yyyy formatted date
+     * @param {Date} date - the date to format
+     * @returns {string} formatted date
+     * @private
+     */
+    static getFormattedDate(date) {
+        let year = date.getFullYear();
+
+        let month = (1 + date.getMonth()).toString();
+        month = month.length > 1 ? month : '0' + month;
+
+        let day = date.getDate().toString();
+        day = day.length > 1 ? day : '0' + day;
+
+        return month + '/' + day + '/' + year;
+    }
+
+
+    /**
+     * Converts a composer object to a string
+     * @param {Property} property - the composer property
+     * @param {object} obj - the instance to convert
+     * @returns {string} the parseable string representation of the object
+     * @private
+     */
+    convertPropertyToString(property, obj) {
+
+        if(property instanceof RelationshipDeclaration) {
+            return `"${obj.getIdentifier()}"`;
+        }
+
+        if(property.isTypeEnum()) {
+            return obj;
+        }
+
+        // uncomment this code when the templates support arrays
+        // if(property.isArray()) {
+        //     let result = '';
+        //     for(let n=0; n < obj.length; n++) {
+        //         result += this.convertPropertyToString(this.getTemplate().getTemplateModel().
+        //             getModelFile().getModelManager().getType(property.getFullyQualifiedTypeName()), obj[n] );
+
+        //         if(n < obj.length-1) {
+        //             result += ' ';
+        //         }
+        //     }
+        //     return result;
+        // }
+
+        switch(property.getFullyQualifiedTypeName()) {
+        case 'String':
+            return `"${obj}"`;
+        case 'Integer':
+        case 'Long':
+        case 'Double':
+            return obj.toString();
+        case 'DateTime':
+            //return obj.toISOString();
+            return TemplateInstance.getFormattedDate(obj);
+        case 'Boolean':
+            if(obj) {
+                return 'true';
+            }
+            else {
+                return 'false';
+            }
+        default:
+            return this.convertClassToString(this.getTemplate().getTemplateModel().
+                getModelFile().getModelManager().getType(property.getFullyQualifiedTypeName()), obj);
+        }
+    }
+
 
     /**
      * Returns the identifier for this clause. The identifier is the identifier of
