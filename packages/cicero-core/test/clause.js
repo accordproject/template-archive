@@ -168,4 +168,15 @@ describe('Clause', () => {
             (()=> clause.parse('')).should.throw('Parsing clause text returned a null AST. This may mean the text is valid, but not complete.');
         });
     });
+
+    describe('#generateText', () => {
+
+        it.only('should be able to roundtrip natural language text', async function() {
+            const template = await Template.fromDirectory('./test/data/latedeliveryandpenalty');
+            const clause = new Clause(template);
+            clause.parse(testLatePenaltyInput);
+            const nl = clause.generateText();
+            testLatePenaltyInput.should.equal(nl);
+        });
+    });
 });

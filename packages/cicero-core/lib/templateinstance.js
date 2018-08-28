@@ -16,6 +16,8 @@
 
 const logger = require('./logger');
 const crypto = require('crypto');
+const templateGrammar = require('./tdl.js');
+const nearley = require('nearley');
 
 /**
  * A TemplateInstance is an instance of a Clause or Contract template. It is executable business logic, linked to
@@ -112,6 +114,118 @@ class TemplateInstance {
 
         this.setData(ast);
     }
+
+    /**
+     * Generates the natural language text for a clause; combining the text from the template
+     * and the clause data.
+     * @returns {object} the ast for the template grammar
+     */
+    generateText() {
+        if(!this.composerData) {
+            throw new Error('Data has not been set. Call setData or parse before calling this method.');
+        }
+
+        const ast = this.getTemplate().getTemplateAst();
+
+        let result = '';
+
+        for(let n=0; n < ast.data.length; n++) {
+            const thing = ast.data[n];
+
+            switch(thing.type) {
+            case 'LastChunk':
+            case 'Chunk':
+                result += thing.value;
+                break;
+
+            case 'BooleanBinding':
+                if(this.composerData[thing.fieldName.value]) {
+                    result += thing.string.value.substring(1,thing.string.value.length-1);
+                }
+                break;
+
+            case 'Binding': {
+                const property = this.getTemplate().getTemplateModel().getProperty(thing.fieldName.value);
+                result += this.convertPropertyToString(property, this.composerData[property.getName()]);
+            }
+                break;
+
+            default:
+                throw new Error('Unrecognized item: ' + thing.type);
+            }
+        }
+
+        return result;
+    }
+
+    /**
+     * Converts a composer object to a string
+     * @param {ClassDeclaration} clazz - the composer classdeclaration
+     * @param {object} obj - the object to convert
+     * @returns {string} the parseable string representation of the object
+     */
+    convertClassToString(clazz, obj) {
+        const properties = clazz.getProperties();
+        let result = '';
+        for(let n=0; n < properties.length; n++) {
+            const child = properties[n];
+            result += this.convertPropertyToString(child, obj[child.getName()]);
+
+            if(n < properties.length-1) {
+                result += ' ';
+            }
+        }
+
+        return result;
+    }
+
+    /**
+     * Converts a composer object to a string
+     * @param {Property} property - the composer property
+     * @param {object} obj - the object to convert
+     * @returns {string} the parseable string representation of the object
+     */
+    convertPropertyToString(property, obj) {
+
+        if(property.isTypeEnum()) {
+            return obj;
+        }
+
+        if(property.isArray()) {
+            let result = '';
+            for(let n=0; n < obj.length; n++) {
+                result += this.convertPropertyToString(this.getTemplate().getTemplateModel().
+                    getModelFile().getModelManager().getType(property.getFullyQualifiedTypeName()), obj[n] );
+
+                if(n < obj.length-1) {
+                    result += ' ';
+                }
+            }
+            return result;
+        }
+
+        switch(property.getFullyQualifiedTypeName()) {
+        case 'String':
+            return `"${obj}"`;
+        case 'Integer':
+        case 'Long':
+        case 'Double':
+            return obj;
+        case 'DateTime':
+            return obj.toISOString();
+        case 'Boolean':
+            if(obj) {
+                return 'true';
+            }
+            else {
+                return 'false';
+            }
+        default:
+            return this.convertClassToString(this.getTemplate().getTemplateModel().
+                getModelFile().getModelManager().getType(property.getFullyQualifiedTypeName()), obj);
+        }
+    }
+
 
     /**
      * Returns the identifier for this clause. The identifier is the identifier of
