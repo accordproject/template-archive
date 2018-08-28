@@ -183,7 +183,7 @@ class TemplateInstance {
 
     /**
      * Returns a MM/dd/yyyy formatted date
-     * @param {Date} date
+     * @param {Date} date - the date to format
      * @returns {string} formatted date
      */
     static getFormattedDate(date) {

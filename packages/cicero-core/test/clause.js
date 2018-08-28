@@ -172,7 +172,7 @@ describe('Clause', () => {
 
     describe('#generateText', () => {
 
-        it.only('should be able to roundtrip latedelivery natural language text', async function() {
+        it('should be able to roundtrip latedelivery natural language text', async function() {
             const template = await Template.fromDirectory('./test/data/latedeliveryandpenalty');
             const clause = new Clause(template);
             clause.parse(testLatePenaltyInput);
@@ -180,7 +180,7 @@ describe('Clause', () => {
             testLatePenaltyInput.should.equal(nl);
         });
 
-        it.only('should be able to roundtrip conga natural language text', async function() {
+        it('should be able to roundtrip conga natural language text', async function() {
             const template = await Template.fromDirectory('./test/data/conga');
             const clause = new Clause(template);
             clause.parse(testCongaInput);
@@ -188,7 +188,7 @@ describe('Clause', () => {
             testCongaInput.should.equal(nl);
         });
 
-        it.only('should be able to roundtrip alltypes language text', async function() {
+        it('should be able to roundtrip alltypes language text', async function() {
             const template = await Template.fromDirectory('./test/data/alltypes');
             const clause = new Clause(template);
             clause.parse(testAllTypesInput);
