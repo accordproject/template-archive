@@ -9,10 +9,10 @@ Late Delivery and Penalty. In case of delayed delivery{{" except for Force Majeu
 // Declare a contract over a template model
 contract LateDeliveryAndPenalty over TemplateModel {
   // Clause checking for late delivery and calculating penalty
-  clause latedeliveryandpenalty(request : LateDeliveryAndPenaltyRequest) : LateDeliveryAndPenaltyResponse throws ErrorResponse {
+  clause latedeliveryandpenalty(request : LateDeliveryAndPenaltyRequest) : LateDeliveryAndPenaltyResponse {
     // Guard against calling late delivery clause too early
     let agreed = request.agreedDelivery;
-    enforce momentIsBefore(agreed,now()) else
+    enforce dateTimeIsBefore(agreed,now()) else
     throw ErrorResponse{ message : "Cannot exercise late delivery before delivery date" }
     ;
     // Guard against force majeure
@@ -24,7 +24,7 @@ contract LateDeliveryAndPenalty over TemplateModel {
     ;
 
     // Calculate the time difference between current date and agreed upon date
-    let diff = momentDiffDays(now,agreed);
+    let diff = dateTimeDiffDays(now,agreed);
     // Penalty formula
     let penalty =
       (diff / contract.penaltyDuration.amount) * contract.penaltyPercentage/100.0 * request.goodsValue;

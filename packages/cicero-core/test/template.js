@@ -32,7 +32,7 @@ function waitForEvent(emitter, eventType) {
     });
 }
 
-async function writeZip(template, ){
+async function writeZip(template){
     try {
         fs.mkdirSync('./test/data/archives');
     } catch (err) {
@@ -96,6 +96,7 @@ describe('Template', () => {
             template.getDescription().should.equal('Late Delivery and Penalty. In case of delayed delivery except for Force Majeure cases, the Seller shall pay to the Buyer for every 9 DAY of delay penalty amounting to 7% of the total value of the Equipment whose delivery has been delayed. Any fractional part of a DAY is to be considered a full DAY. The total amount of penalty shall not however, exceed 2% of the total value of the Equipment involved in late delivery. If the delay is more than 2 WEEK, the Buyer is entitled to terminate this Contract.');
             template.getVersion().should.equal('0.0.1');
             template.getMetadata().getSample().should.equal('Late Delivery and Penalty. In case of delayed delivery except for Force Majeure cases, the Seller shall pay to the Buyer for every 9 days of delay penalty amounting to 7% of the total value of the Equipment whose delivery has been delayed. Any fractional part of a days is to be considered a full days. The total amount of penalty shall not however, exceed 2% of the total value of the Equipment involved in late delivery. If the delay is more than 2 weeks, the Buyer is entitled to terminate this Contract.');
+            template.getHash().should.equal('1c9a4cb5d8a97a686b9e9cc2c7332185b4495a0948a65431ad2c5d8393911cc0');
             const buffer = await template.toArchive();
             buffer.should.not.be.null;
             const template2 = await Template.fromArchive(buffer);
@@ -106,6 +107,7 @@ describe('Template', () => {
             template2.getScriptManager().getScripts().length.should.equal(template.getScriptManager().getScripts().length);
             template2.getMetadata().getREADME().should.equal(template.getMetadata().getREADME());
             template2.getMetadata().getSamples().should.eql(template.getMetadata().getSamples());
+            template2.getHash().should.equal(template.getHash());
             const buffer2 = await template2.toArchive();
             buffer2.should.not.be.null;
         });
@@ -179,23 +181,23 @@ describe('Template', () => {
     describe('#fromUrl', () => {
 
         it('should create a template from an archive at a given URL', async () => {
-            const url = 'https://templates.accordproject.org/archives/acceptance-of-delivery@0.2.0.cta';
+            const url = 'https://templates.accordproject.org/archives/supplyagreement@0.3.0.cta';
             return Template.fromUrl(url, null).should.be.fulfilled;
         });
 
         it('should create a template from an archive at a given AP URL', async () => {
-            const url = 'ap://acceptance-of-delivery@0.2.0#hash';
+            const url = 'ap://acceptance-of-delivery@0.5.0#hash';
             return Template.fromUrl(url, null).should.be.fulfilled;
         });
 
         it('should create a template from an archive at a given github URL', async () => {
-            const url = 'github://accordproject/cicero-template-library/master/build/archives/acceptance-of-delivery@0.2.0.cta';
+            const url = 'github://accordproject/cicero-template-library/master/build/archives/supplyagreement@0.3.0.cta';
             return Template.fromUrl(url, {'encoding':null,'headers':{'Accept': '*/*','Accept-Encoding': 'deflate, gzip'}}).should.be.fulfilled;
         });
 
         it('should throw an error if creating a template from a wrong URL', async () => {
-            const url = 'https://templates.accordproject.org/archives/doesnotexist@0.2.0.cta';
-            return Template.fromUrl(url, null).should.be.rejectedWith('Request to URL [https://templates.accordproject.org/archives/doesnotexist@0.2.0.cta] returned with error code: 404');
+            const url = 'https://templates.accordproject.org/archives/doesnotexist@0.3.0.cta';
+            return Template.fromUrl(url, null).should.be.rejectedWith('Request to URL [https://templates.accordproject.org/archives/doesnotexist@0.3.0.cta] returned with error code: 404');
         });
 
         it('should throw an error if creating a template from a github URL to an archive with the wrong Cicero version', async () => {
@@ -215,7 +217,7 @@ describe('Template', () => {
                 'cicero': {
                     'template': 'clause',
                     'language': 'ergo',
-                    'version': '^0.4.0'
+                    'version': '^0.6.0'
                 }
             },
             null,
@@ -352,7 +354,7 @@ describe('Template', () => {
     describe('#getHash', () => {
         it('should return a SHA-256 hash', async () => {
             const template = await Template.fromDirectory('./test/data/latedeliveryandpenalty');
-            template.getHash().should.equal('0811c3e923bcc51244a787656a276ae7a77a5a86fd6645578607a812f9d446fc');
+            template.getHash().should.equal('1c9a4cb5d8a97a686b9e9cc2c7332185b4495a0948a65431ad2c5d8393911cc0');
         });
     });
 

@@ -42,7 +42,7 @@ describe('TemplateLibrary', () => {
         it('should retrieve index', async function() {
             const templateLibrary = new TemplateLibrary();
             const templateIndex = await templateLibrary.getTemplateIndex();
-            templateIndex.should.have.property('helloworld@0.2.0');
+            templateIndex.should.have.property('helloworld@0.3.0');
         });
 
         it('should retrieve index for latest versions', async function() {
@@ -58,12 +58,14 @@ describe('TemplateLibrary', () => {
             templateIndex.should.not.have.property('helloworld@0.2.0');
         });
 
-        it('should retrieve latest version index for cicero version 0.4.4', async function() {
+        it('should retrieve latest version index for cicero version 0.6.0', async function() {
             const templateLibrary = new TemplateLibrary();
-            const templateIndex = await templateLibrary.getTemplateIndex({latestVersion: true, ciceroVersion: '0.4.4'});
+            const templateIndex = await templateLibrary.getTemplateIndex({latestVersion: true, ciceroVersion: '0.6.0'});
             templateIndex.should.not.have.property('helloworld@0.0.5');
             templateIndex.should.not.have.property('helloworld@0.2.0');
-            templateIndex.should.have.property('helloworld@0.2.1');
+            templateIndex.should.not.have.property('helloworld@0.2.1');
+            templateIndex.should.not.have.property('helloworld@0.3.0');
+            templateIndex.should.have.property('helloworld@0.4.0');
         });
     });
 
@@ -71,8 +73,8 @@ describe('TemplateLibrary', () => {
 
         it('should retrieve a template', async function() {
             const templateLibrary = new TemplateLibrary();
-            const template = await templateLibrary.getTemplate('ap://helloworld@0.2.0#bf7346e1f60a721f5641b03f1747f0de78c181c10cbb1d27c4caeb9f2957cfa0');
-            template.getIdentifier().should.equal('helloworld@0.2.0');
+            const template = await templateLibrary.getTemplate('ap://helloworld@0.4.0#fb1b0a1df819c59991cadf9699cae9767cc057f72015d0d3ed3a436d697bb7ad');
+            template.getIdentifier().should.equal('helloworld@0.4.0');
         });
     });
 
