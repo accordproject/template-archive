@@ -16,8 +16,7 @@
 
 const logger = require('./logger');
 const crypto = require('crypto');
-const templateGrammar = require('./tdl.js');
-const nearley = require('nearley');
+const RelationshipDeclaration = require('composer-common').RelationshipDeclaration;
 
 /**
  * A TemplateInstance is an instance of a Clause or Contract template. It is executable business logic, linked to
@@ -126,6 +125,7 @@ class TemplateInstance {
         }
 
         const ast = this.getTemplate().getTemplateAst();
+        // console.log('AST: ' + JSON.stringify(ast, null, 4));
 
         let result = '';
 
@@ -138,10 +138,12 @@ class TemplateInstance {
                 result += thing.value;
                 break;
 
-            case 'BooleanBinding':
-                if(this.composerData[thing.fieldName.value]) {
+            case 'BooleanBinding': {
+                const property = this.getTemplate().getTemplateModel().getProperty(thing.fieldName.value);
+                if(this.composerData[property.getName()]) {
                     result += thing.string.value.substring(1,thing.string.value.length-1);
                 }
+            }
                 break;
 
             case 'Binding': {
@@ -161,7 +163,7 @@ class TemplateInstance {
     /**
      * Converts a composer object to a string
      * @param {ClassDeclaration} clazz - the composer classdeclaration
-     * @param {object} obj - the object to convert
+     * @param {object} obj - the instance to convert
      * @returns {string} the parseable string representation of the object
      */
     convertClassToString(clazz, obj) {
@@ -180,12 +182,34 @@ class TemplateInstance {
     }
 
     /**
+     * Returns a MM/dd/yyyy formatted date
+     * @param {Date} date
+     * @returns {string} formatted date
+     */
+    static getFormattedDate(date) {
+        let year = date.getFullYear();
+
+        let month = (1 + date.getMonth()).toString();
+        month = month.length > 1 ? month : '0' + month;
+
+        let day = date.getDate().toString();
+        day = day.length > 1 ? day : '0' + day;
+
+        return month + '/' + day + '/' + year;
+    }
+
+
+    /**
      * Converts a composer object to a string
      * @param {Property} property - the composer property
-     * @param {object} obj - the object to convert
+     * @param {object} obj - the instance to convert
      * @returns {string} the parseable string representation of the object
      */
     convertPropertyToString(property, obj) {
+
+        if(property instanceof RelationshipDeclaration) {
+            return `"${obj.getIdentifier()}"`;
+        }
 
         if(property.isTypeEnum()) {
             return obj;
@@ -210,9 +234,10 @@ class TemplateInstance {
         case 'Integer':
         case 'Long':
         case 'Double':
-            return obj;
+            return obj.toString();
         case 'DateTime':
-            return obj.toISOString();
+            //return obj.toISOString();
+            return TemplateInstance.getFormattedDate(obj);
         case 'Boolean':
             if(obj) {
                 return 'true';

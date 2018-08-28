@@ -10,7 +10,6 @@ import org.accordproject.cicero.runtime.Response from https://models.accordproje
 asset TemplateModel extends AccordClause {
   o Double amount
   o String swag
-  @AccordType("Word __ Word", "{% (d) => {return `${d[0]} ${d[2]}`;} %}")
   --> Participant participant
   o String maybeThing optional
 }

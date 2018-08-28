@@ -1,0 +1,8 @@
+doubleProperty: [{doubleProperty}]
+integerProperty: [{integerProperty}]
+longProperty: [{longProperty}]
+stringProperty: [{stringProperty}]
+dateTimeProperty: [{dateTimeProperty}]
+enumProperty: [{enumProperty}]
+relationshipProperty: [{relationshipProperty}]
+conceptProperty: [{conceptProperty}]
