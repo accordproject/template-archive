@@ -188,7 +188,7 @@ describe('Clause', () => {
             testCongaInput.should.equal(nl);
         });
 
-        it('should be able to roundtrip alltypes language text', async function() {
+        it('should be able to roundtrip alltypes natural language text', async function() {
             const template = await Template.fromDirectory('./test/data/alltypes');
             const clause = new Clause(template);
             clause.parse(testAllTypesInput);
