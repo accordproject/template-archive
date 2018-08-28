@@ -166,6 +166,7 @@ class TemplateInstance {
      * @param {ClassDeclaration} clazz - the composer classdeclaration
      * @param {object} obj - the instance to convert
      * @returns {string} the parseable string representation of the object
+     * @private
      */
     convertClassToString(clazz, obj) {
         const properties = clazz.getProperties();
@@ -186,6 +187,7 @@ class TemplateInstance {
      * Returns a MM/dd/yyyy formatted date
      * @param {Date} date - the date to format
      * @returns {string} formatted date
+     * @private
      */
     static getFormattedDate(date) {
         let year = date.getFullYear();
@@ -205,6 +207,7 @@ class TemplateInstance {
      * @param {Property} property - the composer property
      * @param {object} obj - the instance to convert
      * @returns {string} the parseable string representation of the object
+     * @private
      */
     convertPropertyToString(property, obj) {
 
