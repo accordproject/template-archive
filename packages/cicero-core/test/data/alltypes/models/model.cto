@@ -25,6 +25,7 @@ asset TemplateModel extends AccordClause {
   o Long longProperty
   o String stringProperty
   o DateTime dateTimeProperty
+  o Boolean booleanProperty
   o Gender enumProperty
   --> Customer relationshipProperty
   o Address conceptProperty

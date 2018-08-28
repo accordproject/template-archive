@@ -219,18 +219,19 @@ class TemplateInstance {
             return obj;
         }
 
-        if(property.isArray()) {
-            let result = '';
-            for(let n=0; n < obj.length; n++) {
-                result += this.convertPropertyToString(this.getTemplate().getTemplateModel().
-                    getModelFile().getModelManager().getType(property.getFullyQualifiedTypeName()), obj[n] );
+        // uncomment this code when the templates support arrays
+        // if(property.isArray()) {
+        //     let result = '';
+        //     for(let n=0; n < obj.length; n++) {
+        //         result += this.convertPropertyToString(this.getTemplate().getTemplateModel().
+        //             getModelFile().getModelManager().getType(property.getFullyQualifiedTypeName()), obj[n] );
 
-                if(n < obj.length-1) {
-                    result += ' ';
-                }
-            }
-            return result;
-        }
+        //         if(n < obj.length-1) {
+        //             result += ' ';
+        //         }
+        //     }
+        //     return result;
+        // }
 
         switch(property.getFullyQualifiedTypeName()) {
         case 'String':
