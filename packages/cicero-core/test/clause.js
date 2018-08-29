@@ -193,7 +193,7 @@ describe('Clause', () => {
             const clause = new Clause(template);
             clause.parse(testAllTypesInput);
             const nl = clause.generateText();
-            testAllTypesInput.should.equal(nl);
+            nl.should.equal(testAllTypesInput);
         });
     });
 });
