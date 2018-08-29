@@ -190,12 +190,12 @@ class TemplateInstance {
      * @private
      */
     static getFormattedDate(date) {
-        let year = date.getFullYear();
+        let year = date.getUTCFullYear();
 
-        let month = (1 + date.getMonth()).toString();
+        let month = (1 + date.getUTCMonth()).toString();
         month = month.length > 1 ? month : '0' + month;
 
-        let day = date.getDate().toString();
+        let day = date.getUTCDate().toString();
         day = day.length > 1 ? day : '0' + day;
 
         return month + '/' + day + '/' + year;
