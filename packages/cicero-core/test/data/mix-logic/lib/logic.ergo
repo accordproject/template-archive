@@ -9,11 +9,11 @@ Late Delivery and Penalty. In case of delayed delivery{{" except for Force Majeu
 // Declare a contract over a template model
 contract LateDeliveryAndPenalty over TemplateModel {
   // Clause checking for late delivery and calculating penalty
-  clause latedeliveryandpenalty(request : LateDeliveryAndPenaltyRequest) : LateDeliveryAndPenaltyResponse throws ErrorResponse {
+  clause latedeliveryandpenalty(request : LateDeliveryAndPenaltyRequest) : LateDeliveryAndPenaltyResponse {
     // Guard against calling late delivery clause too early
     let agreed = request.agreedDelivery;
     enforce dateTimeIsBefore(agreed,now()) else
-    throw ErrorResponse{ message : "Cannot exercise late delivery before delivery date" }
+    throw ErgoErrorResponse{ message : "Cannot exercise late delivery before delivery date" }
     ;
     // Guard against force majeure
     enforce !contract.forceMajeure or !request.forceMajeure else
