@@ -1,6 +1,6 @@
 {
   "name": "@accordproject/cicero-core",
-  "version": "0.6.0",
+  "version": "0.6.1",
   "description": "Cicero Core - implementation of Accord Protocol Template Specification",
   "engines": {
     "node": ">=8",
@@ -54,7 +54,7 @@
     "webpack-cli": "^3.1.0"
   },
   "dependencies": {
-    "@accordproject/ergo-compiler": "0.3.1",
+    "@accordproject/ergo-compiler": "0.3.4",
     "axios": "0.17.1",
     "composer-common": "0.19.12",
     "debug": "2.6.2",
