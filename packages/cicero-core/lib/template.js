@@ -608,15 +608,20 @@ class Template {
                 throw new Error('Templates cannot mix Ergo and JS logic');
             }
 
+            const ergoModelFiles = [];
+            for( const mf of ctoModelFiles ) {
+                ergoModelFiles.push({ 'name': '(CTO Buffer)', 'content' : mf });
+            }
             ergoFiles.forEach(function (file) {
                 logger.debug(method, 'Found Ergo file, loading it', file.name);
                 promise = promise.then(() => {
-                    return file.async('string');
-                }).then((contents) => {
+                    return { 'name' : file.name, 'content' : file.async('string') };
+                }).then((ergoSource) => {
                     logger.debug(method, 'Loaded Ergo file');
-                    const compiled = Ergo.compileToJavaScriptAndLink([contents],ctoModelFiles,'javascript_cicero');
+                    logger.info('Compiling Ergo logic');
+                    const compiled = Ergo.compileToJavaScriptAndLink([ergoSource],ergoModelFiles,'javascript_cicero');
                     if (compiled.hasOwnProperty('error')) {
-                        throw new Error('In: ' + file + ' [' + Ergo.ergoErrorToString(compiled.error) + ']');
+                        throw new Error(Ergo.ergoVerboseErrorToString(compiled.error));
                     } else {
                         let tempObj = {
                             'name': file.name,
@@ -971,6 +976,7 @@ class Template {
                 process: function (filePath, contents) {
                     let pathObj = fsPath.parse(filePath);
                     if (pathObj.ext.toLowerCase() === '.ergo') {
+                        logger.info('Compiling Ergo logic');
                         logger.debug(method, 'Compiling Ergo to JavaScript ', filePath);
                         // re-get the updated modelfiles from the modelmanager (includes external dependencies)
                         if (template.getMetadata().getLanguage() === 1) {
@@ -981,9 +987,13 @@ class Template {
                             newModelFiles.push(mf.getDefinitions());
                         }
 
-                        const compiled = Ergo.compileToJavaScriptAndLink([contents],newModelFiles,'javascript_cicero');
+                        const ergoModelFiles = [];
+                        for( const mf of template.getModelManager().getModelFiles() ) {
+                            ergoModelFiles.push({ 'name': '(CTO Buffer)', 'content' : mf.getDefinitions() });
+                        }
+                        const compiled = Ergo.compileToJavaScriptAndLink([{ 'name' : filePath, 'content' : contents }],ergoModelFiles,'javascript_cicero');
                         if (compiled.hasOwnProperty('error')) {
-                            throw new Error('In: ' + filePath + ' [' + Ergo.ergoErrorToString(compiled.error) + ']');
+                            throw new Error(Ergo.ergoVerboseErrorToString(compiled.error));
                         } else {
                             contents = compiled.success;
                         }
