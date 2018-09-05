@@ -17,16 +17,16 @@ namespace org.accordproject.installmentsale
 contract InstallmentSale over InstallmentSaleContract state InstallmentSaleState {
   clause init(request : InitializeRequest) : InitializeResponse {
     set state InstallmentSaleState{
-      stateId: "org.accordproject.installmentsale.InstallmentSaleState#1",
+      stateId: "#1",
       status: "WaitingForFirstDayOfNextMonth",
       balance_remaining: contract.INITIAL_DUE,
       total_paid: 0.0,
-      next_payment_month: request.firstMonth
+      next_payment_month: doubleToInteger(request.firstMonth)
     };
     return InitializeResponse{}
   }
 
-  clause PayInstallment(request : Installment) : Balance emits PaymentObligation {
+  clause PayInstallment(request : Installment) : Balance emits MyPaymentObligation {
 //    enforce (state.status = "WaitingForFirstDayOfNextMonth"); // Make sure this is only called in the right state
 //    enforce (contract.MIN_PAYMENT <= state.balance_remaining) and (state.next_payment_month < 23);
 //    enforce (contract.MIN_PAYMENT <= request.amount); // Underpaying is forbidden
@@ -35,13 +35,13 @@ contract InstallmentSale over InstallmentSaleContract state InstallmentSaleState
     let balance = before_interest * (1.0 + contract.INTEREST_RATE/100.00);
     let total_paid = state.total_paid + request.amount;
     set state InstallmentSaleState{
-      stateId: "1",
+      stateId: "#1",
       status: "WaitingForFirstDayOfNextMonth",
       balance_remaining: balance,
       total_paid: total_paid,
-      next_payment_month: state.next_payment_month + 1.0
+      next_payment_month: state.next_payment_month +i 1
     };
-    emit PaymentObligation{
+    emit MyPaymentObligation{
       party: contract.BUYER,
       amount: request.amount
     };
@@ -50,18 +50,18 @@ contract InstallmentSale over InstallmentSaleContract state InstallmentSaleState
       total_paid: total_paid
     }
   }
-  clause PayLastInstallment(request : ClosingPayment) : Balance emits PaymentObligation {
+  clause PayLastInstallment(request : ClosingPayment) : Balance emits MyPaymentObligation {
     enforce (request.amount = state.balance_remaining + contract.DUE_AT_CLOSING);
     let balance = state.balance_remaining + contract.DUE_AT_CLOSING - request.amount;
     let total_paid = state.total_paid + request.amount;
     set state InstallmentSaleState{
-      stateId: "1",
+      stateId: "#1",
       status: "Fulfilled",
       balance_remaining: balance,
       total_paid: total_paid,
-      next_payment_month: 0.0 // ???
+      next_payment_month: 0 // ???
     };
-    emit PaymentObligation{
+    emit MyPaymentObligation{
       party: contract.BUYER,
       amount: request.amount
     };
