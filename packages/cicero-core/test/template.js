@@ -96,7 +96,7 @@ describe('Template', () => {
             template.getDescription().should.equal('Late Delivery and Penalty. In case of delayed delivery except for Force Majeure cases, the Seller shall pay to the Buyer for every 9 DAY of delay penalty amounting to 7% of the total value of the Equipment whose delivery has been delayed. Any fractional part of a DAY is to be considered a full DAY. The total amount of penalty shall not however, exceed 2% of the total value of the Equipment involved in late delivery. If the delay is more than 2 WEEK, the Buyer is entitled to terminate this Contract.');
             template.getVersion().should.equal('0.0.1');
             template.getMetadata().getSample().should.equal('Late Delivery and Penalty. In case of delayed delivery except for Force Majeure cases, the Seller shall pay to the Buyer for every 9 days of delay penalty amounting to 7% of the total value of the Equipment whose delivery has been delayed. Any fractional part of a days is to be considered a full days. The total amount of penalty shall not however, exceed 2% of the total value of the Equipment involved in late delivery. If the delay is more than 2 weeks, the Buyer is entitled to terminate this Contract.');
-            template.getHash().should.equal('a0b247773959817cbab7d506127023cf6c7929c86a02fafc5c1f638309c51c10');
+            template.getHash().should.equal('25b37b53d2088be472f48ee2e47083f6665baa0f006466b8595ed98fd3f45f20');
             const buffer = await template.toArchive();
             buffer.should.not.be.null;
             const template2 = await Template.fromArchive(buffer);
@@ -354,7 +354,7 @@ describe('Template', () => {
     describe('#getHash', () => {
         it('should return a SHA-256 hash', async () => {
             const template = await Template.fromDirectory('./test/data/latedeliveryandpenalty');
-            template.getHash().should.equal('a0b247773959817cbab7d506127023cf6c7929c86a02fafc5c1f638309c51c10');
+            template.getHash().should.equal('25b37b53d2088be472f48ee2e47083f6665baa0f006466b8595ed98fd3f45f20');
         });
     });
 
