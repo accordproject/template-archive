@@ -96,7 +96,7 @@ describe('Template', () => {
             template.getDescription().should.equal('Late Delivery and Penalty. In case of delayed delivery except for Force Majeure cases, the Seller shall pay to the Buyer for every 9 DAY of delay penalty amounting to 7% of the total value of the Equipment whose delivery has been delayed. Any fractional part of a DAY is to be considered a full DAY. The total amount of penalty shall not however, exceed 2% of the total value of the Equipment involved in late delivery. If the delay is more than 2 WEEK, the Buyer is entitled to terminate this Contract.');
             template.getVersion().should.equal('0.0.1');
             template.getMetadata().getSample().should.equal('Late Delivery and Penalty. In case of delayed delivery except for Force Majeure cases, the Seller shall pay to the Buyer for every 9 days of delay penalty amounting to 7% of the total value of the Equipment whose delivery has been delayed. Any fractional part of a days is to be considered a full days. The total amount of penalty shall not however, exceed 2% of the total value of the Equipment involved in late delivery. If the delay is more than 2 weeks, the Buyer is entitled to terminate this Contract.');
-            template.getHash().should.equal('25b37b53d2088be472f48ee2e47083f6665baa0f006466b8595ed98fd3f45f20');
+            template.getHash().should.equal('b510ad4dd1845d26970e182ab074499fa0bb35817a6498c7c3a2da3d1f18ad44');
             const buffer = await template.toArchive();
             buffer.should.not.be.null;
             const template2 = await Template.fromArchive(buffer);
@@ -181,17 +181,17 @@ describe('Template', () => {
     describe('#fromUrl', () => {
 
         it('should create a template from an archive at a given URL', async () => {
-            const url = 'https://templates.accordproject.org/archives/supplyagreement@0.4.0.cta';
+            const url = 'https://templates.accordproject.org/archives/supplyagreement@0.5.0.cta';
             return Template.fromUrl(url, null).should.be.fulfilled;
         });
 
         it('should create a template from an archive at a given AP URL', async () => {
-            const url = 'ap://acceptance-of-delivery@0.6.0#hash';
+            const url = 'ap://acceptance-of-delivery@0.7.0#hash';
             return Template.fromUrl(url, null).should.be.fulfilled;
         });
 
         it('should create a template from an archive at a given github URL', async () => {
-            const url = 'github://accordproject/cicero-template-library/master/build/archives/supplyagreement@0.4.0.cta';
+            const url = 'github://accordproject/cicero-template-library/master/build/archives/supplyagreement@0.5.0.cta';
             return Template.fromUrl(url, {'encoding':null,'headers':{'Accept': '*/*','Accept-Encoding': 'deflate, gzip'}}).should.be.fulfilled;
         });
 
@@ -217,7 +217,7 @@ describe('Template', () => {
                 'cicero': {
                     'template': 'clause',
                     'language': 'ergo',
-                    'version': '^0.7.1'
+                    'version': '^0.8.0'
                 }
             },
             null,
@@ -354,7 +354,7 @@ describe('Template', () => {
     describe('#getHash', () => {
         it('should return a SHA-256 hash', async () => {
             const template = await Template.fromDirectory('./test/data/latedeliveryandpenalty');
-            template.getHash().should.equal('25b37b53d2088be472f48ee2e47083f6665baa0f006466b8595ed98fd3f45f20');
+            template.getHash().should.equal('b510ad4dd1845d26970e182ab074499fa0bb35817a6498c7c3a2da3d1f18ad44');
         });
     });
 

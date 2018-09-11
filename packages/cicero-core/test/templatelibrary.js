@@ -58,15 +58,16 @@ describe('TemplateLibrary', () => {
             templateIndex.should.not.have.property('helloworld@0.2.0');
         });
 
-        it('should retrieve latest version index for cicero version 0.7.1', async function() {
+        it('should retrieve latest version index for cicero version 0.8.0', async function() {
             const templateLibrary = new TemplateLibrary();
-            const templateIndex = await templateLibrary.getTemplateIndex({latestVersion: true, ciceroVersion: '0.7.1'});
+            const templateIndex = await templateLibrary.getTemplateIndex({latestVersion: true, ciceroVersion: '0.8.0'});
             templateIndex.should.not.have.property('helloworld@0.0.5');
             templateIndex.should.not.have.property('helloworld@0.2.0');
             templateIndex.should.not.have.property('helloworld@0.2.1');
             templateIndex.should.not.have.property('helloworld@0.3.0');
             templateIndex.should.not.have.property('helloworld@0.4.0');
-            templateIndex.should.have.property('helloworld@0.5.0');
+            templateIndex.should.not.have.property('helloworld@0.5.0');
+            templateIndex.should.have.property('helloworld@0.6.0');
         });
     });
 
@@ -74,8 +75,8 @@ describe('TemplateLibrary', () => {
 
         it('should retrieve a template', async function() {
             const templateLibrary = new TemplateLibrary();
-            const template = await templateLibrary.getTemplate('ap://helloworld@0.5.0#b31501b2a779bbf0f62b9c0c3c58dcb891a4cdc7bb2bfe541420c6d33c1eb34c');
-            template.getIdentifier().should.equal('helloworld@0.5.0');
+            const template = await templateLibrary.getTemplate('ap://helloworld@0.6.0#e3db6367b30a83804525b27255d0e01b5f0474374faf8e3cc22ffae251487109');
+            template.getIdentifier().should.equal('helloworld@0.6.0');
         });
     });
 
