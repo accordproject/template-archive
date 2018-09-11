@@ -49,7 +49,7 @@ require('yargs')
                 logger.info(JSON.stringify(result));
             })
             .catch((err) => {
-                logger.error(err.message + ' ' + JSON.stringify(err));
+                logger.error(err.message);
             });
     })
     .command('archive', 'archive a template directory', (yargs) => {
@@ -101,7 +101,6 @@ require('yargs')
             argv = Commands.validateExecuteArgs(argv);
         } catch (err){
             logger.error(err.message);
-            return;
         }
 
         return Commands.execute(argv.template, argv.sample, argv.request, argv.state)
@@ -109,7 +108,7 @@ require('yargs')
                 logger.info(JSON.stringify(result));
             })
             .catch((err) => {
-                logger.error(err.message + ' ' + JSON.stringify(err));
+                logger.error(err.message);
             });
     })
     .command('generate', 'generate code from the template model', (yargs) => {

@@ -39,7 +39,7 @@ concept PurchaseObligation extends MyObligation {
   o Integer year
   o Integer quarter
 }
-concept PaymentObligation extends MyObligation {
+concept MyPaymentObligation extends MyObligation {
   o Double amount
 }
 

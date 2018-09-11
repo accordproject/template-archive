@@ -59,7 +59,7 @@ class Commands {
                 return clause.getData();
             })
             .catch((err) => {
-                logger.error(err);
+                logger.error(err.message);
             });
     }
 
@@ -158,7 +158,7 @@ class Commands {
                 }, initResponse);
             })
             .catch((err) => {
-                logger.error(err);
+                logger.error(err.message);
             });
     }
 
