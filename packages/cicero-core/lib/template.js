@@ -619,7 +619,7 @@ class Template {
                 }).then((ergoSource) => {
                     logger.debug(method, 'Loaded Ergo file');
                     logger.info('Compiling Ergo logic');
-                    const compiled = Ergo.compileToJavaScriptAndLink([ergoSource],ergoModelFiles,'javascript_cicero');
+                    const compiled = Ergo.compileToJavaScript([ergoSource],ergoModelFiles,'cicero',true);
                     if (compiled.hasOwnProperty('error')) {
                         throw new Error(Ergo.ergoVerboseErrorToString(compiled.error));
                     } else {
@@ -991,7 +991,7 @@ class Template {
                         for( const mf of template.getModelManager().getModelFiles() ) {
                             ergoModelFiles.push({ 'name': '(CTO Buffer)', 'content' : mf.getDefinitions() });
                         }
-                        const compiled = Ergo.compileToJavaScriptAndLink([{ 'name' : filePath, 'content' : contents }],ergoModelFiles,'javascript_cicero');
+                        const compiled = Ergo.compileToJavaScript([{ 'name' : filePath, 'content' : contents }],ergoModelFiles,'cicero',true);
                         if (compiled.hasOwnProperty('error')) {
                             throw new Error(Ergo.ergoVerboseErrorToString(compiled.error));
                         } else {
