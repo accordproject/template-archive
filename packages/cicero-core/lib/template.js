@@ -646,7 +646,8 @@ class Template {
                 logger.debug(method, 'Added model files to model manager');
                 logger.debug(method, 'Adding JavaScript files to script manager');
                 jsScriptFiles.forEach(function (obj) {
-                    let jsObject = template.scriptManager.createScript(obj.name, '.js', obj.contents);
+                    const objName = obj.name.substr(0, obj.name.lastIndexOf('.')) + '.js';
+                    let jsObject = template.scriptManager.createScript(objName, '.js', obj.contents);
                     template.scriptManager.addScript(jsObject); // Adds all js files to script manager
                 });
                 logger.debug(method, 'Added JavaScript files to script manager');
@@ -1031,8 +1032,10 @@ class Template {
                 process: function (filePath, contents) {
                     let pathObj = fsPath.parse(filePath);
                     if (pathObj.ext.toLowerCase() === '.ergo') {
-                        logger.info('Compiling Ergo logic');
-                        logger.debug(method, 'Compiling Ergo to JavaScript ', filePath);
+                        const resolvedPath = fsPath.resolve(path);
+                        const resolvedFilePath = fsPath.resolve(filePath);
+                        const truncatedPath = resolvedFilePath.replace(resolvedPath+'/', '');
+                        logger.info('Compiling Ergo logic in ' + truncatedPath);
                         // re-get the updated modelfiles from the modelmanager (includes external dependencies)
                         if (template.getMetadata().getLanguage() === 1) {
                             logger.warn('Template is declared as javascript, but this is an ergo template');
@@ -1047,11 +1050,8 @@ class Template {
                             ergoModelFiles.push({ 'name': '(CTO Buffer)', 'content' : mf.getDefinitions() });
                         }
                         const ergoSourceFiles = template.ergoSourceFiles;
-                        const resolvedPath = fsPath.resolve(path);
-                        const resolvedFilePath = fsPath.resolve(filePath);
-                        const truncatedPath = resolvedFilePath.replace(resolvedPath+'/', '');
                         ergoSourceFiles.push({ 'name' : truncatedPath, 'content' : contents });
-                        const compiled = Ergo.compileToJavaScript([{ 'name' : filePath, 'content' : contents }],ergoModelFiles,'cicero',true);
+                        const compiled = Ergo.compileToJavaScript([{ 'name' : truncatedPath, 'content' : contents }],ergoModelFiles,'cicero',true);
                         if (compiled.hasOwnProperty('error')) {
                             throw new Error(Ergo.ergoVerboseErrorToString(compiled.error));
                         } else {
