@@ -80,6 +80,7 @@ class Template {
     constructor(packageJson, readme, samples) {
         this.modelManager = new ModelManager();
         this.scriptManager = new ScriptManager(this.modelManager);
+        this.ergoSourceFiles = [];
         this.introspector = new Introspector(this.modelManager);
         this.factory = new Factory(this.modelManager);
         this.serializer = new Serializer(this.factory, this.modelManager);
@@ -495,6 +496,8 @@ class Template {
         return JSZip.loadAsync(Buffer).then(function (zip) {
             let promise = Promise.resolve();
             let ctoModelFiles = [];
+            let ergoModelFiles = [];
+            let ergoSourceFiles = [];
             let ctoModelFileNames = [];
             let jsScriptFiles = [];
             let sampleTextFiles = {};
@@ -579,8 +582,9 @@ class Template {
                 promise = promise.then(() => {
                     return file.async('string');
                 }).then((contents) => {
-                    logger.debug(method, 'Loaded model file');
+                    logger.debug(method, 'Loading model file'+contents);
                     ctoModelFiles.push(contents);
+                    ergoModelFiles.push({ 'name': file.name, 'content' : contents });
                 });
             });
 
@@ -608,18 +612,16 @@ class Template {
                 throw new Error('Templates cannot mix Ergo and JS logic');
             }
 
-            const ergoModelFiles = [];
-            for( const mf of ctoModelFiles ) {
-                ergoModelFiles.push({ 'name': '(CTO Buffer)', 'content' : mf });
-            }
             ergoFiles.forEach(function (file) {
                 logger.debug(method, 'Found Ergo file, loading it', file.name);
                 promise = promise.then(() => {
-                    return { 'name' : file.name, 'content' : file.async('string') };
+                    return file.async('string');
                 }).then((ergoSource) => {
                     logger.debug(method, 'Loaded Ergo file');
-                    logger.info('Compiling Ergo logic');
-                    const compiled = Ergo.compileToJavaScript([ergoSource],ergoModelFiles,'cicero',true);
+                    logger.info('Compiling Ergo logic in ' + file.name);
+                    const ergoScript = { 'name' : file.name, 'content' : ergoSource};
+                    ergoSourceFiles.push(ergoScript);
+                    const compiled = Ergo.compileToJavaScript([ergoScript],ergoModelFiles,'cicero',true);
                     if (compiled.hasOwnProperty('error')) {
                         throw new Error(Ergo.ergoVerboseErrorToString(compiled.error));
                     } else {
@@ -635,6 +637,7 @@ class Template {
             return promise.then(async () => {
                 logger.debug(method, 'Loaded package.json');
                 template = new Template(packageJsonContents, readmeContents, sampleTextFiles);
+                template.ergoSourceFiles = ergoSourceFiles;
 
                 logger.debug(method, 'Adding model files to model manager');
                 template.modelManager.addModelFiles(ctoModelFiles, ctoModelFileNames, true); // Adds all cto files to model manager
@@ -719,6 +722,50 @@ class Template {
     }
 
     /**
+     * Gets all the CTO models
+     * @return {Array<{name:string, content:string}>} the name and content of each CTO file
+     */
+    getModels() {
+        const modelManager = this.getModelManager();
+        const modelFiles = modelManager.getModelFiles();
+        let models = [];
+        modelFiles.forEach(function (file) {
+            let fileName;
+            // ignore the system namespace when creating an archive
+            if (file.isSystemModelFile()) {
+                return;
+            }
+            if (file.fileName === 'UNKNOWN' || file.fileName === null || !file.fileName) {
+                fileName = file.namespace + '.cto';
+            } else {
+                let fileIdentifier = file.fileName;
+                fileName = fsPath.basename(fileIdentifier);
+            }
+            models.push({ 'name' : fileName, 'content' : file.definitions });
+        });
+        return models;
+    }
+
+    /**
+     * Gets all the Ergo logic
+     * @return {Array<{name:string, content:string}>} the name and content of each Ergo file
+     */
+    getLogic() {
+        let logic = [];
+        this.ergoSourceFiles.forEach(function (file) {
+            let fileName;
+            if (file.name === 'UNKNOWN' || file.name === null || !file.name) {
+                fileName = 'UNKNOWN.cto';
+            } else {
+                let fileIdentifier = file.name;
+                fileName = fsPath.basename(fileIdentifier);
+            }
+            logic.push({ 'name' : fileName, 'content' : file.content });
+        });
+        return logic;
+    }
+
+    /**
      * Store a Template as an archive.
      * @param {Object} [options]  - JSZip options
      * @return {Buffer} buffer  - the zlib buffer
@@ -780,17 +827,25 @@ class Template {
             zip.file('models/' + fileName, file.definitions, options);
         });
 
-        let scriptManager = this.getScriptManager();
-        let scriptFiles = scriptManager.getScripts();
         zip.file('lib/', null, Object.assign({}, options, {
             dir: true
         }));
-        scriptFiles.forEach(function (file) {
-            let fileIdentifier = file.identifier;
-            let fileName = fsPath.basename(fileIdentifier);
-            zip.file('lib/' + fileName, file.contents, options);
-        });
-
+        let ergoFiles = this.ergoSourceFiles;
+        if (ergoFiles === undefined || ergoFiles.length === 0) {
+            let scriptManager = this.getScriptManager();
+            let scriptFiles = scriptManager.getScripts();
+            scriptFiles.forEach(function (file) {
+                let fileIdentifier = file.identifier;
+                let fileName = fsPath.basename(fileIdentifier);
+                zip.file('lib/' + fileName, file.contents, options);
+            });
+        } else {
+            ergoFiles.forEach(function (file) {
+                let fileIdentifier = file.name;
+                let fileName = fsPath.basename(fileIdentifier);
+                zip.file('lib/' + fileName, file.content, options);
+            });
+        }
         return zip.generateAsync({
             type: 'nodebuffer'
         }).then(something => {
@@ -991,6 +1046,11 @@ class Template {
                         for( const mf of template.getModelManager().getModelFiles() ) {
                             ergoModelFiles.push({ 'name': '(CTO Buffer)', 'content' : mf.getDefinitions() });
                         }
+                        const ergoSourceFiles = template.ergoSourceFiles;
+                        const resolvedPath = fsPath.resolve(path);
+                        const resolvedFilePath = fsPath.resolve(filePath);
+                        const truncatedPath = resolvedFilePath.replace(resolvedPath+'/', '');
+                        ergoSourceFiles.push({ 'name' : truncatedPath, 'content' : contents });
                         const compiled = Ergo.compileToJavaScript([{ 'name' : filePath, 'content' : contents }],ergoModelFiles,'cicero',true);
                         if (compiled.hasOwnProperty('error')) {
                             throw new Error(Ergo.ergoVerboseErrorToString(compiled.error));

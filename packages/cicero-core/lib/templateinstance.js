@@ -100,7 +100,7 @@ class TemplateInstance {
 
             parser.results.forEach(function (element) {
                 if (head !== JSON.stringify(element)) {
-                    throw new Error('Ambigious text. Got ' + parser.results.length + ' ASTs for text: ' + text);
+                    throw new Error('Ambiguous text. Got ' + parser.results.length + ' ASTs for text: ' + text);
                 }
             }, this);
         }
