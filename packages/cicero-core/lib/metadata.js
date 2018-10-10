@@ -37,6 +37,7 @@ class Metadata {
      * @param {object} packageJson  - the JS object for package.json (required)
      * @param {String} readme  - the README.md for the template (may be null)
      * @param {object} samples - the sample text for the template in different locales,
+     * @param {object} request - the JS object for the sample request
      * represented as an object whose keys are the locales and whose values are the sample text.
      * For example:
      *  {
@@ -47,9 +48,9 @@ class Metadata {
      * Locale keys (with the exception of default) conform to the IETF Language Tag specification (BCP 47).
      * THe `default` key represents sample template text in a non-specified language, stored in a file called `sample.txt`.
      */
-    constructor(packageJson, readme, samples) {
+    constructor(packageJson, readme, samples, request) {
         const method = 'constructor';
-        logger.entry(method, readme, samples);
+        logger.entry(method, readme, samples, request);
 
         if(!packageJson || typeof(packageJson) !== 'object') {
             throw new Error('package.json is required and must be an object');
@@ -57,6 +58,10 @@ class Metadata {
 
         if(!samples || typeof(samples) !== 'object') {
             throw new Error('sample.txt is required');
+        }
+
+        if(request && typeof(request) !== 'object') {
+            throw new Error('request.json must be an object');
         }
 
         if (!packageJson.name || !this._validName(packageJson.name)) {
@@ -71,6 +76,7 @@ class Metadata {
 
         this.readme = readme;
         this.samples = samples;
+        this.request = request;
 
         const templateTypes = {
             CONTRACT: 0,
@@ -192,6 +198,14 @@ class Metadata {
      */
     getSamples() {
         return this.samples;
+    }
+
+    /**
+     * Returns the sample request for this template.
+     * @return {object} the sample request for the template
+     */
+    getRequest() {
+        return this.request;
     }
 
     /**
