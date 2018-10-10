@@ -16,7 +16,7 @@
 
 const Logger = require('./logger');
 const logger = require('@accordproject/cicero-core').logger;
-const ResourceValidator = require('composer-common/lib/serializer/resourcevalidator');
+const ResourceValidator = require('composer-concerto/lib/serializer/resourcevalidator');
 
 const {
     VM,

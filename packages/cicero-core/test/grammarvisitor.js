@@ -14,8 +14,8 @@
 
 'use strict';
 
-const ModelManager = require('composer-common').ModelManager;
-const Writer = require('composer-common').Writer;
+const CiceroModelManager = require('../lib/ciceromodelmanager');
+const Writer = require('composer-concerto').Writer;
 const GrammarVisitor = require('../lib/grammarvisitor');
 const Template = require('../lib/template');
 const logger = require('../lib/logger');
@@ -58,7 +58,7 @@ describe('GrammarVisitor', () => {
 
         it('should generate grammar from a modelmanager', async () => {
 
-            const mm = new ModelManager();
+            const mm = new CiceroModelManager();
 
             const timemodel = fs.readFileSync(path.resolve(__dirname, 'data/models', 'time.cto'), 'utf8');
             mm.addModelFile(timemodel, 'time.cto', true);
@@ -93,7 +93,7 @@ describe('GrammarVisitor', () => {
 
         it('should generate grammar from a model with relationships', async () => {
 
-            const mm = new ModelManager();
+            const mm = new CiceroModelManager();
             if(mm.getModelFile('org.accordproject.common') === undefined){
                 const model = fs.readFileSync(path.resolve(__dirname, 'data/models', 'common.cto'), 'utf8');
                 mm.addModelFile(model, 'common.cto', true);
@@ -129,7 +129,7 @@ describe('GrammarVisitor', () => {
 
         it('should generate grammar from a model with optional fields', async () => {
 
-            const mm = new ModelManager();
+            const mm = new CiceroModelManager();
             if(mm.getModelFile('org.accordproject.common') === undefined){
                 const model = fs.readFileSync(path.resolve(__dirname, 'data/models', 'common.cto'), 'utf8');
                 mm.addModelFile(model, 'common.cto');
