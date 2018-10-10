@@ -1040,11 +1040,6 @@ class Template {
                         if (template.getMetadata().getLanguage() === 1) {
                             logger.warn('Template is declared as javascript, but this is an ergo template');
                         }
-                        const newModelFiles = [];
-                        for( const mf of template.getModelManager().getModelFiles() ) {
-                            newModelFiles.push(mf.getDefinitions());
-                        }
-
                         const ergoModelFiles = [];
                         for( const mf of template.getModelManager().getModelFiles() ) {
                             ergoModelFiles.push({ 'name': '(CTO Buffer)', 'content' : mf.getDefinitions() });

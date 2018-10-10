@@ -29,7 +29,7 @@ class CompositeArchiveLoader {
 
     /**
      * Adds a ArchiveLoader implemenetation to the ArchiveLoader
-     * @param {ArchiveLoader} archiveLoader - The script to add to the ScriptManager
+     * @param {ArchiveLoader} archiveLoader - The archive to add to the CompositeArchiveLoader
      */
     addArchiveLoader(archiveLoader) {
         this.archiveLoaders.push(archiveLoader);

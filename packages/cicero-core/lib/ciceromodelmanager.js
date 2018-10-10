@@ -41,7 +41,7 @@ class CiceroModelManager extends ModelManager {
      */
     constructor() {
         super();
-        this.addModelFile(systemModel, 'org.accordproject.base.cto', true, true);
+        this.addModelFile(systemModel, 'org.accordproject.base.cto', false, true);
     }
 }
 

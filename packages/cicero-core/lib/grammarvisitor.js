@@ -15,7 +15,7 @@
 'use strict';
 
 const Field = require('composer-concerto').Field;
-const ModelManager = require('composer-concerto').ModelManager;
+const CiceroModelManager = require('./ciceromodelmanager');
 const ModelFile = require('composer-concerto').ModelFile;
 const RelationshipDeclaration = require('composer-concerto').RelationshipDeclaration;
 const EnumDeclaration = require('composer-concerto').EnumDeclaration;
@@ -40,7 +40,7 @@ class GrammarVisitor {
      * @private
      */
     visit(thing, parameters) {
-        if (thing instanceof ModelManager) {
+        if (thing instanceof CiceroModelManager) {
             return this.visitModelManager(thing, parameters);
         } else if (thing instanceof ModelFile) {
             return this.visitModelFile(thing, parameters);
