@@ -48,7 +48,7 @@
   "dependencies": {
     "@accordproject/cicero-core": "0.8.0",
     "@accordproject/cicero-engine": "0.8.0",
-    "@accordproject/ergo-compiler": "0.4.3",
+    "@accordproject/ergo-compiler": "0.4.4",
     "composer-concerto": "0.31.2",
     "uuid": "3.2.1",
     "yargs": "9.0.1"

@@ -1,1 +1,5 @@
+<<<<<<< HEAD
 {"$class":"org.accordproject.latedeliveryandpenalty.TemplateModel","clauseId":"81a7793e-34ae-4872-843e-68d9413a6aa0","forceMajeure":true,"penaltyDuration":{"$class":"org.accordproject.time.Duration","amount":9,"unit":"days"},"penaltyPercentage":7,"capPercentage":2,"termination":{"$class":"org.accordproject.time.Duration","amount":2,"unit":"weeks"},"fractionalPart":"days"}
+=======
+{"$class":"org.accordproject.latedeliveryandpenalty.TemplateModel","clauseId":"1faff88e-0a83-411e-997d-5e527352a640","forceMajeure":true,"penaltyDuration":{"$class":"org.accordproject.time.Duration","amount":9,"unit":"days"},"penaltyPercentage":7,"capPercentage":2,"termination":{"$class":"org.accordproject.time.Duration","amount":2,"unit":"weeks"},"fractionalPart":"days"}
+>>>>>>> 72687b2... (chore) Up Ergo 0.4.4
