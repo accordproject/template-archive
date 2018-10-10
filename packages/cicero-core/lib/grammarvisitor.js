@@ -14,13 +14,13 @@
 
 'use strict';
 
-const Field = require('composer-common').Field;
-const ModelManager = require('composer-common').ModelManager;
-const ModelFile = require('composer-common').ModelFile;
-const RelationshipDeclaration = require('composer-common').RelationshipDeclaration;
-const EnumDeclaration = require('composer-common').EnumDeclaration;
-const EnumValueDeclaration = require('composer-common').EnumValueDeclaration;
-const ClassDeclaration = require('composer-common').ClassDeclaration;
+const Field = require('composer-concerto').Field;
+const ModelManager = require('composer-concerto').ModelManager;
+const ModelFile = require('composer-concerto').ModelFile;
+const RelationshipDeclaration = require('composer-concerto').RelationshipDeclaration;
+const EnumDeclaration = require('composer-concerto').EnumDeclaration;
+const EnumValueDeclaration = require('composer-concerto').EnumValueDeclaration;
+const ClassDeclaration = require('composer-concerto').ClassDeclaration;
 const util = require('util');
 const debug = require('debug')('cicero:grammarvisitor');
 

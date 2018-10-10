@@ -55,7 +55,12 @@ limitations under the License.`),
             {
                 test: /\.js$/,
                 include: [path.join(__dirname, 'src')],
-                use: ['babel-loader']
+                use: {
+                    loader: 'babel-loader',
+                    options: {
+                        presets: ['@babel/preset-env']
+                    }
+                }
             },
             {
                 test: /\.ne$/,

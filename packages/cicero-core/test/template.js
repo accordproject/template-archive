@@ -360,7 +360,7 @@ describe('Template', () => {
 
     describe('#getFactory', () => {
         it('should return a Factory', async () => {
-            const Factory = require('composer-common').Factory;
+            const Factory = require('composer-concerto').Factory;
             const template = await Template.fromDirectory('./test/data/latedeliveryandpenalty');
             template.getFactory().should.be.an.instanceof(Factory);
         });
@@ -368,7 +368,7 @@ describe('Template', () => {
 
     describe('#getSerializer', () => {
         it('should return a Serializer', async () => {
-            const Serializer = require('composer-common').Serializer;
+            const Serializer = require('composer-concerto').Serializer;
             const template = await Template.fromDirectory('./test/data/latedeliveryandpenalty');
             template.getSerializer().should.be.an.instanceof(Serializer);
         });

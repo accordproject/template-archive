@@ -65,7 +65,6 @@ describe('TemplateLibrary', () => {
             templateIndex.should.not.have.property('helloworld@0.2.0');
             templateIndex.should.not.have.property('helloworld@0.2.1');
             templateIndex.should.not.have.property('helloworld@0.3.0');
-            templateIndex.should.have.property('helloworld@0.4.0');
         });
     });
 

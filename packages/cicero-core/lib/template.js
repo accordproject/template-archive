@@ -22,14 +22,14 @@ const minimatch = require('minimatch');
 const glob = require('glob');
 const xregexp = require('xregexp');
 const languageTagRegex = require('ietf-language-tag-regex');
-const Factory = require('composer-common').Factory;
-const RelationshipDeclaration = require('composer-common').RelationshipDeclaration;
-const Introspector = require('composer-common').Introspector;
-const ModelManager = require('composer-common').ModelManager;
-const ScriptManager = require('composer-common').ScriptManager;
+const Factory = require('composer-concerto').Factory;
+const RelationshipDeclaration = require('composer-concerto').RelationshipDeclaration;
+const Introspector = require('composer-concerto').Introspector;
+const CiceroModelManager = require('./ciceromodelmanager');
+const ScriptManager = require('./scriptmanager');
 const DefaultArchiveLoader = require('./loaders/defaultarchiveloader');
-const Serializer = require('composer-common').Serializer;
-const Writer = require('composer-common').Writer;
+const Serializer = require('composer-concerto').Serializer;
+const Writer = require('composer-concerto').Writer;
 const logger = require('./logger');
 const nearley = require('nearley');
 const compile = require('nearley/lib/compile');
@@ -78,7 +78,7 @@ class Template {
      * @param {object} samples - the sample text for the template in different locales
      */
     constructor(packageJson, readme, samples) {
-        this.modelManager = new ModelManager();
+        this.modelManager = new CiceroModelManager();
         this.scriptManager = new ScriptManager(this.modelManager);
         this.introspector = new Introspector(this.modelManager);
         this.factory = new Factory(this.modelManager);

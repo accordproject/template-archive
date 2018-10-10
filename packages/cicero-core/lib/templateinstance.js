@@ -16,7 +16,7 @@
 
 const logger = require('./logger');
 const crypto = require('crypto');
-const RelationshipDeclaration = require('composer-common').RelationshipDeclaration;
+const RelationshipDeclaration = require('composer-concerto').RelationshipDeclaration;
 
 /**
  * A TemplateInstance is an instance of a Clause or Contract template. It is executable business logic, linked to
