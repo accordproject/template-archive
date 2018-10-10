@@ -76,15 +76,16 @@ class Template {
      * @param {object} packageJson  - the JS object for package.json
      * @param {String} readme  - the readme in markdown for the template (optional)
      * @param {object} samples - the sample text for the template in different locales
+     * @param {object} request - the request JSON for the template
      */
-    constructor(packageJson, readme, samples) {
+    constructor(packageJson, readme, samples, request) {
         this.modelManager = new ModelManager();
         this.scriptManager = new ScriptManager(this.modelManager);
         this.ergoSourceFiles = [];
         this.introspector = new Introspector(this.modelManager);
         this.factory = new Factory(this.modelManager);
         this.serializer = new Serializer(this.factory, this.modelManager);
-        this.metadata = new Metadata(packageJson, readme, samples);
+        this.metadata = new Metadata(packageJson, readme, samples, request);
         this.grammar = null;
         this.grammarAst = null;
         this.templatizedGrammar = null;
@@ -501,6 +502,7 @@ class Template {
             let ctoModelFileNames = [];
             let jsScriptFiles = [];
             let sampleTextFiles = {};
+            let requestContents = null;
             let template;
             let readmeContents = null;
             let packageJsonContents = null;
@@ -536,6 +538,17 @@ class Template {
                     sampleTextFiles[locale] = contents;
                 });
             });
+
+            logger.debug(method, 'Loading request.json');
+            let request = zip.file('request.json');
+            if (request) {
+                promise = promise.then(() => {
+                    return request.async('string');
+                }).then((contents) => {
+                    logger.debug(method, 'Loaded request.json');
+                    requestContents = contents;
+                });
+            }
 
             logger.debug(method, 'Loading package.json');
             let packageJson = zip.file('package.json');
@@ -636,7 +649,7 @@ class Template {
 
             return promise.then(async () => {
                 logger.debug(method, 'Loaded package.json');
-                template = new Template(packageJsonContents, readmeContents, sampleTextFiles);
+                template = new Template(packageJsonContents, readmeContents, sampleTextFiles, requestContents);
                 template.ergoSourceFiles = ergoSourceFiles;
 
                 logger.debug(method, 'Adding model files to model manager');
@@ -808,6 +821,11 @@ class Template {
             });
         }
 
+        // save the request.json if present
+        if (this.getMetadata().getRequest()) {
+            zip.file('request.json', this.getMetadata().getRequest(), options);
+        }
+
         let modelManager = this.getModelManager();
         let modelFiles = modelManager.getModelFiles();
         zip.file('models/', null, Object.assign({}, options, {
@@ -930,6 +948,16 @@ class Template {
             }
         }
 
+        // grab the request.json
+        let requestContents = null;
+        const requestPath = fsPath.resolve(path, 'request.json');
+        if (fs.existsSync(requestPath)) {
+            requestContents = fs.readFileSync(requestPath, ENCODING);
+            if (requestContents) {
+                logger.debug(method, 'Loaded request.json', requestContents);
+            }
+        }
+
         // grab the package.json
         const packageJsonPath = fsPath.resolve(path, 'package.json');
         if (!fs.existsSync(packageJsonPath)) {
@@ -969,7 +997,7 @@ class Template {
         let jsonObject = JSON.parse(packageJsonContents);
 
         // create the template
-        const template = new Template(jsonObject, readmeContents, sampleTextFiles);
+        const template = new Template(jsonObject, readmeContents, sampleTextFiles, requestContents);
         const modelFiles = [];
         const modelFileNames = [];
 
@@ -1237,7 +1265,7 @@ class Template {
      * @private
      */
     setSamples(samples) {
-        this.metadata = new Metadata(this.metadata.getPackageJson(), this.metadata.getREADME(), samples);
+        this.metadata = new Metadata(this.metadata.getPackageJson(), this.metadata.getREADME(), samples, this.metadata.getRequest());
     }
 
     /**
@@ -1249,7 +1277,7 @@ class Template {
     setSample(sample, locale) {
         const samples = this.metadata.getSamples();
         samples[locale] = sample;
-        this.metadata = new Metadata(this.metadata.getPackageJson(), this.metadata.getREADME(), samples);
+        this.metadata = new Metadata(this.metadata.getPackageJson(), this.metadata.getREADME(), samples, this.metadata.getRequest());
     }
 
     /**
@@ -1258,7 +1286,7 @@ class Template {
      * @private
      */
     setReadme(readme) {
-        this.metadata = new Metadata(this.metadata.getPackageJson(), readme, this.metadata.getSamples());
+        this.metadata = new Metadata(this.metadata.getPackageJson(), readme, this.metadata.getSamples(), this.metadata.getRequest());
     }
 
     /**
@@ -1267,7 +1295,7 @@ class Template {
      * @private
      */
     setPackageJson(packageJson) {
-        this.metadata = new Metadata(packageJson, this.metadata.getREADME(), this.metadata.getSamples());
+        this.metadata = new Metadata(packageJson, this.metadata.getREADME(), this.metadata.getSamples(), this.metadata.getRequest());
     }
 
     /**

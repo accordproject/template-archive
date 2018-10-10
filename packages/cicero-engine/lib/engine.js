@@ -97,7 +97,7 @@ class Engine {
         }
 
         const head = `
-        __dispatch(contract,data,request,state,moment());
+        __dispatch(contractdata,data,request,state,moment());
 
         function __dispatch(contract,data,request,state,now) {
             switch(request.getFullyQualifiedType()) {
@@ -158,7 +158,7 @@ class Engine {
         }
 
         const head = `
-        __init(contract,data,request,moment());
+        __init(contractdata,data,request,moment());
 
         function __init(contract,data,request,now) {
         `;
@@ -228,7 +228,7 @@ class Engine {
         });
 
         // add immutables to the context
-        vm.freeze(validContract, 'contract'); // Second argument adds object to global.
+        vm.freeze(validContract, 'contractdata'); // Second argument adds object to global.
         vm.freeze(validContract, 'data'); // Second argument adds object to global.
         vm.freeze(validRequest, 'request'); // Second argument adds object to global.
         vm.freeze(validState, 'state'); // Second argument adds object to global.
@@ -299,7 +299,7 @@ class Engine {
         });
 
         // add immutables to the context
-        vm.freeze(validContract, 'contract'); // Second argument adds object to global.
+        vm.freeze(validContract, 'contractdata'); // Second argument adds object to global.
         vm.freeze(validContract, 'data'); // Second argument adds object to global.
         vm.freeze(validRequest, 'request'); // Second argument adds object to global.
 
