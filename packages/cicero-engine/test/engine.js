@@ -263,7 +263,7 @@ describe('BogusClauses', () => {
                 element.language = '.ergo';
             }
         }, this);
-        (() => engine.compileJsClause(clause)).should.throw('Did not find any JavaScript logic');
+        (() => engine.compileJsClause(clause)).should.throw('Did not find any function declarations with the @AccordClauseLogic annotation');
     });
     it('should throw an error when all logic is missing', async function() {
         // Remove all scripts

@@ -14,6 +14,8 @@
 
 'use strict';
 
+const fsPath = require('path');
+
 const ModelManager = require('composer-concerto').ModelManager;
 
 const systemModel = `namespace org.accordproject.base
@@ -43,6 +45,31 @@ class CiceroModelManager extends ModelManager {
         super();
         this.addModelFile(systemModel, 'org.accordproject.base.cto', false, true);
     }
+
+    /**
+     * Gets all the CTO models
+     * @return {Array<{name:string, content:string}>} the name and content of each CTO file
+     */
+    getModels() {
+        const modelFiles = this.getModelFiles();
+        let models = [];
+        modelFiles.forEach(function (file) {
+            let fileName;
+            // ignore the system namespace when creating an archive
+            if (file.isSystemModelFile()) {
+                return;
+            }
+            if (file.fileName === 'UNKNOWN' || file.fileName === null || !file.fileName) {
+                fileName = file.namespace + '.cto';
+            } else {
+                let fileIdentifier = file.fileName;
+                fileName = fsPath.basename(fileIdentifier);
+            }
+            models.push({ 'name' : fileName, 'content' : file.definitions });
+        });
+        return models;
+    }
+
 }
 
 module.exports = CiceroModelManager;
