@@ -27,13 +27,13 @@ const Script = require('./script');
 class ScriptManager {
 
     /**
-   * Create the ScriptManager.
-   * <p>
-   * <strong>Note: Only to be called by framework code. Applications should
-   * retrieve instances from {@link BusinessNetworkDefinition}</strong>
-   * </p>
-   * @param {ModelManager} modelManager - The ModelManager to use for this ScriptManager
-   */
+     * Create the ScriptManager.
+     * <p>
+     * <strong>Note: Only to be called by framework code. Applications should
+     * retrieve instances from {@link BusinessNetworkDefinition}</strong>
+     * </p>
+     * @param {ModelManager} modelManager - The ModelManager to use for this ScriptManager
+     */
     constructor(modelManager) {
         this.modelManager = modelManager;
         this.scripts = {};
@@ -58,7 +58,18 @@ class ScriptManager {
      * @returns {Script} - the instantiated script
      */
     createScript(identifier, language, contents) {
-        return new Script(this.modelManager, identifier, language, contents );
+        return new Script(this.modelManager, identifier, language, contents);
+    }
+
+    /**
+     * Modify an existing Script from a string.
+     *
+     * @param {string} identifier - the identifier of the script
+     * @param {string} language - the language identifier of the script
+     * @param {string} contents - the contents of the script
+     */
+    modifyScript(identifier, language, contents) {
+        this.updateScript(new Script(this.modelManager, identifier, language, contents));
     }
 
     /**
@@ -103,6 +114,25 @@ class ScriptManager {
 
         for(let n=0; n < keys.length;n++) {
             result.push(this.scripts[keys[n]]);
+        }
+
+        return result;
+    }
+
+    /**
+     * Get the array of Script instances for the given language
+     * @param {string} language - The scripts' language
+     * @return {Script[]} The Scripts registered
+     * @private
+     */
+    getScriptsForLanguage(language) {
+        let keys = Object.keys(this.scripts);
+        let result = [];
+
+        for(let n=0; n < keys.length;n++) {
+            if (this.scripts[keys[n]].getLanguage() === language)  {
+                result.push(this.scripts[keys[n]]);
+            }
         }
 
         return result;

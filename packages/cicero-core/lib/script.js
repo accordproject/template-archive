@@ -17,6 +17,7 @@
 const FunctionDeclaration = require('./functiondeclaration');
 const JavaScriptParser = require('composer-concerto/lib/codegen/javascriptparser');
 const debug = require('debug')('cicero:Script');
+const Ergo = require('@accordproject/ergo-compiler/lib/ergo');
 
 /**
  * <p>
@@ -41,6 +42,7 @@ class Script {
         this.identifier = identifier;
         this.language = language;
         this.contents = contents;
+        this.jsContents = null;
         this.functions = [];
 
         if(!contents) {
@@ -48,8 +50,24 @@ class Script {
         }
         let data = {errorStatement:''};
         let parser;
+        if (this.language === '.ergo') {
+            try {
+                const compiledErgo = Ergo.compileToJavaScript([{name:this.identifier,content:this.contents}],this.modelManager.getModels(),'cicero',true);
+                //console.log('compiling' + this.contents);
+                if (compiledErgo.hasOwnProperty('error')) {
+                    throw new Error(Ergo.ergoVerboseErrorToString(compiledErgo.error));
+                }
+                this.jsContents = compiledErgo.success;
+            } catch (error) {
+                debug('ergocompile', error.message, contents);
+                throw error;
+            }
+        } else {
+            this.jsContents = this.contents;
+        }
+
         try {
-            parser = new JavaScriptParser(this.contents, false, 8);
+            parser = new JavaScriptParser(this.jsContents, false, 8);
         } catch (cause) {
             // consider adding a toHex method in the exception to put out the pure hex values of the file.
             const error = new SyntaxError('Failed to parse ' + this.identifier + ': ' + cause.message+'\n'+data.errorStatement);
@@ -100,7 +118,7 @@ class Script {
 
     /**
      * Returns the language of the script
-     * @return {string} the identifier of the script
+     * @return {string} the language of the script
      */
     getLanguage() {
         return this.language;
@@ -108,10 +126,18 @@ class Script {
 
     /**
      * Returns the contents of the script
-     * @return {string} the identifier of the script
+     * @return {string} the content of the script
      */
     getContents() {
         return this.contents;
+    }
+
+    /**
+     * Returns the JavaScript (compiled) contents of the script
+     * @return {string} the JavaScript (compiled) of the script
+     */
+    getJsContents() {
+        return this.jsContents;
     }
 
     /**
