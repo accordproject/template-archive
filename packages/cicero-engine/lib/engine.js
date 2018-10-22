@@ -52,10 +52,8 @@ class Engine {
         let template = clause.getTemplate();
 
         template.getScriptManager().getScripts().forEach(function (element) {
-            if (element.getLanguage() === '.js') {
-                allJsScripts += element.getContents();
-                allJsInitScripts += element.getContents();
-            }
+            allJsScripts += element.getJsContents();
+            allJsInitScripts += element.getJsContents();
         }, this);
 
         if (allJsScripts === '') {
@@ -78,9 +76,7 @@ class Engine {
     buildDispatchFunction(clause) {
         // get the function declarations of all functions
         // that have the @clause annotation
-        const functionDeclarations = clause.getTemplate().getScriptManager().getScripts().filter((ele) => {
-            return ele.getLanguage() === ('.js');
-        }).map((ele) => {
+        const functionDeclarations = clause.getTemplate().getScriptManager().getScripts().map((ele) => {
             return ele.getFunctionDeclarations();
         })
             .reduce((flat, next) => {
@@ -139,9 +135,7 @@ class Engine {
     buildInitFunction(clause) {
         // get the function declarations of all functions
         // that have the @clause annotation
-        const functionDeclarations = clause.getTemplate().getScriptManager().getScripts().filter((ele) => {
-            return ele.getLanguage() === ('.js');
-        }).map((ele) => {
+        const functionDeclarations = clause.getTemplate().getScriptManager().getScripts().map((ele) => {
             return ele.getFunctionDeclarations();
         })
             .reduce((flat, next) => {
