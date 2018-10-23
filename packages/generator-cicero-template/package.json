@@ -51,7 +51,7 @@
     "nyc": "11.7.2",
     "sinon": "4.0.1",
     "yeoman-assert": "3.1.0",
-    "yeoman-test": "1.7.0"
+    "yeoman-test": "^2.0.0"
   },
   "license-check-config": {
     "src": [
@@ -68,7 +68,7 @@
   },
   "dependencies": {
     "chalk": "2.3.2",
-    "yeoman-generator": "2.0.1",
+    "yeoman-generator": "^3.1.1",
     "yosay": "2.0.1"
   },
   "nyc": {

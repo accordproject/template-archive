@@ -3,8 +3,8 @@
     "version": "0.0.6",
     "description": "A sample volume discount clause.",
     "cicero": {
-      "template": "clause",
-      "language": "ergo",
-      "version": "^0.8.0"
+        "template": "clause",
+        "language": "ergo",
+        "version": "^0.8.0"
     }
 }

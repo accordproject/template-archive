@@ -57,7 +57,7 @@
     "@accordproject/ergo-compiler": "0.4.4",
     "axios": "0.17.1",
     "composer-concerto": "0.31.2",
-    "debug": "2.6.2",
+    "debug": "^2.6.9",
     "fast-safe-stringify": "2.0.5",
     "glob": "7.1.2",
     "ietf-language-tag-regex": "0.0.5",
