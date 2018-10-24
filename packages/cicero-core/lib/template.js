@@ -700,14 +700,12 @@ class Template {
 
         let modelFiles = this.getModelManager().getModels();
         modelFiles.forEach(function (file) {
-            //console.log('model: ' + file.name);
             content.models[file.name] = file.content;
         });
 
         let scriptManager = this.getScriptManager();
         let scriptFiles = scriptManager.getScripts();
         scriptFiles.forEach(function (file) {
-            //console.log('script: ' + file.getName());
             content.scripts[file.getName()] = file.contents;
         });
 
@@ -791,7 +789,6 @@ class Template {
         let scriptManager = this.getScriptManager();
         let scriptFiles = scriptManager.getScripts();
         scriptFiles.forEach(function (file) {
-            console.log('toArchive Script' + file.identifier);
             let fileIdentifier = file.identifier;
             let fileName = fsPath.basename(fileIdentifier);
             zip.file('lib/' + fileName, file.contents, options);
