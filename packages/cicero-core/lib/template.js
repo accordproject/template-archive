@@ -729,10 +729,15 @@ class Template {
 
     /**
      * Store a Template as an archive.
+     * @param {string} [kind]  - Archive kind, either 'ergo' or 'js'
      * @param {Object} [options]  - JSZip options
      * @return {Buffer} buffer  - the zlib buffer
      */
-    toArchive(options) {
+    toArchive(kind, options) {
+
+        if (kind !== 'ergo' && kind !== 'js') {
+            throw new Error(`Creating archive should indicate kind (either 'ergo' or 'js') but kind is ${kind}.`);
+        }
 
         let zip = new JSZip();
 
@@ -791,7 +796,12 @@ class Template {
         scriptFiles.forEach(function (file) {
             let fileIdentifier = file.identifier;
             let fileName = fsPath.basename(fileIdentifier);
-            zip.file('lib/' + fileName, file.contents, options);
+            if (kind === 'ergo') {
+                zip.file('lib/' + fileName, file.contents, options);
+            } else {
+                fileName = fileName.split('.').slice(0, -1).join('.') + '.js';
+                zip.file('lib/' + fileName, file.jsContents, options);
+            }
         });
         return zip.generateAsync({
             type: 'nodebuffer'
