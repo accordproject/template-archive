@@ -19,7 +19,7 @@ const { LEVEL, MESSAGE } = require('triple-beam');
 const jsonStringify = require('fast-safe-stringify');
 const jsome = require('jsome');
 const fs = require('fs');
-const env = process.env.NODE_ENV || 'development';
+const env = process.env.NODE_ENV;
 const tsFormat = () => (new Date()).toLocaleTimeString();
 
 /**
