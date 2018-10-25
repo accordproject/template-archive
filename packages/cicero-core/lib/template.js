@@ -500,6 +500,7 @@ class Template {
             let sampleTextFiles = {};
             let requestContents = null;
             let template;
+            let language;
             let readmeContents = null;
             let packageJsonContents = null;
             let grammar = null;
@@ -596,15 +597,27 @@ class Template {
                 });
             });
 
+            promise = promise.then(() => {
+                logger.debug(method, 'Loaded package.json');
+                // Initialize the template
+                template = new Template(packageJsonContents, readmeContents, sampleTextFiles, requestContents);
+                // Lookup the archive's language
+                language = template.getMetadata().getLanguage();
+            });
+
             logger.debug(method, 'Looking for JavaScript files');
             let jsFiles = zip.file(/lib\/.*\.js$/); //Matches any file which is in the 'lib' folder and has a .js extension
 
             logger.debug(method, 'Looking for Ergo files');
             let ergoFiles = zip.file(/lib\/.*\.ergo$/); //Matches any file which is in the 'lib' folder and has a .ergo extension
 
-            if(jsFiles.length>0 && ergoFiles.length>0) {
-                throw new Error('Templates cannot mix Ergo and JS logic');
-            }
+            promise = promise.then(() => {
+                if(language === 0 && jsFiles.length>0) {
+                    throw new Error('Ergo template but contains JavaScript logic');
+                } else if(language === 1 && ergoFiles.length>0) {
+                    throw new Error('JavaScript template but contains Ergo logic');
+                }
+            });
 
             jsFiles.forEach(function (file) {
                 logger.debug(method, 'Found JavaScript file, loading it', file.name);
@@ -635,15 +648,12 @@ class Template {
             });
 
             return promise.then(async () => {
-                logger.debug(method, 'Loaded package.json');
-                template = new Template(packageJsonContents, readmeContents, sampleTextFiles, requestContents);
-
                 logger.debug(method, 'Adding model files to model manager');
                 template.modelManager.addModelFiles(ctoModelFiles, ctoModelFileNames, true); // Adds all cto files to model manager
                 template.modelManager.validateModelFiles();
 
                 logger.debug(method, 'Added model files to model manager');
-                logger.debug(method, 'Adding JavaScript files to script manager');
+                logger.debug(method, 'Adding Logic files to script manager');
                 scriptFiles.forEach(function (obj) {
                     const objExt = '.' +  obj.name.split('.').pop();
                     let jsObject = template.scriptManager.createScript(obj.name, objExt, obj.contents);
@@ -729,7 +739,7 @@ class Template {
 
     /**
      * Store a Template as an archive.
-     * @param {number} [language]  - Archive language type, either 'languageTypes.ERGO' or 'languageTypes.JAVASCRIPT'
+     * @param {string} [language]  - Archive language type, either 'ergo' or 'javascript'
      * @param {Object} [options]  - JSZip options
      * @return {Buffer} buffer  - the zlib buffer
      */
@@ -980,7 +990,7 @@ class Template {
 
             // find script files outside the npm install directory
             const scriptFiles = [];
-            let foundErgo, foundJs = false;
+            let isErgoTemplate = template.getMetadata().getLanguage() === 0 ? true : false;
             Template.processDirectory(path, {
                 accepts: function (file) {
                     return isFileInNodeModuleDir(file, path) === false && minimatch(file, options.scriptGlob, {
@@ -997,15 +1007,13 @@ class Template {
                     const resolvedFilePath = fsPath.resolve(filePath);
                     const truncatedPath = resolvedFilePath.replace(resolvedPath+'/', '');
                     if (pathObj.ext.toLowerCase() === '.ergo') {
-                        if(foundJs) {
-                            throw new Error('Templates cannot mix Ergo and JS logic');
+                        if(!isErgoTemplate) {
+                            throw new Error('JavaScript template but contains Ergo logic');
                         }
-                        foundErgo = true;
                     } else if (pathObj.ext.toLowerCase() === '.js') {
-                        if(foundErgo) {
-                            throw new Error('Templates cannot mix Ergo and JS logic');
+                        if(isErgoTemplate) {
+                            throw new Error('Ergo template but contains JavaScript logic');
                         }
-                        foundJs = true;
                     }
                     const script = template.getScriptManager().createScript(truncatedPath, pathObj.ext.toLowerCase(), contents);
                     scriptFiles.push(script);

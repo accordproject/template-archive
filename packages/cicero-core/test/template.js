@@ -77,8 +77,12 @@ describe('Template', () => {
             return Template.fromDirectory('./test/data/latedeliveryandpenalty').should.be.fulfilled;
         });
 
-        it('should throw error when logic mixes Ergo and JavaScript', async () => {
-            return Template.fromDirectory('./test/data/mix-logic').should.be.rejectedWith('Templates cannot mix Ergo and JS logic');
+        it('should throw error when loading Ergo template containing JavaScript', async () => {
+            return Template.fromDirectory('./test/data/ergo-js-inside').should.be.rejectedWith('Ergo template but contains JavaScript logic');
+        });
+
+        it('should throw error when loading JavaScript template containing Ergo', async () => {
+            return Template.fromDirectory('./test/data/js-ergo-inside').should.be.rejectedWith('JavaScript template but contains Ergo logic');
         });
 
         it('should throw error when Ergo logic does not parse', async () => {
@@ -216,27 +220,33 @@ describe('Template', () => {
             return Template.fromArchive(buffer).should.be.rejectedWith('Failed to find package.json');
         });
 
-        it('should throw an error if mix of Ergo and JS logic', async () => {
-            await writeZip('mix-logic');
-            const buffer = fs.readFileSync('./test/data/archives/mix-logic.zip');
-            return Template.fromArchive(buffer).should.be.rejectedWith('Templates cannot mix Ergo and JS logic');
+        it('should throw error when loading Ergo template containing JavaScript', async () => {
+            await writeZip('ergo-js-inside');
+            const buffer = fs.readFileSync('./test/data/archives/ergo-js-inside.zip');
+            return Template.fromArchive(buffer).should.be.rejectedWith('Ergo template but contains JavaScript logic');
+        });
+
+        it('should throw error when loading JavaScript template containing Ergo', async () => {
+            await writeZip('js-ergo-inside');
+            const buffer = fs.readFileSync('./test/data/archives/js-ergo-inside.zip');
+            return Template.fromArchive(buffer).should.be.rejectedWith('JavaScript template but contains Ergo logic');
         });
     });
 
     describe('#fromUrl', () => {
 
         it('should create a template from an archive at a given URL', async () => {
-            const url = 'https://templates.accordproject.org/archives/supplyagreement@0.5.0.cta';
+            const url = 'https://templates.accordproject.org/archives/ip-payment@0.5.0.cta';
             return Template.fromUrl(url, null).should.be.fulfilled;
         });
 
         it('should create a template from an archive at a given AP URL', async () => {
-            const url = 'ap://acceptance-of-delivery@0.7.0#hash';
+            const url = 'ap://ip-payment@0.5.0#hash';
             return Template.fromUrl(url, null).should.be.fulfilled;
         });
 
         it('should create a template from an archive at a given github URL', async () => {
-            const url = 'github://accordproject/cicero-template-library/master/build/archives/supplyagreement@0.5.0.cta';
+            const url = 'github://accordproject/cicero-template-library/master/build/archives/ip-payment@0.5.0.cta';
             return Template.fromUrl(url, {'encoding':null,'headers':{'Accept': '*/*','Accept-Encoding': 'deflate, gzip'}}).should.be.fulfilled;
         });
 

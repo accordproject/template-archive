@@ -75,8 +75,8 @@ describe('TemplateLibrary', () => {
 
         it('should retrieve a template', async function() {
             const templateLibrary = new TemplateLibrary();
-            const template = await templateLibrary.getTemplate('ap://helloworld@0.6.0#e3db6367b30a83804525b27255d0e01b5f0474374faf8e3cc22ffae251487109');
-            template.getIdentifier().should.equal('helloworld@0.6.0');
+            const template = await templateLibrary.getTemplate('ap://ip-payment@0.5.0#20326ab2507e32890f8fcf06d6bfb18886c1a3961e78b41c6613a48796989477');
+            template.getIdentifier().should.equal('ip-payment@0.5.0');
         });
     });
 
