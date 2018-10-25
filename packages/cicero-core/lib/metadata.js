@@ -20,6 +20,16 @@ const semver = require('semver');
 
 // This code is derived from BusinessNetworkMetadata in Hyperleger Composer composer-common.
 
+const templateTypes = {
+    CONTRACT: 0,
+    CLAUSE: 1
+};
+
+const languageTypes = {
+    ERGO: 0,
+    JAVASCRIPT: 1
+};
+
 /**
  * Defines the metadata for a Template, including the name, version, README markdown.
  * @class
@@ -78,16 +88,6 @@ class Metadata {
         this.samples = samples;
         this.request = request;
 
-        const templateTypes = {
-            CONTRACT: 0,
-            CLAUSE: 1
-        };
-
-        const languageTypes = {
-            ERGO: 0,
-            JAVASCRIPT: 1
-        };
-
         // Set defaults
         this.type = templateTypes.CONTRACT;
         this.language = languageTypes.ERGO;
@@ -113,7 +113,7 @@ class Metadata {
             }
 
             if(packageJson.cicero.language === 'javascript'){
-                this.language = templateTypes.JAVASCRIPT;
+                this.language = languageTypes.JAVASCRIPT;
             }
         } else {
             logger.warn('No cicero template language specified. Assuming that this is an ergo template');
@@ -272,6 +272,27 @@ class Metadata {
     getIdentifier() {
         return this.packageJson.name + '@' + this.packageJson.version;
     }
+
+    /**
+     * Return new Metadata for a target language
+     * @param {string} language - the target language
+     * @return {object} the new Metadata
+     */
+    createTargetMetadata(language) {
+        //  Defaults to JAVASCRIPT
+        if (language === undefined || language === null) { language = 'javascript'; }
+        //  Has to be either JAVASCRIPT or ERGO
+        if (language !== 'javascript' && language !== 'ergo') {
+            throw new Error(`Target language should be either 'ergo' or 'javascript' but target is ${language}.`);
+        }
+        if (this.language === languageTypes.JAVASCRIPT && language === 'ergo') {
+            throw new Error('Cannot export JavaScript archive to Ergo');
+        }
+        const packageJson = JSON.parse(JSON.stringify(this.packageJson));
+        packageJson.cicero.language = language;
+        return new Metadata(packageJson, this.readme, this.samples, this.request);
+    }
+
 }
 
 module.exports = Metadata;
