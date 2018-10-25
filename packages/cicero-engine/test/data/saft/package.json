@@ -7,7 +7,7 @@
     },
     "cicero": {
       "template": "contract",
-      "language": "ergo",
+      "language": "javascript",
       "version": "^0.8.0"
     }
 }
