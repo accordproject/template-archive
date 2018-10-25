@@ -729,19 +729,17 @@ class Template {
 
     /**
      * Store a Template as an archive.
-     * @param {string} [kind]  - Archive kind, either 'ergo' or 'js'
+     * @param {number} [language]  - Archive language type, either 'languageTypes.ERGO' or 'languageTypes.JAVASCRIPT'
      * @param {Object} [options]  - JSZip options
      * @return {Buffer} buffer  - the zlib buffer
      */
-    toArchive(kind, options) {
+    toArchive(language, options) {
 
-        if (kind !== 'ergo' && kind !== 'js') {
-            throw new Error(`Creating archive should indicate kind (either 'ergo' or 'js') but kind is ${kind}.`);
-        }
+        const metadata = this.getMetadata().createTargetMetadata(language);
 
         let zip = new JSZip();
 
-        let packageFileContents = JSON.stringify(this.getMetadata().getPackageJson());
+        let packageFileContents = JSON.stringify(metadata.getPackageJson());
         zip.file('package.json', packageFileContents, options);
 
         // save the grammar
@@ -756,12 +754,12 @@ class Template {
         }
 
         // save the README.md if present
-        if (this.getMetadata().getREADME()) {
-            zip.file('README.md', this.getMetadata().getREADME(), options);
+        if (metadata.getREADME()) {
+            zip.file('README.md', metadata.getREADME(), options);
         }
 
         // Save the sample files
-        const sampleFiles = this.getMetadata().getSamples();
+        const sampleFiles = metadata.getSamples();
         if(sampleFiles){
             Object.keys(sampleFiles).forEach(function (locale) {
                 let fileName;
@@ -775,8 +773,8 @@ class Template {
         }
 
         // save the request.json if present
-        if (this.getMetadata().getRequest()) {
-            let requestFileContents = JSON.stringify(this.getMetadata().getRequest());
+        if (metadata.getRequest()) {
+            let requestFileContents = JSON.stringify(metadata.getRequest());
             zip.file('request.json', requestFileContents, options);
         }
 
@@ -796,7 +794,7 @@ class Template {
         scriptFiles.forEach(function (file) {
             let fileIdentifier = file.identifier;
             let fileName = fsPath.basename(fileIdentifier);
-            if (kind === 'ergo') {
+            if (language === 'ergo') {
                 zip.file('lib/' + fileName, file.contents, options);
             } else {
                 fileName = fileName.split('.').slice(0, -1).join('.') + '.js';

@@ -85,14 +85,19 @@ describe('Template', () => {
             return Template.fromDirectory('./test/data/bad-logic').should.be.rejectedWith('Parse error (at file lib/logic.ergo line 14 col 4). \n    define agreed = request.agreedDelivery;\n    ^^^^^^                                 ');
         });
 
-        it('should throw an error if archive kind is missing', async () => {
-            const templatePromise = Template.fromDirectory('./test/data/latedeliveryandpenalty');
-            return templatePromise.then((template) => template.toArchive()).should.be.rejectedWith('Creating archive should indicate kind (either \'ergo\' or \'js\') but kind is undefined');
+        it('should default to JavaScript when creating an archive', async () => {
+            const templatePromise = Template.fromDirectory('./test/data/latedeliveryandpenalty-js');
+            return templatePromise.then((template) => template.toArchive()).should.not.be.null;
         });
 
         it('should throw an error if archive kind is neither ergo nor js', async () => {
             const templatePromise = Template.fromDirectory('./test/data/latedeliveryandpenalty');
-            return templatePromise.then((template) => template.toArchive('java')).should.be.rejectedWith('Creating archive should indicate kind (either \'ergo\' or \'js\') but kind is java');
+            return templatePromise.then((template) => template.toArchive('java')).should.be.rejectedWith('Target language should be either \'ergo\' or \'javascript\' but target is java');
+        });
+
+        it('should throw an error when trying to export an ergo archive from a javascript one', async () => {
+            const templatePromise = Template.fromDirectory('./test/data/latedeliveryandpenalty-js');
+            return templatePromise.then((template) => template.toArchive('ergo')).should.be.rejectedWith('Cannot export JavaScript archive to Ergo');
         });
 
         it('should roundtrip a source template (Ergo)', async function() {
@@ -136,8 +141,8 @@ describe('Template', () => {
             template.getDescription().should.equal('Late Delivery and Penalty. In case of delayed delivery except for Force Majeure cases, the Seller shall pay to the Buyer for every 9 DAY of delay penalty amounting to 7% of the total value of the Equipment whose delivery has been delayed. Any fractional part of a DAY is to be considered a full DAY. The total amount of penalty shall not however, exceed 2% of the total value of the Equipment involved in late delivery. If the delay is more than 2 WEEK, the Buyer is entitled to terminate this Contract.');
             template.getVersion().should.equal('0.0.1');
             template.getMetadata().getSample().should.equal('Late Delivery and Penalty. In case of delayed delivery except for Force Majeure cases, the Seller shall pay to the Buyer for every 9 days of delay penalty amounting to 7% of the total value of the Equipment whose delivery has been delayed. Any fractional part of a days is to be considered a full days. The total amount of penalty shall not however, exceed 2% of the total value of the Equipment involved in late delivery. If the delay is more than 2 weeks, the Buyer is entitled to terminate this Contract.');
-            template.getHash().should.equal('502f941686e1d37980835b00cf14fffe3f6488618bb7944c7cfde513aa4866c0');
-            const buffer = await template.toArchive('js');
+            template.getHash().should.equal('00462dfc0f832b83995cf89d26d4a9a71eb08a0022aa5c1078280e9eba257dc6');
+            const buffer = await template.toArchive();
             buffer.should.not.be.null;
             const template2 = await Template.fromArchive(buffer);
             template2.getIdentifier().should.equal(template.getIdentifier());
@@ -148,7 +153,7 @@ describe('Template', () => {
             template2.getMetadata().getREADME().should.equal(template.getMetadata().getREADME());
             template2.getMetadata().getSamples().should.eql(template.getMetadata().getSamples());
             template2.getHash().should.equal(template.getHash());
-            const buffer2 = await template2.toArchive('js');
+            const buffer2 = await template2.toArchive();
             buffer2.should.not.be.null;
         });
 
