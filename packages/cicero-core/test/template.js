@@ -363,7 +363,7 @@ describe('Template', () => {
             const template = await Template.fromDirectory('./test/data/latedeliveryandpenalty');
             const types = template.getEmitTypes();
             types.should.be.eql([
-                'org.hyperledger.composer.system.Event',
+                'org.accordproject.base.Event',
             ]);
         });
 
