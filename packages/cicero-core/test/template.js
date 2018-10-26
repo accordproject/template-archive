@@ -94,9 +94,14 @@ describe('Template', () => {
             return templatePromise.then((template) => template.toArchive('javascript')).should.not.be.null;
         });
 
-        it('should throw an error if archive kind is neither ergo nor js', async () => {
+        it('should throw an error if archive language is neither ergo nor javascript', async () => {
             const templatePromise = Template.fromDirectory('./test/data/latedeliveryandpenalty');
-            return templatePromise.then((template) => template.toArchive('java')).should.be.rejectedWith('Target language should be either \'ergo\' or \'javascript\' but target is java');
+            return templatePromise.then((template) => template.toArchive('java')).should.be.rejectedWith('language should be either \'ergo\' or \'javascript\' but is \'java\'');
+        });
+
+        it('should throw an error if archive language is is absent', async () => {
+            const templatePromise = Template.fromDirectory('./test/data/latedeliveryandpenalty');
+            return templatePromise.then((template) => template.toArchive()).should.be.rejectedWith('language is required and must be a string');
         });
 
         it('should throw an error when trying to export an ergo archive from a javascript one', async () => {

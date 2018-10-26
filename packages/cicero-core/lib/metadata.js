@@ -283,7 +283,7 @@ class Metadata {
         if (language === undefined || language === null) { language = 'ergo'; }
         //  Has to be either JAVASCRIPT or ERGO
         if (language !== 'javascript' && language !== 'ergo') {
-            throw new Error(`Target language should be either 'ergo' or 'javascript' but target is ${language}.`);
+            throw new Error(`language should be either 'ergo' or 'javascript' but is '${language}'`);
         }
         if (this.language === languageTypes.JAVASCRIPT && language === 'ergo') {
             throw new Error('Cannot export JavaScript archive to Ergo');

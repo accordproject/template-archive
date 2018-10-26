@@ -739,11 +739,14 @@ class Template {
 
     /**
      * Store a Template as an archive.
-     * @param {string} [language]  - Archive language type, either 'ergo' or 'javascript'
+     * @param {string} [language]  - target language for the archive (should be either 'ergo' or 'javascript')
      * @param {Object} [options]  - JSZip options
      * @return {Buffer} buffer  - the zlib buffer
      */
     toArchive(language, options) {
+        if(!language || typeof(language) !== 'string') {
+            throw new Error('language is required and must be a string');
+        }
 
         const metadata = this.getMetadata().createTargetMetadata(language);
 
