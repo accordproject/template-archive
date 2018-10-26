@@ -91,7 +91,7 @@ describe('Template', () => {
 
         it('should default to JavaScript when creating an archive', async () => {
             const templatePromise = Template.fromDirectory('./test/data/latedeliveryandpenalty-js');
-            return templatePromise.then((template) => template.toArchive()).should.not.be.null;
+            return templatePromise.then((template) => template.toArchive('javascript')).should.not.be.null;
         });
 
         it('should throw an error if archive kind is neither ergo nor js', async () => {
@@ -146,7 +146,7 @@ describe('Template', () => {
             template.getVersion().should.equal('0.0.1');
             template.getMetadata().getSample().should.equal('Late Delivery and Penalty. In case of delayed delivery except for Force Majeure cases, the Seller shall pay to the Buyer for every 9 days of delay penalty amounting to 7% of the total value of the Equipment whose delivery has been delayed. Any fractional part of a days is to be considered a full days. The total amount of penalty shall not however, exceed 2% of the total value of the Equipment involved in late delivery. If the delay is more than 2 weeks, the Buyer is entitled to terminate this Contract.');
             template.getHash().should.equal('00462dfc0f832b83995cf89d26d4a9a71eb08a0022aa5c1078280e9eba257dc6');
-            const buffer = await template.toArchive();
+            const buffer = await template.toArchive('javascript');
             buffer.should.not.be.null;
             const template2 = await Template.fromArchive(buffer);
             template2.getIdentifier().should.equal(template.getIdentifier());
@@ -157,7 +157,7 @@ describe('Template', () => {
             template2.getMetadata().getREADME().should.equal(template.getMetadata().getREADME());
             template2.getMetadata().getSamples().should.eql(template.getMetadata().getSamples());
             template2.getHash().should.equal(template.getHash());
-            const buffer2 = await template2.toArchive();
+            const buffer2 = await template2.toArchive('javascript');
             buffer2.should.not.be.null;
         });
 

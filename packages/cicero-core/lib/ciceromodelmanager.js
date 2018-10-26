@@ -20,7 +20,7 @@ const ModelManager = require('composer-concerto').ModelManager;
 
 const systemModel = `namespace org.accordproject.base
 abstract asset Asset {  }
-abstract participant Participant {   }
+abstract participant Participant {  }
 abstract transaction Transaction identified by transactionId {
   o String transactionId
   o DateTime timestamp

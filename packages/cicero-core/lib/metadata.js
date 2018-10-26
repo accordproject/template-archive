@@ -279,8 +279,8 @@ class Metadata {
      * @return {object} the new Metadata
      */
     createTargetMetadata(language) {
-        //  Defaults to JAVASCRIPT
-        if (language === undefined || language === null) { language = 'javascript'; }
+        //  Defaults to ERGO
+        if (language === undefined || language === null) { language = 'ergo'; }
         //  Has to be either JAVASCRIPT or ERGO
         if (language !== 'javascript' && language !== 'ergo') {
             throw new Error(`Target language should be either 'ergo' or 'javascript' but target is ${language}.`);
