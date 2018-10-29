@@ -71,8 +71,8 @@ if [[ "${BUILD_RELEASE}" = "stable" ]]; then
     git reset --hard
     git clean -d -f
 
-    # Bump the version number.
-    npm run pkgbump
+    # Set the version number.
+    npm run pkgset ${TRAVIS_TAG}
     export NEW_VERSION=$(node -e "console.log(require('${DIR}/package.json').version)")
 
     # Add the version number changes and push them to Git.
