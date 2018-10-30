@@ -1262,7 +1262,7 @@ class Template {
                 return ele.getFunctionDeclarations();
             }).reduce((flat, next) => {
                 return flat.concat(next);
-            }).filter((ele) => {
+            },[]).filter((ele) => {
                 return ele.getDecorators().indexOf('AccordClauseLogic') >= 0;
             }).map((ele) => {
                 return ele;
