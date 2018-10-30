@@ -1197,6 +1197,15 @@ class Template {
     }
 
     /**
+     * Set the request within the Metadata
+     * @param {object} request the samples for the template
+     * @private
+     */
+    setRequest(request) {
+        this.metadata = new Metadata(this.metadata.getPackageJson(), this.metadata.getREADME(), this.metadata.getSamples(), request);
+    }
+
+    /**
      * Set the readme file within the Metadata
      * @param {String} readme the readme in markdown for the business network
      * @private
