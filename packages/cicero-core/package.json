@@ -68,7 +68,7 @@
     "jszip": "3.1.5",
     "minimatch": "3.0.4",
     "moo": "0.4.3",
-    "nearley": "2.13.0",
+    "nearley": "2.15.1",
     "node-cache": "4.2.0",
     "nunjucks": "3.1.2",
     "request": "2.87.0",

@@ -43,7 +43,7 @@ const lexer = moo.states({
             match: /[^]*?\[{/,
             lineBreaks: true,
             push: 'var',
-            value: x => x.slice(0, -2)
+            value: x => x.slice(0, -2).replace(/\t/g, '\\t') // Replace tab due to Nearley bug #XXX
         },
         // we now need to consume everything up until the end of the buffer.
         // note that the order of these two rules is important!
