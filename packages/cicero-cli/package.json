@@ -49,7 +49,7 @@
     "@accordproject/cicero-core": "0.9.3",
     "@accordproject/cicero-engine": "0.9.3",
     "@accordproject/ergo-compiler": "0.5.2",
-    "composer-concerto": "0.31.2",
+    "composer-concerto": "0.60.0",
     "uuid": "3.2.1",
     "yargs": "9.0.1"
   },

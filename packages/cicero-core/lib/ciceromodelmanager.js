@@ -23,11 +23,9 @@ abstract asset Asset {  }
 abstract participant Participant {  }
 abstract transaction Transaction identified by transactionId {
   o String transactionId
-  o DateTime timestamp
 }
 abstract event Event identified by eventId {
   o String eventId
-  o DateTime timestamp
 }`;
 
 /**
