@@ -15,7 +15,7 @@
 'use strict';
 
 const CiceroModelManager = require('../lib/ciceromodelmanager');
-const Writer = require('composer-concerto').Writer;
+const Writer = require('composer-concerto-tools').Writer;
 const GrammarVisitor = require('../lib/grammarvisitor');
 const Template = require('../lib/template');
 const logger = require('../lib/logger');
