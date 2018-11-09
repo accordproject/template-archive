@@ -55,6 +55,7 @@
   },
   "dependencies": {
     "@accordproject/ergo-compiler": "0.5.3",
+    "acorn": "^5.1.2",
     "axios": "0.17.1",
     "composer-concerto": "0.60.0",
     "composer-concerto-tools": "^0.50.4",
