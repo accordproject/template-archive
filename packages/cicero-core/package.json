@@ -58,7 +58,7 @@
     "acorn": "^5.1.2",
     "axios": "0.17.1",
     "composer-concerto": "0.60.0",
-    "composer-concerto-tools": "^0.50.4",
+    "composer-concerto-tools": "^0.50.5",
     "debug": "^2.6.9",
     "fast-safe-stringify": "2.0.5",
     "glob": "7.1.2",
