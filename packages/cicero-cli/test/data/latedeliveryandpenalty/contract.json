@@ -1,5 +1,1 @@
-<<<<<<< HEAD
-{"$class":"org.accordproject.latedeliveryandpenalty.TemplateModel","clauseId":"882a65dd-de24-41a7-91c2-21d1363538b6","forceMajeure":true,"penaltyDuration":{"$class":"org.accordproject.time.Duration","amount":9,"unit":"days"},"penaltyPercentage":7,"capPercentage":2,"termination":{"$class":"org.accordproject.time.Duration","amount":2,"unit":"weeks"},"fractionalPart":"days"}
-=======
-{"$class":"org.accordproject.latedeliveryandpenalty.TemplateModel","clauseId":"551b4d36-8822-48d0-b328-7008e042659d","forceMajeure":true,"penaltyDuration":{"$class":"org.accordproject.time.Duration","amount":9,"unit":"days"},"penaltyPercentage":7,"capPercentage":2,"termination":{"$class":"org.accordproject.time.Duration","amount":2,"unit":"weeks"},"fractionalPart":"days"}
->>>>>>> Upgrade to Nearley 2.15
+{"$class":"org.accordproject.latedeliveryandpenalty.TemplateModel","clauseId":"72d93891-f2fb-492b-b6c5-50f568851023","forceMajeure":true,"penaltyDuration":{"$class":"org.accordproject.time.Duration","amount":9,"unit":"days"},"penaltyPercentage":7,"capPercentage":2,"termination":{"$class":"org.accordproject.time.Duration","amount":2,"unit":"weeks"},"fractionalPart":"days"}
