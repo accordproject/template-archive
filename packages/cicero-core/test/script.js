@@ -43,7 +43,7 @@ describe('Script', () => {
             const script = new Script(modelManager,'test.ergo','.ergo',ergoSample);
             script.getName().should.equal('test.ergo');
             script.getContents().should.equal(ergoSample);
-            script.getTokens().length.should.equal(5080);
+            script.getTokens().length.should.equal(5256);
         });
 
         it('should fail to instantiate for empty script', async function() {
