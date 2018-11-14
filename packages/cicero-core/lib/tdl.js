@@ -1,4 +1,4 @@
-// Generated automatically by nearley, version 2.13.0
+// Generated automatically by nearley, version 2.15.1
 // http://github.com/Hardmath123/nearley
 (function () {
 function id(x) { return x[0]; }
@@ -28,13 +28,14 @@ const lexer = moo.states({
             match: /[^]*?\[{/,
             lineBreaks: true,
             push: 'var',
-            value: x => x.slice(0, -2)
+            value: x => x.slice(0, -2).replace(/\t/g, '\\t') // Replace tab due to Nearley bug #nearley/issues/413
         },
         // we now need to consume everything up until the end of the buffer.
         // note that the order of these two rules is important!
         LastChunk : {
             match: /[^]+/,
             lineBreaks: true,
+            value: x => x.replace(/\t/g, '\\t') // Replace tab due to Nearley bug #nearley/issues/413
         }
     },
     var: {
