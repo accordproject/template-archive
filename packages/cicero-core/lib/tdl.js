@@ -18,6 +18,12 @@ function id(x) { return x[0]; }
 
 const moo = require("moo");
 
+const escapeNearley = (x) => {
+    return x.replace(/\t/g, '\\t') // Replace tab due to Nearley bug #nearley/issues/413
+        .replace(/\f/g, '\\f')
+        .replace(/\r/g, '\\r');
+}
+
 // we use lexer states to distinguish between the tokens
 // in the text and the tokens inside the variables
 const lexer = moo.states({
@@ -28,14 +34,14 @@ const lexer = moo.states({
             match: /[^]*?\[{/,
             lineBreaks: true,
             push: 'var',
-            value: x => x.slice(0, -2).replace(/\t/g, '\\t') // Replace tab due to Nearley bug #nearley/issues/413
+            value: x => escapeNearley(x.slice(0, -2))
         },
         // we now need to consume everything up until the end of the buffer.
         // note that the order of these two rules is important!
         LastChunk : {
             match: /[^]+/,
             lineBreaks: true,
-            value: x => x.replace(/\t/g, '\\t') // Replace tab due to Nearley bug #nearley/issues/413
+            value: x => escapeNearley(x)
         }
     },
     var: {
