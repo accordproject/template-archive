@@ -203,6 +203,13 @@ describe('Template', () => {
             return Template.fromDirectory('./test/data/bad-copyright-license').should.be.rejectedWith('Template references a property \'badPaymentClause\' that is not declared in the template model');
         });
 
+        it('should create an archive for a template with two Ergo modules', async () => {
+            return Template.fromDirectory('./test/data/hellomodule').should.be.fulfilled;
+        });
+
+        it('should fail creating an archive for a template for a wrong Ergo module call', async () => {
+            return Template.fromDirectory('./test/data/hellomodule-bug').should.be.rejectedWith('Type error (at file lib/logic.ergo line 23 col 11). This operator received unexpected arguments');
+        });
     });
 
     describe('#fromArchive', () => {
