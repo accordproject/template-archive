@@ -174,6 +174,37 @@ describe('EngineHelloWorld', () => {
         });
     });
 });
+describe('EngineHelloModule', () => {
+
+    let engine;
+    let clause;
+    const helloWorldInput = fs.readFileSync(path.resolve(__dirname, 'data/hellomodule', 'sample.txt'), 'utf8');
+
+    beforeEach(async function () {
+        engine = new Engine();
+        const template = await Template.fromDirectory('./test/data/hellomodule');
+        clause = new Clause(template);
+        clause.parse(helloWorldInput);
+    });
+
+    afterEach(() => {});
+
+    describe('#execute', function () {
+
+        it('should execute a smart clause', async function () {
+            const request = {
+                '$class': 'org.accordproject.hellomodule.MyRequest',
+                'input': 'Accord Project'
+            };
+            const state = {};
+            state.$class = 'org.accordproject.cicero.contract.AccordContractState';
+            state.stateId = '1';
+            const result = await engine.execute(clause, request, state);
+            result.should.not.be.null;
+            result.response.output.should.equal('Hello Fred Blogs (Accord Project) [motd: PI/2.0 radians is 90.0 degrees]');
+        });
+    });
+});
 describe('EngineHelloEmit', () => {
 
     let engine;
