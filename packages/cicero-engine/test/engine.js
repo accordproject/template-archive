@@ -258,12 +258,12 @@ describe('BogusClauses', () => {
     });
     it('should throw an error when JavaScript logic is missing', async function() {
         // Turn all JavaScript logic into something else
-        clause.getTemplate().getScriptManager().getScripts().forEach(function (element) {
+        clause.getTemplate().getScriptManager().getAllScripts().forEach(function (element) {
             if (element.getLanguage() === '.js') {
                 element.language = '.ergo';
             }
         }, this);
-        (() => engine.compileJsClause(clause)).should.throw('Did not find any function declarations with the @AccordClauseLogic annotation');
+        (() => engine.compileJsClause(clause)).should.throw('Did not find any JavaScript logic');
     });
     it('should throw an error when all logic is missing', async function() {
         // Remove all scripts

@@ -51,9 +51,11 @@ class Engine {
         let allJsInitScripts = '';
         let template = clause.getTemplate();
 
-        template.getScriptManager().getScripts().forEach(function (element) {
-            allJsScripts += element.getJsContents();
-            allJsInitScripts += element.getJsContents();
+        template.getScriptManager().getAllScripts().forEach(function (element) {
+            if (element.getLanguage() === '.js') {
+                allJsScripts += element.getContents();
+                allJsInitScripts += element.getContents();
+            }
         }, this);
 
         if (allJsScripts === '') {
@@ -76,12 +78,7 @@ class Engine {
     buildDispatchFunction(clause) {
         // get the function declarations of all functions
         // that have the @clause annotation
-        const functionDeclarations = clause.getTemplate().getScriptManager().getScripts().map((ele) => {
-            return ele.getFunctionDeclarations();
-        })
-            .reduce((flat, next) => {
-                return flat.concat(next);
-            })
+        const functionDeclarations = clause.getTemplate().getScriptManager().allFunctionDeclarations()
             .filter((ele) => {
                 return ele.getDecorators().indexOf('AccordClauseLogic') >= 0;
             }).map((ele) => {
@@ -135,12 +132,7 @@ class Engine {
     buildInitFunction(clause) {
         // get the function declarations of all functions
         // that have the @clause annotation
-        const functionDeclarations = clause.getTemplate().getScriptManager().getScripts().map((ele) => {
-            return ele.getFunctionDeclarations();
-        })
-            .reduce((flat, next) => {
-                return flat.concat(next);
-            })
+        const functionDeclarations = clause.getTemplate().getScriptManager().allFunctionDeclarations()
             .filter((ele) => {
                 return ele.getDecorators().indexOf('AccordClauseLogicInit') >= 0;
             }).map((ele) => {

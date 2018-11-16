@@ -15,6 +15,7 @@
 'use strict';
 
 const Script = require('./script');
+const Ergo = require('@accordproject/ergo-compiler/lib/ergo');
 
 /**
  * <p>
@@ -37,6 +38,7 @@ class ScriptManager {
     constructor(modelManager) {
         this.modelManager = modelManager;
         this.scripts = {};
+        this.compiledScript = null;
     }
     /**
      * Visitor design pattern
@@ -89,6 +91,8 @@ class ScriptManager {
             throw new Error('Script file does not exist');
         }
         this.addScript(script);
+        // Re-compile Ergo
+        this.compileLogic();
     }
 
     /**
@@ -120,6 +124,19 @@ class ScriptManager {
     }
 
     /**
+     * Get the array of all Script instances, including compiled ones
+     * @return {Script[]} The Scripts registered, including compiled ones
+     * @private
+     */
+    getAllScripts() {
+        let result = this.getScripts();
+        if (this.compiledScript !== null) {
+            result.push(this.compiledScript);
+        }
+        return result;
+    }
+
+    /**
      * Get the array of Script instances for the given language
      * @param {string} language - The scripts' language
      * @return {Script[]} The Scripts registered
@@ -139,10 +156,24 @@ class ScriptManager {
     }
 
     /**
+     * Gets all the Ergo logic
+     * @return {Array<{name:string, content:string}>} the name and content of each Ergo file
+     */
+    getLogic() {
+        let logic = [];
+        const scripts = this.getScriptsForLanguage('.ergo');
+        scripts.forEach(function (script) {
+            logic.push({ 'name' : script.getName(), 'content' : script.getContents() });
+        });
+        return logic;
+    }
+
+    /**
      * Remove all registered Composer files
      */
     clearScripts() {
         this.scripts = {};
+        this.compiledScript = null;
     }
 
     /**
@@ -156,6 +187,19 @@ class ScriptManager {
     }
 
     /**
+     * Get the Script associated with an identifier
+     * @param {string} identifier - the identifier of the Script
+     * @return {Script} the Script
+     * @private
+     */
+    getCompiledScript() {
+        if (!this.compiledScript) {
+            this.compileLogic();
+        }
+        return this.compiledScript;
+    }
+
+    /**
      * Get the identifiers of all registered scripts
      * @return {string[]} The identifiers of all registered scripts
      */
@@ -163,6 +207,42 @@ class ScriptManager {
         return Object.keys(this.scripts);
     }
 
+    /**
+     * Compile the Ergo logic
+     * @return {object} The script compiled to JavaScript
+     */
+    compileLogic() {
+        let sourceErgo = this.getLogic();
+        if (sourceErgo === undefined || sourceErgo.length === 0) {
+            return null;
+        }
+        const compiledErgo = Ergo.compileToJavaScript(sourceErgo,this.modelManager.getModels(),'cicero',true);
+        //console.log('compiling' + this.contents);
+        if (compiledErgo.hasOwnProperty('error')) {
+            throw new Error(Ergo.ergoVerboseErrorToString(compiledErgo.error));
+        }
+        this.compiledScript = new Script(this.modelManager, 'main.js', '.js', compiledErgo.success);
+        return this.compiledScript;
+    }
+
+    /**
+     * Helper method to retrieve all function declarations
+     * @returns {Array} a list of function declarations
+     */
+    allFunctionDeclarations() {
+        let allScripts = this.getAllScripts();
+        const functionDeclarations = allScripts
+            .map((ele) => {
+                return ele.getFunctionDeclarations();
+            }).reduce((flat, next) => {
+                return flat.concat(next);
+            },[]).filter((ele) => {
+                return ele.getDecorators().indexOf('AccordClauseLogic') >= 0 || ele.getDecorators().indexOf('AccordClauseLogicInit') >= 0;
+            }).map((ele) => {
+                return ele;
+            });
+        return functionDeclarations;
+    }
 }
 
 module.exports = ScriptManager;

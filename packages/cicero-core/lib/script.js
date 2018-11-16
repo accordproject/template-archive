@@ -17,7 +17,6 @@
 const FunctionDeclaration = require('./functiondeclaration');
 const JavaScriptParser = require('composer-concerto/lib/codegen/javascriptparser');
 const debug = require('debug')('cicero:Script');
-const Ergo = require('@accordproject/ergo-compiler/lib/ergo');
 
 /**
  * <p>
@@ -30,63 +29,53 @@ const Ergo = require('@accordproject/ergo-compiler/lib/ergo');
 class Script {
 
     /**
-   * Create the Script.
-   * <p>
-   * @param {ModelManager} modelManager - The ModelManager associated with this Script
-   * @param {string} identifier - The identifier of the script
-   * @param {string} language - The language type of the script
-   * @param {string} contents - The contents of the script
-   */
+     * Create the Script.
+     * <p>
+     * @param {ModelManager} modelManager - The ModelManager associated with this Script
+     * @param {string} identifier - The identifier of the script
+     * @param {string} language - The language type of the script
+     * @param {string} contents - The contents of the script
+     */
     constructor(modelManager, identifier, language, contents) {
         this.modelManager = modelManager;
         this.identifier = identifier;
         this.language = language;
         this.contents = contents;
-        this.jsContents = null;
         this.functions = [];
+        this.tokens = [];
 
         if(!contents) {
             throw new Error('Empty script contents');
         }
-        let data = {errorStatement:''};
-        let parser;
-        if (this.language === '.ergo') {
+        if (this.language !== '.ergo') {
+            let data = {errorStatement:''};
+            let parser;
+
             try {
-                const compiledErgo = Ergo.compileToJavaScript([{name:this.identifier,content:this.contents}],this.modelManager.getModels(),'cicero',true);
-                //console.log('compiling' + this.contents);
-                if (compiledErgo.hasOwnProperty('error')) {
-                    throw new Error(Ergo.ergoVerboseErrorToString(compiledErgo.error));
-                }
-                this.jsContents = compiledErgo.success;
-            } catch (error) {
-                debug('ergocompile', error.message, contents);
+                parser = new JavaScriptParser(this.contents, false, 8);
+            } catch (cause) {
+                // consider adding a toHex method in the exception to put out the pure hex values of the file.
+                const error = new SyntaxError('Failed to parse ' + this.identifier + ': ' + cause.message+'\n'+data.errorStatement);
+                error.cause = cause;
+                debug('constructor', error.message, contents);
                 throw error;
             }
-        } else {
-            this.jsContents = this.contents;
+
+            const functions = parser.getFunctions();
+
+            for(let n=0; n < functions.length; n++) {
+                const func = functions[n];
+                const functionDeclaration =
+                      new FunctionDeclaration(this.modelManager, this.language,
+                          func.name, func.visibility,
+                          func.returnType, func.throws, func.parameterNames,
+                          func.parameterTypes, func.decorators, func.functionText );
+                functionDeclaration.validate();
+                this.functions.push( functionDeclaration );
+            }
+
+            this.tokens = parser.getTokens();
         }
-
-        try {
-            parser = new JavaScriptParser(this.jsContents, false, 8);
-        } catch (cause) {
-            // consider adding a toHex method in the exception to put out the pure hex values of the file.
-            const error = new SyntaxError('Failed to parse ' + this.identifier + ': ' + cause.message+'\n'+data.errorStatement);
-            error.cause = cause;
-            debug('constructor', error.message, contents);
-            throw error;
-        }
-
-        const functions = parser.getFunctions();
-
-        for(let n=0; n < functions.length; n++) {
-            const func = functions[n];
-            const functionDeclaration = new FunctionDeclaration(this.modelManager, this.language, func.name, func.visibility,
-                func.returnType, func.throws, func.parameterNames, func.parameterTypes, func.decorators, func.functionText );
-            functionDeclaration.validate();
-            this.functions.push( functionDeclaration );
-        }
-
-        this.tokens = parser.getTokens();
     }
 
     /**
@@ -130,14 +119,6 @@ class Script {
      */
     getContents() {
         return this.contents;
-    }
-
-    /**
-     * Returns the JavaScript (compiled) contents of the script
-     * @return {string} the JavaScript (compiled) of the script
-     */
-    getJsContents() {
-        return this.jsContents;
     }
 
     /**

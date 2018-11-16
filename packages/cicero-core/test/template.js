@@ -115,7 +115,7 @@ describe('Template', () => {
             template.getModelManager().getModelFile('io.clause.latedeliveryandpenalty').should.not.be.null;
             template.getGrammar().should.not.be.null;
             template.getScriptManager().getScripts().length.should.equal(1);
-            template.getLogic().length.should.equal(1);
+            template.getScriptManager().getLogic().length.should.equal(1);
             template.getMetadata().getREADME().should.not.be.null;
             template.getMetadata().getRequest().should.not.be.null;
             template.getName().should.equal('latedeliveryandpenalty');
@@ -467,12 +467,12 @@ describe('Template', () => {
 
         it('should return all Ergo scripts', async () => {
             const template = await Template.fromDirectory('./test/data/latedeliveryandpenalty');
-            template.getLogic().length.should.equal(1);
+            template.getScriptManager().getLogic().length.should.equal(1);
         });
 
         it('should return no Ergo script', async () => {
             const template = await Template.fromDirectory('./test/data/latedeliveryandpenalty-js');
-            template.getLogic().length.should.equal(0);
+            template.getScriptManager().getLogic().length.should.equal(0);
         });
     });
 
