@@ -656,9 +656,12 @@ class Template {
                 logger.debug(method, 'Adding Logic files to script manager');
                 scriptFiles.forEach(function (obj) {
                     const objExt = '.' +  obj.name.split('.').pop();
-                    let jsObject = template.scriptManager.createScript(obj.name, objExt, obj.contents);
-                    template.scriptManager.addScript(jsObject); // Adds all js files to script manager
+                    let scriptObject = template.scriptManager.createScript(obj.name, objExt, obj.contents);
+                    template.scriptManager.addScript(scriptObject); // Adds all js files to script manager
                 });
+                // Compile Ergo
+                template.getScriptManager().compileLogic();
+
                 logger.debug(method, 'Added JavaScript files to script manager');
 
                 // check the template model
@@ -722,19 +725,6 @@ class Template {
         const hasher = crypto.createHash('sha256');
         hasher.update(stringify(content));
         return hasher.digest('hex');
-    }
-
-    /**
-     * Gets all the Ergo logic
-     * @return {Array<{name:string, content:string}>} the name and content of each Ergo file
-     */
-    getLogic() {
-        let logic = [];
-        const scripts = this.getScriptManager().getScriptsForLanguage('.ergo');
-        scripts.forEach(function (script) {
-            logic.push({ 'name' : script.getName(), 'content' : script.getContents() });
-        });
-        return logic;
     }
 
     /**
@@ -803,15 +793,19 @@ class Template {
             dir: true
         }));
         let scriptManager = this.getScriptManager();
-        let scriptFiles = scriptManager.getScripts();
+        let scriptFiles = scriptManager.getAllScripts();
         scriptFiles.forEach(function (file) {
-            let fileIdentifier = file.identifier;
+            let fileIdentifier = file.getIdentifier();
             let fileName = fsPath.basename(fileIdentifier);
             if (language === 'ergo') {
-                zip.file('lib/' + fileName, file.contents, options);
+                if (file.getLanguage() === '.ergo') {
+                    zip.file('lib/' + fileName, file.contents, options);
+                }
             } else {
                 fileName = fileName.split('.').slice(0, -1).join('.') + '.js';
-                zip.file('lib/' + fileName, file.jsContents, options);
+                if (file.getLanguage() === '.js') {
+                    zip.file('lib/' + fileName, file.contents, options);
+                }
             }
         });
         return zip.generateAsync({
@@ -1018,8 +1012,8 @@ class Template {
                             throw new Error('Ergo template but contains JavaScript logic');
                         }
                     }
-                    const script = template.getScriptManager().createScript(truncatedPath, pathObj.ext.toLowerCase(), contents);
-                    scriptFiles.push(script);
+                    const scriptObject = template.getScriptManager().createScript(truncatedPath, pathObj.ext.toLowerCase(), contents);
+                    scriptFiles.push(scriptObject);
                     logger.debug(method, 'Found script file ', path);
                 }
             });
@@ -1031,6 +1025,9 @@ class Template {
             for (let script of scriptFiles) {
                 template.getScriptManager().addScript(script);
             }
+
+            // Compile Ergo
+            template.getScriptManager().compileLogic();
 
             logger.debug(method, 'Added script files', scriptFiles.length);
 
@@ -1266,16 +1263,7 @@ class Template {
      * @private
      */
     extractFuncDeclParameter(index) {
-        const functionDeclarations = this.getScriptManager().getScripts()
-            .map((ele) => {
-                return ele.getFunctionDeclarations();
-            }).reduce((flat, next) => {
-                return flat.concat(next);
-            },[]).filter((ele) => {
-                return ele.getDecorators().indexOf('AccordClauseLogic') >= 0;
-            }).map((ele) => {
-                return ele;
-            });
+        const functionDeclarations = this.getScriptManager().allFunctionDeclarations();
         let types = [];
         functionDeclarations.forEach((ele, n) => {
             const type = ele.getParameterTypes()[index];

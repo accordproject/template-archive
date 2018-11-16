@@ -35,7 +35,7 @@ describe('Script', () => {
         it('should instantiate a JavaScript script', async function() {
             const script = new Script(modelManager,'test.js','.js',jsSample);
             script.getName().should.equal('test.js');
-            script.getJsContents().should.equal(jsSample);
+            script.getContents().should.equal(jsSample);
             script.getTokens().length.should.equal(39);
         });
 
@@ -43,7 +43,7 @@ describe('Script', () => {
             const script = new Script(modelManager,'test.ergo','.ergo',ergoSample);
             script.getName().should.equal('test.ergo');
             script.getContents().should.equal(ergoSample);
-            script.getTokens().length.should.equal(5256);
+            script.getTokens().length.should.equal(0);
         });
 
         it('should fail to instantiate for empty script', async function() {
