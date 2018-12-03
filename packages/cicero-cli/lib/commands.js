@@ -86,10 +86,6 @@ class Commands {
         let isCiceroTemplate = false;
         if(packageJsonExists){
             let packageJsonContents = JSON.parse(fs.readFileSync(path.resolve(argv.template,'package.json')),'utf8');
-            // XXX Patch/Hack for backward compatibility with old templates XXX
-            if (!packageJsonContents.cicero) {
-                packageJsonContents.cicero = { 'template': 'clause', 'version': '^0.3.0' };
-            }
             isCiceroTemplate = packageJsonContents.cicero;
         }
 
@@ -169,7 +165,7 @@ class Commands {
      * @returns {object} a modfied argument object
      */
     static validateExecuteArgs(argv) {
-        // the user typed 'cicero parse dir'
+        // the user typed 'cicero execute dir'
         if(argv._.length === 2){
             argv.template = argv._[1];
         }
@@ -185,11 +181,6 @@ class Commands {
         let isCiceroTemplate = false;
         if(packageJsonExists){
             let packageJsonContents = JSON.parse(fs.readFileSync(path.resolve(argv.template,'package.json')),'utf8');
-            // XXX Patch/Hack for backward compatibility with old templates XXX
-            if (!packageJsonContents.cicero) {
-                packageJsonContents.cicero = { 'template': 'clause', 'version': '^0.3.0' };
-            }
-
             isCiceroTemplate = packageJsonContents.cicero;
         }
 
@@ -274,6 +265,67 @@ class Commands {
             })
             .catch((err) => {
                 logger.error(err);
+            });
+    }
+
+    /**
+     * Set default params before we create an archive using a template
+     *
+     * @param {object} argv the inbound argument values object
+     * @returns {object} a modfied argument object
+     */
+    static validateArchiveArgs(argv) {
+        // the user typed 'cicero archive dir'
+        if(argv._.length === 2){
+            argv.template = argv._[1];
+        }
+
+        if(!argv.template){
+            logger.info('Using current directory as template folder');
+            argv.template = '.';
+        }
+
+        argv.template = path.resolve(argv.template);
+
+        const packageJsonExists = fs.existsSync(path.resolve(argv.template,'package.json'));
+        let isCiceroTemplate = false;
+        if(packageJsonExists){
+            let packageJsonContents = JSON.parse(fs.readFileSync(path.resolve(argv.template,'package.json')),'utf8');
+            isCiceroTemplate = packageJsonContents.cicero;
+        }
+
+        if(!argv.language){
+            logger.info('Using ergo as default language archive.');
+            argv.language = 'ergo';
+        }
+
+        if(argv.verbose) {
+            logger.info(`creating ${argv.language} archive for template ${argv.template}`);
+        }
+
+        if(!packageJsonExists || !isCiceroTemplate){
+            throw new Error(`${argv.template} is not a valid cicero template. Make sure that package.json exists and that it has a cicero entry.`);
+        } else {
+            return argv;
+        }
+    }
+
+    /**
+     * Create an archive using a template
+     *
+     * @param {string} language - target language for the archive (should be either 'ergo' or 'javascript')
+     * @param {string} templatePath to the template directory
+     * @param {string} archiveFile to the archive file
+     * @returns {object} Promise to the code creating an archive
+     */
+    static archive(language, templatePath, archiveFile) {
+        return Template.fromDirectory(templatePath)
+            .then((template) => {
+                template.toArchive(language);
+            })
+            .then((archive) => {
+                logger.info('Creating archive: ' + archiveFile);
+                fs.writeFileSync(archiveFile, archive);
             });
     }
 }
