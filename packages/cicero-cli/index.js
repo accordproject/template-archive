@@ -53,6 +53,11 @@ require('yargs')
             });
     })
     .command('archive', 'archive a template directory', (yargs) => {
+        yargs.option('language', {
+            describe: 'the target language of the archive',
+            type: 'string',
+            default: 'ergo'
+        });
         yargs.option('template', {
             describe: 'path to the directory with the template',
             type: 'string'
@@ -73,9 +78,9 @@ require('yargs')
             return;
         }
 
-        return Commands.archive(argv.template, argv.archiveFile)
+        return Commands.archive(argv.language, argv.template, argv.archiveFile)
             .catch((err) => {
-                logger.error(err.message + ' ' + JSON.stringify(err));
+                logger.error(err.message);
             });
     })
     .command('execute', 'execute a clause with JSON request', (yargs) => {

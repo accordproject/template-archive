@@ -281,4 +281,49 @@ describe('cicero-cli', () => {
             dir.cleanup();
         });
     });
+
+
+    describe('#archive', () => {
+        it('should generate an Ergo archive', async () => {
+            const tmpFile = await tmp.file();
+            const tmpArchive = tmpFile.path + '.cta';
+            await Commands.archive('ergo', template, tmpArchive);
+            fs.readFileSync(tmpArchive).length.should.be.above(0);
+            tmpFile.cleanup();
+        });
+        it('should generate a JavaScript archive', async () => {
+            const tmpFile = await tmp.file();
+            const tmpArchive = tmpFile.path + '.cta';
+            await Commands.archive('javascript', template, tmpArchive);
+            fs.readFileSync(tmpArchive).length.should.be.above(0);
+            tmpFile.cleanup();
+        });
+        it('should not an unknown archive', async () => {
+            const tmpFile = await tmp.file();
+            const tmpArchive = tmpFile.path + '.cta';
+            return Commands.archive('foo', template, tmpArchive)
+                .should.be.rejectedWith('language should be either \'ergo\' or \'javascript\' but is \'foo\'');
+        });
+        it('no args specified', () => {
+            process.chdir(path.resolve(__dirname, 'data/latedeliveryandpenalty/'));
+            const args  = Commands.validateArchiveArgs({
+                _: ['archive'],
+            });
+            args.template.should.match(/cicero-cli\/test\/data\/latedeliveryandpenalty$/);
+            args.language.should.match(/ergo/);
+        });
+        it('verbose flag specified', () => {
+            process.chdir(path.resolve(__dirname, 'data/latedeliveryandpenalty/'));
+            Commands.validateArchiveArgs({
+                _: ['archive'],
+                verbose: true
+            });
+        });
+        it('bad package.json', () => {
+            process.chdir(path.resolve(__dirname, 'data/'));
+            (() => Commands.validateArchiveArgs({
+                _: ['execute'],
+            })).should.throw(' not a valid cicero template. Make sure that package.json exists and that it has a cicero entry.');
+        });
+    });
 });
