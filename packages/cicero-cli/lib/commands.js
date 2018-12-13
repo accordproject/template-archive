@@ -321,11 +321,12 @@ class Commands {
     static archive(language, templatePath, archiveFile) {
         return Template.fromDirectory(templatePath)
             .then((template) => {
-                template.toArchive(language);
+                return template.toArchive(language);
             })
             .then((archive) => {
                 logger.info('Creating archive: ' + archiveFile);
                 fs.writeFileSync(archiveFile, archive);
+                return Promise.resolve(true);
             });
     }
 }

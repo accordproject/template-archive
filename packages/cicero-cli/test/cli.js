@@ -19,6 +19,8 @@ const path = require('path');
 const tmp = require('tmp-promise');
 const fs = require('fs');
 
+const Template = require('@accordproject/cicero-core').Template;
+
 chai.should();
 chai.use(require('chai-things'));
 chai.use(require('chai-as-promised'));
@@ -62,6 +64,26 @@ describe('cicero-cli', () => {
             const result = await Commands.parse(template, sample, contract);
             delete result.clauseId;
             result.should.eql(parseReponse);
+        });
+    });
+
+    describe('#archive', async () => {
+        it('should create a valid ergo archive', async () => {
+            const archiveName = 'test.cta';
+            const result = await Commands.archive('ergo', template, archiveName);
+            result.should.eql(true);
+            const newTemplate = await Template.fromArchive(fs.readFileSync(archiveName));
+            newTemplate.should.not.be.null;
+            fs.unlinkSync(archiveName);
+        });
+
+        it('should create a valid javascript archive', async () => {
+            const archiveName = 'test.cta';
+            const result = await Commands.archive('javascript', template, archiveName);
+            result.should.eql(true);
+            const newTemplate = await Template.fromArchive(fs.readFileSync(archiveName));
+            newTemplate.should.not.be.null;
+            fs.unlinkSync(archiveName);
         });
     });
 
