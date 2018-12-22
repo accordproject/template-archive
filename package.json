@@ -23,7 +23,7 @@
   },
   "name": "cicero",
   "description": "You must install [Lerna](https://lernajs.io) to build this multi-package repository.",
-  "version": "0.9.11",
+  "version": "0.9.12",
   "main": "index.js",
   "private": true,
   "scripts": {
