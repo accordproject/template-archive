@@ -1,6 +1,7 @@
 namespace io.clause.latedeliveryandpenalty
 
 import org.accordproject.cicero.runtime.*
+import org.accordproject.time.*
 
 // Declare a contract over a template model
 contract LateDeliveryAndPenalty over TemplateModel {
@@ -8,7 +9,7 @@ contract LateDeliveryAndPenalty over TemplateModel {
   clause latedeliveryandpenalty(request : LateDeliveryAndPenaltyRequest) : LateDeliveryAndPenaltyResponse {
     // Guard against calling late delivery clause too early
     let agreed = request.agreedDelivery;
-    enforce dateTimeIsBefore(agreed,now()) else
+    enforce isBefore(agreed,now()) else
     throw ErgoErrorResponse{ message : "Cannot exercise late delivery before delivery date" }
     ;
     // Guard against force majeure
@@ -20,16 +21,16 @@ contract LateDeliveryAndPenalty over TemplateModel {
     ;
 
     // Calculate the time difference between current date and agreed upon date
-    let diff = dateTimeDiffDays(now,agreed);
+    let diff = diffWithUnit(now,agreed,"days").amount;
     // Penalty formula
     let penalty =
-      (diff / contract.penaltyDuration.amount) * contract.penaltyPercentage/100.0 * request.goodsValue;
+      (integerToDouble(diff) / integerToDouble(contract.penaltyDuration.amount)) * contract.penaltyPercentage/100.0 * request.goodsValue;
     // Penalty may be capped
     let capped = min([penalty,contract.capPercentage * request.goodsValue / 100.0]);
     // Return the response with the penalty and termination determination
     return LateDeliveryAndPenaltyResponse{
       penalty: capped,
-      buyerMayTerminate: diff > contract.termination.amount
+      buyerMayTerminate: diff >i contract.termination.amount
     }
   }
 }
