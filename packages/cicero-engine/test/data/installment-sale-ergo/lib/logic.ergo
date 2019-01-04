@@ -39,7 +39,7 @@ contract InstallmentSale over InstallmentSaleContract state InstallmentSaleState
       status: "WaitingForFirstDayOfNextMonth",
       balance_remaining: balance,
       total_paid: total_paid,
-      next_payment_month: state.next_payment_month +i 1
+      next_payment_month: state.next_payment_month + 1
     };
     emit MyPaymentObligation{
       party: contract.BUYER,
