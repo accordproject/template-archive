@@ -30,7 +30,7 @@ contract LateDeliveryAndPenalty over TemplateModel {
     // Return the response with the penalty and termination determination
     return LateDeliveryAndPenaltyResponse{
       penalty: capped,
-      buyerMayTerminate: diff >i contract.termination.amount
+      buyerMayTerminate: diff > contract.termination.amount
     }
   }
 }
