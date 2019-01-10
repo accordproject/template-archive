@@ -28,6 +28,7 @@ chai.use(require('chai-as-promised'));
 describe('Clause', () => {
 
     const testLatePenaltyInput = fs.readFileSync(path.resolve(__dirname, 'data/latedeliveryandpenalty', 'sample.txt'), 'utf8');
+    const testLatePenaltyPeriodInput = fs.readFileSync(path.resolve(__dirname, 'data/latedeliveryandpenalty-period', 'sample.txt'), 'utf8');
     const testCongaInput = fs.readFileSync(path.resolve(__dirname, 'data/conga', 'sample.txt'), 'utf8');
     const testAllTypesInput = fs.readFileSync(path.resolve(__dirname, 'data/alltypes', 'sample.txt'), 'utf8');
 
@@ -147,6 +148,39 @@ describe('Clause', () => {
             clause.getIdentifier().should.equal('latedeliveryandpenalty@0.0.1-0ee76aefdd19d6863f2f1642182f506b1ac8e5c4be2a005c00dd13bbf36fe63c');
         });
 
+        it('should be able to set the data from latedeliveryandpenalty natural language text (with a Period)', async function() {
+            const template = await Template.fromDirectory('./test/data/latedeliveryandpenalty-period');
+            const clause = new Clause(template);
+            clause.parse(testLatePenaltyPeriodInput);
+            const data = {
+                $class: 'org.accordproject.simplelatedeliveryandpenalty.SimpleLateDeliveryAndPenaltyContract',
+                buyer: {
+                    $class: 'org.accordproject.cicero.contract.AccordParty',
+                    partyId: 'Betty Buyer'
+                },
+                seller: {
+                    $class: 'org.accordproject.cicero.contract.AccordParty',
+                    partyId: 'Steve Seller'
+                },
+                penaltyPeriod: {
+                    $class: 'org.accordproject.time.Period',
+                    amount: 6,
+                    unit: 'months'
+                },
+                penaltyPercentage: 10.5,
+                capPercentage: 55,
+                maximumDelay: {
+                    $class: 'org.accordproject.time.Period',
+                    amount: 9,
+                    unit: 'months',
+                }
+            };
+            // remove the generated contract id
+            delete clause.getData().contractId;
+            clause.getData().should.eql(data);
+            clause.getIdentifier().should.equal('simplelatedeliveryandpenalty@0.2.1-708587fe51e93166853ebe13a883209a635c4b4d03bb9d15b27c819c394cb995');
+        });
+
         it('should be able to set the data from conga natural language text', async function() {
             const template = await Template.fromDirectory('./test/data/conga');
             const clause = new Clause(template);
@@ -178,6 +212,14 @@ describe('Clause', () => {
             clause.parse(testLatePenaltyInput);
             const nl = clause.generateText();
             testLatePenaltyInput.should.equal(nl);
+        });
+
+        it('should be able to roundtrip latedelivery natural language text (with a Period)', async function() {
+            const template = await Template.fromDirectory('./test/data/latedeliveryandpenalty-period');
+            const clause = new Clause(template);
+            clause.parse(testLatePenaltyPeriodInput);
+            const nl = clause.generateText();
+            testLatePenaltyPeriodInput.should.equal(nl);
         });
 
         it('should be able to roundtrip conga natural language text', async function() {

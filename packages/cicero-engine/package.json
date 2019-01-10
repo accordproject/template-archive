@@ -15,7 +15,7 @@
     "lint": "eslint .",
     "postlint": "npm run licchk",
     "licchk": "license-check",
-    "test": "mocha && nyc mocha"
+    "test": "mocha --timeout 40000 && nyc mocha --timeout 40000"
   },
   "repository": {
     "type": "git",

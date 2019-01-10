@@ -1,0 +1,36 @@
+namespace org.accordproject.simplelatedeliveryandpenalty
+
+import org.accordproject.cicero.contract.* from https://models.accordproject.org/cicero/contract.cto
+import org.accordproject.cicero.runtime.* from https://models.accordproject.org/cicero/runtime.cto
+import org.accordproject.time.* from https://models.accordproject.org/v2.0/time.cto
+
+/**
+ * Defines the data model for the LateDeliveryAndPenalty template.
+ * This defines the structure of the abstract syntax tree that the parser for the template
+ * must generate from input source text.
+ */
+asset SimpleLateDeliveryAndPenaltyContract extends AccordContract {
+  o AccordParty buyer
+  o AccordParty seller
+  o Period penaltyPeriod
+  o Double penaltyPercentage
+  o Double capPercentage
+  o Period maximumDelay
+}
+
+/**
+ * Defines the input data required by the template
+ */
+transaction SimpleLateDeliveryAndPenaltyRequest extends Request {
+  o DateTime agreedDelivery
+  o DateTime deliveredAt optional
+  o Double goodsValue
+}
+
+/**
+ * Defines the output data for the template
+ */
+transaction SimpleLateDeliveryAndPenaltyResponse extends Response {
+  o Double penalty
+  o Boolean buyerMayTerminate
+}

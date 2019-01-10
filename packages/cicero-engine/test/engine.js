@@ -30,20 +30,25 @@ describe('EngineLatePenalty', () => {
 
     let engine;
     let clause;
+    let clause2;
     const testLatePenaltyInput = fs.readFileSync(path.resolve(__dirname, 'data/latedeliveryandpenalty', 'sample.txt'), 'utf8');
+    const testLatePenaltyPeriodInput = fs.readFileSync(path.resolve(__dirname, 'data/latedeliveryandpenalty-period', 'sample.txt'), 'utf8');
 
     beforeEach(async function () {
         engine = new Engine();
         const template = await Template.fromDirectory('./test/data/latedeliveryandpenalty');
+        const template2 = await Template.fromDirectory('./test/data/latedeliveryandpenalty-period');
         clause = new Clause(template);
         clause.parse(testLatePenaltyInput);
+        clause2 = new Clause(template2);
+        clause2.parse(testLatePenaltyPeriodInput);
     });
 
     afterEach(() => {});
 
     describe('#executeergo', function () {
 
-        it('should execute a smart clause', async function () {
+        it('should execute a late delivery and penalty smart clause', async function () {
             const request = {};
             request.$class = 'io.clause.latedeliveryandpenalty.LateDeliveryAndPenaltyRequest';
             request.forceMajeure = false;
@@ -57,6 +62,23 @@ describe('EngineLatePenalty', () => {
             const result = await engine.execute(clause, request, state);
             result.should.not.be.null;
             result.response.penalty.should.equal(110);
+            result.response.buyerMayTerminate.should.equal(true);
+        });
+
+        it('should execute a late delivery and penalty smart clause (with a Period)', async function () {
+            const request = {};
+            request.$class = 'org.accordproject.simplelatedeliveryandpenalty.SimpleLateDeliveryAndPenaltyRequest';
+            request.agreedDelivery = '2017-10-07T16:38:01.412Z';
+            request.goodsValue = 200.00;
+            request.transactionId = '402c8f50-9e61-433e-a7c1-afe61c06ef00';
+            request.timestamp = '2017-11-12T17:38:01.412Z';
+            const state = {};
+            state.$class = 'org.accordproject.cicero.contract.AccordContractState';
+            state.stateId = '1';
+            const result = await engine.execute(clause2, request, state);
+            result.should.not.be.null;
+            result.response.penalty.should.equal(52.5);
+            result.response.buyerMayTerminate.should.equal(true);
         });
     });
 });
