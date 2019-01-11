@@ -122,7 +122,7 @@ describe('Template', () => {
             template.getDescription().should.equal('Late Delivery and Penalty. In case of delayed delivery except for Force Majeure cases, the Seller shall pay to the Buyer for every 9 DAY of delay penalty amounting to 7% of the total value of the Equipment whose delivery has been delayed. Any fractional part of a DAY is to be considered a full DAY. The total amount of penalty shall not however, exceed 2% of the total value of the Equipment involved in late delivery. If the delay is more than 2 WEEK, the Buyer is entitled to terminate this Contract.');
             template.getVersion().should.equal('0.0.1');
             template.getMetadata().getSample().should.equal('Late Delivery and Penalty. In case of delayed delivery except for Force Majeure cases, the Seller shall pay to the Buyer for every 9 days of delay penalty amounting to 7% of the total value of the Equipment whose delivery has been delayed. Any fractional part of a days is to be considered a full days. The total amount of penalty shall not however, exceed 2% of the total value of the Equipment involved in late delivery. If the delay is more than 2 weeks, the Buyer is entitled to terminate this Contract.');
-            template.getHash().should.equal('e02eeba2e198ff246bb01380056cd2df756681064396849995244a7516fcad2c');
+            template.getHash().should.equal('8336919a11aac0a2a625c8b03670830c22afcc9ae959c97d2328fb8ce6be1c5e');
             const buffer = await template.toArchive('ergo');
             buffer.should.not.be.null;
             const template2 = await Template.fromArchive(buffer);
@@ -150,7 +150,7 @@ describe('Template', () => {
             template.getDescription().should.equal('Late Delivery and Penalty. In case of delayed delivery except for Force Majeure cases, the Seller shall pay to the Buyer for every 9 DAY of delay penalty amounting to 7% of the total value of the Equipment whose delivery has been delayed. Any fractional part of a DAY is to be considered a full DAY. The total amount of penalty shall not however, exceed 2% of the total value of the Equipment involved in late delivery. If the delay is more than 2 WEEK, the Buyer is entitled to terminate this Contract.');
             template.getVersion().should.equal('0.0.1');
             template.getMetadata().getSample().should.equal('Late Delivery and Penalty. In case of delayed delivery except for Force Majeure cases, the Seller shall pay to the Buyer for every 9 days of delay penalty amounting to 7% of the total value of the Equipment whose delivery has been delayed. Any fractional part of a days is to be considered a full days. The total amount of penalty shall not however, exceed 2% of the total value of the Equipment involved in late delivery. If the delay is more than 2 weeks, the Buyer is entitled to terminate this Contract.');
-            template.getHash().should.equal('1a9892ed6b86f28bdb0fc5b34051469056a2a604af94274dc25f68a8d4828c63');
+            template.getHash().should.equal('ea38feafc4bf75017b3993235bcdeda1fab0f5e5025719e82bad3e34ee9d0064');
             const buffer = await template.toArchive('javascript');
             buffer.should.not.be.null;
             const template2 = await Template.fromArchive(buffer);
@@ -248,17 +248,17 @@ describe('Template', () => {
     describe('#fromUrl', () => {
 
         it('should create a template from an archive at a given URL', async () => {
-            const url = 'https://templates.accordproject.org/archives/ip-payment@0.6.0.cta';
+            const url = 'https://templates.accordproject.org/archives/ip-payment@0.8.0.cta';
             return Template.fromUrl(url, null).should.be.fulfilled;
         });
 
         it('should create a template from an archive at a given AP URL', async () => {
-            const url = 'ap://ip-payment@0.6.0#hash';
+            const url = 'ap://ip-payment@0.8.0#hash';
             return Template.fromUrl(url, null).should.be.fulfilled;
         });
 
         it('should create a template from an archive at a given github URL', async () => {
-            const url = 'github://accordproject/cicero-template-library/master/build/archives/ip-payment@0.6.0.cta';
+            const url = 'github://accordproject/cicero-template-library/master/build/archives/ip-payment@0.8.0.cta';
             return Template.fromUrl(url, {'encoding':null,'headers':{'Accept': '*/*','Accept-Encoding': 'deflate, gzip'}}).should.be.fulfilled;
         });
 
@@ -284,7 +284,7 @@ describe('Template', () => {
                 'cicero': {
                     'template': 'clause',
                     'language': 'ergo',
-                    'version': '^0.9.1'
+                    'version': '^0.10.0'
                 }
             },
             null,
@@ -440,7 +440,7 @@ describe('Template', () => {
     describe('#getHash', () => {
         it('should return a SHA-256 hash', async () => {
             const template = await Template.fromDirectory('./test/data/latedeliveryandpenalty');
-            template.getHash().should.equal('e02eeba2e198ff246bb01380056cd2df756681064396849995244a7516fcad2c');
+            template.getHash().should.equal('8336919a11aac0a2a625c8b03670830c22afcc9ae959c97d2328fb8ce6be1c5e');
         });
     });
 
