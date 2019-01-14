@@ -18,7 +18,7 @@
     "lint": "eslint .",
     "postlint": "npm run licchk",
     "licchk": "license-check",
-    "test": "mocha --timeout 20000 && nyc mocha --timeout 20000"
+    "test": "mocha && nyc mocha"
   },
   "repository": {
     "type": "git",
@@ -48,7 +48,7 @@
   "dependencies": {
     "@accordproject/cicero-core": "0.10.0",
     "@accordproject/cicero-engine": "0.10.0",
-    "@accordproject/ergo-compiler": "0.6.0",
+    "@accordproject/ergo-compiler": "0.6.2",
     "composer-concerto": "0.60.0",
     "uuid": "3.2.1",
     "yargs": "9.0.1"
