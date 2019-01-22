@@ -321,7 +321,13 @@ class Commands {
     static archive(language, templatePath, archiveFile) {
         return Template.fromDirectory(templatePath)
             .then((template) => {
-                return template.toArchive(language);
+                let target = language;
+                // If target is 'text', set the textArchive flag
+                if (target === 'text') {
+                    template.setTextOnlyArchive();
+                    target = 'ergo';
+                }
+                return template.toArchive(target);
             })
             .then((archive) => {
                 logger.info('Creating archive: ' + archiveFile);
