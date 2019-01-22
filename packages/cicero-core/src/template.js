@@ -88,6 +88,7 @@ class Template {
         this.grammarAst = null;
         this.templatizedGrammar = null;
         this.templateAst = null;
+        this.textOnlyArchive = false;
     }
 
     /**
@@ -775,8 +776,8 @@ class Template {
             });
         }
 
-        // save the request.json if present
-        if (metadata.getRequest()) {
+        // save the request.json if present & not text-only
+        if (metadata.getRequest() && !this.textOnlyArchive) {
             let requestFileContents = JSON.stringify(metadata.getRequest());
             zip.file('request.json', requestFileContents, options);
         }
@@ -792,31 +793,31 @@ class Template {
         zip.file('lib/', null, Object.assign({}, options, {
             dir: true
         }));
-        let scriptManager = this.getScriptManager();
-        let scriptFiles = scriptManager.getAllScripts();
-        scriptFiles.forEach(function (file) {
-            let fileIdentifier = file.getIdentifier();
-            let fileName = fsPath.basename(fileIdentifier);
-            if (language === 'ergo') {
-                if (file.getLanguage() === '.ergo') {
-                    zip.file('lib/' + fileName, file.contents, options);
+        if (!this.textOnlyArchive) {
+            let scriptManager = this.getScriptManager();
+            let scriptFiles = scriptManager.getAllScripts();
+            scriptFiles.forEach(function (file) {
+                let fileIdentifier = file.getIdentifier();
+                let fileName = fsPath.basename(fileIdentifier);
+                if (language === 'ergo') {
+                    if (file.getLanguage() === '.ergo') {
+                        zip.file('lib/' + fileName, file.contents, options);
+                    }
+                } else {
+                    fileName = fileName.split('.').slice(0, -1).join('.') + '.js';
+                    if (file.getLanguage() === '.js') {
+                        zip.file('lib/' + fileName, file.contents, options);
+                    }
                 }
-            } else {
-                fileName = fileName.split('.').slice(0, -1).join('.') + '.js';
-                if (file.getLanguage() === '.js') {
-                    zip.file('lib/' + fileName, file.contents, options);
-                }
-            }
-        });
+            });
+        }
         return zip.generateAsync({
             type: 'nodebuffer'
         }).then(something => {
             return Promise.resolve(something).then(result => {
                 return result;
             });
-
         });
-
     }
 
     /**
@@ -1274,6 +1275,29 @@ class Template {
         logger.debug(types);
         return types;
     }
+
+    /**
+     * Returns true if the template is text-only, i.e., it does not contain any logic
+     * @return {boolean} is the template text only?
+     */
+    isTextOnly() {
+        return this.getScriptManager().getAllScripts().length === 0;
+    }
+
+    /**
+     * Set textOnlyArchive
+     */
+    setTextOnlyArchive() {
+        this.textOnlyArchive = true;
+    }
+
+    /**
+     * Unset textOnlyArchive
+     */
+    unsetTextOnlyArchive() {
+        this.textOnlyArchive = false;
+    }
+
 }
 
 module.exports = Template;

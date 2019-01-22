@@ -73,6 +73,11 @@ describe('Template', () => {
             return Template.fromDirectory('./test/data/no-logic').should.be.fulfilled;
         });
 
+        it('should create a template from a text-only directory', async () => {
+            const template = await Template.fromDirectory('./test/data/text-only');
+            template.isTextOnly().should.equal(true);
+        });
+
         it('should create a template from a directory', () => {
             return Template.fromDirectory('./test/data/latedeliveryandpenalty').should.be.fulfilled;
         });
@@ -94,6 +99,18 @@ describe('Template', () => {
             return templatePromise.then((template) => template.toArchive('javascript')).should.not.be.null;
         });
 
+        it('should generate a text-only archive from a logic template', async () => {
+            const template = await Template.fromDirectory('./test/data/latedeliveryandpenalty');
+            template.setTextOnlyArchive();
+            template.toArchive('ergo').should.not.be.null;
+        });
+
+        it('should generate a logic archive from a text-only template', async () => {
+            const template = await Template.fromDirectory('./test/data/text-only');
+            template.unsetTextOnlyArchive();
+            template.toArchive('ergo').should.not.be.null;
+        });
+
         it('should throw an error if archive language is neither ergo nor javascript', async () => {
             const templatePromise = Template.fromDirectory('./test/data/latedeliveryandpenalty');
             return templatePromise.then((template) => template.toArchive('java')).should.be.rejectedWith('language should be either \'ergo\' or \'javascript\' but is \'java\'');
@@ -111,6 +128,7 @@ describe('Template', () => {
 
         it('should roundtrip a source template (Ergo)', async function() {
             const template = await Template.fromDirectory('./test/data/latedeliveryandpenalty');
+            template.isTextOnly().should.equal(false);
             template.getIdentifier().should.equal('latedeliveryandpenalty@0.0.1');
             template.getModelManager().getModelFile('io.clause.latedeliveryandpenalty').should.not.be.null;
             template.getGrammar().should.not.be.null;
@@ -163,6 +181,38 @@ describe('Template', () => {
             template2.getMetadata().getSamples().should.eql(template.getMetadata().getSamples());
             template2.getHash().should.equal(template.getHash());
             const buffer2 = await template2.toArchive('javascript');
+            buffer2.should.not.be.null;
+        });
+
+        it('should roundtrip a text-only archive', async function() {
+            const template = await Template.fromDirectory('./test/data/latedeliveryandpenalty');
+            template.isTextOnly().should.equal(false);
+            template.getIdentifier().should.equal('latedeliveryandpenalty@0.0.1');
+            template.getModelManager().getModelFile('io.clause.latedeliveryandpenalty').should.not.be.null;
+            template.getGrammar().should.not.be.null;
+            template.getScriptManager().getScripts().length.should.equal(1);
+            template.getScriptManager().getLogic().length.should.equal(1);
+            template.getMetadata().getREADME().should.not.be.null;
+            template.getMetadata().getRequest().should.not.be.null;
+            template.getName().should.equal('latedeliveryandpenalty');
+            template.getDescription().should.equal('Late Delivery and Penalty. In case of delayed delivery except for Force Majeure cases, the Seller shall pay to the Buyer for every 9 DAY of delay penalty amounting to 7% of the total value of the Equipment whose delivery has been delayed. Any fractional part of a DAY is to be considered a full DAY. The total amount of penalty shall not however, exceed 2% of the total value of the Equipment involved in late delivery. If the delay is more than 2 WEEK, the Buyer is entitled to terminate this Contract.');
+            template.getVersion().should.equal('0.0.1');
+            template.getMetadata().getSample().should.equal('Late Delivery and Penalty. In case of delayed delivery except for Force Majeure cases, the Seller shall pay to the Buyer for every 9 days of delay penalty amounting to 7% of the total value of the Equipment whose delivery has been delayed. Any fractional part of a days is to be considered a full days. The total amount of penalty shall not however, exceed 2% of the total value of the Equipment involved in late delivery. If the delay is more than 2 weeks, the Buyer is entitled to terminate this Contract.');
+            template.getHash().should.equal('8336919a11aac0a2a625c8b03670830c22afcc9ae959c97d2328fb8ce6be1c5e');
+            template.setTextOnlyArchive();
+            const buffer = await template.toArchive('ergo');
+            buffer.should.not.be.null;
+            const template2 = await Template.fromArchive(buffer);
+            template2.isTextOnly().should.equal(true);
+            template2.getIdentifier().should.equal(template.getIdentifier());
+            template2.getModelManager().getModelFile('io.clause.latedeliveryandpenalty').should.not.be.null;
+            template2.getGrammar().should.not.be.null;
+            template2.getTemplatizedGrammar().should.equal(template.getTemplatizedGrammar());
+            template2.getScriptManager().getScripts().length.should.equal(0);
+            template2.getMetadata().getREADME().should.equal(template.getMetadata().getREADME());
+            template2.getMetadata().getSamples().should.eql(template.getMetadata().getSamples());
+            template2.getHash().should.equal('cc3ccd0e086a9c049f06c2e5592eb8061b72e99609961c31896b8e62643679c1');
+            const buffer2 = await template2.toArchive('ergo');
             buffer2.should.not.be.null;
         });
 

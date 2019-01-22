@@ -31,6 +31,7 @@ describe('Clause', () => {
     const testLatePenaltyPeriodInput = fs.readFileSync(path.resolve(__dirname, 'data/latedeliveryandpenalty-period', 'sample.txt'), 'utf8');
     const testCongaInput = fs.readFileSync(path.resolve(__dirname, 'data/conga', 'sample.txt'), 'utf8');
     const testAllTypesInput = fs.readFileSync(path.resolve(__dirname, 'data/alltypes', 'sample.txt'), 'utf8');
+    const testTextOnlyInput = fs.readFileSync(path.resolve(__dirname, 'data/text-only', 'sample.txt'), 'utf8');
 
     describe('#constructor', () => {
 
@@ -202,6 +203,37 @@ describe('Clause', () => {
             const clause = new Clause(template);
             (()=> clause.parse('')).should.throw('Parsing clause text returned a null AST. This may mean the text is valid, but not complete.');
         });
+
+        it('should be able to set the data for a text-only clause', async function() {
+            const template = await Template.fromDirectory('./test/data/text-only');
+            const clause = new Clause(template);
+            clause.parse(testTextOnlyInput);
+            const data = {
+                $class: 'io.clause.latedeliveryandpenalty.TemplateModel',
+                capPercentage: 2,
+                forceMajeure: true,
+                fractionalPart : 'days',
+                penaltyDuration: {
+                    $class: 'org.accordproject.time.Duration',
+                    amount: 9,
+                    unit: 'days'
+                },
+                penaltyPercentage: 7,
+                termination: {
+                    $class: 'org.accordproject.time.Duration',
+                    amount: 2,
+                    unit: 'weeks',
+                }
+            };
+            delete clause.getData().clauseId;
+            clause.getData().should.eql(data);
+            clause.getIdentifier().should.equal('text-only@0.0.1-0ee76aefdd19d6863f2f1642182f506b1ac8e5c4be2a005c00dd13bbf36fe63c');
+        });
+
+        it('should create a template from a directory no logic', () => {
+            return Template.fromDirectory('./test/data/no-logic').should.be.fulfilled;
+        });
+
     });
 
     describe('#generateText', () => {

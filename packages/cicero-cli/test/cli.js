@@ -74,6 +74,7 @@ describe('cicero-cli', () => {
             result.should.eql(true);
             const newTemplate = await Template.fromArchive(fs.readFileSync(archiveName));
             newTemplate.should.not.be.null;
+            newTemplate.isTextOnly().should.equal(false);
             fs.unlinkSync(archiveName);
         });
 
@@ -83,8 +84,20 @@ describe('cicero-cli', () => {
             result.should.eql(true);
             const newTemplate = await Template.fromArchive(fs.readFileSync(archiveName));
             newTemplate.should.not.be.null;
+            newTemplate.isTextOnly().should.equal(false);
             fs.unlinkSync(archiveName);
         });
+
+        it('should create a valid text-only archive', async () => {
+            const archiveName = 'test.cta';
+            const result = await Commands.archive('text', template, archiveName);
+            result.should.eql(true);
+            const newTemplate = await Template.fromArchive(fs.readFileSync(archiveName));
+            newTemplate.should.not.be.null;
+            newTemplate.isTextOnly().should.equal(true);
+            fs.unlinkSync(archiveName);
+        });
+
     });
 
     describe('#validateParseArgs', () => {
