@@ -24,6 +24,7 @@ const fs = require('fs');
 const path = require('path');
 const GoLangVisitor = CodeGen.GoLangVisitor;
 const JavaVisitor = CodeGen.JavaVisitor;
+const CordaVisitor = CodeGen.CordaVisitor;
 const JSONSchemaVisitor = CodeGen.JSONSchemaVisitor;
 const PlantUMLVisitor = CodeGen.PlantUMLVisitor;
 const TypescriptVisitor = CodeGen.TypescriptVisitor;
@@ -251,6 +252,9 @@ class Commands {
                     break;
                 case 'Java':
                     visitor = new JavaVisitor();
+                    break;
+                case 'Corda':
+                    visitor = new CordaVisitor();
                     break;
                 case 'JSONSchema':
                     visitor = new JSONSchemaVisitor();
