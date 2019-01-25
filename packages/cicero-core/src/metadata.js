@@ -15,7 +15,7 @@
 'use strict';
 
 const logger = require('./logger');
-const ciceroVersion = require('../package.json').version;
+const ciceroVersion = require('../package.json').version.replace(/-\d+$/, '');
 const semver = require('semver');
 
 // This code is derived from BusinessNetworkMetadata in Hyperleger Composer composer-common.
