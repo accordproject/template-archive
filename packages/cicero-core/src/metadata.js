@@ -15,7 +15,7 @@
 'use strict';
 
 const logger = require('./logger');
-const ciceroVersion = require('../package.json').version.replace(/-\d+$/, '');
+const ciceroVersion = require('../package.json').version;
 const semver = require('semver');
 
 // This code is derived from BusinessNetworkMetadata in Hyperleger Composer composer-common.
@@ -189,7 +189,7 @@ class Metadata {
      * @returns {string} the semantic version
      */
     satisfiesTargetVersion(){
-        return semver.satisfies(ciceroVersion, this.getTargetVersion());
+        return semver.satisfies(ciceroVersion, this.getTargetVersion(), { includePrerelease: true });
     }
 
     /**
