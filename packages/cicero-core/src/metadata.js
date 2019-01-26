@@ -128,7 +128,7 @@ class Metadata {
             throw new Error('package.json is missing the cicero.version property.');
         }
 
-        if (!this.satisfiesTargetVersion()){
+        if (!this.satisfiesTargetVersion(ciceroVersion)){
             const msg = `The template targets Cicero (${this.targetVersion}) but the Cicero version is ${ciceroVersion}.`;
             logger.error(msg);
             throw new Error(msg);
@@ -186,10 +186,11 @@ class Metadata {
 
     /**
      * Only returns true if the current cicero version satisfies the target version of this template
+     * @param {string} version the cicero version to check against
      * @returns {string} the semantic version
      */
-    satisfiesTargetVersion(){
-        return semver.satisfies(ciceroVersion, this.getTargetVersion(), { includePrerelease: true });
+    satisfiesTargetVersion(version){
+        return semver.satisfies(version, this.getTargetVersion(), { includePrerelease: true });
     }
 
     /**

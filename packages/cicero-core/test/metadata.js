@@ -14,6 +14,9 @@
 
 'use strict';
 
+const ciceroVersion = require('../package.json').version;
+const semver = require('semver');
+
 const Metadata = require('../lib/metadata');
 
 const chai = require('chai');
@@ -22,6 +25,36 @@ const should = chai.should();
 chai.should();
 chai.use(require('chai-things'));
 chai.use(require('chai-as-promised'));
+
+/**
+ * Creates a caret range from a fixed version
+ *
+ * @param {string} version the version number
+ * @returns {string} the caret range for that version number
+ */
+function caretRange(version) {
+    return `^${version}`;
+}
+
+/**
+ * Trims the pre-release tag
+ *
+ * @param {string} version the version number
+ * @returns {string} the version number without pre-release tag
+ */
+function trimPreRelease(version) {
+    return `${semver.major(version)}.${semver.minor(version)}.${semver.patch(version)}`;
+}
+
+/**
+ * Increases the patch number
+ *
+ * @param {string} version the version number
+ * @returns {string} the version number with patch number increased by one
+ */
+function incPatch(version) {
+    return semver.inc(version,'patch');
+}
 
 describe('Metadata', () => {
 
@@ -159,6 +192,79 @@ describe('Metadata', () => {
                 cicero: {template: 'clause',language:'ergo',version:'^0.10.0'}
             }, null, {});
             md.getTemplateType().should.be.equal(1);
+        });
+    });
+
+    describe('#satisfiesTargetVersion', () => {
+
+        it('should satisfy when target version is the same as current cicero version', () => {
+            const md = new Metadata({
+                name: 'template',
+                cicero: {template: 'contract',language:'ergo',version:caretRange(ciceroVersion)}
+            }, null, {});
+            md.satisfiesTargetVersion(ciceroVersion).should.be.equal(true);
+        });
+        it('should satisfy when target version has a lower patch number as cicero version', () => {
+            const md = new Metadata({
+                name: 'template',
+                cicero: {template: 'contract',language:'ergo',version:'^0.10.0'}
+            }, null, {});
+            md.satisfiesTargetVersion(ciceroVersion).should.be.equal(true);
+        });
+        it('should satisfy when target version has a lower patch number as current cicero version (with prerelease tag)', () => {
+            const md = new Metadata({
+                name: 'template',
+                cicero: {template: 'contract',language:'ergo',version:caretRange(ciceroVersion)}
+            }, null, {});
+            const version = `${incPatch(trimPreRelease(ciceroVersion))}-20190114233635`;
+            md.satisfiesTargetVersion(version).should.be.equal(true);
+        });
+        it('should satisfy when target version has a lower patch number as cicero version (with prerelease tag)', () => {
+            const md = new Metadata({
+                name: 'template',
+                cicero: {template: 'contract',language:'ergo',version:'^0.10.0'}
+            }, null, {});
+            md.satisfiesTargetVersion('0.10.1-20190114233635').should.be.equal(true);
+        });
+        it('should not satisfy when target version has a lower minor number as cicero version', () => {
+            const md = new Metadata({
+                name: 'template',
+                cicero: {template: 'contract',language:'ergo',version:'^0.10.0'}
+            }, null, {});
+            md.targetVersion = '^0.9.0';
+            md.satisfiesTargetVersion(ciceroVersion).should.be.equal(false);
+        });
+        it('should satisfy when cicero version is a prerelease for a version with patch number 0', () => {
+            const md = new Metadata({
+                name: 'template',
+                cicero: {template: 'contract',language:'ergo',version:'^0.10.0'}
+            }, null, {});
+            md.targetVersion = '^0.9.0';
+            md.satisfiesTargetVersion('0.10.0-20190114233635').should.be.equal(true);
+        });
+        it('should satisfy when cicero version is a prerelease for a version with patch number higher than 0', () => {
+            const md = new Metadata({
+                name: 'template',
+                cicero: {template: 'contract',language:'ergo',version:'^0.10.0'}
+            }, null, {});
+            md.targetVersion = '^0.9.0';
+            md.satisfiesTargetVersion('0.10.1-20190114233635').should.be.equal(false);
+        });
+        it('should not satisfy when target version has a higher minor number as cicero version', () => {
+            const md = new Metadata({
+                name: 'template',
+                cicero: {template: 'contract',language:'ergo',version:'^0.10.0'}
+            }, null, {});
+            md.targetVersion = '^0.11.0';
+            md.satisfiesTargetVersion(ciceroVersion).should.be.equal(false);
+        });
+        it('should not satisfy when target version has a higher minor number as cicero version (with prerelease tag)', () => {
+            const md = new Metadata({
+                name: 'template',
+                cicero: {template: 'contract',language:'ergo',version:'^0.10.0'}
+            }, null, {});
+            md.targetVersion = '^0.11.0';
+            md.satisfiesTargetVersion('0.10.0-20190114233635').should.be.equal(false);
         });
     });
 });

@@ -18,6 +18,7 @@
 const fs = require('fs');
 const moment = require('moment');
 const path = require('path');
+const semver = require('semver');
 
 const timestamp = moment().format('YYYYMMDDHHmmss');
 
@@ -25,7 +26,7 @@ const lernaDirectory = path.resolve('.');
 const lernaConfigFile = path.resolve(lernaDirectory, 'lerna.json');
 const lernaConfig = require(lernaConfigFile);
 lernaConfig.version.replace(/-.*/, '');
-const targetVersion = lernaConfig.version + '-' + timestamp;
+const targetVersion = semver.inc(lernaConfig.version, 'patch') + '-' + timestamp;
 lernaConfig.version = targetVersion;
 fs.writeFileSync(lernaConfigFile, JSON.stringify(lernaConfig, null, 2), 'utf8');
 
