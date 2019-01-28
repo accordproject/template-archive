@@ -70,31 +70,31 @@ describe('cicero-cli', () => {
     describe('#archive', async () => {
         it('should create a valid ergo archive', async () => {
             const archiveName = 'test.cta';
-            const result = await Commands.archive('ergo', template, archiveName);
+            const result = await Commands.archive('ergo', template, archiveName, false);
             result.should.eql(true);
             const newTemplate = await Template.fromArchive(fs.readFileSync(archiveName));
             newTemplate.should.not.be.null;
-            newTemplate.isTextOnly().should.equal(false);
+            newTemplate.hasNoLogic().should.equal(false);
             fs.unlinkSync(archiveName);
         });
 
         it('should create a valid javascript archive', async () => {
             const archiveName = 'test.cta';
-            const result = await Commands.archive('javascript', template, archiveName);
+            const result = await Commands.archive('javascript', template, archiveName, false);
             result.should.eql(true);
             const newTemplate = await Template.fromArchive(fs.readFileSync(archiveName));
             newTemplate.should.not.be.null;
-            newTemplate.isTextOnly().should.equal(false);
+            newTemplate.hasNoLogic().should.equal(false);
             fs.unlinkSync(archiveName);
         });
 
-        it('should create a valid text-only archive', async () => {
+        it('should omit logic when creating a valid archive', async () => {
             const archiveName = 'test.cta';
-            const result = await Commands.archive('text', template, archiveName);
+            const result = await Commands.archive('ergo', template, archiveName, true);
             result.should.eql(true);
             const newTemplate = await Template.fromArchive(fs.readFileSync(archiveName));
             newTemplate.should.not.be.null;
-            newTemplate.isTextOnly().should.equal(true);
+            newTemplate.hasNoLogic().should.equal(true);
             fs.unlinkSync(archiveName);
         });
 
@@ -328,21 +328,21 @@ describe('cicero-cli', () => {
         it('should generate an Ergo archive', async () => {
             const tmpFile = await tmp.file();
             const tmpArchive = tmpFile.path + '.cta';
-            await Commands.archive('ergo', template, tmpArchive);
+            await Commands.archive('ergo', template, tmpArchive, false);
             fs.readFileSync(tmpArchive).length.should.be.above(0);
             tmpFile.cleanup();
         });
         it('should generate a JavaScript archive', async () => {
             const tmpFile = await tmp.file();
             const tmpArchive = tmpFile.path + '.cta';
-            await Commands.archive('javascript', template, tmpArchive);
+            await Commands.archive('javascript', template, tmpArchive, false);
             fs.readFileSync(tmpArchive).length.should.be.above(0);
             tmpFile.cleanup();
         });
         it('should not an unknown archive', async () => {
             const tmpFile = await tmp.file();
             const tmpArchive = tmpFile.path + '.cta';
-            return Commands.archive('foo', template, tmpArchive)
+            return Commands.archive('foo', template, tmpArchive, false)
                 .should.be.rejectedWith('language should be either \'ergo\' or \'javascript\' but is \'foo\'');
         });
         it('no args specified', () => {

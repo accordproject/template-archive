@@ -66,6 +66,11 @@ require('yargs')
             describe: 'file name for the archive',
             type: 'string'
         });
+        yargs.option('omitLogic', {
+            describe: 'omit the logic in the archive',
+            type: 'boolean',
+            default: false
+        });
     }, (argv) => {
         if (argv.verbose) {
             logger.info(`archive the template in the directory ${argv.template} into the file ${argv.archiveFile}`);
@@ -78,7 +83,7 @@ require('yargs')
             return;
         }
 
-        return Commands.archive(argv.language, argv.template, argv.archiveFile)
+        return Commands.archive(argv.language, argv.template, argv.archiveFile, argv.omitLogic)
             .catch((err) => {
                 logger.error(err.message);
             });
