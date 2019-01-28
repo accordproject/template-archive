@@ -140,7 +140,7 @@ class Engine {
             });
 
         if (functionDeclarations.length > 1) {
-            throw new Error('Shoult have at most one function declaration with the @AccordClauseLogicInit annotation');
+            throw new Error('Should have at most one function declaration with the @AccordClauseLogicInit annotation');
         }
 
         const head = `
