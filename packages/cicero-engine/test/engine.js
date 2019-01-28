@@ -260,6 +260,36 @@ describe('EngineHelloEmit', () => {
         });
     });
 });
+describe('EngineHelloEmitInit', () => {
+
+    let engine;
+    let clause;
+    const helloEmitInitInput = fs.readFileSync(path.resolve(__dirname, 'data/helloemitinit', 'sample.txt'), 'utf8');
+
+    beforeEach(async function () {
+        engine = new Engine();
+        const template = await Template.fromDirectory('./test/data/helloemitinit');
+        clause = new Clause(template);
+        clause.parse(helloEmitInitInput);
+    });
+
+    afterEach(() => {});
+
+    describe('#executeandemitinit', function () {
+
+        it('should execute a smart clause which emits during initialization', async function () {
+            const request = {
+                '$class': 'org.accordproject.helloemit.MyInitRequest',
+                'input': 'Accord Project'
+            };
+            const result = await engine.init(clause, request);
+            result.should.not.be.null;
+            result.response.should.not.be.null;
+            result.emit[0].$class.should.equal('org.accordproject.helloemit.Greeting');
+            result.emit[0].message.should.equal('Voila!');
+        });
+    });
+});
 describe('EngineSaft', () => {
 
     let engine;
@@ -388,6 +418,37 @@ describe('EngineInstallmentSaleJs', () => {
             result1.state.balance_remaining.should.equal(7612.499999999999);
             result1.state.total_paid.should.equal(2500.00);
         });
+    });
+});
+describe('EngineInstallmentSaleJsErr', () => {
+
+    let engine;
+    let clause;
+    const testLatePenaltyInput = fs.readFileSync(path.resolve(__dirname, 'data/installment-sale-err', 'sample.txt'), 'utf8');
+
+    beforeEach(async function () {
+        engine = new Engine();
+        const template = await Template.fromDirectory('./test/data/installment-sale-err');
+        clause = new Clause(template);
+        clause.parse(testLatePenaltyInput);
+    });
+
+    afterEach(() => {});
+
+    describe('#execute', function () {
+
+        it('should fail initialization when more than one initialization clause', async () => {
+            try {
+                const request = {};
+                request.$class = 'org.accordproject.installmentsale.InitializeRequest';
+                request.firstMonth = 1.0;
+                const result = await engine.init(clause, request);
+                return result;
+            } catch (err) {
+                err.message.should.equal('Should have at most one function declaration with the @AccordClauseLogicInit annotation');
+            }
+        });
+
     });
 });
 describe('EngineInstallmentSaleErgo', () => {
