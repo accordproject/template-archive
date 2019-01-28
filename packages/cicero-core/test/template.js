@@ -69,13 +69,13 @@ describe('Template', () => {
 
     describe('#fromDirectory', () => {
 
-        it('should create a template from a directory no logic', () => {
+        it('should create a template from a directory with no @AccordClauseLogic in logic', () => {
             return Template.fromDirectory('./test/data/no-logic').should.be.fulfilled;
         });
 
-        it('should create a template from a text-only directory', async () => {
+        it('should create a template from a directory with no logic', async () => {
             const template = await Template.fromDirectory('./test/data/text-only');
-            template.isTextOnly().should.equal(true);
+            template.hasNoLogic().should.equal(true);
         });
 
         it('should create a template from a directory', () => {
@@ -101,13 +101,13 @@ describe('Template', () => {
 
         it('should generate a text-only archive from a logic template', async () => {
             const template = await Template.fromDirectory('./test/data/latedeliveryandpenalty');
-            template.setTextOnlyArchive();
+            template.setArchiveOmitsLogic();
             template.toArchive('ergo').should.not.be.null;
         });
 
         it('should generate a logic archive from a text-only template', async () => {
             const template = await Template.fromDirectory('./test/data/text-only');
-            template.unsetTextOnlyArchive();
+            template.unsetArchiveOmitsLogic();
             template.toArchive('ergo').should.not.be.null;
         });
 
@@ -128,7 +128,7 @@ describe('Template', () => {
 
         it('should roundtrip a source template (Ergo)', async function() {
             const template = await Template.fromDirectory('./test/data/latedeliveryandpenalty');
-            template.isTextOnly().should.equal(false);
+            template.hasNoLogic().should.equal(false);
             template.getIdentifier().should.equal('latedeliveryandpenalty@0.0.1');
             template.getModelManager().getModelFile('io.clause.latedeliveryandpenalty').should.not.be.null;
             template.getGrammar().should.not.be.null;
@@ -186,7 +186,7 @@ describe('Template', () => {
 
         it('should roundtrip a text-only archive', async function() {
             const template = await Template.fromDirectory('./test/data/latedeliveryandpenalty');
-            template.isTextOnly().should.equal(false);
+            template.hasNoLogic().should.equal(false);
             template.getIdentifier().should.equal('latedeliveryandpenalty@0.0.1');
             template.getModelManager().getModelFile('io.clause.latedeliveryandpenalty').should.not.be.null;
             template.getGrammar().should.not.be.null;
@@ -199,11 +199,11 @@ describe('Template', () => {
             template.getVersion().should.equal('0.0.1');
             template.getMetadata().getSample().should.equal('Late Delivery and Penalty. In case of delayed delivery except for Force Majeure cases, the Seller shall pay to the Buyer for every 9 days of delay penalty amounting to 7% of the total value of the Equipment whose delivery has been delayed. Any fractional part of a days is to be considered a full days. The total amount of penalty shall not however, exceed 2% of the total value of the Equipment involved in late delivery. If the delay is more than 2 weeks, the Buyer is entitled to terminate this Contract.');
             template.getHash().should.equal('8336919a11aac0a2a625c8b03670830c22afcc9ae959c97d2328fb8ce6be1c5e');
-            template.setTextOnlyArchive();
+            template.setArchiveOmitsLogic();
             const buffer = await template.toArchive('ergo');
             buffer.should.not.be.null;
             const template2 = await Template.fromArchive(buffer);
-            template2.isTextOnly().should.equal(true);
+            template2.hasNoLogic().should.equal(true);
             template2.getIdentifier().should.equal(template.getIdentifier());
             template2.getModelManager().getModelFile('io.clause.latedeliveryandpenalty').should.not.be.null;
             template2.getGrammar().should.not.be.null;

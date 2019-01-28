@@ -88,7 +88,7 @@ class Template {
         this.grammarAst = null;
         this.templatizedGrammar = null;
         this.templateAst = null;
-        this.textOnlyArchive = false;
+        this.archiveOmitsLogic = false;
     }
 
     /**
@@ -777,7 +777,7 @@ class Template {
         }
 
         // save the request.json if present & not text-only
-        if (metadata.getRequest() && !this.textOnlyArchive) {
+        if (metadata.getRequest() && !this.archiveOmitsLogic) {
             let requestFileContents = JSON.stringify(metadata.getRequest());
             zip.file('request.json', requestFileContents, options);
         }
@@ -793,7 +793,7 @@ class Template {
         zip.file('lib/', null, Object.assign({}, options, {
             dir: true
         }));
-        if (!this.textOnlyArchive) {
+        if (!this.archiveOmitsLogic) {
             let scriptManager = this.getScriptManager();
             let scriptFiles = scriptManager.getAllScripts();
             scriptFiles.forEach(function (file) {
@@ -1280,22 +1280,22 @@ class Template {
      * Returns true if the template is text-only, i.e., it does not contain any logic
      * @return {boolean} is the template text only?
      */
-    isTextOnly() {
+    hasNoLogic() {
         return this.getScriptManager().getAllScripts().length === 0;
     }
 
     /**
-     * Set textOnlyArchive
+     * Set archiveOmitsLogic
      */
-    setTextOnlyArchive() {
-        this.textOnlyArchive = true;
+    setArchiveOmitsLogic() {
+        this.archiveOmitsLogic = true;
     }
 
     /**
-     * Unset textOnlyArchive
+     * Unset archiveOmitsLogic
      */
-    unsetTextOnlyArchive() {
-        this.textOnlyArchive = false;
+    unsetArchiveOmitsLogic() {
+        this.archiveOmitsLogic = false;
     }
 
 }

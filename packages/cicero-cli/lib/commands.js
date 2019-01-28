@@ -320,18 +320,17 @@ class Commands {
      * @param {string} language - target language for the archive (should be either 'ergo' or 'javascript')
      * @param {string} templatePath to the template directory
      * @param {string} archiveFile to the archive file
+     * @param {boolean} omitLogic whether to omit the logic in the resulting archive
      * @returns {object} Promise to the code creating an archive
      */
-    static archive(language, templatePath, archiveFile) {
+    static archive(language, templatePath, archiveFile, omitLogic) {
         return Template.fromDirectory(templatePath)
             .then((template) => {
-                let target = language;
-                // If target is 'text', set the textArchive flag
-                if (target === 'text') {
-                    template.setTextOnlyArchive();
-                    target = 'ergo';
+                // If 'omitLogic' is true, set the archiveOmitsLogic flag
+                if (omitLogic) {
+                    template.setArchiveOmitsLogic();
                 }
-                return template.toArchive(target);
+                return template.toArchive(language);
             })
             .then((archive) => {
                 logger.info('Creating archive: ' + archiveFile);
