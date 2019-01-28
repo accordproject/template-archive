@@ -18,6 +18,7 @@ const chai = require('chai');
 const path = require('path');
 const tmp = require('tmp-promise');
 const fs = require('fs');
+const should = require('chai').should();
 
 const Template = require('@accordproject/cicero-core').Template;
 
@@ -51,11 +52,20 @@ describe('cicero-cli', () => {
         'fractionalPart':'days'
     };
 
+    const sampleErr = path.resolve(__dirname, 'data/latedeliveryandpenalty/', 'sample_err.txt');
+    const stateErr = path.resolve(__dirname, 'data/latedeliveryandpenalty/', 'state_err.json');
+    const requestErr = path.resolve(__dirname, 'data/latedeliveryandpenalty/', 'request_err.json');
+
     describe('#parse', () => {
         it('should parse a clause using a template', async () => {
             const result = await Commands.parse(template, sample, null);
             delete result.clauseId;
             result.should.eql(parseReponse);
+        });
+
+        it('should fail parsing a clause using a template', async () => {
+            const result = await Commands.parse(template, sampleErr, null);
+            should.equal(result,undefined);
         });
     });
 
@@ -183,6 +193,25 @@ describe('cicero-cli', () => {
             response.response.penalty.should.be.equal(4);
             response.response.buyerMayTerminate.should.be.equal(true);
         });
+
+        it('should execute with default state when state is not found', async () => {
+            const response = await Commands.execute(template, sample, [request], stateErr);
+            response.response.$class.should.be.equal('org.accordproject.latedeliveryandpenalty.LateDeliveryAndPenaltyResponse');
+            response.response.penalty.should.be.equal(4);
+            response.response.buyerMayTerminate.should.be.equal(true);
+        });
+
+        it('should execute with more than one request', async () => {
+            const response = await Commands.execute(template, sample, [request,request], state);
+            response.response.$class.should.be.equal('org.accordproject.latedeliveryandpenalty.LateDeliveryAndPenaltyResponse');
+            response.response.penalty.should.be.equal(4);
+            response.response.buyerMayTerminate.should.be.equal(true);
+        });
+
+        it('should fail execute on a bogus request', async () => {
+            const response = await Commands.execute(template, sample, [requestErr], state);
+            should.equal(response,undefined);
+        });
     });
 
     describe('#executeergo', () => {
@@ -208,7 +237,8 @@ describe('cicero-cli', () => {
             const args  = Commands.validateExecuteArgs({
                 _: ['execute'],
                 template: './',
-                sample: 'sample.txt'
+                sample: 'sample.txt',
+                state: 'state.txt'
             });
             args.template.should.match(/cicero-cli\/test\/data\/latedeliveryandpenalty$/);
             args.sample.should.match(/sample.txt$/);
@@ -218,12 +248,13 @@ describe('cicero-cli', () => {
             const args  = Commands.validateExecuteArgs({
                 _: ['execute'],
                 template: 'latedeliveryandpenalty',
-                sample: 'latedeliveryandpenalty/sample.txt'
+                sample: 'latedeliveryandpenalty/sample.txt',
+                state: 'latedeliveryandpenalty/state.txt'
             });
             args.template.should.match(/cicero-cli\/test\/data\/latedeliveryandpenalty$/);
             args.sample.should.match(/sample.txt$/);
         });
-        it('all args specified, parent folder, no sample', () => {
+        it('all args specified, parent folder, no sample, no state', () => {
             process.chdir(path.resolve(__dirname, 'data/'));
             const args  = Commands.validateExecuteArgs({
                 _: ['execute'],
@@ -349,6 +380,26 @@ describe('cicero-cli', () => {
             process.chdir(path.resolve(__dirname, 'data/latedeliveryandpenalty/'));
             const args  = Commands.validateArchiveArgs({
                 _: ['archive'],
+                omitLogic: false
+            });
+            args.template.should.match(/cicero-cli\/test\/data\/latedeliveryandpenalty$/);
+            args.language.should.match(/ergo/);
+        });
+        it('only language arg specified', () => {
+            process.chdir(path.resolve(__dirname, 'data/latedeliveryandpenalty/'));
+            const args  = Commands.validateArchiveArgs({
+                _: ['archive'],
+                language: 'ergo',
+                omitLogic: false
+            });
+            args.template.should.match(/cicero-cli\/test\/data\/latedeliveryandpenalty$/);
+            args.language.should.match(/ergo/);
+        });
+        it('template arg specified', () => {
+            process.chdir(path.resolve(__dirname));
+            const args  = Commands.validateArchiveArgs({
+                _: ['archive', 'data/latedeliveryandpenalty/'],
+                omitLogic: false
             });
             args.template.should.match(/cicero-cli\/test\/data\/latedeliveryandpenalty$/);
             args.language.should.match(/ergo/);
@@ -357,13 +408,15 @@ describe('cicero-cli', () => {
             process.chdir(path.resolve(__dirname, 'data/latedeliveryandpenalty/'));
             Commands.validateArchiveArgs({
                 _: ['archive'],
-                verbose: true
+                verbose: true,
+                omitLogic: false
             });
         });
         it('bad package.json', () => {
             process.chdir(path.resolve(__dirname, 'data/'));
             (() => Commands.validateArchiveArgs({
                 _: ['execute'],
+                omitLogic: false,
             })).should.throw(' not a valid cicero template. Make sure that package.json exists and that it has a cicero entry.');
         });
     });
