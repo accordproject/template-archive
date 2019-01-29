@@ -104,7 +104,7 @@ class TemplateLibrary {
         for(let key of Object.keys(templateIndex)) {
             const template = templateIndex[key];
 
-            if(semver.satisfies(ciceroVersion, template.ciceroVersion)) {
+            if(semver.satisfies(ciceroVersion, template.ciceroVersion, { includePrerelease: true })) {
                 result[key] = template;
             }
         }
