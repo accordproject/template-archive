@@ -297,6 +297,11 @@ describe('Template', () => {
 
     describe('#fromUrl', () => {
 
+        it('should throw an error if an archive loader cannot be found', async () => {
+            const url = 'ab://ip-payment@0.8.0#hash';
+            return (() => Template.fromUrl(url, null)).should.throw('Failed to find a model file loader that can handle: ab://ip-payment@0.8.0#hash');
+        });
+
         it('should create a template from an archive at a given URL', async () => {
             const url = 'https://templates.accordproject.org/archives/ip-payment@0.8.0.cta';
             return Template.fromUrl(url, null).should.be.fulfilled;
@@ -305,6 +310,11 @@ describe('Template', () => {
         it('should create a template from an archive at a given AP URL', async () => {
             const url = 'ap://ip-payment@0.8.0#hash';
             return Template.fromUrl(url, null).should.be.fulfilled;
+        });
+
+        it('should throw an error if creating a template from a wrongly formed AP URL', async () => {
+            const url = 'ap://ip-payment@0.8.0';
+            return (() => Template.fromUrl(url, null)).should.throw('Invalid template specifier. Must contain @ and #: ap://ip-payment@0.8.0');
         });
 
         it('should create a template from an archive at a given github URL', async () => {
@@ -322,6 +332,10 @@ describe('Template', () => {
             return Template.fromUrl(url, {'encoding':null,'headers':{'Accept': '*/*','Accept-Encoding': 'deflate, gzip'}}).should.be.rejectedWith('The template targets Cicero (^0.3.0) but the Cicero version is');
         });
 
+        it('should throw an error if creating a template from a non existing URL', async () => {
+            const url = 'https://emplates.accordproject.org/archives/doesnotexist@0.3.0.cta';
+            return Template.fromUrl(url, {'encoding':null,'headers':{'Accept': '*/*','Accept-Encoding': 'deflate, gzip'}}).should.be.rejectedWith('Server did not respond for URL [https://emplates.accordproject.org/archives/doesnotexist@0.3.0.cta]');
+        });
     });
 
     describe('#getParser', () => {
