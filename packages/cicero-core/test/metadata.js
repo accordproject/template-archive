@@ -79,6 +79,13 @@ describe('Metadata', () => {
             }, null, 'sample')).should.throw('sample.txt is required');
         });
 
+        it('should throw an error if request is not an object', () => {
+            (() => new Metadata({
+                name: 'template',
+                cicero: {template: 'contract',version:'^0.3.0-0'}
+            }, null, {}, 'request')).should.throw('request.json must be an object');
+        });
+
         it('should throw an error if package.json does not contain a valid name', () => {
             (() => new Metadata({}, null, {})).should.throw('template name can only contain lowercase alphanumerics, _ or -');
             (() => new Metadata({
