@@ -1,6 +1,6 @@
 language: node_js
 node_js:
-- '8'
+  - '8'
 dist: trusty
 before_install: |
   set -e
@@ -23,7 +23,8 @@ deploy:
       all_branches: true
       repo: accordproject/cicero
 after_failure: tail -n +1 -- /home/travis/.npm/_logs/*-debug.log
-after_success: npm run coverage
+after_success:
+  - 'if [ "$TRAVIS_REPO_SLUG" = "accordproject/cicero" ]; then npm run coverage; fi'
 cache:
   directories:
   - node_modules
