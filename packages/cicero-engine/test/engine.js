@@ -17,6 +17,7 @@
 const Template = require('@accordproject/cicero-core').Template;
 const Clause = require('@accordproject/cicero-core').Clause;
 const Engine = require('../lib/engine');
+const Util = require('../lib/util');
 
 const chai = require('chai');
 
@@ -71,13 +72,13 @@ describe('EngineLatePenalty', () => {
             request.agreedDelivery = '2017-10-07T16:38:01.412Z';
             request.goodsValue = 200.00;
             request.transactionId = '402c8f50-9e61-433e-a7c1-afe61c06ef00';
-            request.timestamp = '2017-11-12T17:38:01.412Z';
+            request.timestamp = '2019-11-12T17:38:01.412Z';
             const state = {};
             state.$class = 'org.accordproject.cicero.contract.AccordContractState';
             state.stateId = '1';
             const result = await engine.execute(clause2, request, state);
             result.should.not.be.null;
-            result.response.penalty.should.equal(59.5);
+            result.response.penalty.should.equal(87.5);
             result.response.buyerMayTerminate.should.equal(true);
         });
     });
@@ -280,7 +281,8 @@ describe('EngineHelloEmitInit', () => {
         it('should execute a smart clause which emits during initialization', async function () {
             const request = {
                 '$class': 'org.accordproject.helloemit.MyInitRequest',
-                'input': 'Accord Project'
+                'input': 'Accord Project',
+                'timestamp': '2017-11-12T17:38:01.412Z'
             };
             const result = await engine.init(clause, request);
             result.should.not.be.null;
@@ -515,5 +517,13 @@ describe('EngineInstallmentSaleErgo', () => {
             result1.state.balance_remaining.should.equal(7612.499999999999);
             result1.state.total_paid.should.equal(2500.00);
         });
+    });
+});
+describe('Resolve root directory for Cucumber', () => {
+    it('Should resolve to given root directory', function () {
+        return Util.resolveRootDir({rootdir:'foo/bar'}).should.equal('foo/bar');
+    });
+    it('Should resolve to \'.\'', function () {
+        return Util.resolveRootDir({}).should.equal('.');
     });
 });
