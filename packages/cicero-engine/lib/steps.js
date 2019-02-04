@@ -59,6 +59,17 @@ function compare(expected,actual) {
     }
 }
 
+/**
+ * Load a clause from directory
+ *
+ * @param {string} templateDir the directory for the template
+ * @param {object} Promise to the new clause
+ */
+async function loadClause(templateDir) {
+    const template = await Template.fromDirectory(templateDir);
+    return new Clause(template);
+}
+
 // Defaults
 const defaultState = {'stateId':'1','$class':'org.accordproject.cicero.contract.AccordContractState'};
 
@@ -66,27 +77,28 @@ Before(function () {
     this.engine = new Engine();
     this.currentTime = '1970-01-01T00:00:00Z';
     this.state = defaultState;
-    this.template = null;
     this.clause = null;
     this.request = null;
 });
 
 Given('the template in {string}', async function(dir) {
     const templateDir = Path.resolve(Util.resolveRootDir(this.parameters),dir);
-    this.template = await Template.fromDirectory(templateDir);
-    this.request = this.template.getMetadata().getRequest();
-    this.clause = new Clause(this.template);
+    const clause = await loadClause(templateDir);
+    this.request = clause.getTemplate().getMetadata().getRequest();
+    this.clause = clause;
 });
 
 Given('the current time is {string}', function(currentTime) {
     this.currentTime = currentTime;
 });
 
-Given('that the contract says', function (contractText) {
+Given('that the contract says', async function (contractText) {
     if (this.clause) {
         this.clause.parse(contractText);
     } else {
-        throw new Error('Cannot run a test without a contract');
+        const clause = await loadClause('.');
+        this.request = clause.getTemplate().getMetadata().getRequest();
+        this.clause = clause;
     }
 });
 
