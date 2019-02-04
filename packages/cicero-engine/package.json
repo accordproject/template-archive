@@ -15,7 +15,11 @@
     "lint": "eslint .",
     "postlint": "npm run licchk",
     "licchk": "license-check",
-    "test": "mocha && nyc mocha"
+    "test:mocha": "mocha",
+    "test:cucumber": "cucumber-js test/features --require lib/steps.js --world-parameters '{\"rootdir\":\"./test\"}'",
+    "test:all": "npm run test:mocha && npm run test:cucumber",
+    "test:cov": "nyc npm run test:all",
+    "test": "npm run test:all && npm run test:cov"
   },
   "repository": {
     "type": "git",
@@ -37,6 +41,7 @@
   "devDependencies": {
     "chai": "3.5.0",
     "chai-things": "0.2.0",
+    "cucumber": "^5.1.0",
     "eslint": "4.19.1",
     "license-check": "1.1.5",
     "mocha": "5.1.1",

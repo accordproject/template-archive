@@ -1,0 +1,53 @@
+Feature: Late delivery contract
+  This describe the expected behavior for the Accord Project's late delivery and penalty contract
+
+  Background:
+    Given the template in "data/latedeliveryandpenalty"
+    And that the contract says
+"""
+Late Delivery and Penalty. In case of delayed delivery except for Force Majeure cases, the Seller shall pay to the Buyer for every 2 days of delay penalty amounting to 10.5% of the total value of the Equipment whose delivery has been delayed. Any fractional part of a days is to be considered a full days. The total amount of penalty shall not however, exceed 55% of the total value of the Equipment involved in late delivery. If the delay is more than 15 days, the Buyer is entitled to terminate this Contract.
+"""
+
+  Scenario: The contract should return the penalty amount but not allow the buyer to terminate
+    When the current time is "2019-01-11T16:34:00-05:00"
+    When it receives the request
+"""
+{
+    "$class": "io.clause.latedeliveryandpenalty.LateDeliveryAndPenaltyRequest",
+    "forceMajeure": false,
+    "agreedDelivery": "2018-12-31 03:24:00Z",
+    "deliveredAt": null,
+    "goodsValue": 200.00,
+    "timestamp": "2019-01-11T16:34:00-05:00"
+}
+"""
+    Then it should respond with
+"""
+{
+  "$class": "io.clause.latedeliveryandpenalty.LateDeliveryAndPenaltyResponse",
+  "buyerMayTerminate": false,
+  "penalty": 110
+}
+"""
+
+  Scenario: The contract should return the penalty amount and allow the buyer to terminate
+    When the current time is "2019-01-11T16:34:00-05:00"
+    When it receives the request
+"""
+{
+    "$class": "io.clause.latedeliveryandpenalty.LateDeliveryAndPenaltyRequest",
+    "forceMajeure": false,
+    "agreedDelivery": "2018-01-31 03:24:00Z",
+    "deliveredAt": null,
+    "goodsValue": 200.00
+}
+"""
+    Then it should respond with
+"""
+{
+  "$class": "io.clause.latedeliveryandpenalty.LateDeliveryAndPenaltyResponse",
+  "buyerMayTerminate": true,
+  "penalty": 110
+}
+"""
+
