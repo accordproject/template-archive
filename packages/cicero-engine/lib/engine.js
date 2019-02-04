@@ -17,6 +17,7 @@
 const Logger = require('./logger');
 const logger = require('@accordproject/cicero-core').logger;
 const ResourceValidator = require('composer-concerto/lib/serializer/resourcevalidator');
+const Moment = require('moment');
 
 const {
     VM,
@@ -90,7 +91,7 @@ class Engine {
         }
 
         const head = `
-        __dispatch(contractdata,data,request,state,moment());
+        __dispatch(contractdata,data,request,state,now);
 
         function __dispatch(contract,data,request,state,now) {
             switch(request.getFullyQualifiedType()) {
@@ -144,7 +145,7 @@ class Engine {
         }
 
         const head = `
-        __init(contractdata,data,request,moment());
+        __init(contractdata,data,request,now);
 
         function __init(contract,data,request,now) {
         `;
@@ -184,6 +185,12 @@ class Engine {
      * @private
      */
     async execute(clause, request, state) {
+        let validNow;
+        if (request.timestamp) {
+            validNow = Moment.parseZone(request.timestamp);
+        } else {
+            validNow = Moment();
+        }
         const template = clause.getTemplate();
         // ensure the request is valid
         const validRequest = template.getSerializer().fromJSON(request, {validate: false, acceptResourcesForRelationships: true});
@@ -209,7 +216,8 @@ class Engine {
             sandbox: {
                 moment: require('moment'),
                 serializer:template.getSerializer(),
-                logger: new Logger(template.getSerializer())
+                logger: new Logger(template.getSerializer()),
+                utcOffset: validNow.utcOffset()
             }
         });
 
@@ -218,6 +226,7 @@ class Engine {
         vm.freeze(validContract, 'data'); // Second argument adds object to global.
         vm.freeze(validRequest, 'request'); // Second argument adds object to global.
         vm.freeze(validState, 'state'); // Second argument adds object to global.
+        vm.freeze(validNow, 'now'); // Second argument adds object to global.
 
         vm.freeze(factory, 'factory'); // Second argument adds object to global.
 
@@ -260,6 +269,12 @@ class Engine {
      * @private
      */
     async init(clause, request) {
+        let validNow;
+        if (request.timestamp) {
+            validNow = Moment.parseZone(request.timestamp);
+        } else {
+            validNow = Moment();
+        }
         const template = clause.getTemplate();
         // ensure the request is valid
         const validRequest = template.getSerializer().fromJSON(request, {validate: false, acceptResourcesForRelationships: true});
@@ -280,7 +295,8 @@ class Engine {
             sandbox: {
                 moment: require('moment'),
                 serializer:template.getSerializer(),
-                logger: new Logger(template.getSerializer())
+                logger: new Logger(template.getSerializer()),
+                utcOffset: validNow.utcOffset()
             }
         });
 
@@ -288,6 +304,7 @@ class Engine {
         vm.freeze(validContract, 'contractdata'); // Second argument adds object to global.
         vm.freeze(validContract, 'data'); // Second argument adds object to global.
         vm.freeze(validRequest, 'request'); // Second argument adds object to global.
+        vm.freeze(validNow, 'now'); // Second argument adds object to global.
 
         vm.freeze(factory, 'factory'); // Second argument adds object to global.
 
