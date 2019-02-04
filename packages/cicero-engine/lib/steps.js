@@ -63,7 +63,7 @@ function compare(expected,actual) {
  * Load a clause from directory
  *
  * @param {string} templateDir the directory for the template
- * @param {object} Promise to the new clause
+ * @return {object} Promise to the new clause
  */
 async function loadClause(templateDir) {
     const template = await Template.fromDirectory(templateDir);
