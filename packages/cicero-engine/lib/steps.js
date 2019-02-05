@@ -48,7 +48,14 @@ async function send(engine,template,clause,currentTime,stateJson,requestJson) {
  * @param {string} actual the result as returned by the engine
  */
 function compare(expected,actual) {
-    expect(expected).to.deep.include(actual);
+    // Some basic deep comparison for arrays, since Chai doesn't do the right thing
+    if (Array.isArray(actual)) {
+        for (let i = 0; i < expected.length; i++) {
+            expect(actual[i]).to.deep.include(expected[i]);
+        }
+    } else {
+        expect(actual).to.deep.include(expected);
+    }
 }
 
 /**
@@ -101,9 +108,9 @@ When('it receives the request', function (actualRequest) {
 Then('it should respond with', function (expectedResponse) {
     const response = JSON.parse(expectedResponse);
     if (this.answer) {
-        expect(actualAnswer).to.have.property('response');
-        expect(actualAnswer).to.not.have.property('error');
-        return compare(response,actualAnswer.response);
+        expect(this.answer).to.have.property('response');
+        expect(this.answer).to.not.have.property('error');
+        return compare(response,this.answer.response);
     } else {
         return send(this.engine,this.template,this.clause,this.currentTime,this.state,this.request)
             .then((actualAnswer) => {
@@ -115,7 +122,7 @@ Then('it should respond with', function (expectedResponse) {
     }
 });
 
-Then('the following obligations have( also) been emitted', function (expectedEmit) {
+Then('the following obligations should have( also) been emitted', function (expectedEmit) {
     const emit = JSON.parse(expectedEmit);
     if (this.answer) {
         expect(this.answer).to.have.property('emit');
