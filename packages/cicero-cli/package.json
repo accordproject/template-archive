@@ -36,12 +36,12 @@
   },
   "homepage": "https://github.com/accordproject/cicero#readme",
   "devDependencies": {
-    "chai": "3.5.0",
-    "chai-as-promised": "6.0.0",
+    "chai": "4.2.0",
+    "chai-as-promised": "7.1.1",
     "chai-things": "0.2.0",
     "eslint": "4.19.1",
     "license-check": "1.1.5",
-    "mocha": "5.1.1",
+    "mocha": "5.2.0",
     "nyc": "11.7.2",
     "tmp-promise": "1.0.4"
   },

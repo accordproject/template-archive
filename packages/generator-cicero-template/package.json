@@ -39,13 +39,13 @@
     "yeoman-generator"
   ],
   "devDependencies": {
-    "chai": "3.5.0",
-    "chai-as-promised": "6.0.0",
+    "chai": "4.2.0",
+    "chai-as-promised": "7.1.1",
     "chai-things": "0.2.0",
     "eslint": "4.19.1",
     "jsdoc": "3.5.5",
     "license-check": "1.1.5",
-    "mocha": "5.1.1",
+    "mocha": "5.2.0",
     "mocha-lcov-reporter": "1.3.0",
     "mockery": "2.0.0",
     "nyc": "11.7.2",
