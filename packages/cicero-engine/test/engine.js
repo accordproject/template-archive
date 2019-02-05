@@ -490,8 +490,7 @@ describe('EngineInstallmentSaleErgo', () => {
 
         it('should initialize a smart clause', async function () {
             const request = {};
-            request.$class = 'org.accordproject.installmentsale.InitializeRequest';
-            request.firstMonth = 1.0;
+            request.$class = 'org.accordproject.cicero.runtime.Request';
             const result = await engine.init(clause, request);
             result.should.not.be.null;
             result.response.should.not.be.null;
@@ -501,8 +500,7 @@ describe('EngineInstallmentSaleErgo', () => {
 
         it('should initialize a smart clause and execute one installment', async function () {
             const request = {};
-            request.$class = 'org.accordproject.installmentsale.InitializeRequest';
-            request.firstMonth = 1.0;
+            request.$class = 'org.accordproject.cicero.runtime.Request';
             const result = await engine.init(clause, request);
             result.should.not.be.null;
             result.response.should.not.be.null;
