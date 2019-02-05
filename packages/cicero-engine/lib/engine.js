@@ -185,17 +185,19 @@ class Engine {
      * @private
      */
     async execute(clause, request, state) {
+        const template = clause.getTemplate();
+        // ensure the request is valid
+        const validRequest = template.getSerializer().fromJSON(request, {validate: false, acceptResourcesForRelationships: true});
+        validRequest.$validator = new ResourceValidator({permitResourcesForRelationships: true});
+        validRequest.validate();
+
+        // Set the current time
         let validNow;
         if (request.timestamp) {
             validNow = Moment.parseZone(request.timestamp);
         } else {
             validNow = Moment();
         }
-        const template = clause.getTemplate();
-        // ensure the request is valid
-        const validRequest = template.getSerializer().fromJSON(request, {validate: false, acceptResourcesForRelationships: true});
-        validRequest.$validator = new ResourceValidator({permitResourcesForRelationships: true});
-        validRequest.validate();
 
         // ensure the state is valid
         const validState = template.getSerializer().fromJSON(state, {validate: false, acceptResourcesForRelationships: true});
@@ -269,17 +271,19 @@ class Engine {
      * @private
      */
     async init(clause, request) {
+        const template = clause.getTemplate();
+        // ensure the request is valid
+        const validRequest = template.getSerializer().fromJSON(request, {validate: false, acceptResourcesForRelationships: true});
+        validRequest.$validator = new ResourceValidator({permitResourcesForRelationships: true});
+        validRequest.validate();
+
+        // Set the current time
         let validNow;
         if (request.timestamp) {
             validNow = Moment.parseZone(request.timestamp);
         } else {
             validNow = Moment();
         }
-        const template = clause.getTemplate();
-        // ensure the request is valid
-        const validRequest = template.getSerializer().fromJSON(request, {validate: false, acceptResourcesForRelationships: true});
-        validRequest.$validator = new ResourceValidator({permitResourcesForRelationships: true});
-        validRequest.validate();
 
         logger.debug('Engine processing initialization request ' + request.$class);
 

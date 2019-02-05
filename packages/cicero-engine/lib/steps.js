@@ -30,14 +30,13 @@ const { Before, Given, When, Then } = require('cucumber');
  * Sends a request to the AP contract
  *
  * @param {object} engine the Cicero engine
- * @param {object} template the template
  * @param {object} clause the clause instance
  * @param {string} currentTime the definition of 'now'
  * @param {object} stateJson state data in JSON
  * @param {object} requestJson state data in JSON
  * @returns {object} Promise to the response
  */
-async function send(engine,template,clause,currentTime,stateJson,requestJson) {
+async function send(engine,clause,currentTime,stateJson,requestJson) {
     return engine.execute(clause,requestJson,stateJson);
 }
 
@@ -101,8 +100,26 @@ Given('that the contract says', async function (contractText) {
     this.clause.parse(contractText);
 });
 
+Given('the default( sample) contract', async function () {
+    if (!this.clause) {
+        const clause = await loadClause('.');
+        this.request = clause.getTemplate().getMetadata().getRequest();
+        this.clause = clause;
+    }
+    this.clause.parse(this.clause.getTemplate().getMetadata().getSample());
+});
+
 When('it receives the request', function (actualRequest) {
     this.request = JSON.parse(actualRequest);
+});
+
+When('it receives the default request', function () {
+    this.request = this.clause.getTemplate().getMetadata().getRequest();
+});
+
+Then('the contract data should be', async function (contractData) {
+    const expectedData = JSON.parse(contractData);
+    return compare(expectedData,this.clause.getData());
 });
 
 Then('it should respond with', function (expectedResponse) {
@@ -112,7 +129,7 @@ Then('it should respond with', function (expectedResponse) {
         expect(this.answer).to.not.have.property('error');
         return compare(response,this.answer.response);
     } else {
-        return send(this.engine,this.template,this.clause,this.currentTime,this.state,this.request)
+        return send(this.engine,this.clause,this.currentTime,this.state,this.request)
             .then((actualAnswer) => {
                 this.answer = actualAnswer;
                 expect(actualAnswer).to.have.property('response');
@@ -129,7 +146,7 @@ Then('the following obligations should have( also) been emitted', function (expe
         expect(this.answer).to.not.have.property('error');
         return compare(emit,this.answer.emit);
     } else {
-        return send(this.engine,this.template,this.clause,this.currentTime,this.state,this.request)
+        return send(this.engine,this.clause,this.currentTime,this.state,this.request)
             .then((actualAnswer) => {
                 this.answer = actualAnswer;
                 expect(actualAnswer).to.have.property('emit');
@@ -140,7 +157,7 @@ Then('the following obligations should have( also) been emitted', function (expe
 });
 
 Then('it should reject the request with the error {string}', function (expectedError) {
-    return send(this.engine,this.template,this.clause,this.currentTime,this.state,this.request)
+    return send(this.engine,this.clause,this.currentTime,this.state,this.request)
         .catch((actualError) => {
             expect(actualError.message).to.equal(expectedError);
         });
