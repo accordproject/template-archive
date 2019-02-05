@@ -16,7 +16,7 @@
     "postlint": "npm run licchk",
     "licchk": "license-check",
     "test:mocha": "mocha",
-    "test:cucumber": "cucumber-js test/features --require lib/steps.js --world-parameters '{\"rootdir\":\"./test\"}'",
+    "test:cucumber": "cucumber-js test/features --require lib/steps.js --world-parameters '{\"rootdir\":\"./test\"}' && cucumber-js test/data/helloemit/test --require lib/steps.js --world-parameters '{\"rootdir\":\"./test/data/helloemit\"}'",
     "test:all": "npm run test:mocha && npm run test:cucumber",
     "test:cov": "nyc npm run test:all",
     "test": "npm run test:all && npm run test:cov"

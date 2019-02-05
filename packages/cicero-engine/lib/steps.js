@@ -27,17 +27,36 @@ const Util = require('./util');
 const { Before, Given, When, Then } = require('cucumber');
 
 /**
- * Sends a request to the AP contract
+ * Initializes the contract
  *
  * @param {object} engine the Cicero engine
  * @param {object} clause the clause instance
  * @param {string} currentTime the definition of 'now'
- * @param {object} stateJson state data in JSON
- * @param {object} requestJson state data in JSON
+ * @param {object} request state data in JSON
  * @returns {object} Promise to the response
  */
-async function send(engine,clause,currentTime,stateJson,requestJson) {
-    return engine.execute(clause,requestJson,stateJson);
+async function init(engine,clause,currentTime,request) {
+    if (!request.timestamp) {
+        request.timestamp = currentTime;
+    }
+    return engine.init(clause,request);
+}
+
+/**
+ * Sends a request to the contract
+ *
+ * @param {object} engine the Cicero engine
+ * @param {object} clause the clause instance
+ * @param {string} currentTime the definition of 'now'
+ * @param {object} state state data in JSON
+ * @param {object} request state data in JSON
+ * @returns {object} Promise to the response
+ */
+async function send(engine,clause,currentTime,state,request) {
+    if (!request.timestamp) {
+        request.timestamp = currentTime;
+    }
+    return engine.execute(clause,request,state);
 }
 
 /**
@@ -69,7 +88,11 @@ async function loadClause(templateDir) {
 }
 
 // Defaults
-const defaultState = {'stateId':'1','$class':'org.accordproject.cicero.contract.AccordContractState'};
+const defaultState = {
+    '$class':'org.accordproject.cicero.contract.AccordContractState',
+    'stateId':'org.accordproject.cicero.contract.AccordContractState#1'
+};
+const initRequest = {'$class':'org.accordproject.cicero.runtime.Request'};
 
 Before(function () {
     this.engine = new Engine();
@@ -93,7 +116,8 @@ Given('the current time is {string}', function(currentTime) {
 
 Given('that the contract says', async function (contractText) {
     if (!this.clause) {
-        const clause = await loadClause('.');
+        const templateDir = Path.resolve(Util.resolveRootDir(this.parameters),'.');
+        const clause = await loadClause(templateDir);
         this.request = clause.getTemplate().getMetadata().getRequest();
         this.clause = clause;
     }
@@ -102,11 +126,20 @@ Given('that the contract says', async function (contractText) {
 
 Given('the default( sample) contract', async function () {
     if (!this.clause) {
-        const clause = await loadClause('.');
+        const templateDir = Path.resolve(Util.resolveRootDir(this.parameters),'.');
+        const clause = await loadClause(templateDir);
         this.request = clause.getTemplate().getMetadata().getRequest();
         this.clause = clause;
     }
     this.clause.parse(this.clause.getTemplate().getMetadata().getSample());
+});
+
+Given('the state', function (actualState) {
+    this.state = JSON.parse(actualState);
+});
+
+When('it is in the state', function (actualState) {
+    this.state = JSON.parse(actualState);
 });
 
 When('it receives the request', function (actualRequest) {
@@ -115,6 +148,26 @@ When('it receives the request', function (actualRequest) {
 
 When('it receives the default request', function () {
     this.request = this.clause.getTemplate().getMetadata().getRequest();
+});
+
+Then('the initial state( of the contract) should be', function (expectedState) {
+    const state = JSON.parse(expectedState);
+    return init(this.engine,this.clause,this.currentTime,initRequest)
+        .then((actualAnswer) => {
+            expect(actualAnswer).to.have.property('state');
+            expect(actualAnswer).to.not.have.property('error');
+            return compare(state,actualAnswer.state);
+        });
+});
+
+Then('the initial state( of the contract) should be the default state', function () {
+    const state = defaultState;
+    return init(this.engine,this.clause,this.currentTime,initRequest)
+        .then((actualAnswer) => {
+            expect(actualAnswer).to.have.property('state');
+            expect(actualAnswer).to.not.have.property('error');
+            return compare(state,actualAnswer.state);
+        });
 });
 
 Then('the contract data should be', async function (contractData) {
@@ -135,6 +188,23 @@ Then('it should respond with', function (expectedResponse) {
                 expect(actualAnswer).to.have.property('response');
                 expect(actualAnswer).to.not.have.property('error');
                 return compare(response,actualAnswer.response);
+            });
+    }
+});
+
+Then('the new state( of the contract) should be', function (expectedState) {
+    const state = JSON.parse(expectedState);
+    if (this.answer) {
+        expect(this.answer).to.have.property('state');
+        expect(this.answer).to.not.have.property('error');
+        return compare(state,this.answer.state);
+    } else {
+        return send(this.engine,this.clause,this.currentTime,this.state,this.request)
+            .then((actualAnswer) => {
+                this.answer = actualAnswer;
+                expect(actualAnswer).to.have.property('state');
+                expect(actualAnswer).to.not.have.property('error');
+                return compare(state,actualAnswer.state);
             });
     }
 });
