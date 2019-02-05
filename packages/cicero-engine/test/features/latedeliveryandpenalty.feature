@@ -8,8 +8,10 @@ Feature: Late delivery contract
 Late Delivery and Penalty. In case of delayed delivery except for Force Majeure cases, the Seller shall pay to the Buyer for every 2 days of delay penalty amounting to 10.5% of the total value of the Equipment whose delivery has been delayed. Any fractional part of a days is to be considered a full days. The total amount of penalty shall not however, exceed 55% of the total value of the Equipment involved in late delivery. If the delay is more than 15 days, the Buyer is entitled to terminate this Contract.
 """
 
+  Scenario: The contract should be in the default initial state
+    Then the initial state of the contract should be the default state
+
   Scenario: The contract should return the penalty amount but not allow the buyer to terminate
-    When the current time is "2019-01-11T16:34:00-05:00"
     When it receives the request
 """
 {
