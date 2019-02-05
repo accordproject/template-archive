@@ -5,8 +5,17 @@ Feature: HelloWorld+Emit contract
     Given the template in "data/helloemit"
     And that the contract says
 """
-Name of the person to greet: "Fred Blogs".
+Name of the person to greet: "John Doe".
 Thank you!
+"""
+
+  Scenario: The contract data should be set
+    Then the contract data should be
+"""
+{
+  "$class": "org.accordproject.helloemit.TemplateModel",
+  "name": "John Doe"
+}
 """
 
   Scenario: The contract should say hello
@@ -14,14 +23,14 @@ Thank you!
 """
 {
     "$class": "org.accordproject.helloemit.MyRequest",
-    "input": "World"
+    "input": "Le Monde"
 }
 """
     Then it should respond with
 """
 {
   "$class": "org.accordproject.helloemit.MyResponse",
-  "output": "Hello Fred Blogs (World)"
+  "output": "Hello John Doe (Le Monde)"
 }
 """
 
@@ -53,7 +62,7 @@ Thank you!
 """
 {
   "$class": "org.accordproject.helloemit.MyResponse",
-  "output": "Hello Fred Blogs (World)"
+  "output": "Hello John Doe (World)"
 }
 """
     And the following obligations should have been emitted
