@@ -1,0 +1,198 @@
+namespace org.accordproject.cicero.dom
+
+import org.accordproject.cicero.contract.AccordParty from https://models.accordproject.org/cicero/contract.cto
+
+/**
+ * Describes the structure of the natural language and automated clauses for 
+ * contract and clause templates. 
+ *
+ * Scoping
+ * =======
+ * 
+ * The @scope annotation is used to tag elements that can only be used in 
+ * clause templates, contract templates or used in both.
+ *
+ * Elements tagged with the ContractTemplate scope may appear in the DOM tree
+ * under a root ContractTemplate.
+ *
+ * Elements tagged with the ClauseTemplate scope may appear in the DOM tree
+ * under the root ClauseTemplate.
+ *
+ * Elements tagged with both ContractTemplate and ClauseTemplate may appear
+ in the DOM tree for either a ContractTemplate or ClauseTemplate.
+ */
+
+/**
+ * DOM metadata
+ */
+concept Metadata {
+  o String version default="1.0" // version of the DOM
+  o String locale default="en-US" // Default locale. IETF Language Tag specification (BCP 47)
+}
+
+/**
+ * An abstract base type
+ */
+abstract asset Element identified by id {
+  o String id
+}
+
+/**
+ * Root type for contract templates
+ */
+asset ContractTemplate extends Element {
+  o Metadata metadata
+  o Section content optional
+}
+
+/**
+ * Root type for clause templates
+ */
+@scope(ContractTemplate)
+asset ClauseTemplate extends Element {
+  o Metadata metadata
+  o Section content optional
+}
+
+/**
+ * A block of (unparameterized) natural language text in a template
+ */
+@scope(ContractTemplate, ClauseTemplate)
+asset Text extends Element {
+  o String content
+  o String locale optional // if not specified inherits the locale of the owning clause or contract
+}
+
+/**
+ * A parameter in a template. The parameter has a name and optionally a fully-qualified type name
+ * and a description. If the type name is present then the type MUST NOT be present in the template model
+ * for the contract or clause and will be dyanmically added. If the type is not present then the template
+ * model MUST HAVE a property with the name.
+ */
+@scope(ContractTemplate, ClauseTemplate)
+asset Parameter extends Element {
+  o String name // the name of the parameter
+  o String description optional
+  o String type optional // the type of the parameter if defined inline. If not specified the parameter must be in the template model.
+  o BooleanExpression constraint optional // An expression to constrain the parameter.
+}
+
+/**
+ * An element that must be one of a set of options.
+ */
+@scope(ContractTemplate, ClauseTemplate)
+asset Choice extends Element {
+ o Element[] options
+ o Boolean required
+}
+
+/**
+ * An element that must be included if a predicate is true
+ */
+@scope(ContractTemplate, ClauseTemplate)
+asset Conditional extends Element {
+ o Element element
+ o BooleanExpression predicate
+}
+
+/**
+ * A reference to a clause via a URI. The URI scheme is opaque to the specification
+ * but can include external clauses with URIs like ap://helloworld@0.2.1#8fd9219cf577fe121cdd05d7b0c340fbe0755dc8aec3c6ff818d3b4e5d5a863f
+ * or internal clauses with URIs like internal://MyContractSpecificClause
+ */
+@scope(ContractTemplate)
+abstract asset Clause extends Element {
+  o String templateUri
+}
+
+/**
+ * A concept that captures the description and reference to a signing party to the contract
+ */
+@scope(ContractTemplate)
+concept SigningParty {
+  o Text description
+  --> AccordParty party
+}
+
+/**
+ * A set of signing parties for a contract
+ */
+@scope(ContractTemplate)
+asset Signatures extends Element {
+  o SigningParty[] parties
+}
+
+/**
+ * A link to an element in the contract.
+ */
+@scope(ContractTemplate, ClauseTemplate)
+asset Link extends Element {
+  --> Element reference
+}
+
+/**
+ * A section of a contract or clause. A section has a heading
+ * and an optional set of child elements. A section can optionally include
+ * a page break.
+ */
+@scope(ContractTemplate, ClauseTemplate)
+asset Section extends Element {
+  o Text heading
+  o Element[] children optional
+  o Boolean pageBreak default=false
+}
+
+/**
+ * List styles to support both ordered (numbered) lists, unordered (bullet) lists
+ * and lists displayed on a single line
+ */
+enum ListStyle {
+  o ORDERED     // numbers
+  o UNORDERED   // bullets
+  o SINGLE_LINE // a separated list on a single line
+}
+
+/** 
+ * A list is a section that numbers or bullets its child elements
+ */
+@scope(ContractTemplate, ClauseTemplate)
+asset List extends Section {
+  o ListStyle style
+  o String separator optional
+}
+
+/**
+ * Logic can be inlined in contracts or clauses
+ */
+abstract asset Script extends Element {
+    o String language default="ERGO"
+    o String version
+    o String code
+}
+
+/**
+ * Logic declarations (constants, functions) can be included in a contract to perform basic calculations
+ */
+@scope(ContractTemplate)
+asset Declarations extends Script {
+}
+
+/**
+ * Expressions can be included to construct part of the output contract or check constraints on parameters
+ */
+abstract asset Expression extends Script {
+}
+
+
+/**
+ * An expression to that returns an element
+ */
+@scope(ContractTemplate, ClauseTemplate)
+asset ElementExpression extends Expression{
+}
+
+/**
+ * An expression that returns true or false
+ */
+asset BooleanExpression extends Expression{
+}
