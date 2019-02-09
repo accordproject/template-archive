@@ -18,7 +18,7 @@ const logger = require('@accordproject/cicero-core').logger;
 const Template = require('@accordproject/cicero-core').Template;
 const Clause = require('@accordproject/cicero-core').Clause;
 const Engine = require('@accordproject/cicero-engine').Engine;
-const CodeGen = require('composer-concerto-tools').CodeGen;
+const CodeGen = require('@accordproject/cicero-tools').CodeGen;
 const FileWriter = CodeGen.FileWriter;
 const fs = require('fs');
 const path = require('path');
@@ -33,7 +33,7 @@ const uuidv4 = require('uuid/v4');
 /**
  * Utility class that implements the commands exposed by the Cicero CLI.
  * @class
- * @memberof module:composer-cli
+ * @memberof module:cicero-cli
  */
 class Commands {
 
