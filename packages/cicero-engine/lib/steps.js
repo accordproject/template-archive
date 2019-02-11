@@ -36,9 +36,6 @@ const { Before, Given, When, Then } = require('cucumber');
  * @returns {object} Promise to the response
  */
 async function init(engine,clause,request,currentTime) {
-    if (!request.timestamp) {
-        request.timestamp = currentTime;
-    }
     return engine.init(clause,request,currentTime);
 }
 
@@ -53,9 +50,6 @@ async function init(engine,clause,request,currentTime) {
  * @returns {object} Promise to the response
  */
 async function send(engine,clause,request,state,currentTime) {
-    if (!request.timestamp) {
-        request.timestamp = currentTime;
-    }
     return engine.execute(clause,request,state,currentTime);
 }
 

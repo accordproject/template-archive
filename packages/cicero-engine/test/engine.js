@@ -23,6 +23,7 @@ const chai = require('chai');
 
 chai.should();
 chai.use(require('chai-things'));
+chai.use(require('chai-as-promised'));
 
 const fs = require('fs');
 const path = require('path');
@@ -65,7 +66,36 @@ describe('EngineLatePenalty', () => {
             result.response.buyerMayTerminate.should.equal(true);
         });
 
-        it('should execute a late delivery and penalty smart clause (with a Period)', async function () {
+        it('should execute a late delivery and penalty smart clause in the ET timezone', async function () {
+            const request = {};
+            request.$class = 'io.clause.latedeliveryandpenalty.LateDeliveryAndPenaltyRequest';
+            request.forceMajeure = false;
+            request.agreedDelivery = '2017-11-10T16:38:01-05:00';
+            request.goodsValue = 200.00;
+            request.transactionId = '402c8f50-9e61-433e-a7c1-afe61c06ef00';
+            const state = {};
+            state.$class = 'org.accordproject.cicero.contract.AccordContractState';
+            state.stateId = '1';
+            const result = await engine.execute(clause, request, state, '2017-11-12T17:38:01-05:00');
+            result.should.not.be.null;
+            result.response.penalty.should.equal(21);
+            result.response.buyerMayTerminate.should.equal(false);
+        });
+
+        it('should fail to execute if the current time is not in the right format', async function () {
+            const request = {};
+            request.$class = 'io.clause.latedeliveryandpenalty.LateDeliveryAndPenaltyRequest';
+            request.forceMajeure = false;
+            request.agreedDelivery = '2017-11-10T16:38:01-05:00';
+            request.goodsValue = 200.00;
+            request.transactionId = '402c8f50-9e61-433e-a7c1-afe61c06ef00';
+            const state = {};
+            state.$class = 'org.accordproject.cicero.contract.AccordContractState';
+            state.stateId = '1';
+            return engine.execute(clause, request, state, '2017-11-12').should.be.rejectedWith('2017-11-12 is not a valid moment with the format \'YYYY-MM-DDTHH:mm:ssZ\'');
+        });
+
+        it('should execute a late delivery and penalty smart clause with a time period', async function () {
             const request = {};
             request.$class = 'org.accordproject.simplelatedeliveryandpenalty.SimpleLateDeliveryAndPenaltyRequest';
             request.agreedDelivery = '2017-10-07T16:38:01Z';
