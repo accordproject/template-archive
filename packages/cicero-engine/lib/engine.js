@@ -181,23 +181,20 @@ class Engine {
      * using the Composer serializer.
      * @param {object} state  - the contract state, a JS object that can be deserialized
      * using the Composer serializer.
+     * @param {string} currentTime - the definition of 'now'
      * @return {Promise} a promise that resolves to a result for the clause
      * @private
      */
-    async execute(clause, request, state) {
+    async execute(clause, request, state, currentTime) {
         const template = clause.getTemplate();
         // ensure the request is valid
         const validRequest = template.getSerializer().fromJSON(request, {validate: false, acceptResourcesForRelationships: true});
         validRequest.$validator = new ResourceValidator({permitResourcesForRelationships: true});
         validRequest.validate();
 
-        // Set the current time
-        let validNow;
-        if (request.timestamp) {
-            validNow = Moment.parseZone(request.timestamp);
-        } else {
-            validNow = Moment();
-        }
+        // Set the current time and UTC Offset
+        const validNow = Engine.initCurrentTime(currentTime);
+        const validUtcOffset = validNow.utcOffset();
 
         // ensure the state is valid
         const validState = template.getSerializer().fromJSON(state, {validate: false, acceptResourcesForRelationships: true});
@@ -219,7 +216,7 @@ class Engine {
                 moment: require('moment'),
                 serializer:template.getSerializer(),
                 logger: new Logger(template.getSerializer()),
-                utcOffset: validNow.utcOffset()
+                utcOffset: validUtcOffset
             }
         });
 
@@ -267,23 +264,20 @@ class Engine {
      * @param {Clause} clause  - the clause to execute
      * @param {object} request  - the request, a JS object that can be deserialized
      * using the Composer serializer.
+     * @param {string} currentTime - the definition of 'now'
      * @return {Promise} a promise that resolves to a result for the clause initialization
      * @private
      */
-    async init(clause, request) {
+    async init(clause, request, currentTime) {
         const template = clause.getTemplate();
         // ensure the request is valid
         const validRequest = template.getSerializer().fromJSON(request, {validate: false, acceptResourcesForRelationships: true});
         validRequest.$validator = new ResourceValidator({permitResourcesForRelationships: true});
         validRequest.validate();
 
-        // Set the current time
-        let validNow;
-        if (request.timestamp) {
-            validNow = Moment.parseZone(request.timestamp);
-        } else {
-            validNow = Moment();
-        }
+        // Set the current time and UTC Offset
+        const validNow = Engine.initCurrentTime(currentTime);
+        const validUtcOffset = validNow.utcOffset();
 
         logger.debug('Engine processing initialization request ' + request.$class);
 
@@ -300,7 +294,7 @@ class Engine {
                 moment: require('moment'),
                 serializer:template.getSerializer(),
                 logger: new Logger(template.getSerializer()),
-                utcOffset: validNow.utcOffset()
+                utcOffset: validUtcOffset
             }
         });
 
@@ -341,6 +335,26 @@ class Engine {
             'emit': emitResult,
         };
     }
+
+    /**
+     * Ensures there is a proper current time
+     *
+     * @param {string} currentTime - the definition of 'now'
+     * @returns {object} if valid, the moment object for the current time
+     */
+    static initCurrentTime(currentTime) {
+        if (!currentTime) {
+            // Defaults to current local time
+            return Moment();
+        }
+        const now = Moment.parseZone(currentTime, 'YYYY-MM-DDTHH:mm:ssZ', true);
+        if (now.isValid()) {
+            return now;
+        } else {
+            throw new Error(`${currentTime} is not a valid moment in format 'YYYY-MM-DDTHH:mm:ssZ'`);
+        }
+    }
+
 }
 
 module.exports = Engine;
