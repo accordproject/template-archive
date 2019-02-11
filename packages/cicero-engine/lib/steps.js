@@ -29,34 +29,34 @@ const { Before, Given, When, Then } = require('cucumber');
 /**
  * Initializes the contract
  *
- * @param {object} engine the Cicero engine
- * @param {object} clause the clause instance
- * @param {string} currentTime the definition of 'now'
- * @param {object} request state data in JSON
+ * @param {object} engine - the Cicero engine
+ * @param {object} clause - the clause instance
+ * @param {object} request - the request data in JSON
+ * @param {string} currentTime - the definition of 'now'
  * @returns {object} Promise to the response
  */
-async function init(engine,clause,currentTime,request) {
+async function init(engine,clause,request,currentTime) {
     if (!request.timestamp) {
         request.timestamp = currentTime;
     }
-    return engine.init(clause,request);
+    return engine.init(clause,request,currentTime);
 }
 
 /**
  * Sends a request to the contract
  *
- * @param {object} engine the Cicero engine
- * @param {object} clause the clause instance
- * @param {string} currentTime the definition of 'now'
- * @param {object} state state data in JSON
- * @param {object} request state data in JSON
+ * @param {object} engine - the Cicero engine
+ * @param {object} clause - the clause instance
+ * @param {object} request - the request data in JSON
+ * @param {object} state - the state data in JSON
+ * @param {string} currentTime - the definition of 'now'
  * @returns {object} Promise to the response
  */
-async function send(engine,clause,currentTime,state,request) {
+async function send(engine,clause,request,state,currentTime) {
     if (!request.timestamp) {
         request.timestamp = currentTime;
     }
-    return engine.execute(clause,request,state);
+    return engine.execute(clause,request,state,currentTime);
 }
 
 /**
@@ -152,7 +152,7 @@ When('it receives the default request', function () {
 
 Then('the initial state( of the contract) should be', function (expectedState) {
     const state = JSON.parse(expectedState);
-    return init(this.engine,this.clause,this.currentTime,initRequest)
+    return init(this.engine,this.clause,initRequest,this.currentTime)
         .then((actualAnswer) => {
             expect(actualAnswer).to.have.property('state');
             expect(actualAnswer).to.not.have.property('error');
@@ -162,7 +162,7 @@ Then('the initial state( of the contract) should be', function (expectedState) {
 
 Then('the initial state( of the contract) should be the default state', function () {
     const state = defaultState;
-    return init(this.engine,this.clause,this.currentTime,initRequest)
+    return init(this.engine,this.clause,initRequest,this.currentTime)
         .then((actualAnswer) => {
             expect(actualAnswer).to.have.property('state');
             expect(actualAnswer).to.not.have.property('error');
@@ -182,7 +182,7 @@ Then('it should respond with', function (expectedResponse) {
         expect(this.answer).to.not.have.property('error');
         return compare(response,this.answer.response);
     } else {
-        return send(this.engine,this.clause,this.currentTime,this.state,this.request)
+        return send(this.engine,this.clause,this.request,this.state,this.currentTime)
             .then((actualAnswer) => {
                 this.answer = actualAnswer;
                 expect(actualAnswer).to.have.property('response');
@@ -199,7 +199,7 @@ Then('the new state( of the contract) should be', function (expectedState) {
         expect(this.answer).to.not.have.property('error');
         return compare(state,this.answer.state);
     } else {
-        return send(this.engine,this.clause,this.currentTime,this.state,this.request)
+        return send(this.engine,this.clause,this.request,this.state,this.currentTime)
             .then((actualAnswer) => {
                 this.answer = actualAnswer;
                 expect(actualAnswer).to.have.property('state');
@@ -216,7 +216,7 @@ Then('the following obligations should have( also) been emitted', function (expe
         expect(this.answer).to.not.have.property('error');
         return compare(emit,this.answer.emit);
     } else {
-        return send(this.engine,this.clause,this.currentTime,this.state,this.request)
+        return send(this.engine,this.clause,this.request,this.state,this.currentTime)
             .then((actualAnswer) => {
                 this.answer = actualAnswer;
                 expect(actualAnswer).to.have.property('emit');
@@ -227,7 +227,7 @@ Then('the following obligations should have( also) been emitted', function (expe
 });
 
 Then('it should reject the request with the error {string}', function (expectedError) {
-    return send(this.engine,this.clause,this.currentTime,this.state,this.request)
+    return send(this.engine,this.clause,this.request,this.state,this.currentTime)
         .catch((actualError) => {
             expect(actualError.message).to.equal(expectedError);
         });
