@@ -351,7 +351,7 @@ class Engine {
         if (now.isValid()) {
             return now;
         } else {
-            throw new Error(`${currentTime} is not a valid moment in format 'YYYY-MM-DDTHH:mm:ssZ'`);
+            throw new Error(`${currentTime} is not a valid moment with the format 'YYYY-MM-DDTHH:mm:ssZ'`);
         }
     }
 
