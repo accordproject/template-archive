@@ -53,14 +53,13 @@ describe('EngineLatePenalty', () => {
             const request = {};
             request.$class = 'io.clause.latedeliveryandpenalty.LateDeliveryAndPenaltyRequest';
             request.forceMajeure = false;
-            request.agreedDelivery = '2017-10-07T16:38:01.412Z';
+            request.agreedDelivery = '2017-10-07T16:38:01Z';
             request.goodsValue = 200.00;
             request.transactionId = '402c8f50-9e61-433e-a7c1-afe61c06ef00';
-            request.timestamp = '2017-11-12T17:38:01.412Z';
             const state = {};
             state.$class = 'org.accordproject.cicero.contract.AccordContractState';
             state.stateId = '1';
-            const result = await engine.execute(clause, request, state);
+            const result = await engine.execute(clause, request, state, '2017-11-12T17:38:01Z');
             result.should.not.be.null;
             result.response.penalty.should.equal(110);
             result.response.buyerMayTerminate.should.equal(true);
@@ -69,14 +68,13 @@ describe('EngineLatePenalty', () => {
         it('should execute a late delivery and penalty smart clause (with a Period)', async function () {
             const request = {};
             request.$class = 'org.accordproject.simplelatedeliveryandpenalty.SimpleLateDeliveryAndPenaltyRequest';
-            request.agreedDelivery = '2017-10-07T16:38:01.412Z';
+            request.agreedDelivery = '2017-10-07T16:38:01Z';
             request.goodsValue = 200.00;
             request.transactionId = '402c8f50-9e61-433e-a7c1-afe61c06ef00';
-            request.timestamp = '2019-11-12T17:38:01.412Z';
             const state = {};
             state.$class = 'org.accordproject.cicero.contract.AccordContractState';
             state.stateId = '1';
-            const result = await engine.execute(clause2, request, state);
+            const result = await engine.execute(clause2, request, state, '2019-11-12T17:38:01Z');
             result.should.not.be.null;
             result.response.penalty.should.equal(87.5);
             result.response.buyerMayTerminate.should.equal(true);
@@ -281,8 +279,7 @@ describe('EngineHelloEmitInit', () => {
         it('should execute a smart clause which emits during initialization', async function () {
             const request = {
                 '$class': 'org.accordproject.helloemit.MyInitRequest',
-                'input': 'Accord Project',
-                'timestamp': '2017-11-12T17:38:01.412Z'
+                'input': 'Accord Project'
             };
             const result = await engine.init(clause, request);
             result.should.not.be.null;
