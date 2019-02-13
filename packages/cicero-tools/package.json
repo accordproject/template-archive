@@ -52,7 +52,7 @@
   },
   "dependencies": {
     "composer-concerto": "0.60.0",
-    "composer-concerto-tools": "^0.50.6",
+    "composer-concerto-tools": "^0.50.7",
     "uuid": "3.2.1",
     "yargs": "9.0.1"
   },
