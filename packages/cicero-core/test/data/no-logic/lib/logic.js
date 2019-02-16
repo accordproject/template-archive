@@ -4,13 +4,6 @@
 /*eslint-disable no-undef*/
 /*eslint-disable no-var*/
 
-/**
- * Execute the smart clause
- * @param {Context} context - the Accord context
- * @param {io.clause.latedeliveryandpenalty.LateDeliveryAndPenaltyRequest} context.request - the incoming request
- * @param {io.clause.latedeliveryandpenalty.LateDeliveryAndPenaltyResponse} context.response - the response
- * @param {Event} context.emit - the emitted events
- */
 function execute(context) {
 
     logger.info(context);
