@@ -10,7 +10,6 @@
  * @param {io.clause.latedeliveryandpenalty.LateDeliveryAndPenaltyRequest} context.request - the incoming request
  * @param {io.clause.latedeliveryandpenalty.LateDeliveryAndPenaltyResponse} context.response - the response
  * @param {Event} context.emit - the emitted events
- * @AccordClauseLogic
  */
 function execute(context) {
 

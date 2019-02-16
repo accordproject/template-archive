@@ -236,11 +236,7 @@ class ScriptManager {
                 return ele.getFunctionDeclarations();
             }).reduce((flat, next) => {
                 return flat.concat(next);
-            },[]).filter((ele) => {
-                return ele.getDecorators().indexOf('AccordClauseLogic') >= 0 || ele.getDecorators().indexOf('AccordClauseLogicInit') >= 0;
-            }).map((ele) => {
-                return ele;
-            });
+            },[]);
         return functionDeclarations;
     }
 }

@@ -8,15 +8,15 @@
 /**
  * Execute the smart clause
  * @param {Context} context - the Accord context
- * @param {org.accordproject.volumediscount.VolumeDiscountRequest} context.request - the incoming request
- * @param {org.accordproject.volumediscount.VolumeDiscountResponse} context.response - the response
+ * @param {org.accordproject.saft.Launch} context.request - the incoming request
+ * @param {org.accordproject.saft.Payout} context.response - the response
  * @param {org.accordproject.base.Event} context.emit - the emitted events
  * @param {org.accordproject.cicero.contract.AccordContractState} context.state - the state
  */
-function orgXaccordprojectXvolumediscountXVolumeDiscount_volumediscount(context) {
+function orgXaccordprojectXsaftXSaft_onLaunch(context) {
   let pcontext = { 'request' : serializer.toJSON(context.request,{permitResourcesForRelationships:true}), 'state': serializer.toJSON(context.state,{permitResourcesForRelationships:true}), 'contract': serializer.toJSON(context.contract,{permitResourcesForRelationships:true}), 'emit': context.emit, 'now': context.now};
   //logger.info('ergo context: '+JSON.stringify(pcontext))
-  let result = new orgXaccordprojectXvolumediscountXVolumeDiscount().volumediscount(pcontext);
+  let result = new orgXaccordprojectXsaftXSaft().onLaunch(pcontext);
   if (result.hasOwnProperty('left')) {
     //logger.info('ergo result: '+JSON.stringify(result))
     context.response = result.left.response ?
@@ -33,7 +33,36 @@ function orgXaccordprojectXvolumediscountXVolumeDiscount_volumediscount(context)
     throw new Error(result.right.message);
   }
 }
-class orgXaccordprojectXvolumediscountXVolumeDiscount {
+
+/**
+ * Execute the smart clause
+ * @param {Context} context - the Accord context
+ * @param {org.accordproject.saft.Terminate} context.request - the incoming request
+ * @param {org.accordproject.saft.Payout} context.response - the response
+ * @param {org.accordproject.base.Event} context.emit - the emitted events
+ * @param {org.accordproject.cicero.contract.AccordContractState} context.state - the state
+ */
+function orgXaccordprojectXsaftXSaft_onTerminate(context) {
+  let pcontext = { 'request' : serializer.toJSON(context.request,{permitResourcesForRelationships:true}), 'state': serializer.toJSON(context.state,{permitResourcesForRelationships:true}), 'contract': serializer.toJSON(context.contract,{permitResourcesForRelationships:true}), 'emit': context.emit, 'now': context.now};
+  //logger.info('ergo context: '+JSON.stringify(pcontext))
+  let result = new orgXaccordprojectXsaftXSaft().onTerminate(pcontext);
+  if (result.hasOwnProperty('left')) {
+    //logger.info('ergo result: '+JSON.stringify(result))
+    context.response = result.left.response ?
+         serializer.fromJSON(result.left.response, {validate: false, acceptResourcesForRelationships: true},{permitResourcesForRelationships:true})
+       : serializer.fromJSON({ '$class': 'org.accordproject.cicero.runtime.Response' });
+    context.state = serializer.fromJSON(result.left.state, {validate: false, acceptResourcesForRelationships: true});
+    let emitResult = [];
+    for (let i = 0; i < result.left.emit.length; i++) {
+      emitResult.push(serializer.fromJSON(result.left.emit[i], {validate: false, acceptResourcesForRelationships: true}));
+    }
+    context.emit = emitResult;
+    return context;
+  } else {
+    throw new Error(result.right.message);
+  }
+}
+class orgXaccordprojectXsaftXSaft {
   main(context) {
     var vcontract = deref(context, "contract");
     var vnow = deref(context, "now");
@@ -44,13 +73,13 @@ class orgXaccordprojectXvolumediscountXVolumeDiscount {
     var vlemit_0 = vemit;
     var vX$match0 = vrequest;
     var res1 = null;
-    if (either(cast(["org.accordproject.volumediscount.VolumeDiscountRequest"],vX$match0))) {
+    if (either(cast(["org.accordproject.saft.Terminate"],vX$match0))) {
       var vX$case0 = null;
-      vX$case0 = toLeft(cast(["org.accordproject.volumediscount.VolumeDiscountRequest"],vX$match0));
+      vX$case0 = toLeft(cast(["org.accordproject.saft.Terminate"],vX$match0));
       res1 = {"left" : {"$main": vX$case0}};
     } else {
       var vX$case1 = null;
-      vX$case1 = toRight(cast(["org.accordproject.volumediscount.VolumeDiscountRequest"],vX$match0));
+      vX$case1 = toRight(cast(["org.accordproject.saft.Terminate"],vX$match0));
       res1 = {"right" : null};
     }
     var res4 = null;
@@ -66,23 +95,40 @@ class orgXaccordprojectXvolumediscountXVolumeDiscount {
       var vrequest_0 = vX$main;
       var vlstate = vstate;
       var vlemit = vemit;
-      var t3;
-      if ((deref(unbrand(vrequest), "netAnnualChargeVolume") < deref(unbrand(vcontract), "firstVolume"))) {
-        t3 = {"left" : concat(concat({"response": brand(["org.accordproject.volumediscount.VolumeDiscountResponse"],{"discountRate": deref(unbrand(vcontract), "firstRate")})}, {"state": vlstate}), {"emit": vlemit})};
-      } else {
-        var t2;
-        if ((deref(unbrand(vrequest), "netAnnualChargeVolume") < deref(unbrand(vcontract), "secondVolume"))) {
-          t2 = {"left" : concat(concat({"response": brand(["org.accordproject.volumediscount.VolumeDiscountResponse"],{"discountRate": deref(unbrand(vcontract), "secondRate")})}, {"state": vlstate}), {"emit": vlemit})};
-        } else {
-          t2 = {"left" : concat(concat({"response": brand(["org.accordproject.volumediscount.VolumeDiscountResponse"],{"discountRate": deref(unbrand(vcontract), "thirdRate")})}, {"state": vlstate}), {"emit": vlemit})};
-        }
-        t3 = t2;
-      }
-      res4 = t3;
+      res4 = {"left" : concat(concat({"response": brand(["org.accordproject.saft.Payout"],concat({"tokenAmount": brand(["org.accordproject.money.MonetaryAmount"],concat({"doubleValue": 9}, {"currencyCode": "USD"}))}, {"tokenAddress": deref(unbrand(vcontract), "purchaser")}))}, {"state": vlstate}), {"emit": vlemit})};
     } else {
-      var vX$1 = null;
-      vX$1 = toRight(res1);
-      res4 = {"right" : {"type": ["org.accordproject.ergo.stdlib.ErgoErrorResponse"], "data": {"message": "DefaultMatch Error at 17:0-26:1 ''"}}};
+      var vX$case1_0 = null;
+      vX$case1_0 = toRight(res1);
+      var res2 = null;
+      if (either(cast(["org.accordproject.saft.Launch"],vX$match0))) {
+        var vX$1 = null;
+        vX$1 = toLeft(cast(["org.accordproject.saft.Launch"],vX$match0));
+        res2 = {"left" : {"$main": vX$1}};
+      } else {
+        var vX$2 = null;
+        vX$2 = toRight(cast(["org.accordproject.saft.Launch"],vX$match0));
+        res2 = {"right" : null};
+      }
+      var res3 = null;
+      if (either(res2)) {
+        var vX$3 = null;
+        vX$3 = toLeft(res2);
+        var vX$4 = vX$3;
+        var vX$5 = deref(vX$4, "$main");
+        var vnow_0$0 = vnow;
+        var vcontract_0$0 = vcontract;
+        var vstate_0$0 = vlstate_0;
+        var vemit_0$0 = vlemit_0;
+        var vrequest_0$0 = vX$5;
+        var vlstate$0 = vstate;
+        var vlemit$0 = vemit;
+        res3 = {"left" : concat(concat({"response": brand(["org.accordproject.saft.Payout"],concat({"tokenAmount": brand(["org.accordproject.money.MonetaryAmount"],concat({"doubleValue": 100}, {"currencyCode": "USD"}))}, {"tokenAddress": deref(unbrand(vcontract), "purchaser")}))}, {"state": vlstate$0}), {"emit": vlemit$0})};
+      } else {
+        var vX$6 = null;
+        vX$6 = toRight(res2);
+        res3 = {"right" : {"type": ["org.accordproject.ergo.stdlib.ErgoErrorResponse"], "data": {"message": "DefaultMatch Error at 19:0-33:1 ''"}}};
+      }
+      res4 = res3;
     }
     return res4;
   }
@@ -94,33 +140,28 @@ class orgXaccordprojectXvolumediscountXVolumeDiscount {
     var vlstate = brand(["org.accordproject.cicero.contract.AccordContractState"],{"stateId": "org.accordproject.cicero.contract.AccordContractState#1"});
     return {"left" : concat(concat({"response": null}, {"state": vlstate}), {"emit": vlemit})};
   }
-  volumediscount(context) {
+  onTerminate(context) {
     var vcontract = deref(context, "contract");
-    var vrequest = deref(context, "request");
     var vemit = deref(context, "emit");
     var vstate = deref(context, "state");
     var vlstate = vstate;
     var vlemit = vemit;
-    var t2;
-    if ((deref(unbrand(vrequest), "netAnnualChargeVolume") < deref(unbrand(vcontract), "firstVolume"))) {
-      t2 = {"left" : concat(concat({"response": brand(["org.accordproject.volumediscount.VolumeDiscountResponse"],{"discountRate": deref(unbrand(vcontract), "firstRate")})}, {"state": vlstate}), {"emit": vlemit})};
-    } else {
-      var t1;
-      if ((deref(unbrand(vrequest), "netAnnualChargeVolume") < deref(unbrand(vcontract), "secondVolume"))) {
-        t1 = {"left" : concat(concat({"response": brand(["org.accordproject.volumediscount.VolumeDiscountResponse"],{"discountRate": deref(unbrand(vcontract), "secondRate")})}, {"state": vlstate}), {"emit": vlemit})};
-      } else {
-        t1 = {"left" : concat(concat({"response": brand(["org.accordproject.volumediscount.VolumeDiscountResponse"],{"discountRate": deref(unbrand(vcontract), "thirdRate")})}, {"state": vlstate}), {"emit": vlemit})};
-      }
-      t2 = t1;
-    }
-    return t2;
+    return {"left" : concat(concat({"response": brand(["org.accordproject.saft.Payout"],concat({"tokenAmount": brand(["org.accordproject.money.MonetaryAmount"],concat({"doubleValue": 9}, {"currencyCode": "USD"}))}, {"tokenAddress": deref(unbrand(vcontract), "purchaser")}))}, {"state": vlstate}), {"emit": vlemit})};
+  }
+  onLaunch(context) {
+    var vcontract = deref(context, "contract");
+    var vemit = deref(context, "emit");
+    var vstate = deref(context, "state");
+    var vlstate = vstate;
+    var vlemit = vemit;
+    return {"left" : concat(concat({"response": brand(["org.accordproject.saft.Payout"],concat({"tokenAmount": brand(["org.accordproject.money.MonetaryAmount"],concat({"doubleValue": 100}, {"currencyCode": "USD"}))}, {"tokenAddress": deref(unbrand(vcontract), "purchaser")}))}, {"state": vlstate}), {"emit": vlemit})};
   }
 }
-const contract = new orgXaccordprojectXvolumediscountXVolumeDiscount();
+const contract = new orgXaccordprojectXsaftXSaft();
 function __dispatch(context) {
   let pcontext = { 'request' : serializer.toJSON(context.request,{permitResourcesForRelationships:true}), 'state': serializer.toJSON(context.state,{permitResourcesForRelationships:true}), 'contract': serializer.toJSON(context.contract,{permitResourcesForRelationships:true}), 'emit': context.emit, 'now': context.now};
   //logger.info('ergo context: '+JSON.stringify(pcontext))
-  let result = new orgXaccordprojectXvolumediscountXVolumeDiscount().main(pcontext);
+  let result = new orgXaccordprojectXsaftXSaft().main(pcontext);
   if (result.hasOwnProperty('left')) {
     //logger.info('ergo result: '+JSON.stringify(result))
     context.response = result.left.response ?
@@ -140,7 +181,7 @@ function __dispatch(context) {
 function __init(context) {
   let pcontext = { 'request' : serializer.toJSON(context.request,{permitResourcesForRelationships:true}), 'state': { '$class': 'org.accordproject.cicero.contract.AccordContractState', 'stateId' : 'org.accordproject.cicero.contract.AccordContractState#1' }, 'contract': serializer.toJSON(context.contract,{permitResourcesForRelationships:true}), 'emit': context.emit, 'now': context.now};
   //logger.info('ergo context: '+JSON.stringify(pcontext))
-  let result = new orgXaccordprojectXvolumediscountXVolumeDiscount().init(pcontext);
+  let result = new orgXaccordprojectXsaftXSaft().init(pcontext);
   if (result.hasOwnProperty('left')) {
     //logger.info('ergo result: '+JSON.stringify(result))
     context.response = result.left.response ?

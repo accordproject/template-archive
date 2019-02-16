@@ -52,7 +52,7 @@ describe('EngineLatePenalty', () => {
 
         it('should execute a late delivery and penalty smart clause', async function () {
             const request = {};
-            request.$class = 'io.clause.latedeliveryandpenalty.LateDeliveryAndPenaltyRequest';
+            request.$class = 'org.accordproject.latedeliveryandpenalty.LateDeliveryAndPenaltyRequest';
             request.forceMajeure = false;
             request.agreedDelivery = '2017-10-07T16:38:01Z';
             request.goodsValue = 200.00;
@@ -68,7 +68,7 @@ describe('EngineLatePenalty', () => {
 
         it('should execute a late delivery and penalty smart clause in the ET timezone', async function () {
             const request = {};
-            request.$class = 'io.clause.latedeliveryandpenalty.LateDeliveryAndPenaltyRequest';
+            request.$class = 'org.accordproject.latedeliveryandpenalty.LateDeliveryAndPenaltyRequest';
             request.forceMajeure = false;
             request.agreedDelivery = '2017-11-10T16:38:01-05:00';
             request.goodsValue = 200.00;
@@ -84,7 +84,7 @@ describe('EngineLatePenalty', () => {
 
         it('should fail to execute if the current time is not in the right format', async function () {
             const request = {};
-            request.$class = 'io.clause.latedeliveryandpenalty.LateDeliveryAndPenaltyRequest';
+            request.$class = 'org.accordproject.latedeliveryandpenalty.LateDeliveryAndPenaltyRequest';
             request.forceMajeure = false;
             request.agreedDelivery = '2017-11-10T16:38:01-05:00';
             request.goodsValue = 200.00;
@@ -346,7 +346,7 @@ describe('EngineSaft', () => {
             state.stateId = '1';
             const result = await engine.execute(clause, request, state);
             result.should.not.be.null;
-            result.response.tokenAmount.should.equal(100);
+            result.response.tokenAmount.doubleValue.should.equal(100);
             result.response.tokenAddress.should.equal('Daniel Charles Selman');
         });
     });
@@ -365,8 +365,11 @@ describe('BogusClauses', () => {
 
     afterEach(() => {});
 
-    it('should throw error when no annotation in JavaScript logic', async () => {
-        return (() => engine.buildDispatchFunction(clause)).should.throw('Did not find any function declarations with the @AccordClauseLogic annotation');
+    it('should throw error when no __dispatch in JavaScript logic', async () => {
+        return (() => engine.buildDispatchFunction(clause)).should.throw('Function __dispatch was not found in logic');
+    });
+    it('should throw error when no __init in JavaScript logic', async () => {
+        return (() => engine.buildInitFunction(clause)).should.throw('Function __init was not found in logic');
     });
     it('should throw an error when JavaScript logic is missing', async function() {
         // Turn all JavaScript logic into something else
@@ -420,24 +423,24 @@ describe('EngineInstallmentSaleJs', () => {
 
         it('should initialize a smart clause', async function () {
             const request = {};
-            request.$class = 'org.accordproject.installmentsale.InitializeRequest';
-            request.firstMonth = 1.0;
+            request.$class = 'org.accordproject.cicero.runtime.Request';
             const result = await engine.init(clause, request);
             result.should.not.be.null;
             result.response.should.not.be.null;
             result.state.balance_remaining.should.equal(10000.00);
             result.state.total_paid.should.equal(0.0);
+            result.state.next_payment_month.should.equal(3.0);
         });
 
         it('should initialize a smart clause and execute one installment', async function () {
             const request = {};
-            request.$class = 'org.accordproject.installmentsale.InitializeRequest';
-            request.firstMonth = 1.0;
+            request.$class = 'org.accordproject.cicero.runtime.Request';
             const result = await engine.init(clause, request);
             result.should.not.be.null;
             result.response.should.not.be.null;
             result.state.balance_remaining.should.equal(10000.00);
             result.state.total_paid.should.equal(0.0);
+            result.state.next_payment_month.should.equal(3.0);
             const request1 = {};
             request1.$class = 'org.accordproject.installmentsale.Installment';
             request1.amount = 2500.00;
@@ -446,38 +449,8 @@ describe('EngineInstallmentSaleJs', () => {
             result1.response.balance.should.equal(7612.499999999999);
             result1.state.balance_remaining.should.equal(7612.499999999999);
             result1.state.total_paid.should.equal(2500.00);
+            result1.state.next_payment_month.should.equal(4.0);
         });
-    });
-});
-describe('EngineInstallmentSaleJsErr', () => {
-
-    let engine;
-    let clause;
-    const testLatePenaltyInput = fs.readFileSync(path.resolve(__dirname, 'data/installment-sale-err', 'sample.txt'), 'utf8');
-
-    beforeEach(async function () {
-        engine = new Engine();
-        const template = await Template.fromDirectory('./test/data/installment-sale-err');
-        clause = new Clause(template);
-        clause.parse(testLatePenaltyInput);
-    });
-
-    afterEach(() => {});
-
-    describe('#execute', function () {
-
-        it('should fail initialization when more than one initialization clause', async () => {
-            try {
-                const request = {};
-                request.$class = 'org.accordproject.installmentsale.InitializeRequest';
-                request.firstMonth = 1.0;
-                const result = await engine.init(clause, request);
-                return result;
-            } catch (err) {
-                err.message.should.equal('Should have at most one function declaration with the @AccordClauseLogicInit annotation');
-            }
-        });
-
     });
 });
 describe('EngineInstallmentSaleErgo', () => {
