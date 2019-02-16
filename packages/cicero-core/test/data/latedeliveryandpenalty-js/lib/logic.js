@@ -649,7 +649,6 @@ function mustBeUnit(unit) {
  * @param {Context} context - the Accord context
  * @param {io.clause.latedeliveryandpenalty.LateDeliveryAndPenaltyRequest} context.request - the incoming request
  * @param {io.clause.latedeliveryandpenalty.LateDeliveryAndPenaltyResponse} context.response - the response
- * @AccordClauseLogic
  */
 function LateDeliveryAndPenalty_latedeliveryandpenalty(context) {
   let pcontext = { 'request' : serializer.toJSON(context.request,{permitResourcesForRelationships:true}), 'state': serializer.toJSON(context.state,{permitResourcesForRelationships:true}), 'contract': context.contract, 'emit': context.emit, 'now': context.now};

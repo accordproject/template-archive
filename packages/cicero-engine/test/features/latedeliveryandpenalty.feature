@@ -16,7 +16,7 @@ Late Delivery and Penalty. In case of delayed delivery except for Force Majeure 
     And it receives the request
 """
 {
-    "$class": "io.clause.latedeliveryandpenalty.LateDeliveryAndPenaltyRequest",
+    "$class": "org.accordproject.latedeliveryandpenalty.LateDeliveryAndPenaltyRequest",
     "forceMajeure": false,
     "agreedDelivery": "2018-12-31 03:24:00Z",
     "deliveredAt": null,
@@ -26,7 +26,7 @@ Late Delivery and Penalty. In case of delayed delivery except for Force Majeure 
     Then it should respond with
 """
 {
-  "$class": "io.clause.latedeliveryandpenalty.LateDeliveryAndPenaltyResponse",
+  "$class": "org.accordproject.latedeliveryandpenalty.LateDeliveryAndPenaltyResponse",
   "buyerMayTerminate": false,
   "penalty": 110
 }
@@ -37,7 +37,7 @@ Late Delivery and Penalty. In case of delayed delivery except for Force Majeure 
     And it receives the request
 """
 {
-    "$class": "io.clause.latedeliveryandpenalty.LateDeliveryAndPenaltyRequest",
+    "$class": "org.accordproject.latedeliveryandpenalty.LateDeliveryAndPenaltyRequest",
     "forceMajeure": false,
     "agreedDelivery": "2018-01-31 03:24:00Z",
     "deliveredAt": null,
@@ -47,7 +47,7 @@ Late Delivery and Penalty. In case of delayed delivery except for Force Majeure 
     Then it should respond with
 """
 {
-  "$class": "io.clause.latedeliveryandpenalty.LateDeliveryAndPenaltyResponse",
+  "$class": "org.accordproject.latedeliveryandpenalty.LateDeliveryAndPenaltyResponse",
   "buyerMayTerminate": true,
   "penalty": 110
 }
@@ -58,7 +58,7 @@ Late Delivery and Penalty. In case of delayed delivery except for Force Majeure 
     And it receives the request
 """
 {
-    "$class": "io.clause.latedeliveryandpenalty.LateDeliveryAndPenaltyRequest",
+    "$class": "org.accordproject.latedeliveryandpenalty.LateDeliveryAndPenaltyRequest",
     "forceMajeure": false,
     "agreedDelivery": "2019-01-31 03:24:00Z",
     "deliveredAt": null,

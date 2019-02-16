@@ -14,7 +14,6 @@
 
 'use strict';
 
-const Logger = require('./logger');
 const logger = require('@accordproject/cicero-core').logger;
 const ResourceValidator = require('composer-concerto/lib/serializer/resourcevalidator');
 const Moment = require('moment');
@@ -77,49 +76,10 @@ class Engine {
      * @private
      */
     buildDispatchFunction(clause) {
-        // get the function declarations of all functions
-        // that have the @clause annotation
-        const functionDeclarations = clause.getTemplate().getScriptManager().allFunctionDeclarations()
-            .filter((ele) => {
-                return ele.getDecorators().indexOf('AccordClauseLogic') >= 0;
-            }).map((ele) => {
-                return ele;
-            });
-
-        if (functionDeclarations.length === 0) {
-            throw new Error('Did not find any function declarations with the @AccordClauseLogic annotation');
-        }
-
-        const head = `
-        __dispatch(contractdata,data,request,state,now);
-
-        function __dispatch(contract,data,request,state,now) {
-            switch(request.getFullyQualifiedType()) {
+        Engine.hasFunctionDeclaration(clause,'__dispatch');
+        const code = `
+        __dispatch({contract:data,request:request,state:state,now:now,emit:[]});
         `;
-
-        let methods = '';
-        functionDeclarations.forEach((ele, n) => {
-            methods += `
-            case '${ele.getParameterTypes()[1]}':
-                let type${n} = '${ele.getParameterTypes()[2]}';
-                let ns${n} = type${n}.substr(0, type${n}.lastIndexOf('.'));
-                let clazz${n} = type${n}.substr(type${n}.lastIndexOf('.')+1);
-                let response${n} = factory.newTransaction(ns${n}, clazz${n});
-                let context${n} = {request: request, state: state, contract: contract, data: data, response: response${n}, emit: [], now: now};
-                ${ele.getName()}(context${n});
-                return { response: context${n}.response, state: context${n}.state, emit: context${n}.emit };
-            break;`;
-        });
-
-        const tail = `
-            default:
-                throw new Error('No function handler for ' + request.getFullyQualifiedType() );
-            } // switch
-            return 'oops';
-        }
-        `;
-
-        const code = head + methods + tail;
         logger.debug(code);
         return code;
     }
@@ -131,45 +91,10 @@ class Engine {
      * @private
      */
     buildInitFunction(clause) {
-        // get the function declarations of all functions
-        // that have the @clause annotation
-        const functionDeclarations = clause.getTemplate().getScriptManager().allFunctionDeclarations()
-            .filter((ele) => {
-                return ele.getDecorators().indexOf('AccordClauseLogicInit') >= 0;
-            }).map((ele) => {
-                return ele;
-            });
-
-        if (functionDeclarations.length > 1) {
-            throw new Error('Should have at most one function declaration with the @AccordClauseLogicInit annotation');
-        }
-
-        const head = `
-        __init(contractdata,data,request,now);
-
-        function __init(contract,data,request,now) {
+        Engine.hasFunctionDeclaration(clause,'__init');
+        const code = `
+        __init({contract:data,request:request,now:now,emit:[]});
         `;
-
-        let methods = '';
-        if (functionDeclarations.length === 0) {
-            methods += `
-                return { response: serializer.fromJSON({ '$class': 'org.accordproject.cicero.runtime.Response' }, {validate: false, acceptResourcesForRelationships: true}), state: serializer.fromJSON({ '$class': 'org.accordproject.cicero.contract.AccordContractState', 'stateId' : 'org.accordproject.cicero.contract.AccordContractState#1' }, {validate: false, acceptResourcesForRelationships: true}), emit: [] };`;
-        } else {
-            const ele = functionDeclarations[0];
-            methods += `
-                let type0 = '${ele.getParameterTypes()[2]}';
-                let ns0 = type0.substr(0, type0.lastIndexOf('.'));
-                let clazz0 = type0.substr(type0.lastIndexOf('.')+1);
-                let response0 = factory.newTransaction(ns0, clazz0);
-                let context0 = {request: request, contract: contract, data: data, response: response0, emit: [], now: now};
-                ${ele.getName()}(context0);
-                return { response: context0.response, state: context0.state, emit: context0.emit };`;
-        }
-        const tail = `
-        }
-        `;
-
-        const code = head + methods + tail;
         logger.debug(code);
         return code;
     }
@@ -215,13 +140,12 @@ class Engine {
             sandbox: {
                 moment: require('moment'),
                 serializer:template.getSerializer(),
-                logger: new Logger(template.getSerializer()),
+                logger: logger,
                 utcOffset: validUtcOffset
             }
         });
 
         // add immutables to the context
-        vm.freeze(validContract, 'contractdata'); // Second argument adds object to global.
         vm.freeze(validContract, 'data'); // Second argument adds object to global.
         vm.freeze(validRequest, 'request'); // Second argument adds object to global.
         vm.freeze(validState, 'state'); // Second argument adds object to global.
@@ -293,13 +217,12 @@ class Engine {
             sandbox: {
                 moment: require('moment'),
                 serializer:template.getSerializer(),
-                logger: new Logger(template.getSerializer()),
+                logger: logger,
                 utcOffset: validUtcOffset
             }
         });
 
         // add immutables to the context
-        vm.freeze(validContract, 'contractdata'); // Second argument adds object to global.
         vm.freeze(validContract, 'data'); // Second argument adds object to global.
         vm.freeze(validRequest, 'request'); // Second argument adds object to global.
         vm.freeze(validNow, 'now'); // Second argument adds object to global.
@@ -355,6 +278,19 @@ class Engine {
         }
     }
 
+    /**
+     * Looks for the presence of a function in a clause's logic
+     *
+     * @param {Clause} clause  - the clause
+     * @param {string} name  - the function name
+     */
+    static hasFunctionDeclaration(clause, name) {
+        // get the function declarations of either init or dispatch
+        const funDecls = clause.getTemplate().getScriptManager().allFunctionDeclarations();
+        if (!funDecls.some((ele) => { return ele.getName() === name; })) {
+            throw new Error(`Function ${name} was not found in logic`);
+        }
+    }
 }
 
 module.exports = Engine;
