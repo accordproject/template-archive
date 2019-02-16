@@ -1,4 +1,4 @@
-namespace io.clause.latedeliveryandpenalty
+namespace org.accordproject.latedeliveryandpenalty
 
 import org.accordproject.cicero.contract.* from https://models.accordproject.org/cicero/contract.cto
 import org.accordproject.cicero.runtime.* from https://models.accordproject.org/cicero/runtime.cto

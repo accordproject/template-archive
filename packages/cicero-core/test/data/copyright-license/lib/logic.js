@@ -24,7 +24,6 @@
  * @param {org.accordproject.copyrightlicense.PaymentRequest} context.request - the incoming request
  * @param {org.accordproject.copyrightlicense.PayOut} context.response - the response
  * @param {Event} context.emit - the emitted events
- * @AccordClauseLogic
  */
 function paymentClause(context) {
     var req = context.request;
