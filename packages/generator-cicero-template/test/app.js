@@ -25,6 +25,7 @@ describe('generator-cicero-template:app', () => {
             .run(path.join(__dirname, '../generators/app'))
             .withPrompts({ templateName: 'test' }, { modeNamespace: 'foo' });
         assert.file('./test/package.json');
+        assert.file('./test/test/logic_default.feature');
     });
 
     describe('helpers', () => {
