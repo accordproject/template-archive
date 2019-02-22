@@ -186,6 +186,19 @@ describe('cicero-cli', () => {
         });
     });
 
+    describe('#init', () => {
+        it('should initialize a clause using a template', async () => {
+            const response = await Commands.init(template, sample);
+            response.state.$class.should.be.equal('org.accordproject.cicero.contract.AccordContractState');
+            response.state.stateId.should.be.equal('org.accordproject.cicero.contract.AccordContractState#1');
+        });
+
+        it('should fail to initialize on a bogus sample', async () => {
+            const response = await Commands.init(template, sampleErr);
+            should.equal(response,undefined);
+        });
+    });
+
     describe('#execute', () => {
         it('should execute a clause using a template', async () => {
             const response = await Commands.execute(template, sample, [request], state);
@@ -212,6 +225,13 @@ describe('cicero-cli', () => {
             const response = await Commands.execute(template, sample, [requestErr], state);
             should.equal(response,undefined);
         });
+
+        it('should execute a clause using a template (with currentTime set)', async () => {
+            const response = await Commands.execute(template, sample, [request], state, '2017-12-19T17:38:01Z');
+            response.response.$class.should.be.equal('org.accordproject.latedeliveryandpenalty.LateDeliveryAndPenaltyResponse');
+            response.response.penalty.should.be.equal(3.1111111111111107);
+            response.response.buyerMayTerminate.should.be.equal(false);
+        });
     });
 
     describe('#executeergo', () => {
@@ -220,6 +240,82 @@ describe('cicero-cli', () => {
             response.response.$class.should.be.equal('org.accordproject.latedeliveryandpenalty.LateDeliveryAndPenaltyResponse');
             response.response.penalty.should.be.equal(4);
             response.response.buyerMayTerminate.should.be.equal(true);
+        });
+    });
+
+    describe('#validateInitArgs', () => {
+        it('no args specified', () => {
+            process.chdir(path.resolve(__dirname, 'data/latedeliveryandpenalty/'));
+            const args  = Commands.validateInitArgs({
+                _: ['init'],
+            });
+            args.template.should.match(/cicero-cli\/test\/data\/latedeliveryandpenalty$/);
+            args.sample.should.match(/sample.txt$/);
+        });
+        it('all args specified', () => {
+            process.chdir(path.resolve(__dirname, 'data/latedeliveryandpenalty/'));
+            const args  = Commands.validateInitArgs({
+                _: ['init'],
+                template: './',
+                sample: 'sample.txt'
+            });
+            args.template.should.match(/cicero-cli\/test\/data\/latedeliveryandpenalty$/);
+            args.sample.should.match(/sample.txt$/);
+        });
+        it('all args specified, parent folder', () => {
+            process.chdir(path.resolve(__dirname, 'data/'));
+            const args  = Commands.validateInitArgs({
+                _: ['initt'],
+                template: 'latedeliveryandpenalty',
+                sample: 'latedeliveryandpenalty/sample.txt'
+            });
+            args.template.should.match(/cicero-cli\/test\/data\/latedeliveryandpenalty$/);
+            args.sample.should.match(/sample.txt$/);
+        });
+        it('all args specified, parent folder, no sample, no state', () => {
+            process.chdir(path.resolve(__dirname, 'data/'));
+            const args  = Commands.validateInitArgs({
+                _: ['init'],
+                template: 'latedeliveryandpenalty',
+            });
+            args.template.should.match(/cicero-cli\/test\/data\/latedeliveryandpenalty$/);
+            args.sample.should.match(/sample.txt$/);
+        });
+        it('all args specified, child folder, no sample', () => {
+            process.chdir(path.resolve(__dirname, 'data/latedeliveryandpenalty/grammar'));
+            const args  = Commands.validateInitArgs({
+                _: ['init'],
+                template: '../',
+            });
+            args.template.should.match(/cicero-cli\/test\/data\/latedeliveryandpenalty$/);
+            args.sample.should.match(/sample.txt$/);
+        });
+        it('no flags specified', () => {
+            const args  = Commands.validateInitArgs({
+                _: ['init', path.resolve(__dirname, 'data/latedeliveryandpenalty/')],
+            });
+            args.template.should.match(/cicero-cli\/test\/data\/latedeliveryandpenalty$/);
+            args.sample.should.match(/sample.txt$/);
+        });
+        it('verbose flag specified', () => {
+            process.chdir(path.resolve(__dirname, 'data/latedeliveryandpenalty/'));
+            Commands.validateInitArgs({
+                _: ['init'],
+                verbose: true
+            });
+        });
+        it('bad package.json', () => {
+            process.chdir(path.resolve(__dirname, 'data/'));
+            (() => Commands.validateInitArgs({
+                _: ['init'],
+            })).should.throw(' not a valid cicero template. Make sure that package.json exists and that it has a cicero entry.');
+        });
+        it('bad sample.txt', () => {
+            process.chdir(path.resolve(__dirname, 'data/latedeliveryandpenalty/'));
+            (() => Commands.validateInitArgs({
+                _: ['init'],
+                sample: 'sample_en.txt'
+            })).should.throw('A sample text file is required. Try the --sample flag or create a sample.txt in the root folder of your template.');
         });
     });
 
