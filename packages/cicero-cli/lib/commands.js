@@ -28,7 +28,8 @@ const CordaVisitor = CodeGen.CordaVisitor;
 const JSONSchemaVisitor = CodeGen.JSONSchemaVisitor;
 const PlantUMLVisitor = CodeGen.PlantUMLVisitor;
 const TypescriptVisitor = CodeGen.TypescriptVisitor;
-const uuidv4 = require('uuid/v4');
+
+const defaultRequest = {'$class':'org.accordproject.cicero.runtime.Request'};
 
 /**
  * Utility class that implements the commands exposed by the Cicero CLI.
@@ -110,42 +111,70 @@ class Commands {
     }
 
     /**
+     * Initializes a sample text using a template
+     *
+     * @param {string} templatePath to the template directory
+     * @param {string} samplePath to the sample file
+     * @param {string} currentTime - the definition of 'now'
+     * @returns {object} Promise to the result of execution
+     */
+    static init(templatePath, samplePath, currentTime) {
+        let clause;
+        const sampleText = fs.readFileSync(samplePath, 'utf8');
+
+        const engine = new Engine();
+        return Template.fromDirectory(templatePath)
+            .then((template) => {
+                // Initialize clause
+                clause = new Clause(template);
+                clause.parse(sampleText);
+
+                return engine.init(clause, defaultRequest, currentTime);
+            })
+            .catch((err) => {
+                logger.error(err.message);
+            });
+    }
+
+
+    /**
      * Execute a sample text using a template
      *
      * @param {string} templatePath to the template directory
      * @param {string} samplePath to the sample file
      * @param {string[]} requestsPath to the array of request files
      * @param {string} statePath to the state file
+     * @param {string} currentTime - the definition of 'now'
      * @returns {object} Promise to the result of execution
      */
-    static execute(templatePath, samplePath, requestsPath, statePath) {
+    static execute(templatePath, samplePath, requestsPath, statePath, currentTime) {
         let clause;
         const sampleText = fs.readFileSync(samplePath, 'utf8');
         let requestsJson = [];
-        let stateJson;
 
         for (let i = 0; i < requestsPath.length; i++) {
             requestsJson.push(JSON.parse(fs.readFileSync(requestsPath[i], 'utf8')));
         }
-        if(!fs.existsSync(statePath)) {
-            logger.warn('A state file was not provided, generating default state object. Try the --state flag or create a state.json in the root folder of your template.');
-            stateJson = {
-                '$class': 'org.accordproject.cicero.contract.AccordContractState',
-                stateId: uuidv4()
 
-            };
-        } else {
-            stateJson = JSON.parse(fs.readFileSync(statePath, 'utf8'));
-        }
-
+        const engine = new Engine();
         return Template.fromDirectory(templatePath)
-            .then((template) => {
+            .then(async (template) => {
+                // Initialize clause
                 clause = new Clause(template);
                 clause.parse(sampleText);
-                const engine = new Engine();
+
+                let stateJson;
+                if(!fs.existsSync(statePath)) {
+                    logger.warn('A state file was not provided, initializing state. Try the --state flag or create a state.json in the root folder of your template.');
+                    const initResult = await engine.init(clause, defaultRequest, currentTime);
+                    stateJson = initResult.state;
+                } else {
+                    stateJson = JSON.parse(fs.readFileSync(statePath, 'utf8'));
+                }
+
                 // First execution to get the initial response
                 const firstRequest = requestsJson[0];
-                const initResponse = engine.execute(clause, firstRequest, stateJson);
+                const initResponse = engine.execute(clause, firstRequest, stateJson, currentTime);
                 // Get all the other requests and chain execution through Promise.reduce()
                 const otherRequests = requestsJson.slice(1, requestsJson.length);
                 return otherRequests.reduce((promise,requestJson) => {
@@ -220,6 +249,51 @@ class Commands {
             throw new Error('A sample text file is required. Try the --sample flag or create a sample.txt in the root folder of your template.');
         } else if(!requestExists){
             throw new Error('A request file is required. Try the --request flag or create a request.json in the root folder of your template.');
+        } else {
+            return argv;
+        }
+    }
+
+    /**
+     * Set default params before we initialize a template
+     *
+     * @param {object} argv the inbound argument values object
+     * @returns {object} a modfied argument object
+     */
+    static validateInitArgs(argv) {
+        // the user typed 'cicero execute dir'
+        if(argv._.length === 2){
+            argv.template = argv._[1];
+        }
+
+        if(!argv.template){
+            logger.info('Using current directory as template folder');
+            argv.template = '.';
+        }
+
+        argv.template = path.resolve(argv.template);
+
+        const packageJsonExists = fs.existsSync(path.resolve(argv.template,'package.json'));
+        let isCiceroTemplate = false;
+        if(packageJsonExists){
+            let packageJsonContents = JSON.parse(fs.readFileSync(path.resolve(argv.template,'package.json')),'utf8');
+            isCiceroTemplate = packageJsonContents.cicero;
+        }
+
+        if(!argv.sample){
+            logger.info('Loading a default sample.txt file.');
+            argv.sample = path.resolve(argv.template,'sample.txt');
+        }
+
+        if(argv.verbose) {
+            logger.info(`initialize sample ${argv.sample} using a template ${argv.template}`);
+        }
+
+        let sampleExists = fs.existsSync(argv.sample);
+        if(!packageJsonExists || !isCiceroTemplate){
+            throw new Error(`${argv.template} is not a valid cicero template. Make sure that package.json exists and that it has a cicero entry.`);
+        } else if (!sampleExists){
+            throw new Error('A sample text file is required. Try the --sample flag or create a sample.txt in the root folder of your template.');
         } else {
             return argv;
         }

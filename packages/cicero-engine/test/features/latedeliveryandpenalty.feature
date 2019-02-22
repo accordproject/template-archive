@@ -65,4 +65,4 @@ Late Delivery and Penalty. In case of delayed delivery except for Force Majeure 
     "goodsValue": 200.00
 }
 """
-    Then it should reject the request with the error "Cannot exercise late delivery before delivery date"
+    Then it should reject the request with the error "[Ergo] Cannot exercise late delivery before delivery date"

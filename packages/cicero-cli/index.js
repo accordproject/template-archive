@@ -105,6 +105,11 @@ require('yargs')
             describe: 'path to the JSON state',
             type: 'string'
         });
+        yargs.option('currentTime', {
+            describe: 'execute with this current time',
+            type: 'string',
+            default: null
+        });
     }, (argv) => {
 
         try {
@@ -113,7 +118,37 @@ require('yargs')
             logger.error(err.message);
         }
 
-        return Commands.execute(argv.template, argv.sample, argv.request, argv.state)
+        return Commands.execute(argv.template, argv.sample, argv.request, argv.state, argv.currentTime)
+            .then((result) => {
+                logger.info(JSON.stringify(result));
+            })
+            .catch((err) => {
+                logger.error(err.message);
+            });
+    })
+    .command('init', 'initialize a clause', (yargs) => {
+        yargs.option('template', {
+            describe: 'path to the directory with the template',
+            type: 'string'
+        });
+        yargs.option('sample', {
+            describe: 'path to the clause text',
+            type: 'string'
+        });
+        yargs.option('currentTime', {
+            describe: 'initialize with this current time',
+            type: 'string',
+            default: null
+        });
+    }, (argv) => {
+
+        try {
+            argv = Commands.validateInitArgs(argv);
+        } catch (err){
+            logger.error(err.message);
+        }
+
+        return Commands.init(argv.template, argv.sample, argv.currentTime)
             .then((result) => {
                 logger.info(JSON.stringify(result));
             })

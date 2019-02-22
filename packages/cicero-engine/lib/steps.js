@@ -26,6 +26,13 @@ const Util = require('./util');
 
 const { Before, Given, When, Then } = require('cucumber');
 
+// Defaults
+const defaultState = {
+    '$class':'org.accordproject.cicero.contract.AccordContractState',
+    'stateId':'org.accordproject.cicero.contract.AccordContractState#1'
+};
+const initRequest = {'$class':'org.accordproject.cicero.runtime.Request'};
+
 /**
  * Initializes the contract
  *
@@ -50,7 +57,13 @@ async function init(engine,clause,request,currentTime) {
  * @returns {object} Promise to the response
  */
 async function send(engine,clause,request,state,currentTime) {
-    return engine.execute(clause,request,state,currentTime);
+    if (state === null) {
+        const initAnswer = await init(engine,clause,initRequest,currentTime);
+        const initState = initAnswer.state;
+        return engine.execute(clause,request,initState,currentTime);
+    } else {
+        return engine.execute(clause,request,state,currentTime);
+    }
 }
 
 /**
@@ -81,17 +94,10 @@ async function loadClause(templateDir) {
     return new Clause(template);
 }
 
-// Defaults
-const defaultState = {
-    '$class':'org.accordproject.cicero.contract.AccordContractState',
-    'stateId':'org.accordproject.cicero.contract.AccordContractState#1'
-};
-const initRequest = {'$class':'org.accordproject.cicero.runtime.Request'};
-
 Before(function () {
     this.engine = new Engine();
     this.currentTime = '1970-01-01T00:00:00Z';
-    this.state = defaultState;
+    this.state = null;
     this.clause = null;
     this.request = null;
     this.answer = null;
