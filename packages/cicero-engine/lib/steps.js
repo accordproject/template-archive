@@ -24,7 +24,7 @@ const Clause = require('@accordproject/cicero-core').Clause;
 const Engine = require('./engine');
 const Util = require('./util');
 
-const { Before, Given, When, Then } = require('cucumber');
+const { Before, Given, When, Then, setDefaultTimeout } = require('cucumber');
 
 // Defaults
 const defaultState = {
@@ -95,6 +95,8 @@ async function loadClause(templateDir) {
 }
 
 Before(function () {
+    setDefaultTimeout(20 * 1000);
+
     this.engine = new Engine();
     this.currentTime = '1970-01-01T00:00:00Z';
     this.state = null;
@@ -154,6 +156,7 @@ Then('the initial state( of the contract) should be', function (expectedState) {
     const state = JSON.parse(expectedState);
     return init(this.engine,this.clause,initRequest,this.currentTime)
         .then((actualAnswer) => {
+            this.answer = actualAnswer;
             expect(actualAnswer).to.have.property('state');
             expect(actualAnswer).to.not.have.property('error');
             return compare(state,actualAnswer.state);
@@ -164,6 +167,7 @@ Then('the initial state( of the contract) should be the default state', function
     const state = defaultState;
     return init(this.engine,this.clause,initRequest,this.currentTime)
         .then((actualAnswer) => {
+            this.answer = actualAnswer;
             expect(actualAnswer).to.have.property('state');
             expect(actualAnswer).to.not.have.property('error');
             return compare(state,actualAnswer.state);
