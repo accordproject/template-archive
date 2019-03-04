@@ -366,10 +366,10 @@ describe('BogusClauses', () => {
     afterEach(() => {});
 
     it('should throw error when no __dispatch in JavaScript logic', async () => {
-        return (() => engine.buildDispatchFunction(clause)).should.throw('Function __dispatch was not found in logic');
+        return (() => engine.hasDispatch(clause)).should.throw('Function __dispatch was not found in logic');
     });
     it('should throw error when no __init in JavaScript logic', async () => {
-        return (() => engine.buildInitFunction(clause)).should.throw('Function __init was not found in logic');
+        return (() => engine.hasInit(clause)).should.throw('Function __init was not found in logic');
     });
     it('should throw an error when JavaScript logic is missing', async function() {
         // Turn all JavaScript logic into something else
