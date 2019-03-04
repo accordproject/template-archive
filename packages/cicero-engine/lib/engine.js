@@ -38,7 +38,6 @@ class Engine {
      */
     constructor() {
         this.scripts = {};
-        this.initScripts = {};
     }
 
     /**
@@ -48,54 +47,47 @@ class Engine {
      */
     compileJsClause(clause) {
         let allJsScripts = '';
-        let allJsInitScripts = '';
         let template = clause.getTemplate();
 
         template.getScriptManager().getAllScripts().forEach(function (element) {
             if (element.getLanguage() === '.js') {
                 allJsScripts += element.getContents();
-                allJsInitScripts += element.getContents();
             }
         }, this);
 
         if (allJsScripts === '') {
             throw new Error('Did not find any JavaScript logic');
         }
-        allJsScripts += this.buildDispatchFunction(clause);
-        allJsInitScripts += this.buildInitFunction(clause);
+
+        // Check that the clause script has both __dispatch and __init
+        this.hasDispatch(clause);
+        this.hasInit(clause);
+
         const script = new VMScript(allJsScripts);
-        const initScript = new VMScript(allJsInitScripts);
         this.scripts[clause.getIdentifier()] = script;
-        this.initScripts[clause.getIdentifier()] = initScript;
     }
 
     /**
      * Generate the runtime dispatch logic
-     * @param {Clause} clause - the clause to compile
      * @return {String} the dispatch code
      * @private
      */
-    buildDispatchFunction(clause) {
-        Engine.hasFunctionDeclaration(clause,'__dispatch');
+    buildDispatchFunction() {
         const code = `
         __dispatch({contract:data,request:request,state:state,now:now,emit:[]});
         `;
-        logger.debug(code);
         return code;
     }
 
     /**
      * Generate the initialization logic
-     * @param {Clause} clause - the clause to compile
      * @return {String} the initialization code
      * @private
      */
-    buildInitFunction(clause) {
-        Engine.hasFunctionDeclaration(clause,'__init');
+    buildInitFunction() {
         const code = `
         __init({contract:data,request:request,now:now,emit:[]});
         `;
-        logger.debug(code);
         return code;
     }
 
@@ -118,7 +110,7 @@ class Engine {
         validRequest.validate();
 
         // Set the current time and UTC Offset
-        const validNow = Engine.initCurrentTime(currentTime);
+        const validNow = Engine.setCurrentTime(currentTime);
         const validUtcOffset = validNow.utcOffset();
 
         // ensure the state is valid
@@ -128,13 +120,14 @@ class Engine {
 
         logger.debug('Engine processing request ' + request.$class + ' with state ' + state.$class);
 
-        let script = this.scripts[clause.getIdentifier()];
+        let script;
 
         this.compileJsClause(clause);
         script = this.scripts[clause.getIdentifier()];
 
+        const callScript = this.buildDispatchFunction();
+
         const validContract = clause.getDataAsComposerObject();
-        const factory = template.getFactory();
         const vm = new VM({
             timeout: 1000,
             sandbox: {
@@ -151,10 +144,9 @@ class Engine {
         vm.freeze(validState, 'state'); // Second argument adds object to global.
         vm.freeze(validNow, 'now'); // Second argument adds object to global.
 
-        vm.freeze(factory, 'factory'); // Second argument adds object to global.
-
         // execute the logic
-        const result = vm.run(script);
+        vm.run(script);
+        const result = vm.run(callScript);
 
         // ensure the response is valid
         result.response.$validator = new ResourceValidator({permitResourcesForRelationships: true});
@@ -200,18 +192,19 @@ class Engine {
         validRequest.validate();
 
         // Set the current time and UTC Offset
-        const validNow = Engine.initCurrentTime(currentTime);
+        const validNow = Engine.setCurrentTime(currentTime);
         const validUtcOffset = validNow.utcOffset();
 
         logger.debug('Engine processing initialization request ' + request.$class);
 
-        let script = this.initScripts[clause.getIdentifier()];
+        let script;
 
         this.compileJsClause(clause);
-        script = this.initScripts[clause.getIdentifier()];
+        script = this.scripts[clause.getIdentifier()];
+
+        const callScript = this.buildInitFunction();
 
         const validContract = clause.getDataAsComposerObject();
-        const factory = template.getFactory();
         const vm = new VM({
             timeout: 1000,
             sandbox: {
@@ -227,10 +220,9 @@ class Engine {
         vm.freeze(validRequest, 'request'); // Second argument adds object to global.
         vm.freeze(validNow, 'now'); // Second argument adds object to global.
 
-        vm.freeze(factory, 'factory'); // Second argument adds object to global.
-
         // execute the logic
-        const result = vm.run(script);
+        vm.run(script);
+        const result = vm.run(callScript);
 
         // ensure the response is valid
         result.response.$validator = new ResourceValidator({permitResourcesForRelationships: true});
@@ -265,7 +257,7 @@ class Engine {
      * @param {string} currentTime - the definition of 'now'
      * @returns {object} if valid, the moment object for the current time
      */
-    static initCurrentTime(currentTime) {
+    static setCurrentTime(currentTime) {
         if (!currentTime) {
             // Defaults to current local time
             return Moment();
@@ -291,6 +283,24 @@ class Engine {
             throw new Error(`Function ${name} was not found in logic`);
         }
     }
+    /**
+     * Checks that the clause has a dispatch
+     * @param {Clause} clause  - the clause to compile
+     * @private
+     */
+    hasDispatch(clause) {
+        Engine.hasFunctionDeclaration(clause,'__dispatch');
+    }
+
+    /**
+     * Checks that the clause has an init
+     * @param {Clause} clause  - the clause to compile
+     * @private
+     */
+    hasInit(clause) {
+        Engine.hasFunctionDeclaration(clause,'__init');
+    }
+
 }
 
 module.exports = Engine;
