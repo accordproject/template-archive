@@ -238,6 +238,7 @@ class Template {
             autoescape: false  // Required to allow nearley syntax strings
         });
         const combined = nunjucks.render('template.ne', parts);
+        // console.log(combined);
         logger.debug('Generated template grammar' + combined);
 
         this.setGrammar(combined);
@@ -300,6 +301,38 @@ class Template {
                     symbols: [`${element.string.value}:? {% (d) => {return d[0] !== null;}%} # ${element.fieldName.value}`],
                 });
                 break;
+            case 'FormattedBinding':
+                {
+                    const propertyName = element.fieldName.value;
+                    const property = templateModel.getProperty(propertyName);
+                    if (!property) {
+                        throw new Error(`Template references a property '${propertyName}' that is not declared in the template model '${templateModel.getFullyQualifiedName()}'. Details: ${JSON.stringify(element)}`);
+                    }
+                    let type = property.getType();
+                    // let type = element.format.value;
+                    if( property.getType() !== 'DateTime') {
+                        throw new Error('Formatted types are currently only supported for DateTime properties.');
+                    }
+                    let action = '{% id %}';
+                    let suffix = ':';
+                    // TODO (DCS) need a serialization for arrays
+                    if (property.isArray()) {
+                        throw new Error('Arrays are not yet supported!');
+                        // suffix += '+';
+                    }
+                    if (property.isOptional()) {
+                        suffix += '?';
+                    }
+                    if (suffix === ':') {
+                        suffix = '';
+                    }
+                    parts.modelRules.push({
+                        prefix: rule,
+                        format: element.format,
+                        symbols: [`${type}${suffix} ${action} # ${propertyName}`],
+                    });
+                }
+                break;
             case 'Binding':
                 {
                     const propertyName = element.fieldName.value;
@@ -336,6 +369,7 @@ class Template {
                     }
                     parts.modelRules.push({
                         prefix: rule,
+                        format: element.format,
                         symbols: [`${type}${suffix} ${action} # ${propertyName}`],
                     });
                 }
@@ -403,7 +437,7 @@ class Template {
     findFirstBinding(propertyName, elements) {
         for(let n=0; n < elements.length; n++) {
             const element = elements[n];
-            if(element !== null && ['Binding','BooleanBinding','ClauseBinding'].includes(element.type)) {
+            if(element !== null && ['Binding','FormattedBinding', 'BooleanBinding','ClauseBinding'].includes(element.type)) {
                 if(element.fieldName.value === propertyName) {
                     return n;
                 }

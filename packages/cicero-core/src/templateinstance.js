@@ -16,6 +16,7 @@
 
 const logger = require('./logger');
 const crypto = require('crypto');
+const moment = require('moment');
 const RelationshipDeclaration = require('composer-concerto').RelationshipDeclaration;
 
 /**
@@ -104,14 +105,37 @@ class TemplateInstance {
                 }
             }, this);
         }
-        const ast = parser.results[0];
+        let ast = parser.results[0];
         logger.debug('Result of parsing: ' + JSON.stringify(ast));
 
         if(!ast) {
             throw new Error('Parsing clause text returned a null AST. This may mean the text is valid, but not complete.');
         }
 
+        ast = TemplateInstance.convertDateTimes(ast);
         this.setData(ast);
+    }
+
+    /**
+     * Recursive function that converts all instances of ParsedDateTime
+     * to a Date.
+     * @param {*} obj the input object
+     * @returns {*} the converted object
+     */
+    static convertDateTimes(obj) {
+        if(obj.$class === 'ParsedDateTime') {
+            // 2013-02-08 09:30:26.123+07
+            const instance = moment(obj.year + '-' + obj.month + '-' + obj.day + ' ' +
+                    obj.hour + ':' + obj.minute + ':' + obj.second + '.' + obj.millisecond + obj.timezone );
+            return instance.toDate().toISOString();
+        }
+        else if( typeof obj === 'object' && obj !== null) {
+            Object.entries(obj).forEach(
+                ([key, value]) => {obj[key] = TemplateInstance.convertDateTimes(value);}
+            );
+        }
+
+        return obj;
     }
 
     /**
@@ -147,6 +171,7 @@ class TemplateInstance {
             }
                 break;
 
+            case 'FormattedBinding':
             case 'Binding': {
                 const property = this.getTemplate().getTemplateModel().getProperty(thing.fieldName.value);
                 result += this.convertPropertyToString(property, this.composerData[property.getName()]);
