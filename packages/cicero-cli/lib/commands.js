@@ -29,8 +29,6 @@ const JSONSchemaVisitor = CodeGen.JSONSchemaVisitor;
 const PlantUMLVisitor = CodeGen.PlantUMLVisitor;
 const TypescriptVisitor = CodeGen.TypescriptVisitor;
 
-const defaultRequest = {'$class':'org.accordproject.cicero.runtime.Request'};
-
 /**
  * Utility class that implements the commands exposed by the Cicero CLI.
  * @class
@@ -129,7 +127,7 @@ class Commands {
                 clause = new Clause(template);
                 clause.parse(sampleText);
 
-                return engine.init(clause, defaultRequest, currentTime);
+                return engine.init(clause, currentTime);
             })
             .catch((err) => {
                 logger.error(err.message);
@@ -166,7 +164,7 @@ class Commands {
                 let stateJson;
                 if(!fs.existsSync(statePath)) {
                     logger.warn('A state file was not provided, initializing state. Try the --state flag or create a state.json in the root folder of your template.');
-                    const initResult = await engine.init(clause, defaultRequest, currentTime);
+                    const initResult = await engine.init(clause, currentTime);
                     stateJson = initResult.state;
                 } else {
                     stateJson = JSON.parse(fs.readFileSync(statePath, 'utf8'));

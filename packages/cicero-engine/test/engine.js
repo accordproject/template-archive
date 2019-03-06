@@ -189,10 +189,7 @@ describe('EngineHelloWorld', () => {
         });
 
         it('should execute a smart clause with state initialization', async function () {
-            const request = {
-                '$class': 'org.accordproject.cicero.runtime.Request'
-            };
-            const result = await engine.init(clause, request);
+            const result = await engine.init(clause);
             result.state.should.not.be.null;
             const state = result.state;
             state.$class.should.equal('org.accordproject.cicero.contract.AccordContractState');
@@ -307,11 +304,7 @@ describe('EngineHelloEmitInit', () => {
     describe('#executeandemitinit', function () {
 
         it('should execute a smart clause which emits during initialization', async function () {
-            const request = {
-                '$class': 'org.accordproject.helloemit.MyInitRequest',
-                'input': 'Accord Project'
-            };
-            const result = await engine.init(clause, request);
+            const result = await engine.init(clause);
             result.should.not.be.null;
             result.response.should.not.be.null;
             result.emit[0].$class.should.equal('org.accordproject.helloemit.Greeting');
@@ -366,24 +359,28 @@ describe('BogusClauses', () => {
     afterEach(() => {});
 
     it('should throw error when no __dispatch in JavaScript logic', async () => {
-        return (() => engine.hasDispatch(clause)).should.throw('Function __dispatch was not found in logic');
+        const scriptManager = clause.getTemplate().getScriptManager();
+        return (() => engine.hasDispatch(scriptManager)).should.throw('Function __dispatch was not found in logic');
     });
     it('should throw error when no __init in JavaScript logic', async () => {
-        return (() => engine.hasInit(clause)).should.throw('Function __init was not found in logic');
+        const scriptManager = clause.getTemplate().getScriptManager();
+        return (() => engine.hasInit(scriptManager)).should.throw('Function __init was not found in logic');
     });
     it('should throw an error when JavaScript logic is missing', async function() {
         // Turn all JavaScript logic into something else
-        clause.getTemplate().getScriptManager().getAllScripts().forEach(function (element) {
+        const scriptManager = clause.getTemplate().getScriptManager();
+        scriptManager.getAllScripts().forEach(function (element) {
             if (element.getLanguage() === '.js') {
                 element.language = '.ergo';
             }
         }, this);
-        (() => engine.compileJsClause(clause)).should.throw('Did not find any JavaScript logic');
+        (() => engine.compileJsLogic(scriptManager)).should.throw('Did not find any JavaScript logic');
     });
     it('should throw an error when all logic is missing', async function() {
         // Remove all scripts
-        clause.getTemplate().getScriptManager().scripts = {};
-        (() => engine.compileJsClause(clause)).should.throw('Did not find any JavaScript logic');
+        const scriptManager = clause.getTemplate().getScriptManager();
+        scriptManager.scripts = {};
+        (() => engine.compileJsLogic(scriptManager)).should.throw('Did not find any JavaScript logic');
     });
 });
 describe('EngineInstallmentSaleJs', () => {
@@ -422,9 +419,7 @@ describe('EngineInstallmentSaleJs', () => {
         });
 
         it('should initialize a smart clause', async function () {
-            const request = {};
-            request.$class = 'org.accordproject.cicero.runtime.Request';
-            const result = await engine.init(clause, request);
+            const result = await engine.init(clause);
             result.should.not.be.null;
             result.response.should.not.be.null;
             result.state.balance_remaining.should.equal(10000.00);
@@ -433,9 +428,7 @@ describe('EngineInstallmentSaleJs', () => {
         });
 
         it('should initialize a smart clause and execute one installment', async function () {
-            const request = {};
-            request.$class = 'org.accordproject.cicero.runtime.Request';
-            const result = await engine.init(clause, request);
+            const result = await engine.init(clause);
             result.should.not.be.null;
             result.response.should.not.be.null;
             result.state.balance_remaining.should.equal(10000.00);
@@ -489,9 +482,7 @@ describe('EngineInstallmentSaleErgo', () => {
         });
 
         it('should initialize a smart clause', async function () {
-            const request = {};
-            request.$class = 'org.accordproject.cicero.runtime.Request';
-            const result = await engine.init(clause, request);
+            const result = await engine.init(clause);
             result.should.not.be.null;
             result.response.should.not.be.null;
             result.state.balance_remaining.should.equal(10000.00);
@@ -499,9 +490,7 @@ describe('EngineInstallmentSaleErgo', () => {
         });
 
         it('should initialize a smart clause and execute one installment', async function () {
-            const request = {};
-            request.$class = 'org.accordproject.cicero.runtime.Request';
-            const result = await engine.init(clause, request);
+            const result = await engine.init(clause);
             result.should.not.be.null;
             result.response.should.not.be.null;
             result.state.balance_remaining.should.equal(10000.00);
@@ -523,5 +512,24 @@ describe('Resolve root directory for Cucumber', () => {
     });
     it('Should resolve to \'.\'', function () {
         return Util.resolveRootDir({}).should.equal('.');
+    });
+});
+describe('Initialize current time', () => {
+    it('Should succeed for a well-formed date/time', function () {
+        const currentTime = Engine.setCurrentTime('1970-01-01T00:00:00Z');
+        return currentTime.format().should.equal('1970-01-01T00:00:00Z');
+    });
+    it('Should stringify a date time back with its timezone', function () {
+        const currentTime = Engine.setCurrentTime('1970-01-01T00:00:00+05:00');
+        return JSON.stringify(currentTime).should.equal('"1970-01-01T00:00:00+05:00"');
+    });
+    it('Should fail for a non-well-formed date/time', function () {
+        return (() => Engine.setCurrentTime('1970-01-01').format()).should.throw('1970-01-01 is not a valid moment with the format \'YYYY-MM-DDTHH:mm:ssZ\'');
+    });
+    it('Should not fail when currentTime is null', function () {
+        return (() => Engine.setCurrentTime(null).format()).should.not.be.null;
+    });
+    it('Should not fail when currentTime is undefined', function () {
+        return (() => Engine.setCurrentTime(undefined).format()).should.not.be.null;
     });
 });
