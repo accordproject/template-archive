@@ -4,12 +4,12 @@ import org.accordproject.cicero.contract.*
 
 contract HelloWorld over TemplateModel {
    // Simple Clause
-   clause init(request : MyInitRequest) : MyResponse emits Greeting {
+   clause init() : MyResponse emits Greeting {
 		 set state AccordContractState{
 			 stateId: "1"
 		 };
      emit Greeting{ message: "Voila!" };
-     return MyResponse{ output: "Hello " ++ contract.name ++ " (" ++ request.input ++ ")" }
+     return MyResponse{ output: "Hello " ++ contract.name }
   }
    // Simple Clause
    clause helloworld(request : MyRequest) : MyResponse {

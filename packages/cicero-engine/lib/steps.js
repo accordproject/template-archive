@@ -31,19 +31,17 @@ const defaultState = {
     '$class':'org.accordproject.cicero.contract.AccordContractState',
     'stateId':'org.accordproject.cicero.contract.AccordContractState#1'
 };
-const initRequest = {'$class':'org.accordproject.cicero.runtime.Request'};
 
 /**
  * Initializes the contract
  *
  * @param {object} engine - the Cicero engine
  * @param {object} clause - the clause instance
- * @param {object} request - the request data in JSON
  * @param {string} currentTime - the definition of 'now'
  * @returns {object} Promise to the response
  */
-async function init(engine,clause,request,currentTime) {
-    return engine.init(clause,request,currentTime);
+async function init(engine,clause,currentTime) {
+    return engine.init(clause,currentTime);
 }
 
 /**
@@ -58,7 +56,7 @@ async function init(engine,clause,request,currentTime) {
  */
 async function send(engine,clause,request,state,currentTime) {
     if (state === null) {
-        const initAnswer = await init(engine,clause,initRequest,currentTime);
+        const initAnswer = await init(engine,clause,currentTime);
         const initState = initAnswer.state;
         return engine.execute(clause,request,initState,currentTime);
     } else {
@@ -154,7 +152,7 @@ When('it receives the default request', function () {
 
 Then('the initial state( of the contract) should be', function (expectedState) {
     const state = JSON.parse(expectedState);
-    return init(this.engine,this.clause,initRequest,this.currentTime)
+    return init(this.engine,this.clause,this.currentTime)
         .then((actualAnswer) => {
             this.answer = actualAnswer;
             expect(actualAnswer).to.have.property('state');
@@ -165,7 +163,7 @@ Then('the initial state( of the contract) should be', function (expectedState) {
 
 Then('the initial state( of the contract) should be the default state', function () {
     const state = defaultState;
-    return init(this.engine,this.clause,initRequest,this.currentTime)
+    return init(this.engine,this.clause,this.currentTime)
         .then((actualAnswer) => {
             this.answer = actualAnswer;
             expect(actualAnswer).to.have.property('state');
