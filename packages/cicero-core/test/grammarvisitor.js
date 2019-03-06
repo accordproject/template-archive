@@ -18,7 +18,7 @@ const APModelManager = require('@accordproject/ergo-compiler').APModelManager;
 const Logger = require('@accordproject/ergo-compiler').Logger;
 const Writer = require('composer-concerto').Writer;
 const GrammarVisitor = require('../lib/grammarvisitor');
-const Template = require('../lib/template');
+const ParserManager = require('../lib/parsermanager');
 const nunjucks = require('nunjucks');
 
 const fs = require('fs');
@@ -87,7 +87,7 @@ describe('GrammarVisitor', () => {
             const combined = nunjucks.renderString(ruleTemplate, {modelRules: generatedGrammar});
 
             // check we can parse the generated grammar
-            const ast = Template.compileGrammar(combined);
+            const ast = ParserManager.compileGrammar(combined);
             ast.should.not.be.null;
         });
 
@@ -123,7 +123,7 @@ describe('GrammarVisitor', () => {
             const combined = nunjucks.renderString(ruleTemplate, {modelRules: generatedGrammar});
 
             // check we can parse the generated grammar
-            const ast = Template.compileGrammar(combined);
+            const ast = ParserManager.compileGrammar(combined);
             ast.should.not.be.null;
         });
 
@@ -156,7 +156,7 @@ describe('GrammarVisitor', () => {
             const combined = nunjucks.renderString(ruleTemplate, {modelRules: generatedGrammar});
 
             // check we can parse the generated grammar
-            const ast = Template.compileGrammar(combined);
+            const ast = ParserManager.compileGrammar(combined);
             ast.should.not.be.null;
         });
 

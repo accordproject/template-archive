@@ -59,8 +59,6 @@ class Metadata {
      * THe `default` key represents sample template text in a non-specified language, stored in a file called `sample.txt`.
      */
     constructor(packageJson, readme, samples, request) {
-        const method = 'constructor';
-        Logger.entry(method, readme, samples, request);
 
         if(!packageJson || typeof(packageJson) !== 'object') {
             throw new Error('package.json is required and must be an object');
@@ -141,8 +139,6 @@ class Metadata {
             Logger.error(msg);
             throw new Error(msg);
         }
-
-        Logger.exit(method);
     }
 
     /**
@@ -221,10 +217,10 @@ class Metadata {
      * Returns the sample for this template in the given locale. This may be null.
      * If no locale is specified returns the default sample if it has been specified.
      *
-     * @param {string} locale the IETF language code for the language
+     * @param {string} locale the IETF language code for the language.
      * @return {string} the sample file for the template in the given locale or null
      */
-    getSample(locale) {
+    getSample(locale=null) {
         if(!locale && 'default' in this.samples){
             return this.samples.default;
         } else if (locale && locale in this.samples){

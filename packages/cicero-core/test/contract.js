@@ -29,7 +29,6 @@ describe('Contract', () => {
     const sampleText = fs.readFileSync(path.resolve(__dirname, 'data/copyright-license', 'sample.txt'), 'utf8');
 
     describe('#parse', () => {
-
         it('should be able to set the data from copyright-license natural language text', async function() {
             const template = await Template.fromDirectory('./test/data/copyright-license');
             const contract = new Contract(template);
