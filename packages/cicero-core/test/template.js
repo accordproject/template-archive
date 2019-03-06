@@ -15,11 +15,11 @@
 'use strict';
 
 const Template = require('../lib/template');
-const nearley = require('nearley');
 const fs = require('fs');
 const archiver = require('archiver');
 
 const chai = require('chai');
+const assert = require('chai').assert;
 
 chai.should();
 chai.use(require('chai-things'));
@@ -75,40 +75,15 @@ describe('Template', () => {
 
         it('should create a template from a directory with no logic', async () => {
             const template = await Template.fromDirectory('./test/data/text-only');
-            template.hasNoLogic().should.equal(true);
+            template.hasLogic().should.equal(false);
         });
 
         it('should create a template from a directory', () => {
             return Template.fromDirectory('./test/data/latedeliveryandpenalty').should.be.fulfilled;
         });
 
-        it('should throw error when loading Ergo template containing JavaScript', async () => {
-            return Template.fromDirectory('./test/data/ergo-js-inside').should.be.rejectedWith('Ergo template but contains JavaScript logic');
-        });
-
-        it('should throw error when loading JavaScript template containing Ergo', async () => {
-            return Template.fromDirectory('./test/data/js-ergo-inside').should.be.rejectedWith('JavaScript template but contains Ergo logic');
-        });
-
         it('should throw error when Ergo logic does not parse', async () => {
             return Template.fromDirectory('./test/data/bad-logic').should.be.rejectedWith('Parse error (at file lib/logic.ergo line 14 col 4). \n    define agreed = request.agreedDelivery;\n    ^^^^^^                                 ');
-        });
-
-        it('should default to JavaScript when creating an archive', async () => {
-            const templatePromise = Template.fromDirectory('./test/data/latedeliveryandpenalty-js');
-            return templatePromise.then((template) => template.toArchive('javascript')).should.not.be.null;
-        });
-
-        it('should generate a text-only archive from a logic template', async () => {
-            const template = await Template.fromDirectory('./test/data/latedeliveryandpenalty');
-            template.setArchiveOmitsLogic();
-            template.toArchive('ergo').should.not.be.null;
-        });
-
-        it('should generate a logic archive from a text-only template', async () => {
-            const template = await Template.fromDirectory('./test/data/text-only');
-            template.unsetArchiveOmitsLogic();
-            template.toArchive('ergo').should.not.be.null;
         });
 
         it('should throw an error if archive language is neither ergo nor javascript', async () => {
@@ -121,17 +96,12 @@ describe('Template', () => {
             return templatePromise.then((template) => template.toArchive()).should.be.rejectedWith('language is required and must be a string');
         });
 
-        it('should throw an error when trying to export an ergo archive from a javascript one', async () => {
-            const templatePromise = Template.fromDirectory('./test/data/latedeliveryandpenalty-js');
-            return templatePromise.then((template) => template.toArchive('ergo')).should.be.rejectedWith('Cannot export JavaScript archive to Ergo');
-        });
-
         it('should roundtrip a source template (Ergo)', async function() {
             const template = await Template.fromDirectory('./test/data/latedeliveryandpenalty');
-            template.hasNoLogic().should.equal(false);
+            template.hasLogic().should.equal(true);
             template.getIdentifier().should.equal('latedeliveryandpenalty@0.0.1');
             template.getModelManager().getModelFile('io.clause.latedeliveryandpenalty').should.not.be.null;
-            template.getGrammar().should.not.be.null;
+            template.getParserManager().getGrammar().should.not.be.null;
             template.getScriptManager().getScripts().length.should.equal(1);
             template.getScriptManager().getLogic().length.should.equal(1);
             template.getMetadata().getREADME().should.not.be.null;
@@ -147,77 +117,13 @@ describe('Template', () => {
             const template2 = await Template.fromArchive(buffer);
             template2.getIdentifier().should.equal(template.getIdentifier());
             template2.getModelManager().getModelFile('io.clause.latedeliveryandpenalty').should.not.be.null;
-            template2.getGrammar().should.not.be.null;
-            template2.getTemplatizedGrammar().should.equal(template.getTemplatizedGrammar());
+            template2.getParserManager().getGrammar().should.not.be.null;
+            template2.getParserManager().getTemplatizedGrammar().should.equal(template.getParserManager().getTemplatizedGrammar());
             template2.getScriptManager().getScripts().length.should.equal(template.getScriptManager().getScripts().length);
             template2.getMetadata().getREADME().should.equal(template.getMetadata().getREADME());
             template2.getMetadata().getKeywords().should.eql(template.getMetadata().getKeywords());
             template2.getMetadata().getSamples().should.eql(template.getMetadata().getSamples());
             template2.getHash().should.equal(template.getHash());
-            const buffer2 = await template2.toArchive('ergo');
-            buffer2.should.not.be.null;
-        });
-
-        it('should roundtrip a compiled template (JavaScript)', async function() {
-            const template = await Template.fromDirectory('./test/data/latedeliveryandpenalty-js');
-            template.getIdentifier().should.equal('latedeliveryandpenalty@0.0.1');
-            template.getModelManager().getModelFile('io.clause.latedeliveryandpenalty').should.not.be.null;
-            template.getGrammar().should.not.be.null;
-            template.getScriptManager().getScripts().length.should.equal(1);
-            template.getMetadata().getREADME().should.not.be.null;
-            template.getMetadata().getRequest().should.not.be.null;
-            template.getMetadata().getKeywords().should.not.be.null;
-            template.getName().should.equal('latedeliveryandpenalty');
-            template.getDescription().should.equal('Late Delivery and Penalty. In case of delayed delivery except for Force Majeure cases, the Seller shall pay to the Buyer for every 9 DAY of delay penalty amounting to 7% of the total value of the Equipment whose delivery has been delayed. Any fractional part of a DAY is to be considered a full DAY. The total amount of penalty shall not however, exceed 2% of the total value of the Equipment involved in late delivery. If the delay is more than 2 WEEK, the Buyer is entitled to terminate this Contract.');
-            template.getVersion().should.equal('0.0.1');
-            template.getMetadata().getSample().should.equal('Late Delivery and Penalty. In case of delayed delivery except for Force Majeure cases, the Seller shall pay to the Buyer for every 9 days of delay penalty amounting to 7% of the total value of the Equipment whose delivery has been delayed. Any fractional part of a days is to be considered a full days. The total amount of penalty shall not however, exceed 2% of the total value of the Equipment involved in late delivery. If the delay is more than 2 weeks, the Buyer is entitled to terminate this Contract.');
-            template.getHash().should.equal('f78a8ee83fbd3abb53ea978235443df4e153cd5a8acebd6c88aeb986ef308b99');
-            const buffer = await template.toArchive('javascript');
-            buffer.should.not.be.null;
-            const template2 = await Template.fromArchive(buffer);
-            template2.getIdentifier().should.equal(template.getIdentifier());
-            template2.getModelManager().getModelFile('io.clause.latedeliveryandpenalty').should.not.be.null;
-            template2.getGrammar().should.not.be.null;
-            template2.getGrammar().should.equal(template.getGrammar());
-            template2.getScriptManager().getScripts().length.should.equal(template.getScriptManager().getScripts().length);
-            template2.getMetadata().getREADME().should.equal(template.getMetadata().getREADME());
-            template2.getMetadata().getKeywords().should.eql(template.getMetadata().getKeywords());
-            template2.getMetadata().getSamples().should.eql(template.getMetadata().getSamples());
-            template2.getHash().should.equal(template.getHash());
-            const buffer2 = await template2.toArchive('javascript');
-            buffer2.should.not.be.null;
-        });
-
-        it('should roundtrip a text-only archive', async function() {
-            const template = await Template.fromDirectory('./test/data/latedeliveryandpenalty');
-            template.hasNoLogic().should.equal(false);
-            template.getIdentifier().should.equal('latedeliveryandpenalty@0.0.1');
-            template.getModelManager().getModelFile('io.clause.latedeliveryandpenalty').should.not.be.null;
-            template.getGrammar().should.not.be.null;
-            template.getScriptManager().getScripts().length.should.equal(1);
-            template.getScriptManager().getLogic().length.should.equal(1);
-            template.getMetadata().getREADME().should.not.be.null;
-            template.getMetadata().getRequest().should.not.be.null;
-            template.getMetadata().getKeywords().should.not.be.null;
-            template.getName().should.equal('latedeliveryandpenalty');
-            template.getDescription().should.equal('Late Delivery and Penalty. In case of delayed delivery except for Force Majeure cases, the Seller shall pay to the Buyer for every 9 DAY of delay penalty amounting to 7% of the total value of the Equipment whose delivery has been delayed. Any fractional part of a DAY is to be considered a full DAY. The total amount of penalty shall not however, exceed 2% of the total value of the Equipment involved in late delivery. If the delay is more than 2 WEEK, the Buyer is entitled to terminate this Contract.');
-            template.getVersion().should.equal('0.0.1');
-            template.getMetadata().getSample().should.equal('Late Delivery and Penalty. In case of delayed delivery except for Force Majeure cases, the Seller shall pay to the Buyer for every 9 days of delay penalty amounting to 7% of the total value of the Equipment whose delivery has been delayed. Any fractional part of a days is to be considered a full days. The total amount of penalty shall not however, exceed 2% of the total value of the Equipment involved in late delivery. If the delay is more than 2 weeks, the Buyer is entitled to terminate this Contract.');
-            template.getHash().should.equal('72c3509c5d4beabce209b82c559bb6abcd2eeddbf5dabceda791f4e189f2ce17');
-            template.setArchiveOmitsLogic();
-            const buffer = await template.toArchive('ergo');
-            buffer.should.not.be.null;
-            const template2 = await Template.fromArchive(buffer);
-            template2.hasNoLogic().should.equal(true);
-            template2.getIdentifier().should.equal(template.getIdentifier());
-            template2.getModelManager().getModelFile('io.clause.latedeliveryandpenalty').should.not.be.null;
-            template2.getGrammar().should.not.be.null;
-            template2.getTemplatizedGrammar().should.equal(template.getTemplatizedGrammar());
-            template2.getScriptManager().getScripts().length.should.equal(0);
-            template2.getMetadata().getREADME().should.equal(template.getMetadata().getREADME());
-            template2.getMetadata().getKeywords().should.eql(template.getMetadata().getKeywords());
-            template2.getMetadata().getSamples().should.eql(template.getMetadata().getSamples());
-            template2.getHash().should.equal('88e6db1c3d4e07ec79e1c51cf75947b0e099c10dcab9c8a9bf156981e9f61a86');
             const buffer2 = await template2.toArchive('ergo');
             buffer2.should.not.be.null;
         });
@@ -231,7 +137,13 @@ describe('Template', () => {
         });
 
         it('should throw an error if a package.json file does not exist', async () => {
-            return (() => Template.fromDirectory('./test/data/no-packagejson')).should.throw('Failed to find package.json');
+            try {
+                await Template.fromDirectory('./test/data/no-packagejson');
+                assert.isOk(false,'should throw an error if a package.json file does not exist');
+            }
+            catch(err) {
+                // ignore
+            }
         });
 
         it('should create a template from a directory with a locale sample', () => {
@@ -239,11 +151,23 @@ describe('Template', () => {
         });
 
         it('should throw an error if a sample.txt file does not exist', async () => {
-            return (() => Template.fromDirectory('./test/data/no-sample')).should.throw('Failed to find any sample files. e.g. sample.txt, sample_fr.txt');
+            try {
+                await Template.fromDirectory('./test/data/no-sample');
+                assert.isOk(false,'should throw an error if a sample.txt file does not exist');
+            }
+            catch(err) {
+                // ignore
+            }
         });
 
         it('should throw an error if the locale is not in the IETF format', async () => {
-            return (() => Template.fromDirectory('./test/data/bad-locale')).should.throw('Invalid locale used in sample file, sample_!.txt. Locales should be IETF language tags, e.g. sample_fr.txt');
+            try {
+                await Template.fromDirectory('./test/data/bad-locale');
+                assert.isOk(false,'should throw an error if the locale is not in the IETF format');
+            }
+            catch(err) {
+                // ignore
+            }
         });
 
         // Test case for issue #23
@@ -271,7 +195,6 @@ describe('Template', () => {
     describe('#fromArchive', () => {
 
         it('should create a template from an archive', async () => {
-            await writeZip('latedeliveryandpenalty');
             const buffer = fs.readFileSync('./test/data/latedeliveryandpenalty.cta');
             return Template.fromArchive(buffer).should.be.fulfilled;
         });
@@ -287,25 +210,19 @@ describe('Template', () => {
             const buffer = fs.readFileSync('./test/data/archives/no-packagejson.zip');
             return Template.fromArchive(buffer).should.be.rejectedWith('Failed to find package.json');
         });
-
-        it('should throw error when loading Ergo template containing JavaScript', async () => {
-            await writeZip('ergo-js-inside');
-            const buffer = fs.readFileSync('./test/data/archives/ergo-js-inside.zip');
-            return Template.fromArchive(buffer).should.be.rejectedWith('Ergo template but contains JavaScript logic');
-        });
-
-        it('should throw error when loading JavaScript template containing Ergo', async () => {
-            await writeZip('js-ergo-inside');
-            const buffer = fs.readFileSync('./test/data/archives/js-ergo-inside.zip');
-            return Template.fromArchive(buffer).should.be.rejectedWith('JavaScript template but contains Ergo logic');
-        });
     });
 
     describe('#fromUrl', () => {
 
         it('should throw an error if an archive loader cannot be found', async () => {
-            const url = 'ab://ip-payment@0.9.0#hash';
-            return (() => Template.fromUrl(url, null)).should.throw('Failed to find a model file loader that can handle: ab://ip-payment@0.9.0#hash');
+
+            try {
+                await Template.fromUrl('ab://ip-payment@0.9.0#hash', null);
+                assert.isOk(false,'should throw an error if an archive loader cannot be found');
+            }
+            catch(err) {
+                // ignore
+            }
         });
 
         it('should create a template from an archive at a given URL', async () => {
@@ -319,8 +236,13 @@ describe('Template', () => {
         });
 
         it('should throw an error if creating a template from a wrongly formed AP URL', async () => {
-            const url = 'ap://ip-payment@0.9.0';
-            return (() => Template.fromUrl(url, null)).should.throw('Invalid template specifier. Must contain @ and #: ap://ip-payment@0.9.0');
+            try {
+                await Template.fromUrl('ap://ip-payment@0.9.0', null);
+                assert.isOk(false,'should throw an error if creating a template from a wrongly formed AP URL');
+            }
+            catch(err) {
+                // ignore
+            }
         });
 
         it('should create a template from an archive at a given github URL', async () => {
@@ -334,45 +256,13 @@ describe('Template', () => {
         });
 
         it('should throw an error if creating a template from a github URL to an archive with the wrong Cicero version', async () => {
-            const url = 'github://accordproject/cicero-template-library/master/build/archives/acceptance-of-delivery@0.0.3.cta';
-            return Template.fromUrl(url, {'encoding':null,'headers':{'Accept': '*/*','Accept-Encoding': 'deflate, gzip'}}).should.be.rejectedWith('The template targets Cicero (^0.3.0) but the Cicero version is');
+            const url = 'github://accordproject/cicero-template-library/master/build/archives/acceptance-of-delivery@0.3.0.cta';
+            return Template.fromUrl(url, {'encoding':null,'headers':{'Accept': '*/*','Accept-Encoding': 'deflate, gzip'}}).should.be.rejectedWith('The template targets Cicero (^0.4.6) but the Cicero version is');
         });
 
         it('should throw an error if creating a template from a non existing URL', async () => {
             const url = 'https://emplates.accordproject.org/archives/doesnotexist@0.3.0.cta';
             return Template.fromUrl(url, {'encoding':null,'headers':{'Accept': '*/*','Accept-Encoding': 'deflate, gzip'}}).should.be.rejectedWith('Server did not respond for URL [https://emplates.accordproject.org/archives/doesnotexist@0.3.0.cta]');
-        });
-    });
-
-    describe('#getParser', () => {
-
-        it('should throw an error if called before calling setGrammar or buildGrammar', async () => {
-            const template = new Template({
-                'name': 'conga',
-                'version': '0.0.1',
-                'description': '"Dan Selman" agrees to spend 100.0 conga coins on "swag"',
-                'cicero': {
-                    'template': 'clause',
-                    'language': 'ergo',
-                    'version': '^0.11.0'
-                }
-            },
-            null,
-            {
-                'default':'"Dan Selman" agrees to spend 100.0 conga coins on "swag"',
-            },
-            null);
-            return (() => template.getParser()).should.throw('Must call setGrammar or buildGrammar before calling getParser');
-        });
-
-        it('should return a parser object', async () => {
-            const template = await Template.fromDirectory('./test/data/latedeliveryandpenalty');
-            return template.getParser().should.be.an.instanceof(nearley.Parser);
-        });
-
-        it('should return a parser object for no logic', async () => {
-            const template = await Template.fromDirectory('./test/data/no-logic');
-            return template.getParser().should.be.an.instanceof(nearley.Parser);
         });
     });
 
@@ -579,11 +469,6 @@ describe('Template', () => {
         it('should return all Ergo scripts', async () => {
             const template = await Template.fromDirectory('./test/data/latedeliveryandpenalty');
             template.getScriptManager().getLogic().length.should.equal(1);
-        });
-
-        it('should return no Ergo script', async () => {
-            const template = await Template.fromDirectory('./test/data/latedeliveryandpenalty-js');
-            template.getScriptManager().getLogic().length.should.equal(0);
         });
     });
 

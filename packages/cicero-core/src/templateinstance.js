@@ -16,6 +16,7 @@
 
 const Logger = require('@accordproject/ergo-compiler').Logger;
 const crypto = require('crypto');
+const moment = require('moment-mini');
 const RelationshipDeclaration = require('composer-concerto').RelationshipDeclaration;
 
 /**
@@ -93,7 +94,7 @@ class TemplateInstance {
      * @param {string} text  - the data for the clause
      */
     parse(text) {
-        let parser = this.getTemplate().getParser();
+        let parser = this.getTemplate().getParserManager().getParser();
         parser.feed(text);
         if (parser.results.length !== 1) {
             const head = JSON.stringify(parser.results[0]);
@@ -104,14 +105,50 @@ class TemplateInstance {
                 }
             }, this);
         }
-        const ast = parser.results[0];
+        let ast = parser.results[0];
         Logger.debug('Result of parsing: ' + JSON.stringify(ast));
 
         if(!ast) {
             throw new Error('Parsing clause text returned a null AST. This may mean the text is valid, but not complete.');
         }
 
+        ast = TemplateInstance.convertDateTimes(ast);
         this.setData(ast);
+    }
+
+    /**
+     * Left pads a number
+     * @param {*} n - the number
+     * @param {*} width - the number of chars to pad to
+     * @param {string} z - the pad character
+     * @return {string} the left padded string
+     */
+    static pad(n, width, z = '0') {
+        n = n + '';
+        return n.length >= width ? n : new Array(width - n.length + 1).join(z) + n;
+    }
+
+    /**
+     * Recursive function that converts all instances of ParsedDateTime
+     * to a Moment.
+     * @param {*} obj the input object
+     * @returns {*} the converted object
+     */
+    static convertDateTimes(obj) {
+        if(obj.$class === 'ParsedDateTime') {
+            const instance = moment([obj.years, obj.months, obj.days, obj.hours, obj.minutes, obj.seconds, obj.milliseconds])
+                .utcOffset(obj.timezone, true);
+            const result = instance.format('YYYY-MM-DDTHH:mm:ss.SSSZ');
+            console.log('result : ' + result);
+            return result;
+        }
+        else if( typeof obj === 'object' && obj !== null) {
+            Object.entries(obj).forEach(
+                ([key, value]) => {obj[key] = TemplateInstance.convertDateTimes(value);}
+            );
+        }
+
+        return obj;
     }
 
     /**
@@ -125,7 +162,7 @@ class TemplateInstance {
             throw new Error('Data has not been set. Call setData or parse before calling this method.');
         }
 
-        const ast = this.getTemplate().getTemplateAst();
+        const ast = this.getTemplate().getParserManager().getTemplateAst();
         // console.log('AST: ' + JSON.stringify(ast, null, 4));
 
         let result = '';
@@ -147,9 +184,11 @@ class TemplateInstance {
             }
                 break;
 
+            case 'FormattedBinding':
             case 'Binding': {
                 const property = this.getTemplate().getTemplateModel().getProperty(thing.fieldName.value);
-                result += this.convertPropertyToString(property, this.composerData[property.getName()]);
+                const value = this.composerData[property.getName()];
+                result += this.convertPropertyToString(property, value, thing.format ? thing.format.value : null);
             }
                 break;
 
@@ -184,22 +223,19 @@ class TemplateInstance {
     }
 
     /**
-     * Returns a MM/dd/yyyy formatted date
-     * @param {Date} date - the date to format
-     * @returns {string} formatted date
+     * Returns moment Date object parsed using a format string
+     * @param {Date} date - date/time string to parse
+     * @param {string} format - the optional format string. If not specified
+     * this defaults to 'MM/DD/YYYY'
+     * @returns {string} ISO-8601 formatted date as a string
      * @private
      */
-    static getFormattedDate(date) {
-        let utcDate = date.utc();
-        let year = utcDate.year().toString();
-
-        let month = (1 + utcDate.month()).toString();
-        month = month.length > 1 ? month : '0' + month;
-
-        let day = utcDate.date().toString();
-        day = day.length > 1 ? day : '0' + day;
-
-        return month + '/' + day + '/' + year;
+    static formatDateTime(date, format) {
+        if(!format) {
+            format = 'MM/DD/YYYY';
+        }
+        const instance = moment.parseZone(date);
+        return instance.format(format);
     }
 
 
@@ -207,10 +243,15 @@ class TemplateInstance {
      * Converts a composer object to a string
      * @param {Property} property - the composer property
      * @param {object} obj - the instance to convert
+     * @param {string} format - the optional format string to use
      * @returns {string} the parseable string representation of the object
      * @private
      */
-    convertPropertyToString(property, obj) {
+    convertPropertyToString(property, obj, format) {
+
+        if(property.isOptional() === false && !obj) {
+            throw new Error(`Required property ${property.getFullyQualifiedName()} is null.`);
+        }
 
         if(property instanceof RelationshipDeclaration) {
             return `"${obj.getIdentifier()}"`;
@@ -218,6 +259,11 @@ class TemplateInstance {
 
         if(property.isTypeEnum()) {
             return obj;
+        }
+
+        if(format) {
+            // strip quotes
+            format = format.substr(1, format.length-2);
         }
 
         // uncomment this code when the templates support arrays
@@ -242,8 +288,7 @@ class TemplateInstance {
         case 'Double':
             return obj.toString();
         case 'DateTime':
-            //return obj.toISOString();
-            return TemplateInstance.getFormattedDate(obj);
+            return TemplateInstance.formatDateTime(obj, format);
         case 'Boolean':
             if(obj) {
                 return 'true';

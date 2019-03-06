@@ -88,45 +88,6 @@ describe('cicero-server', () => {
             });
     });
 
-    it('/should execute a simple stateless request (js)', async () => {
-        return request.post('/execute/latedeliveryandpenalty-js/data.json')
-            .send(body)
-            .expect(200)
-            .then(response => {
-                response.body.response.should.include(responseBody);
-                response.body.should.not.have.property('state');
-            });
-    });
-
-    it('/should execute a simple stateless request with a sample clause (js)', async () => {
-        return request.post('/execute/latedeliveryandpenalty-js/sample.txt')
-            .send(body)
-            .expect(200)
-            .then(response => {
-                response.body.response.should.include(responseBody);
-                response.body.should.not.have.property('state');
-            });
-    });
-
-    it('/should fail to execute a simple stateless request with a bad data file (js)', async () => {
-        return request.post('/execute/latedeliveryandpenalty-js/bad.txt')
-            .send(body)
-            .expect(500);
-    });
-
-    it('/should execute a stateful request (js)', async () => {
-        return request.post('/execute/latedeliveryandpenalty-js/data.json')
-            .send({
-                request: body,
-                state,
-            })
-            .expect(200)
-            .then(response => {
-                response.body.response.should.include(responseBody);
-                response.body.state.should.include(state);
-            });
-    });
-
     after(() => {
         server.close();
     });

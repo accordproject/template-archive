@@ -1,6 +1,7 @@
 namespace org.accordproject.cicero.runtime
 
-import org.accordproject.cicero.contract.* from https://models.accordproject.org/cicero/contract.cto
+import org.accordproject.cicero.contract.AccordContract from https://models.accordproject.org/cicero/contract.cto
+import org.accordproject.cicero.contract.AccordContractState from https://models.accordproject.org/cicero/contract.cto
 import org.accordproject.money.MonetaryAmount from https://models.accordproject.org/money.cto
 
 /**

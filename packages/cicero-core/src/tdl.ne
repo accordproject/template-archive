@@ -60,14 +60,15 @@ const lexer = moo.states({
         }
     },
     var: {
-        varend: {
+varend: {
             match: '}]',
             pop: true
         }, // pop back to main state
+        varas: 'as',
         varid: /[a-zA-Z_][_a-zA-Z0-9]*/,
         varstring: /".*?"/,
-        varcond: /:\?/,
-        varspace: / /,
+        varcond: ':?',
+        varspace: ' ',
         clauseidstart: {
             match: /#[a-zA-Z_][_a-zA-Z0-9]*/,
             value: x => x.slice(1)
@@ -148,7 +149,8 @@ CLAUSE_VARIABLE_EXTERNAL -> %clauseidstart %clauseclose %varend
 
 # A variable may be one of the sub-types below
 VARIABLE -> 
-      BOOLEAN_BINDING  {% id %}
+      FORMATTED_BINDING {% id %}
+    | BOOLEAN_BINDING  {% id %}
     | BINDING {% id %} 
 
 # A Boolean binding set a boolean to true if a given optional string literal is present
@@ -159,6 +161,18 @@ BOOLEAN_BINDING -> %varstring %varcond %varspace %varid %varend
             type: 'BooleanBinding',
             string: data[0],
             fieldName: data[3]
+        };
+    }
+%}
+
+# A Formatted binding specifies how a field is parsed inline. For example, for a DateTime field:
+# [{fieldName as "YYYY-MM-DD HH:mm Z"}]
+FORMATTED_BINDING -> %varid %varspace %varas %varspace %varstring %varend
+{% (data) => {
+        return {
+            type: 'FormattedBinding',
+            fieldName: data[0],
+            format: data[4],
         };
     }
 %}
