@@ -17,6 +17,8 @@
 const logger = require('@accordproject/cicero-core').logger;
 const ResourceValidator = require('composer-concerto/lib/serializer/resourcevalidator');
 const Moment = require('moment');
+// Make sure Moment serialization preserves utcOffset. See https://momentjs.com/docs/#/displaying/as-json/
+Moment.fn.toJSON = require('./momenttojson');
 
 const {
     VM,
@@ -41,15 +43,15 @@ class Engine {
     }
 
     /**
-     * Compile and cache a clause with JavaScript logic
-     * @param {Clause} clause  - the clause to compile
+     * Compile and cache JavaScript logic
+     * @param {ScriptManager} scriptManager  - the script manager
+     * @param {string} clauseId - the clause identifier
      * @private
      */
-    compileJsClause(clause) {
+    compileJsLogic(scriptManager, clauseId) {
         let allJsScripts = '';
-        let template = clause.getTemplate();
 
-        template.getScriptManager().getAllScripts().forEach(function (element) {
+        scriptManager.getAllScripts().forEach(function (element) {
             if (element.getLanguage() === '.js') {
                 allJsScripts += element.getContents();
             }
@@ -60,11 +62,11 @@ class Engine {
         }
 
         // Check that the clause script has both __dispatch and __init
-        this.hasDispatch(clause);
-        this.hasInit(clause);
+        this.hasDispatch(scriptManager);
+        this.hasInit(scriptManager);
 
         const script = new VMScript(allJsScripts);
-        this.scripts[clause.getIdentifier()] = script;
+        this.scripts[clauseId] = script;
     }
 
     /**
@@ -86,7 +88,7 @@ class Engine {
      */
     buildInitFunction() {
         const code = `
-        __init({contract:data,request:request,now:now,emit:[]});
+        __init({contract:data,request:null,now:now,emit:[]});
         `;
         return code;
     }
@@ -103,9 +105,13 @@ class Engine {
      * @private
      */
     async execute(clause, request, state, currentTime) {
-        const template = clause.getTemplate();
+        const serializer = clause.getTemplate().getSerializer();
+        const scriptManager = clause.getTemplate().getScriptManager();
+        const clauseId = clause.getIdentifier();
+        const validContract = clause.getDataAsComposerObject();
+
         // ensure the request is valid
-        const validRequest = template.getSerializer().fromJSON(request, {validate: false, acceptResourcesForRelationships: true});
+        const validRequest = serializer.fromJSON(request, {validate: false, acceptResourcesForRelationships: true});
         validRequest.$validator = new ResourceValidator({permitResourcesForRelationships: true});
         validRequest.validate();
 
@@ -114,7 +120,7 @@ class Engine {
         const validUtcOffset = validNow.utcOffset();
 
         // ensure the state is valid
-        const validState = template.getSerializer().fromJSON(state, {validate: false, acceptResourcesForRelationships: true});
+        const validState = serializer.fromJSON(state, {validate: false, acceptResourcesForRelationships: true});
         validState.$validator = new ResourceValidator({permitResourcesForRelationships: true});
         validState.validate();
 
@@ -122,17 +128,16 @@ class Engine {
 
         let script;
 
-        this.compileJsClause(clause);
-        script = this.scripts[clause.getIdentifier()];
+        this.compileJsLogic(scriptManager, clauseId);
+        script = this.scripts[clauseId];
 
         const callScript = this.buildDispatchFunction();
 
-        const validContract = clause.getDataAsComposerObject();
         const vm = new VM({
             timeout: 1000,
             sandbox: {
-                moment: require('moment'),
-                serializer:template.getSerializer(),
+                moment: Moment,
+                serializer:serializer,
                 logger: logger,
                 utcOffset: validUtcOffset
             }
@@ -151,23 +156,23 @@ class Engine {
         // ensure the response is valid
         result.response.$validator = new ResourceValidator({permitResourcesForRelationships: true});
         result.response.validate();
-        const responseResult = template.getSerializer().toJSON(result.response, {convertResourcesToRelationships: true});
+        const responseResult = serializer.toJSON(result.response, {convertResourcesToRelationships: true});
 
         // ensure the new state is valid
         result.state.$validator = new ResourceValidator({permitResourcesForRelationships: true});
         result.state.validate();
-        const stateResult = template.getSerializer().toJSON(result.state, {convertResourcesToRelationships: true});
+        const stateResult = serializer.toJSON(result.state, {convertResourcesToRelationships: true});
 
         // ensure all the emits are valid
         let emitResult = [];
         for (let i = 0; i < result.emit.length; i++) {
             result.emit[i].$validator = new ResourceValidator({permitResourcesForRelationships: true});
             result.emit[i].validate();
-            emitResult.push(template.getSerializer().toJSON(result.emit[i], {convertResourcesToRelationships: true}));
+            emitResult.push(serializer.toJSON(result.emit[i], {convertResourcesToRelationships: true}));
         }
 
         return {
-            'clause': clause.getIdentifier(),
+            'clause': clauseId,
             'request': request,
             'response': responseResult,
             'state': stateResult,
@@ -176,40 +181,34 @@ class Engine {
     }
 
     /**
-     * Initialize a clause, passing in the request object
+     * Initialize a clause
      * @param {Clause} clause  - the clause to execute
-     * @param {object} request  - the request, a JS object that can be deserialized
-     * using the Composer serializer.
      * @param {string} currentTime - the definition of 'now'
      * @return {Promise} a promise that resolves to a result for the clause initialization
      * @private
      */
-    async init(clause, request, currentTime) {
-        const template = clause.getTemplate();
-        // ensure the request is valid
-        const validRequest = template.getSerializer().fromJSON(request, {validate: false, acceptResourcesForRelationships: true});
-        validRequest.$validator = new ResourceValidator({permitResourcesForRelationships: true});
-        validRequest.validate();
+    async init(clause, currentTime) {
+        const serializer = clause.getTemplate().getSerializer();
+        const scriptManager = clause.getTemplate().getScriptManager();
+        const clauseId = clause.getIdentifier();
+        const validContract = clause.getDataAsComposerObject();
 
         // Set the current time and UTC Offset
         const validNow = Engine.setCurrentTime(currentTime);
         const validUtcOffset = validNow.utcOffset();
 
-        logger.debug('Engine processing initialization request ' + request.$class);
-
         let script;
 
-        this.compileJsClause(clause);
-        script = this.scripts[clause.getIdentifier()];
+        this.compileJsLogic(scriptManager, clauseId);
+        script = this.scripts[clauseId];
 
         const callScript = this.buildInitFunction();
 
-        const validContract = clause.getDataAsComposerObject();
         const vm = new VM({
             timeout: 1000,
             sandbox: {
-                moment: require('moment'),
-                serializer:template.getSerializer(),
+                moment: Moment,
+                serializer:serializer,
                 logger: logger,
                 utcOffset: validUtcOffset
             }
@@ -217,7 +216,6 @@ class Engine {
 
         // add immutables to the context
         vm.freeze(validContract, 'data'); // Second argument adds object to global.
-        vm.freeze(validRequest, 'request'); // Second argument adds object to global.
         vm.freeze(validNow, 'now'); // Second argument adds object to global.
 
         // execute the logic
@@ -227,24 +225,24 @@ class Engine {
         // ensure the response is valid
         result.response.$validator = new ResourceValidator({permitResourcesForRelationships: true});
         result.response.validate();
-        const responseResult = template.getSerializer().toJSON(result.response, {convertResourcesToRelationships: true});
+        const responseResult = serializer.toJSON(result.response, {convertResourcesToRelationships: true});
 
         // ensure the new state is valid
         result.state.$validator = new ResourceValidator({permitResourcesForRelationships: true});
         result.state.validate();
-        const stateResult = template.getSerializer().toJSON(result.state, {convertResourcesToRelationships: true});
+        const stateResult = serializer.toJSON(result.state, {convertResourcesToRelationships: true});
 
         // ensure all the emits are valid
         let emitResult = [];
         for (let i = 0; i < result.emit.length; i++) {
             result.emit[i].$validator = new ResourceValidator({permitResourcesForRelationships: true});
             result.emit[i].validate();
-            emitResult.push(template.getSerializer().toJSON(result.emit[i], {convertResourcesToRelationships: true}));
+            emitResult.push(serializer.toJSON(result.emit[i], {convertResourcesToRelationships: true}));
         }
 
         return {
-            'clause': clause.getIdentifier(),
-            'request': request,
+            'clause': clauseId,
+            'request': null,
             'response': responseResult,
             'state': stateResult,
             'emit': emitResult,
@@ -271,34 +269,34 @@ class Engine {
     }
 
     /**
-     * Looks for the presence of a function in a clause's logic
+     * Looks for the presence of a function in the JavaScript logic
      *
-     * @param {Clause} clause  - the clause
+     * @param {ScriptManager} scriptManager  - the script manager
      * @param {string} name  - the function name
      */
-    static hasFunctionDeclaration(clause, name) {
+    static hasFunctionDeclaration(scriptManager, name) {
         // get the function declarations of either init or dispatch
-        const funDecls = clause.getTemplate().getScriptManager().allFunctionDeclarations();
+        const funDecls = scriptManager.allFunctionDeclarations();
         if (!funDecls.some((ele) => { return ele.getName() === name; })) {
             throw new Error(`Function ${name} was not found in logic`);
         }
     }
     /**
-     * Checks that the clause has a dispatch
-     * @param {Clause} clause  - the clause to compile
+     * Checks that the logic has a dispatch function
+     * @param {ScriptManager} scriptManager  - the script manager
      * @private
      */
-    hasDispatch(clause) {
-        Engine.hasFunctionDeclaration(clause,'__dispatch');
+    hasDispatch(scriptManager) {
+        Engine.hasFunctionDeclaration(scriptManager,'__dispatch');
     }
 
     /**
-     * Checks that the clause has an init
-     * @param {Clause} clause  - the clause to compile
+     * Checks that the logic has an init function
+     * @param {ScriptManager} scriptManager  - the script manager
      * @private
      */
-    hasInit(clause) {
-        Engine.hasFunctionDeclaration(clause,'__init');
+    hasInit(scriptManager) {
+        Engine.hasFunctionDeclaration(scriptManager,'__init');
     }
 
 }
