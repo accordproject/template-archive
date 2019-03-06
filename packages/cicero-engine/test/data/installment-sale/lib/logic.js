@@ -5,34 +5,6 @@
 /*eslint-disable no-var*/
 
 
-/**
- * Execute the smart clause
- * @param {Context} context - the Accord context
- * @param {org.accordproject.cicero.runtime.Request} context.request - the incoming request
- * @param {org.accordproject.cicero.runtime.Response} context.response - the response
- * @param {org.accordproject.base.Event} context.emit - the emitted events
- * @param {org.accordproject.installmentsale.InstallmentSaleState} context.state - the state
- */
-function orgXaccordprojectXinstallmentsaleXInstallmentSale_init(context) {
-  let pcontext = { 'request' : serializer.toJSON(context.request,{permitResourcesForRelationships:true}), 'state': { '$class': 'org.accordproject.cicero.contract.AccordContractState', 'stateId' : 'org.accordproject.cicero.contract.AccordContractState#1' }, 'contract': serializer.toJSON(context.contract,{permitResourcesForRelationships:true}), 'emit': context.emit, 'now': context.now};
-  //logger.info('ergo context: '+JSON.stringify(pcontext))
-  let result = new orgXaccordprojectXinstallmentsaleXInstallmentSale().init(pcontext);
-  if (result.hasOwnProperty('left')) {
-    //logger.info('ergo result: '+JSON.stringify(result))
-    context.response = result.left.response ?
-         serializer.fromJSON(result.left.response, {validate: false, acceptResourcesForRelationships: true},{permitResourcesForRelationships:true})
-       : serializer.fromJSON({ '$class': 'org.accordproject.cicero.runtime.Response' });
-    context.state = serializer.fromJSON(result.left.state, {validate: false, acceptResourcesForRelationships: true});
-    let emitResult = [];
-    for (let i = 0; i < result.left.emit.length; i++) {
-      emitResult.push(serializer.fromJSON(result.left.emit[i], {validate: false, acceptResourcesForRelationships: true}));
-    }
-    context.emit = emitResult;
-    return context;
-  } else {
-    throw new Error(result.right.message);
-  }
-}
 
 /**
  * Execute the smart clause
@@ -59,7 +31,8 @@ function orgXaccordprojectXinstallmentsaleXInstallmentSale_PayInstallment(contex
     context.emit = emitResult;
     return context;
   } else {
-    throw new Error(result.right.message);
+    //logger.error('ergo error: '+JSON.stringify(result.right))
+    ciceroError(result);
   }
 }
 
@@ -88,7 +61,8 @@ function orgXaccordprojectXinstallmentsaleXInstallmentSale_PayLastInstallment(co
     context.emit = emitResult;
     return context;
   } else {
-    throw new Error(result.right.message);
+    //logger.error('ergo error: '+JSON.stringify(result.right))
+    ciceroError(result);
   }
 }
 class orgXaccordprojectXinstallmentsaleXInstallmentSale {
@@ -188,7 +162,7 @@ class orgXaccordprojectXinstallmentsaleXInstallmentSale {
       } else {
         var vX$6 = null;
         vX$6 = toRight(res3);
-        res7 = {"right" : {"type": ["org.accordproject.ergo.stdlib.ErgoErrorResponse"], "data": {"message": "DefaultMatch Error at 20:0-86:1 ''"}}};
+        res7 = {"right" : {"type": ["org.accordproject.ergo.stdlib.ErgoErrorResponse"], "data": {"message": "Dispatch Error: no clause in the contract matches the request"}}};
       }
       res8 = res7;
     }
@@ -273,11 +247,12 @@ function __dispatch(context) {
     context.emit = emitResult;
     return context;
   } else {
-    throw new Error(result.right.message);
+    //logger.error('ergo error: '+JSON.stringify(result.right))
+    ciceroError(result);
   }
 }
 function __init(context) {
-  let pcontext = { 'request' : serializer.toJSON(context.request,{permitResourcesForRelationships:true}), 'state': { '$class': 'org.accordproject.cicero.contract.AccordContractState', 'stateId' : 'org.accordproject.cicero.contract.AccordContractState#1' }, 'contract': serializer.toJSON(context.contract,{permitResourcesForRelationships:true}), 'emit': context.emit, 'now': context.now};
+  let pcontext = { 'state': { '$class': 'org.accordproject.cicero.contract.AccordContractState', 'stateId' : 'org.accordproject.cicero.contract.AccordContractState#1' }, 'contract': serializer.toJSON(context.contract,{permitResourcesForRelationships:true}), 'emit': context.emit, 'now': context.now};
   //logger.info('ergo context: '+JSON.stringify(pcontext))
   let result = new orgXaccordprojectXinstallmentsaleXInstallmentSale().init(pcontext);
   if (result.hasOwnProperty('left')) {
@@ -293,7 +268,8 @@ function __init(context) {
     context.emit = emitResult;
     return context;
   } else {
-    throw new Error(result.right.message);
+    //logger.error('ergo error: '+JSON.stringify(result.right))
+    ciceroError(result);
   }
 }
 
@@ -998,8 +974,10 @@ function dateTimeDiff(date1, date2) {
 function mustBeDate(date) {
     if (typeof date == "string") {
         return moment.parseZone(date).utcOffset(utcOffset, false);
+    } else if (date instanceof Date) {
+        return moment(date).utcOffset(utcOffset, false);
     } else {
-        return date.clone();
+        return date.clone().utcOffset(utcOffset, false);;
     }
 }
 
@@ -1043,3 +1021,18 @@ function dateTimeEndOf(part, date) {
     mustBeUnit(part);
     return date.endOf(part);
 }
+
+/** Target-specific support */
+
+/* Cicero Error handling */
+function ciceroError(result) {
+    var failure = toRight(result);
+    var message = "Unknown Ergo Logic Error (Please file a GitHub issue)";
+    if (either(cast(["org.accordproject.ergo.stdlib.ErgoErrorResponse"],failure))) {
+        message = unbrand(toLeft(cast(["org.accordproject.ergo.stdlib.ErgoErrorResponse"],failure))).message;
+    } else {
+        message = JSON.stringify(toRight(cast(["org.accordproject.ergo.stdlib.ErgoErrorResponse"],failure)));
+    }
+    throw new Error("[Ergo] " + message);
+}
+
