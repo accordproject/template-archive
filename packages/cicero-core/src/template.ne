@@ -74,7 +74,7 @@ Double -> decimal {% id %}
 Integer -> int {% id %}
 Long -> int {% id %}
 Boolean -> "true" {% id %} | "false" {% id %}
-# DateTime -> DATE  {% id %}
+DateTime -> DATE  {% id %}
 
 # https://github.com/kach/nearley/blob/master/builtin/number.ne
 unsigned_int -> [0-9]:+ {%
@@ -262,17 +262,17 @@ TZ -> TZ_OFFSET {% id %} |
       UTC {% id %}
 
 # Date format
-DateTime -> DD " " MMM " " YYYY " " HH ":" mm ":" ss " " SSS TZ
-{% (d) => {
-	return {
-        "$class" : "ParsedDateTime",
-		"year": d[4], 
-		"month": d[2], 
-		"day": d[0], 
-		"hour": d[6], 
-		"minute": d[8], 
-		"second": d[10], 
-		"millisecond": d[12], 
-		"timezone": d[13]
-	};}
-%}
+# DateTime -> DD " " MMM " " YYYY " " HH ":" mm ":" ss " " SSS TZ
+# {% (d) => {
+# 	return {
+#         "$class" : "ParsedDateTime",
+# 		"year": d[4], 
+# 		"month": d[2], 
+# 		"day": d[0], 
+# 		"hour": d[6], 
+# 		"minute": d[8], 
+# 		"second": d[10], 
+# 		"millisecond": d[12], 
+# 		"timezone": d[13]
+# 	};}
+# %}

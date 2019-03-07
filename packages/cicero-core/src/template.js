@@ -238,7 +238,7 @@ class Template {
             autoescape: false  // Required to allow nearley syntax strings
         });
         const combined = nunjucks.render('template.ne', parts);
-        // console.log(combined);
+        console.log(combined);
         logger.debug('Generated template grammar' + combined);
 
         this.setGrammar(combined);
@@ -313,6 +313,27 @@ class Template {
                     if( property.getType() !== 'DateTime') {
                         throw new Error('Formatted types are currently only supported for DateTime properties.');
                     }
+                    // push the formatting rule
+                    const formatString = Template.formatStringToRuleAction(element.format.value);
+                    const formattingRuleName = type + '_' + Template.formatStringToRuleName(formatString);
+                    const formattingRuleAction =
+`{% (d) => {
+    return {
+        "$class" : "ParsedDateTime",
+        "year": d[4], 
+        "month": d[2], 
+        "day": d[0], 
+        "hour": d[6], 
+        "minute": d[8], 
+        "second": d[10], 
+        "millisecond": d[12], 
+        "timezone": d[13]
+    };}
+%}`;
+                    parts.modelRules.push({
+                        prefix: formattingRuleName,
+                        symbols: [`${formatString} ${formattingRuleAction} # ${propertyName} as ${element.format.value}`],
+                    });
                     let action = '{% id %}';
                     let suffix = ':';
                     // TODO (DCS) need a serialization for arrays
@@ -328,8 +349,7 @@ class Template {
                     }
                     parts.modelRules.push({
                         prefix: rule,
-                        format: element.format,
-                        symbols: [`${type}${suffix} ${action} # ${propertyName}`],
+                        symbols: [`${formattingRuleName}${suffix} ${action} # ${propertyName}`],
                     });
                 }
                 break;
@@ -369,7 +389,6 @@ class Template {
                     }
                     parts.modelRules.push({
                         prefix: rule,
-                        format: element.format,
                         symbols: [`${type}${suffix} ${action} # ${propertyName}`],
                     });
                 }
@@ -407,6 +426,61 @@ class Template {
                 throw new Error(`Unrecognized type ${element.type}`);
             }
         }
+    }
+
+    /**
+     * Converts a format string to a Nearley action
+     * @param {string} formatString - the input format string
+     * @returns {string} a version that can be used as the action of a rule
+     */
+    static formatStringToRuleAction(formatString) {
+        const input = formatString.substr(1,formatString.length -2);
+
+        // anything that is not part of an existing rule we need to convert to a quoted string
+        const ruleNames = 'DMHmsSYTZ';
+        let result = '';
+        let state = 'unknown';
+
+        for (let i = 0; i < input.length; i++) {
+            const char = input.charAt(i);
+            const isRule = ruleNames.indexOf(char) >= 0;
+
+            // initialize state
+            if(state === 'unknown' ) {
+                if(isRule) {
+                    state = 'rule';
+                }
+                else {
+                    state = 'notrule';
+                }
+            }
+
+            if(isRule) {
+                if(state === 'notrule') {
+                    result += '" '; // close quotes
+                }
+                state = 'rule';
+                result += char;
+            }
+            else {
+                if( state === 'rule') {
+                    result += ' "'; // open quotes
+                }
+                state = 'notrule';
+                result += char;
+            }
+        }
+
+        return result;
+    }
+
+    /**
+     * Cleans a format string so it can be used as part of a Nearley rule
+     * @param {string} formatString - the input format string
+     * @returns {string} a version safe for including in a nearley rule
+     */
+    static formatStringToRuleName(formatString) {
+        return crypto.createHash('md5').update(formatString).digest('hex');
     }
 
     /**
