@@ -15,7 +15,7 @@
 
 'use strict';
 
-const logger = require('@accordproject/cicero-core').logger;
+const Logger = require('@accordproject/ergo-compiler').Logger;
 const Commands = require('./lib/commands');
 
 require('yargs')
@@ -34,22 +34,22 @@ require('yargs')
         });
     }, (argv) => {
         if (argv.verbose) {
-            logger.info(`parse sample ${argv.sample} using a template ${argv.template}`);
+            Logger.info(`parse sample ${argv.sample} using a template ${argv.template}`);
         }
 
         try {
             argv = Commands.validateParseArgs(argv);
         } catch (err){
-            logger.error(err.message);
+            Logger.error(err.message);
             return;
         }
 
         return Commands.parse(argv.template, argv.sample, argv.out)
             .then((result) => {
-                logger.info(JSON.stringify(result));
+                Logger.info(JSON.stringify(result));
             })
             .catch((err) => {
-                logger.error(err.message);
+                Logger.error(err.message);
             });
     })
     .command('archive', 'archive a template directory', (yargs) => {
@@ -73,19 +73,19 @@ require('yargs')
         });
     }, (argv) => {
         if (argv.verbose) {
-            logger.info(`archive the template in the directory ${argv.template} into the file ${argv.archiveFile}`);
+            Logger.info(`archive the template in the directory ${argv.template} into the file ${argv.archiveFile}`);
         }
 
         try {
             argv = Commands.validateArchiveArgs(argv);
         } catch (err){
-            logger.error(err.message);
+            Logger.error(err.message);
             return;
         }
 
         return Commands.archive(argv.language, argv.template, argv.archiveFile, argv.omitLogic)
             .catch((err) => {
-                logger.error(err.message);
+                Logger.error(err.message);
             });
     })
     .command('execute', 'execute a clause with JSON request', (yargs) => {
@@ -115,15 +115,15 @@ require('yargs')
         try {
             argv = Commands.validateExecuteArgs(argv);
         } catch (err){
-            logger.error(err.message);
+            Logger.error(err.message);
         }
 
         return Commands.execute(argv.template, argv.sample, argv.request, argv.state, argv.currentTime)
             .then((result) => {
-                logger.info(JSON.stringify(result));
+                Logger.info(JSON.stringify(result));
             })
             .catch((err) => {
-                logger.error(err.message);
+                Logger.error(err.message);
             });
     })
     .command('init', 'initialize a clause', (yargs) => {
@@ -145,15 +145,15 @@ require('yargs')
         try {
             argv = Commands.validateInitArgs(argv);
         } catch (err){
-            logger.error(err.message);
+            Logger.error(err.message);
         }
 
         return Commands.init(argv.template, argv.sample, argv.currentTime)
             .then((result) => {
-                logger.info(JSON.stringify(result));
+                Logger.info(JSON.stringify(result));
             })
             .catch((err) => {
-                logger.error(err.message);
+                Logger.error(err.message);
             });
     })
     .command('generate', 'generate code from the template model', (yargs) => {
@@ -174,22 +174,22 @@ require('yargs')
         });
     }, (argv) => {
         if (argv.verbose) {
-            logger.info(`generate code in format ${argv.format} from the model for template ${argv.template} into directory ${argv.outputDirectory}`);
+            Logger.info(`generate code in format ${argv.format} from the model for template ${argv.template} into directory ${argv.outputDirectory}`);
         }
 
         try {
             argv = Commands.validateExecuteArgs(argv);
         } catch (err){
-            logger.error(err.message);
+            Logger.error(err.message);
             return;
         }
 
         return Commands.generate(argv.format, argv.template, argv.outputDirectory)
             .then((result) => {
-                logger.info('Completed.');
+                Logger.info('Completed.');
             })
             .catch((err) => {
-                logger.error(err.message + ' ' + JSON.stringify(err));
+                Logger.error(err.message + ' ' + JSON.stringify(err));
             });
     })
     .option('verbose', {

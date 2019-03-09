@@ -18,7 +18,7 @@ const CiceroModelManager = require('../lib/ciceromodelmanager');
 const Writer = require('composer-concerto-tools').Writer;
 const GrammarVisitor = require('../lib/grammarvisitor');
 const Template = require('../lib/template');
-const logger = require('../lib/logger');
+const Logger = require('@accordproject/ergo-compiler').Logger;
 const nunjucks = require('nunjucks');
 
 const fs = require('fs');
@@ -82,7 +82,7 @@ describe('GrammarVisitor', () => {
 
             const generatedGrammar = parameters.rules;
             generatedGrammar.should.not.be.empty;
-            logger.debug('Generated grammar', generatedGrammar);
+            Logger.debug('Generated grammar', generatedGrammar);
 
             const combined = nunjucks.renderString(ruleTemplate, {modelRules: generatedGrammar});
 
@@ -118,7 +118,7 @@ describe('GrammarVisitor', () => {
 
             const generatedGrammar = parameters.rules;
             generatedGrammar.should.not.be.empty;
-            logger.debug('Generated grammar', generatedGrammar);
+            Logger.debug('Generated grammar', generatedGrammar);
 
             const combined = nunjucks.renderString(ruleTemplate, {modelRules: generatedGrammar});
 
@@ -151,7 +151,7 @@ describe('GrammarVisitor', () => {
 
             const generatedGrammar = parameters.rules;
             generatedGrammar.should.not.be.empty;
-            logger.debug('Generated grammar', generatedGrammar);
+            Logger.debug('Generated grammar', generatedGrammar);
 
             const combined = nunjucks.renderString(ruleTemplate, {modelRules: generatedGrammar});
 
