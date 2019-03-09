@@ -14,11 +14,13 @@
 
 'use strict';
 
-const logger = require('@accordproject/cicero-core').logger;
+const Logger = require('@accordproject/ergo-compiler').Logger;
+const Util = require('@accordproject/ergo-engine').Util;
 const ResourceValidator = require('composer-concerto/lib/serializer/resourcevalidator');
+
 const Moment = require('moment');
 // Make sure Moment serialization preserves utcOffset. See https://momentjs.com/docs/#/displaying/as-json/
-Moment.fn.toJSON = require('./momenttojson');
+Moment.fn.toJSON = Util.momentToJson;
 
 const {
     VM,
@@ -116,7 +118,7 @@ class Engine {
         validRequest.validate();
 
         // Set the current time and UTC Offset
-        const validNow = Engine.setCurrentTime(currentTime);
+        const validNow = Util.setCurrentTime(currentTime);
         const validUtcOffset = validNow.utcOffset();
 
         // ensure the state is valid
@@ -124,7 +126,7 @@ class Engine {
         validState.$validator = new ResourceValidator({permitResourcesForRelationships: true});
         validState.validate();
 
-        logger.debug('Engine processing request ' + request.$class + ' with state ' + state.$class);
+        Logger.debug('Engine processing request ' + request.$class + ' with state ' + state.$class);
 
         let script;
 
@@ -137,8 +139,8 @@ class Engine {
             timeout: 1000,
             sandbox: {
                 moment: Moment,
-                serializer:serializer,
-                logger: logger,
+                serializer: serializer,
+                logger: Logger,
                 utcOffset: validUtcOffset
             }
         });
@@ -194,7 +196,7 @@ class Engine {
         const validContract = clause.getDataAsComposerObject();
 
         // Set the current time and UTC Offset
-        const validNow = Engine.setCurrentTime(currentTime);
+        const validNow = Util.setCurrentTime(currentTime);
         const validUtcOffset = validNow.utcOffset();
 
         let script;
@@ -208,8 +210,8 @@ class Engine {
             timeout: 1000,
             sandbox: {
                 moment: Moment,
-                serializer:serializer,
-                logger: logger,
+                serializer: serializer,
+                logger: Logger,
                 utcOffset: validUtcOffset
             }
         });
@@ -247,25 +249,6 @@ class Engine {
             'state': stateResult,
             'emit': emitResult,
         };
-    }
-
-    /**
-     * Ensures there is a proper current time
-     *
-     * @param {string} currentTime - the definition of 'now'
-     * @returns {object} if valid, the moment object for the current time
-     */
-    static setCurrentTime(currentTime) {
-        if (!currentTime) {
-            // Defaults to current local time
-            return Moment();
-        }
-        const now = Moment.parseZone(currentTime, 'YYYY-MM-DDTHH:mm:ssZ', true);
-        if (now.isValid()) {
-            return now;
-        } else {
-            throw new Error(`${currentTime} is not a valid moment with the format 'YYYY-MM-DDTHH:mm:ssZ'`);
-        }
     }
 
     /**

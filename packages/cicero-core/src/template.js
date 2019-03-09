@@ -30,7 +30,7 @@ const ScriptManager = require('./scriptmanager');
 const DefaultArchiveLoader = require('./loaders/defaultarchiveloader');
 const Serializer = require('composer-concerto').Serializer;
 const Writer = require('composer-concerto-tools').Writer;
-const logger = require('./logger');
+const Logger = require('@accordproject/ergo-compiler').Logger;
 const nearley = require('nearley');
 const compile = require('nearley/lib/compile');
 const generate = require('nearley/lib/generate');
@@ -196,7 +196,7 @@ class Template {
      */
     buildGrammar(templatizedGrammar) {
 
-        logger.debug('buildGrammar', templatizedGrammar);
+        Logger.debug('buildGrammar', templatizedGrammar);
         const parser = new nearley.Parser(nearley.Grammar.fromCompiled(templateGrammar));
         parser.feed(templatizedGrammar);
         if (parser.results.length !== 1) {
@@ -206,7 +206,7 @@ class Template {
         // parse the template grammar to generate a dynamic grammar
         const ast = parser.results[0];
         this.templateAst = ast;
-        logger.debug('Template AST', ast);
+        Logger.debug('Template AST', ast);
         const parts = {
             textRules: [],
             modelRules: []
@@ -238,7 +238,7 @@ class Template {
             autoescape: false  // Required to allow nearley syntax strings
         });
         const combined = nunjucks.render('template.ne', parts);
-        logger.debug('Generated template grammar' + combined);
+        Logger.debug('Generated template grammar' + combined);
 
         this.setGrammar(combined);
         this.templatizedGrammar = templatizedGrammar;
@@ -262,7 +262,7 @@ class Template {
         ast.data.forEach((element, index) => {
             // ignore empty chunks (issue #1) and missing optional last chunks
             if (element && (element.type !== 'Chunk' || element.value.length > 0)) {
-                logger.debug(`element ${prefix}${index} ${JSON.stringify(element)}`);
+                Logger.debug(`element ${prefix}${index} ${JSON.stringify(element)}`);
                 rules[prefix + index] = element;
                 textRules.symbols.push(prefix + index);
             }
@@ -479,7 +479,7 @@ class Template {
             eval(grammarJs);
             return module.exports;
         } catch (err) {
-            logger.error(err);
+            Logger.error(err);
             throw err;
         }
     }
@@ -492,7 +492,7 @@ class Template {
      */
     static fromArchive(Buffer) {
         const method = 'fromArchive';
-        logger.entry(method, Buffer.length);
+        Logger.entry(method, Buffer.length);
         return JSZip.loadAsync(Buffer).then(function (zip) {
             let promise = Promise.resolve();
             let ctoModelFiles = [];
@@ -507,48 +507,48 @@ class Template {
             let grammar = null;
             let templatizedGrammar = null;
 
-            logger.debug(method, 'Loading README.md');
+            Logger.debug(method, 'Loading README.md');
             let readme = zip.file('README.md');
             if (readme) {
                 promise = promise.then(() => {
                     return readme.async('string');
                 }).then((contents) => {
-                    logger.debug(method, 'Loaded README.md');
+                    Logger.debug(method, 'Loaded README.md');
                     readmeContents = contents;
                 });
             }
 
-            logger.debug(method, 'Looking for sample files');
+            Logger.debug(method, 'Looking for sample files');
             let sampleFiles = zip.file(SAMPLE_FILE_REGEXP);
             sampleFiles.forEach(function (file) {
-                logger.debug(method, 'Found sample file, loading it', file);
+                Logger.debug(method, 'Found sample file, loading it', file);
                 promise = promise.then(() => {
                     return file.async('string');
                 }).then((contents) => {
-                    logger.debug(method, 'Loaded sample file');
+                    Logger.debug(method, 'Loaded sample file');
                     let matches = file.name.match(SAMPLE_FILE_REGEXP);
                     let locale = 'default';
                     // Locale match found
                     if(matches !== null && matches[2]){
                         locale = matches[2];
                     }
-                    logger.debug(method, 'Using sample file locale, ' + locale);
+                    Logger.debug(method, 'Using sample file locale, ' + locale);
                     sampleTextFiles[locale] = contents;
                 });
             });
 
-            logger.debug(method, 'Loading request.json');
+            Logger.debug(method, 'Loading request.json');
             let requestJson = zip.file('request.json');
             if (requestJson) {
                 promise = promise.then(() => {
                     return requestJson.async('string');
                 }).then((contents) => {
-                    logger.debug(method, 'Loaded request.json');
+                    Logger.debug(method, 'Loaded request.json');
                     requestContents = contents ? JSON.parse(contents) : null;
                 });
             }
 
-            logger.debug(method, 'Loading package.json');
+            Logger.debug(method, 'Loading package.json');
             let packageJson = zip.file('package.json');
             if (packageJson === null) {
                 throw Error('Failed to find package.json');
@@ -556,21 +556,21 @@ class Template {
             promise = promise.then(() => {
                 return packageJson.async('string');
             }).then((contents) => {
-                logger.debug(method, 'Loaded package.json');
+                Logger.debug(method, 'Loaded package.json');
                 packageJsonContents = JSON.parse(contents);
             });
 
-            logger.debug(method, 'Loading grammar.ne');
+            Logger.debug(method, 'Loading grammar.ne');
             let grammarNe = zip.file('grammar/grammar.ne');
             if (grammarNe !== null) {
                 promise = promise.then(() => {
                     return grammarNe.async('string');
                 }).then((contents) => {
-                    logger.debug(method, 'Loaded grammar.ne');
+                    Logger.debug(method, 'Loaded grammar.ne');
                     grammar = contents;
                 });
             } else {
-                logger.debug(method, 'Loading template.tem');
+                Logger.debug(method, 'Loading template.tem');
                 let template_txt = zip.file('grammar/template.tem');
 
                 if (template_txt === null) {
@@ -580,36 +580,36 @@ class Template {
                 promise = promise.then(() => {
                     return template_txt.async('string');
                 }).then((contents) => {
-                    logger.debug(method, 'Loaded template.tem');
+                    Logger.debug(method, 'Loaded template.tem');
                     templatizedGrammar = contents;
                 });
             }
 
-            logger.debug(method, 'Looking for model files');
+            Logger.debug(method, 'Looking for model files');
             let ctoFiles = zip.file(/models\/.*\.cto$/); //Matches any file which is in the 'models' folder and has a .cto extension
             ctoFiles.forEach(function (file) {
-                logger.debug(method, 'Found model file, loading it', file.name);
+                Logger.debug(method, 'Found model file, loading it', file.name);
                 ctoModelFileNames.push(file.name);
                 promise = promise.then(() => {
                     return file.async('string');
                 }).then((contents) => {
-                    logger.debug(method, 'Loading model file'+contents);
+                    Logger.debug(method, 'Loading model file'+contents);
                     ctoModelFiles.push(contents);
                 });
             });
 
             promise = promise.then(() => {
-                logger.debug(method, 'Loaded package.json');
+                Logger.debug(method, 'Loaded package.json');
                 // Initialize the template
                 template = new Template(packageJsonContents, readmeContents, sampleTextFiles, requestContents);
                 // Lookup the archive's language
                 language = template.getMetadata().getLanguage();
             });
 
-            logger.debug(method, 'Looking for JavaScript files');
+            Logger.debug(method, 'Looking for JavaScript files');
             let jsFiles = zip.file(/lib\/.*\.js$/); //Matches any file which is in the 'lib' folder and has a .js extension
 
-            logger.debug(method, 'Looking for Ergo files');
+            Logger.debug(method, 'Looking for Ergo files');
             let ergoFiles = zip.file(/lib\/.*\.ergo$/); //Matches any file which is in the 'lib' folder and has a .ergo extension
 
             promise = promise.then(() => {
@@ -621,11 +621,11 @@ class Template {
             });
 
             jsFiles.forEach(function (file) {
-                logger.debug(method, 'Found JavaScript file, loading it', file.name);
+                Logger.debug(method, 'Found JavaScript file, loading it', file.name);
                 promise = promise.then(() => {
                     return file.async('string');
                 }).then((contents) => {
-                    logger.debug(method, 'Loaded JavaScript file');
+                    Logger.debug(method, 'Loaded JavaScript file');
                     let tempObj = {
                         'name': file.name,
                         'contents': contents
@@ -635,11 +635,11 @@ class Template {
             });
 
             ergoFiles.forEach(function (file) {
-                logger.debug(method, 'Found Ergo file, loading it', file.name);
+                Logger.debug(method, 'Found Ergo file, loading it', file.name);
                 promise = promise.then(() => {
                     return file.async('string');
                 }).then((contents) => {
-                    logger.debug(method, 'Loaded Ergo file');
+                    Logger.debug(method, 'Loaded Ergo file');
                     let tempObj = {
                         'name': file.name,
                         'contents': contents
@@ -649,12 +649,12 @@ class Template {
             });
 
             return promise.then(async () => {
-                logger.debug(method, 'Adding model files to model manager');
+                Logger.debug(method, 'Adding model files to model manager');
                 template.modelManager.addModelFiles(ctoModelFiles, ctoModelFileNames, true); // Adds all cto files to model manager
                 template.modelManager.validateModelFiles();
 
-                logger.debug(method, 'Added model files to model manager');
-                logger.debug(method, 'Adding Logic files to script manager');
+                Logger.debug(method, 'Added model files to model manager');
+                Logger.debug(method, 'Adding Logic files to script manager');
                 scriptFiles.forEach(function (obj) {
                     const objExt = '.' +  obj.name.split('.').pop();
                     let scriptObject = template.scriptManager.createScript(obj.name, objExt, obj.contents);
@@ -663,19 +663,19 @@ class Template {
                 // Compile Ergo
                 template.getScriptManager().compileLogic();
 
-                logger.debug(method, 'Added JavaScript files to script manager');
+                Logger.debug(method, 'Added JavaScript files to script manager');
 
                 // check the template model
                 template.getTemplateModel();
 
-                logger.debug(method, 'Setting grammar');
+                Logger.debug(method, 'Setting grammar');
                 if (grammar) {
                     template.setGrammar(grammar);
                 } else {
                     template.buildGrammar(templatizedGrammar);
                 }
 
-                logger.exit(method, template.toString());
+                Logger.exit(method, template.toString());
                 return template; // Returns template
             });
         });
@@ -880,7 +880,7 @@ class Template {
         }
 
         const method = 'fromDirectory';
-        logger.entry(method, path);
+        Logger.entry(method, path);
 
         // grab the README.md
         let readmeContents = null;
@@ -888,7 +888,7 @@ class Template {
         if (fs.existsSync(readmePath)) {
             readmeContents = fs.readFileSync(readmePath, ENCODING);
             if (readmeContents) {
-                logger.debug(method, 'Loaded README.md', readmeContents);
+                Logger.debug(method, 'Loaded README.md', readmeContents);
             }
         }
 
@@ -898,7 +898,7 @@ class Template {
         if (fs.existsSync(requestJsonPath)) {
             requestContents = fs.readFileSync(requestJsonPath, ENCODING);
             if (requestContents) {
-                logger.debug(method, 'Loaded request.json', requestContents);
+                Logger.debug(method, 'Loaded request.json', requestContents);
             }
         }
 
@@ -912,13 +912,13 @@ class Template {
         }
 
         let packageJsonContents = fs.readFileSync(packageJsonPath, ENCODING);
-        logger.debug(method, 'Loaded package.json', packageJsonContents);
+        Logger.debug(method, 'Loaded package.json', packageJsonContents);
 
         // parse the package.json
         let packageJsonObject = JSON.parse(packageJsonContents);
 
         // grab the sample files
-        logger.debug(method, 'Looking for sample files');
+        Logger.debug(method, 'Looking for sample files');
         let sampleTextFiles = {};
         let sampleFiles = glob.sync('@(sample.txt|sample_*.txt)', { cwd: fsPath.resolve(path) });
         if (sampleFiles.length === 0){
@@ -930,17 +930,17 @@ class Template {
                 throw new Error('Invalid locale used in sample file, ' + file + '. Locales should be IETF language tags, e.g. sample_fr.txt');
             }
 
-            logger.debug(method, 'Found sample file, loading it: ' + file);
+            Logger.debug(method, 'Found sample file, loading it: ' + file);
             const sampleFilePath = fsPath.resolve(path, file);
             const sampleFileContents = fs.readFileSync(sampleFilePath, ENCODING);
-            logger.debug(method, 'Loaded ' + file, sampleFileContents);
+            Logger.debug(method, 'Loaded ' + file, sampleFileContents);
 
             let locale = 'default';
             // Match found
             if(matches !== null && matches[2]){
                 locale = matches[2];
             }
-            logger.debug(method, 'Using sample file locale', locale);
+            Logger.debug(method, 'Using sample file locale', locale);
             sampleTextFiles[locale] = sampleFileContents;
         });
 
@@ -961,7 +961,7 @@ class Template {
                 return element === 'node_modules';
             });
 
-            logger.debug(method, file, result);
+            Logger.debug(method, file, result);
             return result;
         };
 
@@ -978,13 +978,13 @@ class Template {
             process: function (path, contents) {
                 modelFiles.push(contents);
                 modelFileNames.push(path);
-                logger.debug(method, 'Found model file', path);
+                Logger.debug(method, 'Found model file', path);
             }
         });
 
         template.getModelManager().addModelFiles(modelFiles, modelFileNames, true);
         return template.getModelManager().updateExternalModels().then(() => {
-            logger.debug(method, 'Added model files', modelFiles.length);
+            Logger.debug(method, 'Added model files', modelFiles.length);
 
             // find script files outside the npm install directory
             const scriptFiles = [];
@@ -1015,7 +1015,7 @@ class Template {
                     }
                     const scriptObject = template.getScriptManager().createScript(truncatedPath, pathObj.ext.toLowerCase(), contents);
                     scriptFiles.push(scriptObject);
-                    logger.debug(method, 'Found script file ', path);
+                    Logger.debug(method, 'Found script file ', path);
                 }
             });
 
@@ -1030,7 +1030,7 @@ class Template {
             // Compile Ergo
             template.getScriptManager().compileLogic();
 
-            logger.debug(method, 'Added script files', scriptFiles.length);
+            Logger.debug(method, 'Added script files', scriptFiles.length);
 
             // check the template model
             template.getTemplateModel();
@@ -1047,13 +1047,13 @@ class Template {
             if (!grammarNe) {
                 let template_txt = fs.readFileSync(fsPath.resolve(path, 'grammar/template.tem'), ENCODING);
                 template.buildGrammar(template_txt);
-                logger.debug(method, 'Loaded template.tem', template_txt);
+                Logger.debug(method, 'Loaded template.tem', template_txt);
             } else {
-                logger.debug(method, 'Loaded grammar.ne', grammarNe);
+                Logger.debug(method, 'Loaded grammar.ne', grammarNe);
                 template.setGrammar(grammarNe);
             }
 
-            logger.exit(method, path);
+            Logger.exit(method, path);
             return Promise.resolve(template);
         });
     }
@@ -1067,7 +1067,7 @@ class Template {
     static processDirectory(path, fileProcessor) {
         const items = Template.walkSync(path, [], fileProcessor);
         items.sort();
-        logger.debug('processDirectory', 'Path ' + path, items);
+        Logger.debug('processDirectory', 'Path ' + path, items);
         items.forEach((item) => {
             Template.processFile(item, fileProcessor);
         });
@@ -1082,11 +1082,11 @@ class Template {
     static processFile(file, fileProcessor) {
 
         if (fileProcessor.accepts(file)) {
-            logger.debug('processFile', 'FileProcessor accepted', file);
+            Logger.debug('processFile', 'FileProcessor accepted', file);
             let fileContents = fs.readFileSync(file, ENCODING);
             fileProcessor.process(file, fileContents);
         } else {
-            logger.debug('processFile', 'FileProcessor rejected', file);
+            Logger.debug('processFile', 'FileProcessor rejected', file);
         }
     }
 
@@ -1272,7 +1272,7 @@ class Template {
                 types.push(type);
             }
         });
-        logger.debug(types);
+        Logger.debug(types);
         return types;
     }
 
