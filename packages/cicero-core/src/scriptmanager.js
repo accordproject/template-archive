@@ -15,7 +15,7 @@
 'use strict';
 
 const Script = require('./script');
-const Ergo = require('@accordproject/ergo-compiler/lib/ergo');
+const ErgoCompiler = require('@accordproject/ergo-compiler').Compiler;
 
 /**
  * <p>
@@ -216,10 +216,10 @@ class ScriptManager {
         if (sourceErgo === undefined || sourceErgo.length === 0) {
             return null;
         }
-        const compiledErgo = Ergo.compileToJavaScript(sourceErgo,this.modelManager.getModels(),'cicero',true);
+        const compiledErgo = ErgoCompiler.compileToJavaScript(sourceErgo,this.modelManager.getModels(),'cicero',true);
         //console.log('compiling' + this.contents);
         if (compiledErgo.hasOwnProperty('error')) {
-            throw new Error(Ergo.ergoVerboseErrorToString(compiledErgo.error));
+            throw new Error(ErgoCompiler.ergoVerboseErrorToString(compiledErgo.error));
         }
         this.compiledScript = new Script(this.modelManager, 'main.js', '.js', compiledErgo.success);
         return this.compiledScript;

@@ -14,7 +14,7 @@
 
 'use strict';
 
-const logger = require('./logger');
+const Logger = require('@accordproject/ergo-compiler').Logger;
 const ciceroVersion = require('../package.json').version;
 const semver = require('semver');
 
@@ -60,7 +60,7 @@ class Metadata {
      */
     constructor(packageJson, readme, samples, request) {
         const method = 'constructor';
-        logger.entry(method, readme, samples, request);
+        Logger.entry(method, readme, samples, request);
 
         if(!packageJson || typeof(packageJson) !== 'object') {
             throw new Error('package.json is required and must be an object');
@@ -111,7 +111,7 @@ class Metadata {
                 this.type = templateTypes.CLAUSE;
             }
         } else {
-            logger.warn('No cicero template type specified. Assuming that this is a contract template');
+            Logger.warn('No cicero template type specified. Assuming that this is a contract template');
         }
 
         if (packageJson.cicero && packageJson.cicero.language) {
@@ -124,7 +124,7 @@ class Metadata {
                 this.language = languageTypes.JAVASCRIPT;
             }
         } else {
-            logger.warn('No cicero template language specified. Assuming that this is an ergo template');
+            Logger.warn('No cicero template language specified. Assuming that this is an ergo template');
         }
 
         if (packageJson.cicero && packageJson.cicero.version) {
@@ -138,11 +138,11 @@ class Metadata {
 
         if (!this.satisfiesTargetVersion(ciceroVersion)){
             const msg = `The template targets Cicero (${this.targetVersion}) but the Cicero version is ${ciceroVersion}.`;
-            logger.error(msg);
+            Logger.error(msg);
             throw new Error(msg);
         }
 
-        logger.exit(method);
+        Logger.exit(method);
     }
 
     /**
