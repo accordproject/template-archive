@@ -14,7 +14,7 @@
 
 'use strict';
 
-const logger = require('@accordproject/cicero-core').logger;
+const Logger = require('@accordproject/ergo-compiler').Logger;
 const Template = require('@accordproject/cicero-core').Template;
 const Clause = require('@accordproject/cicero-core').Clause;
 const Engine = require('@accordproject/cicero-engine').Engine;
@@ -53,13 +53,13 @@ class Commands {
                 clause = new Clause(template);
                 clause.parse(sampleText);
                 if (outPath) {
-                    logger.info('Creating file: ' + outPath);
+                    Logger.info('Creating file: ' + outPath);
                     fs.writeFileSync(outPath, JSON.stringify(clause.getData()));
                 }
                 return clause.getData();
             })
             .catch((err) => {
-                logger.error(err.message);
+                Logger.error(err.message);
             });
     }
 
@@ -76,7 +76,7 @@ class Commands {
         }
 
         if(!argv.template){
-            logger.info('Using current directory as template folder');
+            Logger.info('Using current directory as template folder');
             argv.template = '.';
         }
 
@@ -90,12 +90,12 @@ class Commands {
         }
 
         if(!argv.sample){
-            logger.info('Loading a default sample.txt file.');
+            Logger.info('Loading a default sample.txt file.');
             argv.sample = path.resolve(argv.template,'sample.txt');
         }
 
         if(argv.verbose) {
-            logger.info(`parse sample ${argv.sample} using a template ${argv.template}`);
+            Logger.info(`parse sample ${argv.sample} using a template ${argv.template}`);
         }
 
         let sampleExists = fs.existsSync(argv.sample);
@@ -130,7 +130,7 @@ class Commands {
                 return engine.init(clause, currentTime);
             })
             .catch((err) => {
-                logger.error(err.message);
+                Logger.error(err.message);
             });
     }
 
@@ -163,7 +163,7 @@ class Commands {
 
                 let stateJson;
                 if(!fs.existsSync(statePath)) {
-                    logger.warn('A state file was not provided, initializing state. Try the --state flag or create a state.json in the root folder of your template.');
+                    Logger.warn('A state file was not provided, initializing state. Try the --state flag or create a state.json in the root folder of your template.');
                     const initResult = await engine.init(clause, currentTime);
                     stateJson = initResult.state;
                 } else {
@@ -182,7 +182,7 @@ class Commands {
                 }, initResponse);
             })
             .catch((err) => {
-                logger.error(err.message);
+                Logger.error(err.message);
             });
     }
 
@@ -199,7 +199,7 @@ class Commands {
         }
 
         if(!argv.template){
-            logger.info('Using current directory as template folder');
+            Logger.info('Using current directory as template folder');
             argv.template = '.';
         }
 
@@ -213,22 +213,22 @@ class Commands {
         }
 
         if(!argv.sample){
-            logger.info('Loading a default sample.txt file.');
+            Logger.info('Loading a default sample.txt file.');
             argv.sample = path.resolve(argv.template,'sample.txt');
         }
 
         if(!argv.request){
-            logger.info('Loading a single default request.json file.');
+            Logger.info('Loading a single default request.json file.');
             argv.request = [path.resolve(argv.template,'request.json')];
         }
 
         if(!argv.state){
-            logger.info('Loading a default state.json file.');
+            Logger.info('Loading a default state.json file.');
             argv.state = path.resolve(argv.template,'state.json');
         }
 
         if(argv.verbose) {
-            logger.info(`execute sample ${argv.sample} using a template ${argv.template} with request ${argv.request} with state ${argv.state}`);
+            Logger.info(`execute sample ${argv.sample} using a template ${argv.template} with request ${argv.request} with state ${argv.state}`);
         }
 
         let sampleExists = fs.existsSync(argv.sample);
@@ -265,7 +265,7 @@ class Commands {
         }
 
         if(!argv.template){
-            logger.info('Using current directory as template folder');
+            Logger.info('Using current directory as template folder');
             argv.template = '.';
         }
 
@@ -279,12 +279,12 @@ class Commands {
         }
 
         if(!argv.sample){
-            logger.info('Loading a default sample.txt file.');
+            Logger.info('Loading a default sample.txt file.');
             argv.sample = path.resolve(argv.template,'sample.txt');
         }
 
         if(argv.verbose) {
-            logger.info(`initialize sample ${argv.sample} using a template ${argv.template}`);
+            Logger.info(`initialize sample ${argv.sample} using a template ${argv.template}`);
         }
 
         let sampleExists = fs.existsSync(argv.sample);
@@ -340,7 +340,7 @@ class Commands {
                 template.getModelManager().accept(visitor, parameters);
             })
             .catch((err) => {
-                logger.error(err);
+                Logger.error(err);
             });
     }
 
@@ -357,7 +357,7 @@ class Commands {
         }
 
         if(!argv.template){
-            logger.info('Using current directory as template folder');
+            Logger.info('Using current directory as template folder');
             argv.template = '.';
         }
 
@@ -371,12 +371,12 @@ class Commands {
         }
 
         if(!argv.language){
-            logger.info('Using ergo as default language archive.');
+            Logger.info('Using ergo as default language archive.');
             argv.language = 'ergo';
         }
 
         if(argv.verbose) {
-            logger.info(`creating ${argv.language} archive for template ${argv.template}`);
+            Logger.info(`creating ${argv.language} archive for template ${argv.template}`);
         }
 
         if(!packageJsonExists || !isCiceroTemplate){
@@ -405,7 +405,7 @@ class Commands {
                 return template.toArchive(language);
             })
             .then((archive) => {
-                logger.info('Creating archive: ' + archiveFile);
+                Logger.info('Creating archive: ' + archiveFile);
                 fs.writeFileSync(archiveFile, archive);
                 return Promise.resolve(true);
             });

@@ -21,8 +21,8 @@ const expect = Chai.expect;
 
 const Template = require('@accordproject/cicero-core').Template;
 const Clause = require('@accordproject/cicero-core').Clause;
+const Util = require('@accordproject/ergo-engine').Util;
 const Engine = require('./engine');
-const Util = require('./util');
 
 const { Before, Given, When, Then, setDefaultTimeout } = require('cucumber');
 

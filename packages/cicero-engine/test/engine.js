@@ -17,7 +17,6 @@
 const Template = require('@accordproject/cicero-core').Template;
 const Clause = require('@accordproject/cicero-core').Clause;
 const Engine = require('../lib/engine');
-const Util = require('../lib/util');
 
 const chai = require('chai');
 
@@ -504,32 +503,5 @@ describe('EngineInstallmentSaleErgo', () => {
             result1.state.balance_remaining.should.equal(7612.499999999999);
             result1.state.total_paid.should.equal(2500.00);
         });
-    });
-});
-describe('Resolve root directory for Cucumber', () => {
-    it('Should resolve to given root directory', function () {
-        return Util.resolveRootDir({rootdir:'foo/bar'}).should.equal('foo/bar');
-    });
-    it('Should resolve to \'.\'', function () {
-        return Util.resolveRootDir({}).should.equal('.');
-    });
-});
-describe('Initialize current time', () => {
-    it('Should succeed for a well-formed date/time', function () {
-        const currentTime = Engine.setCurrentTime('1970-01-01T00:00:00Z');
-        return currentTime.format().should.equal('1970-01-01T00:00:00Z');
-    });
-    it('Should stringify a date time back with its timezone', function () {
-        const currentTime = Engine.setCurrentTime('1970-01-01T00:00:00+05:00');
-        return JSON.stringify(currentTime).should.equal('"1970-01-01T00:00:00+05:00"');
-    });
-    it('Should fail for a non-well-formed date/time', function () {
-        return (() => Engine.setCurrentTime('1970-01-01').format()).should.throw('1970-01-01 is not a valid moment with the format \'YYYY-MM-DDTHH:mm:ssZ\'');
-    });
-    it('Should not fail when currentTime is null', function () {
-        return (() => Engine.setCurrentTime(null).format()).should.not.be.null;
-    });
-    it('Should not fail when currentTime is undefined', function () {
-        return (() => Engine.setCurrentTime(undefined).format()).should.not.be.null;
     });
 });

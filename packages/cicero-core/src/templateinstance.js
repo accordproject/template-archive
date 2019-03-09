@@ -14,7 +14,7 @@
 
 'use strict';
 
-const logger = require('./logger');
+const Logger = require('@accordproject/ergo-compiler').Logger;
 const crypto = require('crypto');
 const RelationshipDeclaration = require('composer-concerto').RelationshipDeclaration;
 
@@ -59,7 +59,7 @@ class TemplateInstance {
         }
 
         // downloadExternalDependencies the data using the template model
-        logger.debug('Setting clause data: ' + JSON.stringify(data));
+        Logger.debug('Setting clause data: ' + JSON.stringify(data));
         const resource = this.getTemplate().getSerializer().fromJSON(data);
         resource.validate();
 
@@ -105,7 +105,7 @@ class TemplateInstance {
             }, this);
         }
         const ast = parser.results[0];
-        logger.debug('Result of parsing: ' + JSON.stringify(ast));
+        Logger.debug('Result of parsing: ' + JSON.stringify(ast));
 
         if(!ast) {
             throw new Error('Parsing clause text returned a null AST. This may mean the text is valid, but not complete.');

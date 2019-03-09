@@ -16,7 +16,7 @@
 
 const NodeCache = require('node-cache');
 const Template = require('./template');
-const logger = require('./logger');
+const Logger = require('@accordproject/ergo-compiler').Logger;
 const rp = require('request-promise-native');
 const crypto = require('crypto');
 const stringify = require('json-stable-stringify');
@@ -44,7 +44,7 @@ class TemplateLibrary {
      */
     constructor(url) {
         this.url = url || 'https://templates.accordproject.org';
-        logger.info('Creating TemplateLibrary for ' + this.url);
+        Logger.info('Creating TemplateLibrary for ' + this.url);
     }
 
     /**
@@ -125,7 +125,7 @@ class TemplateLibrary {
         if (cacheKey) {
             const result = globalTemplateIndexCache.get(cacheKey);
             if (result) {
-                logger.info('Returning template index from cache');
+                Logger.info('Returning template index from cache');
                 return Promise.resolve(result);
             }
         }
@@ -138,7 +138,7 @@ class TemplateLibrary {
             json: true, // Automatically parses the JSON string in the response
         };
 
-        logger.info('Loading template library from', httpOptions.uri);
+        Logger.info('Loading template library from', httpOptions.uri);
         return rp(httpOptions)
             .then((templateIndex) => {
 
@@ -157,7 +157,7 @@ class TemplateLibrary {
                 return templateIndex;
             })
             .catch((err) => {
-                logger.error('Failed to load template index', err);
+                Logger.error('Failed to load template index', err);
                 throw err;
             });
     }
@@ -210,7 +210,7 @@ class TemplateLibrary {
         if (cacheKey) {
             const result = globalTemplateCache.get(cacheKey);
             if (result) {
-                logger.info('Returning template from cache', templateUri);
+                Logger.info('Returning template from cache', templateUri);
                 return result;
             }
         }
@@ -228,7 +228,7 @@ class TemplateLibrary {
         // check the hash matches
         const templateHash = template.getHash();
         if(templateHash !== templateUriInfo.templateHash) {
-            logger.warn(`Requested template ${templateUri} but the hash of the template is ${templateHash}`);
+            Logger.warn(`Requested template ${templateUri} but the hash of the template is ${templateHash}`);
         }
 
         if (cacheKey) {

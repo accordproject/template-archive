@@ -23,4 +23,3 @@ module.exports.Clause = require('./lib/clause');
 module.exports.Template = require('./lib/template');
 module.exports.TemplateLibrary = require('./lib/templatelibrary');
 module.exports.version = require('./package.json');
-module.exports.logger = require('./lib/logger');
