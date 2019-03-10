@@ -17,7 +17,7 @@
 const CiceroModelManager = require('../lib/ciceromodelmanager');
 const Writer = require('composer-concerto-tools').Writer;
 const GrammarVisitor = require('../lib/grammarvisitor');
-const Template = require('../lib/template');
+const ParserManager = require('../lib/parsermanager');
 const logger = require('../lib/logger');
 const nunjucks = require('nunjucks');
 
@@ -87,7 +87,7 @@ describe('GrammarVisitor', () => {
             const combined = nunjucks.renderString(ruleTemplate, {modelRules: generatedGrammar});
 
             // check we can parse the generated grammar
-            const ast = Template.compileGrammar(combined);
+            const ast = ParserManager.compileGrammar(combined);
             ast.should.not.be.null;
         });
 
@@ -123,7 +123,7 @@ describe('GrammarVisitor', () => {
             const combined = nunjucks.renderString(ruleTemplate, {modelRules: generatedGrammar});
 
             // check we can parse the generated grammar
-            const ast = Template.compileGrammar(combined);
+            const ast = ParserManager.compileGrammar(combined);
             ast.should.not.be.null;
         });
 
@@ -156,7 +156,7 @@ describe('GrammarVisitor', () => {
             const combined = nunjucks.renderString(ruleTemplate, {modelRules: generatedGrammar});
 
             // check we can parse the generated grammar
-            const ast = Template.compileGrammar(combined);
+            const ast = ParserManager.compileGrammar(combined);
             ast.should.not.be.null;
         });
 

@@ -25,7 +25,7 @@ chai.should();
 chai.use(require('chai-things'));
 chai.use(require('chai-as-promised'));
 
-describe.only('FormattedDates', () => {
+describe('FormattedDates', () => {
 
     const formattedDatesInput = fs.readFileSync(path.resolve(__dirname, 'data/formatted-dates', 'sample.txt'), 'utf8');
 

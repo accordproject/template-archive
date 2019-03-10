@@ -1,0 +1,471 @@
+/*
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+'use strict';
+
+const fsPath = require('path');
+const RelationshipDeclaration = require('composer-concerto').RelationshipDeclaration;
+const Writer = require('composer-concerto-tools').Writer;
+const logger = require('./logger');
+const nearley = require('nearley');
+const compile = require('nearley/lib/compile');
+const generate = require('nearley/lib/generate');
+const nearleyGrammar = require('nearley/lib/nearley-language-bootstrapped');
+const templateGrammar = require('./tdl.js');
+const GrammarVisitor = require('./grammarvisitor');
+const uuid = require('uuid');
+const nunjucks = require('nunjucks');
+const crypto = require('crypto');
+
+// This required because only compiled nunjucks templates are supported browser-side
+// https://mozilla.github.io/nunjucks/api.html#browser-usage
+// We can't always import it in Cicero because precompiling is not supported server-side!
+// https://github.com/mozilla/nunjucks/issues/1065
+if(process.browser){
+    require('./compiled_template');
+}
+
+/**
+ * Generates and manages the parser for a template.
+ * @class
+ * @public
+ * @memberof module:cicero-core
+ */
+class ParserManager {
+
+    /**
+     * Create the ParserManager.
+     * @param {object} template - the template instance
+     */
+    constructor(template) {
+        this.template = template;
+        this.grammar = null;
+        this.grammarAst = null;
+        this.templatizedGrammar = null;
+        this.templateAst = null;
+    }
+
+    /**
+     * Gets a parser object for this template
+     * @return {object} the parser for this template
+     */
+    getParser() {
+        if (!this.grammarAst) {
+            throw new Error('Must call setGrammar or buildGrammar before calling getParser');
+        }
+
+        return new nearley.Parser(nearley.Grammar.fromCompiled(this.grammarAst));
+    }
+
+    /**
+     * Gets the AST for the template
+     * @return {object} the AST for the template
+     */
+    getTemplateAst() {
+        if (!this.grammarAst) {
+            throw new Error('Must call setGrammar or buildGrammar before calling getTemplateAst');
+        }
+
+        return this.templateAst;
+    }
+
+    /**
+     * Set the grammar for the template
+     * @param {String} grammar  - the grammar for the template
+     */
+    setGrammar(grammar) {
+        this.grammarAst = ParserManager.compileGrammar(grammar);
+        this.grammar = grammar;
+    }
+
+    /**
+     * Build a grammar from a template
+     * @param {String} templatizedGrammar  - the annotated template
+     */
+    buildGrammar(templatizedGrammar) {
+
+        logger.debug('buildGrammar', templatizedGrammar);
+        const parser = new nearley.Parser(nearley.Grammar.fromCompiled(templateGrammar));
+        parser.feed(templatizedGrammar);
+        if (parser.results.length !== 1) {
+            throw new Error('Ambiguous parse!');
+        }
+
+        // parse the template grammar to generate a dynamic grammar
+        const ast = parser.results[0];
+        this.templateAst = ast;
+        logger.debug('Template AST', ast);
+        const parts = {
+            textRules: [],
+            modelRules: [],
+            grammars : {}
+        };
+        parts.grammars.base = require('./grammars/base');
+        this.buildGrammarRules(ast, this.template.getTemplateModel(), 'rule', parts);
+
+        // generate the grammar for the model
+        const parameters = {
+            writer: new Writer(),
+            rules : []
+        };
+        const gv = new GrammarVisitor();
+        this.template.getModelManager().accept(gv, parameters);
+        parts.modelRules.push(...parameters.rules);
+
+        // combine the results
+        nunjucks.configure(fsPath.resolve(__dirname), {
+            tags: {
+                blockStart: '<%',
+                blockEnd: '%>'
+            },
+            autoescape: false  // Required to allow nearley syntax strings
+        });
+        const combined = nunjucks.render('template.ne', parts);
+        console.log(combined);
+        logger.debug('Generated template grammar' + combined);
+
+        this.setGrammar(combined);
+        this.templatizedGrammar = templatizedGrammar;
+    }
+
+    /**
+     * Build grammar rules from a template
+     * @param {object} ast  - the AST from which to build the grammar
+     * @param {ClassDeclaration} templateModel  - the type of the parent class for this AST
+     * @param {String} prefix - A unique prefix for the grammar rules
+     * @param {Object} parts - Result object to acculumate rules
+     */
+    buildGrammarRules(ast, templateModel, prefix, parts) {
+        // now we create each subordinate rule in turn
+        const rules = {};
+        let textRules = {};
+
+        // create the root rule, for the Template Model
+        textRules.prefix = prefix;
+        textRules.symbols = [];
+        ast.data.forEach((element, index) => {
+            // ignore empty chunks (issue #1) and missing optional last chunks
+            if (element && (element.type !== 'Chunk' || element.value.length > 0)) {
+                logger.debug(`element ${prefix}${index} ${JSON.stringify(element)}`);
+                rules[prefix + index] = element;
+                textRules.symbols.push(prefix + index);
+            }
+        }, this);
+        textRules.class = templateModel.getFullyQualifiedName();
+        const identifier = templateModel.getIdentifierFieldName();
+        if (identifier !== null) {
+            textRules.identifier = `${identifier} : "${uuid.v4()}"`;
+        }
+        textRules.properties = [];
+        templateModel.getProperties().forEach((property, index) => {
+            const sep = index < templateModel.getProperties().length - 1 ? ',' : '';
+            const bindingIndex = this.findFirstBinding(property.getName(), ast.data);
+            if (bindingIndex !== -1) { // ignore things like transactionId
+                // TODO (DCS) add !==null check for BooleanBinding
+                textRules.properties.push(`${property.getName()} : ${prefix}${bindingIndex}${sep}`);
+            }
+        });
+        parts.textRules.push(textRules);
+
+        // Now create the child rules for each symbol in the root rule
+        for (let rule in rules) {
+            const element = rules[rule];
+            switch (element.type) {
+            case 'Chunk':
+            case 'LastChunk':
+                parts.modelRules.push({
+                    prefix: rule,
+                    symbols: [this.cleanChunk(element.value)],
+                });
+                break;
+            case 'BooleanBinding':
+                parts.modelRules.push({
+                    prefix: rule,
+                    symbols: [`${element.string.value}:? {% (d) => {return d[0] !== null;}%} # ${element.fieldName.value}`],
+                });
+                break;
+            case 'FormattedBinding':
+                {
+                    const propertyName = element.fieldName.value;
+                    const property = templateModel.getProperty(propertyName);
+                    if (!property) {
+                        throw new Error(`Template references a property '${propertyName}' that is not declared in the template model '${templateModel.getFullyQualifiedName()}'. Details: ${JSON.stringify(element)}`);
+                    }
+                    let type = property.getType();
+                    // let type = element.format.value;
+                    if( property.getType() !== 'DateTime') {
+                        throw new Error('Formatted types are currently only supported for DateTime properties.');
+                    }
+
+                    // we only include the datetime grammar if used
+                    if(!parts.grammars.dateTime) {
+                        parts.grammars.dateTime = require('./grammars/datetime');
+                        parts.grammars.dateTimeEn = require('./grammars/datetime-en');
+                    }
+
+                    // push the formatting rule
+                    const formatString = ParserManager.formatStringToRuleAction(element.format.value);
+                    const formattingRuleName = type + '_' + ParserManager.formatStringToRuleName(formatString);
+                    const formattingRuleAction =
+`{% (d) => {
+    return {
+        "$class" : "ParsedDateTime",
+        "year": d[4], 
+        "month": d[2], 
+        "day": d[0], 
+        "hour": d[6], 
+        "minute": d[8], 
+        "second": d[10], 
+        "millisecond": d[12], 
+        "timezone": d[13]
+    };}
+%}`;
+                    parts.modelRules.push({
+                        prefix: formattingRuleName,
+                        symbols: [`${formatString} ${formattingRuleAction} # ${propertyName} as ${element.format.value}`],
+                    });
+                    let action = '{% id %}';
+                    let suffix = ':';
+                    // TODO (DCS) need a serialization for arrays
+                    if (property.isArray()) {
+                        throw new Error('Arrays are not yet supported!');
+                        // suffix += '+';
+                    }
+                    if (property.isOptional()) {
+                        suffix += '?';
+                    }
+                    if (suffix === ':') {
+                        suffix = '';
+                    }
+                    parts.modelRules.push({
+                        prefix: rule,
+                        symbols: [`${formattingRuleName}${suffix} ${action} # ${propertyName}`],
+                    });
+                }
+                break;
+            case 'Binding':
+                {
+                    const propertyName = element.fieldName.value;
+                    const property = templateModel.getProperty(propertyName);
+                    if (!property) {
+                        throw new Error(`Template references a property '${propertyName}' that is not declared in the template model '${templateModel.getFullyQualifiedName()}'. Details: ${JSON.stringify(element)}`);
+                    }
+                    let type = property.getType();
+                    // relationships need to be transformed into strings
+                    if (property instanceof RelationshipDeclaration) {
+                        type = 'String';
+                    }
+                    let action = '{% id %}';
+                    const decorator = property.getDecorator('AccordType');
+                    if (decorator) {
+                        if (decorator.getArguments().length > 0) {
+                            type = decorator.getArguments()[0];
+                        }
+                        if (decorator.getArguments().length > 1) {
+                            action = decorator.getArguments()[1];
+                        }
+                    }
+                    let suffix = ':';
+                    // TODO (DCS) need a serialization for arrays
+                    if (property.isArray()) {
+                        throw new Error('Arrays are not yet supported!');
+                        // suffix += '+';
+                    }
+                    if (property.isOptional()) {
+                        suffix += '?';
+                    }
+                    if (suffix === ':') {
+                        suffix = '';
+                    }
+                    parts.modelRules.push({
+                        prefix: rule,
+                        symbols: [`${type}${suffix} ${action} # ${propertyName}`],
+                    });
+                }
+                break;
+            case 'ClauseBinding':
+                {
+                    const propertyName = element.fieldName.value;
+                    const clauseTemplate = element.template;
+                    const property = templateModel.getProperty(propertyName);
+                    if (!property) {
+                        throw new Error(`Template references a property '${propertyName}' that is not declared in the template model '${templateModel.getFullyQualifiedName()}'. Details: ${JSON.stringify(element)}`);
+                    }
+                    const clauseTemplateModel = this.template.getIntrospector().getClassDeclaration(property.getFullyQualifiedTypeName());
+                    this.buildGrammarRules(clauseTemplate, clauseTemplateModel, propertyName, parts);
+                    let suffix = ':';
+                    // TODO (DCS) need a serialization for arrays
+                    if (property.isArray()) {
+                        throw new Error('Arrays are not yet supported!');
+                        // suffix += '+';
+                    }
+                    if (property.isOptional()) {
+                        suffix += '?';
+                    }
+                    if (suffix === ':') {
+                        suffix = '';
+                    }
+
+                    parts.modelRules.push({
+                        prefix: rule,
+                        symbols: [`${element.fieldName.value}${suffix} {% id %}\n`],
+                    });
+                }
+                break;
+            default:
+                throw new Error(`Unrecognized type ${element.type}`);
+            }
+        }
+    }
+
+    /**
+     * Converts a format string to a Nearley action
+     * @param {string} formatString - the input format string
+     * @returns {string} a version that can be used as the action of a rule
+     */
+    static formatStringToRuleAction(formatString) {
+        const input = formatString.substr(1,formatString.length -2);
+
+        // anything that is not part of an existing rule we need to convert to a quoted string
+        const ruleNames = 'DMHmsSYTZ';
+        let result = '';
+        let state = 'unknown';
+
+        for (let i = 0; i < input.length; i++) {
+            const char = input.charAt(i);
+            const isRule = ruleNames.indexOf(char) >= 0;
+
+            // initialize state
+            if(state === 'unknown' ) {
+                if(isRule) {
+                    state = 'rule';
+                }
+                else {
+                    state = 'notrule';
+                }
+            }
+
+            if(isRule) {
+                if(state === 'notrule') {
+                    result += '" '; // close quotes
+                }
+                state = 'rule';
+                result += char;
+            }
+            else {
+                if( state === 'rule') {
+                    result += ' "'; // open quotes
+                }
+                state = 'notrule';
+                result += char;
+            }
+        }
+
+        return result;
+    }
+
+    /**
+     * Cleans a format string so it can be used as part of a Nearley rule
+     * @param {string} formatString - the input format string
+     * @returns {string} a version safe for including in a nearley rule
+     */
+    static formatStringToRuleName(formatString) {
+        return crypto.createHash('md5').update(formatString).digest('hex');
+    }
+
+    /**
+     * Cleans a chunk of text to make it safe to include
+     * as a grammar rule. We need to remove linefeeds and
+     * escape any '"' characters.
+     *
+     * @param {string} input - the input text from the template
+     * @return {string} cleaned text
+     */
+    cleanChunk(input) {
+        // we replace all \r and \n with \n
+        let text = input.replace(/\r?\n|\r/gm,'\\n');
+
+        // replace all " with \", even across newlines
+        text = text.replace(/"/gm, '\\"');
+
+        return `"${text}"`;
+    }
+
+    /**
+     * Finds the first binding for the given property
+     *
+     * @param {string} propertyName the name of the property
+     * @param {object[]} elements the result of parsing the template_txt.
+     * @return {int} the index of the element or -1
+     */
+    findFirstBinding(propertyName, elements) {
+        for(let n=0; n < elements.length; n++) {
+            const element = elements[n];
+            if(element !== null && ['Binding','FormattedBinding', 'BooleanBinding','ClauseBinding'].includes(element.type)) {
+                if(element.fieldName.value === propertyName) {
+                    return n;
+                }
+            }
+        }
+        return -1;
+    }
+
+    /**
+     * Get the (compiled) grammar for the template
+     * @return {String} - the grammar for the template
+     */
+    getGrammar() {
+        return this.grammar;
+    }
+
+    /**
+     * Returns the templatized grammar
+     * @return {String} the contents of the templatized grammar
+     */
+    getTemplatizedGrammar() {
+        return this.templatizedGrammar;
+    }
+
+    /**
+     * Compiles a Nearley grammar to its AST
+     * @param {string} sourceCode  - the source text for the grammar
+     * @return {object} the AST for the grammar
+     */
+    static compileGrammar(sourceCode) {
+
+        try {
+            // Parse the grammar source into an AST
+            const grammarParser = new nearley.Parser(nearleyGrammar);
+            grammarParser.feed(sourceCode);
+            const grammarAst = grammarParser.results[0]; // TODO check for errors
+
+            // Compile the AST into a set of rules
+            const grammarInfoObject = compile(grammarAst, {});
+            // Generate JavaScript code from the rules
+            const grammarJs = generate(grammarInfoObject, 'grammar');
+
+            // Pretend this is a CommonJS environment to catch exports from the grammar.
+            const module = {
+                exports: {}
+            };
+            eval(grammarJs);
+            return module.exports;
+        } catch (err) {
+            logger.error(err);
+            throw err;
+        }
+    }
+}
+
+module.exports = ParserManager;
