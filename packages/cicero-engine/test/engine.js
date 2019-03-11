@@ -77,7 +77,7 @@ describe('EngineLatePenalty', () => {
             state.stateId = '1';
             const result = await engine.execute(clause2, request, state);
             result.should.not.be.null;
-            result.response.penalty.should.equal(52.5);
+            result.response.penalty.should.equal(59.5);
             result.response.buyerMayTerminate.should.equal(true);
         });
     });
