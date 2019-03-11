@@ -1,6 +1,6 @@
 {
   "name": "@accordproject/cicero-cli",
-  "version": "0.10.1",
+  "version": "0.10.2",
   "description": "Cicero CLI",
   "engines": {
     "node": ">=8",
@@ -46,8 +46,8 @@
     "tmp-promise": "1.0.4"
   },
   "dependencies": {
-    "@accordproject/cicero-core": "0.10.1",
-    "@accordproject/cicero-engine": "0.10.1",
+    "@accordproject/cicero-core": "0.10.2",
+    "@accordproject/cicero-engine": "0.10.2",
     "@accordproject/ergo-compiler": "0.6.3",
     "composer-concerto": "0.60.0",
     "uuid": "3.2.1",
