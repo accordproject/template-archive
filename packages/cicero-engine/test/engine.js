@@ -359,11 +359,11 @@ describe('BogusClauses', () => {
 
     it('should throw error when no __dispatch in JavaScript logic', async () => {
         const scriptManager = clause.getTemplate().getScriptManager();
-        return (() => engine.hasDispatch(scriptManager)).should.throw('Function __dispatch was not found in logic');
+        return (() => scriptManager.hasDispatch()).should.throw('Function __dispatch was not found in logic');
     });
     it('should throw error when no __init in JavaScript logic', async () => {
         const scriptManager = clause.getTemplate().getScriptManager();
-        return (() => engine.hasInit(scriptManager)).should.throw('Function __init was not found in logic');
+        return (() => scriptManager.hasInit()).should.throw('Function __init was not found in logic');
     });
     it('should throw an error when JavaScript logic is missing', async function() {
         // Turn all JavaScript logic into something else
