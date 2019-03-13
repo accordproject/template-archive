@@ -14,8 +14,8 @@
 
 'use strict';
 
+const APModelManager = require('@accordproject/ergo-compiler').APModelManager;
 const Field = require('composer-concerto').Field;
-const CiceroModelManager = require('./ciceromodelmanager');
 const ModelFile = require('composer-concerto').ModelFile;
 const RelationshipDeclaration = require('composer-concerto').RelationshipDeclaration;
 const EnumDeclaration = require('composer-concerto').EnumDeclaration;
@@ -40,7 +40,7 @@ class GrammarVisitor {
      * @private
      */
     visit(thing, parameters) {
-        if (thing instanceof CiceroModelManager) {
+        if (thing instanceof APModelManager) {
             return this.visitModelManager(thing, parameters);
         } else if (thing instanceof ModelFile) {
             return this.visitModelFile(thing, parameters);
