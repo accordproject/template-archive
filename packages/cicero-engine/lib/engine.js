@@ -64,8 +64,8 @@ class Engine {
         }
 
         // Check that the clause script has both __dispatch and __init
-        this.hasDispatch(scriptManager);
-        this.hasInit(scriptManager);
+        scriptManager.hasDispatch();
+        scriptManager.hasInit();
 
         const script = new VMScript(allJsScripts);
         this.scripts[clauseId] = script;
@@ -250,38 +250,6 @@ class Engine {
             'emit': emitResult,
         };
     }
-
-    /**
-     * Looks for the presence of a function in the JavaScript logic
-     *
-     * @param {ScriptManager} scriptManager  - the script manager
-     * @param {string} name  - the function name
-     */
-    static hasFunctionDeclaration(scriptManager, name) {
-        // get the function declarations of either init or dispatch
-        const funDecls = scriptManager.allFunctionDeclarations();
-        if (!funDecls.some((ele) => { return ele.getName() === name; })) {
-            throw new Error(`Function ${name} was not found in logic`);
-        }
-    }
-    /**
-     * Checks that the logic has a dispatch function
-     * @param {ScriptManager} scriptManager  - the script manager
-     * @private
-     */
-    hasDispatch(scriptManager) {
-        Engine.hasFunctionDeclaration(scriptManager,'__dispatch');
-    }
-
-    /**
-     * Checks that the logic has an init function
-     * @param {ScriptManager} scriptManager  - the script manager
-     * @private
-     */
-    hasInit(scriptManager) {
-        Engine.hasFunctionDeclaration(scriptManager,'__init');
-    }
-
 }
 
 module.exports = Engine;

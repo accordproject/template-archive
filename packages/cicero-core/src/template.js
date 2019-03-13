@@ -22,13 +22,9 @@ const minimatch = require('minimatch');
 const glob = require('glob');
 const xregexp = require('xregexp');
 const languageTagRegex = require('ietf-language-tag-regex');
-const Factory = require('composer-concerto').Factory;
 const RelationshipDeclaration = require('composer-concerto').RelationshipDeclaration;
-const Introspector = require('composer-concerto').Introspector;
-const CiceroModelManager = require('./ciceromodelmanager');
-const ScriptManager = require('./scriptmanager');
 const DefaultArchiveLoader = require('./loaders/defaultarchiveloader');
-const Serializer = require('composer-concerto').Serializer;
+const TemplateLogic = require('@accordproject/ergo-compiler').TemplateLogic;
 const Writer = require('composer-concerto-tools').Writer;
 const Logger = require('@accordproject/ergo-compiler').Logger;
 const nearley = require('nearley');
@@ -78,11 +74,7 @@ class Template {
      * @param {object} request - the JS object for the sample request
      */
     constructor(packageJson, readme, samples, request) {
-        this.modelManager = new CiceroModelManager();
-        this.scriptManager = new ScriptManager(this.modelManager);
-        this.introspector = new Introspector(this.modelManager);
-        this.factory = new Factory(this.modelManager);
-        this.serializer = new Serializer(this.factory, this.modelManager);
+        this.templateLogic = new TemplateLogic();
         this.metadata = new Metadata(packageJson, readme, samples, request);
         this.grammar = null;
         this.grammarAst = null;
@@ -650,15 +642,15 @@ class Template {
 
             return promise.then(async () => {
                 Logger.debug(method, 'Adding model files to model manager');
-                template.modelManager.addModelFiles(ctoModelFiles, ctoModelFileNames, true); // Adds all cto files to model manager
-                template.modelManager.validateModelFiles();
+                template.getModelManager().addModelFiles(ctoModelFiles, ctoModelFileNames, true); // Adds all cto files to model manager
+                template.getModelManager().validateModelFiles();
 
                 Logger.debug(method, 'Added model files to model manager');
                 Logger.debug(method, 'Adding Logic files to script manager');
                 scriptFiles.forEach(function (obj) {
                     const objExt = '.' +  obj.name.split('.').pop();
-                    let scriptObject = template.scriptManager.createScript(obj.name, objExt, obj.contents);
-                    template.scriptManager.addScript(scriptObject); // Adds all js files to script manager
+                    let scriptObject = template.getScriptManager().createScript(obj.name, objExt, obj.contents);
+                    template.getScriptManager().addScript(scriptObject); // Adds all js files to script manager
                 });
                 // Compile Ergo
                 template.getScriptManager().compileLogic();
@@ -1132,7 +1124,7 @@ class Template {
      * @return {Introspector} the Introspector for this business network
      */
     getIntrospector() {
-        return this.introspector;
+        return this.templateLogic.getIntrospector();
     }
 
     /**
@@ -1141,7 +1133,7 @@ class Template {
      * @return {Factory} the Factory for this business network
      */
     getFactory() {
-        return this.factory;
+        return this.templateLogic.getFactory();
     }
 
     /**
@@ -1150,7 +1142,7 @@ class Template {
      * @return {Serializer} the Serializer for this business network
      */
     getSerializer() {
-        return this.serializer;
+        return this.templateLogic.getSerializer();
     }
 
     /**
@@ -1160,7 +1152,7 @@ class Template {
      * @private
      */
     getScriptManager() {
-        return this.scriptManager;
+        return this.templateLogic.getScriptManager();
     }
 
     /**
@@ -1170,7 +1162,7 @@ class Template {
      * @private
      */
     getModelManager() {
-        return this.modelManager;
+        return this.templateLogic.getModelManager();
     }
 
     /**
