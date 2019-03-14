@@ -251,6 +251,14 @@ class Metadata {
     }
 
     /**
+     * Returns the name for this template.
+     * @return {Array} the name of the template
+     */
+    getKeywords() {
+        return this.packageJson.keywords;
+    }
+
+    /**
      * Returns the description for this template.
      * @return {string} the description of the template
      */
