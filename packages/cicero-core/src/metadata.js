@@ -255,7 +255,11 @@ class Metadata {
      * @return {Array} the name of the template
      */
     getKeywords() {
-        return this.packageJson.keywords;
+        if (this.packageJson.keywords.length < 1 || this.packageJson.keywords === undefined) {
+            return [];
+        } else {
+            return this.packageJson.keywords;
+        }
     }
 
     /**
