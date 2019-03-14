@@ -550,6 +550,14 @@ describe('Template', () => {
             template.setPackageJson(packageJson);
             template.getMetadata().getKeywords()[2].should.be.equal('automobile');
         });
+
+        it('should return empty array if no keywords exist', async () => {
+            const template = await Template.fromDirectory('./test/data/latedeliveryandpenalty');
+            const packageJson = template.getMetadata().getPackageJson();
+            packageJson.keywords = [];
+            template.setPackageJson(packageJson);
+            template.getMetadata().getKeywords().should.be.deep.equal([]);
+        });
     });
 
     describe('#getLogic', () => {
