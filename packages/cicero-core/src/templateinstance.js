@@ -283,6 +283,14 @@ class TemplateInstance {
     }
 
     /**
+     * Returns the template logic for this clause
+     * @return {TemplateLogic} the template for this clause
+     */
+    getTemplateLogic() {
+        return this.template.getTemplateLogic();
+    }
+
+    /**
      * Returns a JSON representation of the clause
      * @return {object} the JS object for serialization
      */
