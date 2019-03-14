@@ -65,7 +65,7 @@ async function writeZip(template){
 }
 /* eslint-enable */
 
-describe('Template', () => {
+describe.only('Template', () => {
 
     describe('#fromDirectory', () => {
 
@@ -531,6 +531,24 @@ describe('Template', () => {
             packageJson.name = 'new_name';
             template.setPackageJson(packageJson);
             template.getMetadata().getPackageJson().name.should.be.equal('new_name');
+        });
+    });
+
+    describe.only('#setKeywords', () => {
+        it('should set the keywords of the metadatas package json', async () => {
+            const template = await Template.fromDirectory('./test/data/latedeliveryandpenalty');
+            const packageJson = template.getMetadata().getPackageJson();
+            packageJson.keywords = ['payment', 'car', 'automobile'];
+            template.setPackageJson(packageJson);
+            template.getMetadata().getKeywords().should.be.deep.equal(['payment', 'car', 'automobile']);
+        });
+
+        it('should find a specific keyword of the metadatas package json', async () => {
+            const template = await Template.fromDirectory('./test/data/latedeliveryandpenalty');
+            const packageJson = template.getMetadata().getPackageJson();
+            packageJson.keywords = ['payment', 'car', 'automobile'];
+            template.setPackageJson(packageJson);
+            template.getMetadata().getKeywords()[2].should.be.equal('automobile');
         });
     });
 
