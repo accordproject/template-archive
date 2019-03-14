@@ -65,7 +65,7 @@ async function writeZip(template){
 }
 /* eslint-enable */
 
-describe.only('Template', () => {
+describe('Template', () => {
 
     describe('#fromDirectory', () => {
 
@@ -534,7 +534,7 @@ describe.only('Template', () => {
         });
     });
 
-    describe.only('#setKeywords', () => {
+    describe('#setKeywords', () => {
         it('should set the keywords of the metadatas package json', async () => {
             const template = await Template.fromDirectory('./test/data/latedeliveryandpenalty');
             const packageJson = template.getMetadata().getPackageJson();
