@@ -101,6 +101,18 @@ describe('Metadata', () => {
             }, {}, {})).should.throw('README must be a string');
         });
 
+        it('should throw an error if keywords is not an array', () => {
+            return (() => new Metadata({
+                name: 'template',
+                cicero: {
+                    template: 'contract',
+                    language:'ergo',
+                    version:'0.10.2'
+                },
+                keywords: {},
+            }, null, {})).should.throw('keywords property in package.json must be an array.');
+        });
+
         it('should throw an error if template isn\'t contract or clause', () => {
             return (() => new Metadata({
                 name: 'template',
