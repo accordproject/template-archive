@@ -65,7 +65,7 @@ async function writeZip(template){
 }
 /* eslint-enable */
 
-describe('Template', () => {
+describe.only('Template', () => {
 
     describe('#fromDirectory', () => {
 
@@ -136,11 +136,12 @@ describe('Template', () => {
             template.getScriptManager().getLogic().length.should.equal(1);
             template.getMetadata().getREADME().should.not.be.null;
             template.getMetadata().getRequest().should.not.be.null;
+            template.getMetadata().getKeywords().should.not.be.null;
             template.getName().should.equal('latedeliveryandpenalty');
             template.getDescription().should.equal('Late Delivery and Penalty. In case of delayed delivery except for Force Majeure cases, the Seller shall pay to the Buyer for every 9 DAY of delay penalty amounting to 7% of the total value of the Equipment whose delivery has been delayed. Any fractional part of a DAY is to be considered a full DAY. The total amount of penalty shall not however, exceed 2% of the total value of the Equipment involved in late delivery. If the delay is more than 2 WEEK, the Buyer is entitled to terminate this Contract.');
             template.getVersion().should.equal('0.0.1');
             template.getMetadata().getSample().should.equal('Late Delivery and Penalty. In case of delayed delivery except for Force Majeure cases, the Seller shall pay to the Buyer for every 9 days of delay penalty amounting to 7% of the total value of the Equipment whose delivery has been delayed. Any fractional part of a days is to be considered a full days. The total amount of penalty shall not however, exceed 2% of the total value of the Equipment involved in late delivery. If the delay is more than 2 weeks, the Buyer is entitled to terminate this Contract.');
-            template.getHash().should.equal('8336919a11aac0a2a625c8b03670830c22afcc9ae959c97d2328fb8ce6be1c5e');
+            template.getHash().should.equal('44eb1919cb4b3ee7597eb46c527bcc573877add4c25dee98e63f1fb7876a675b');
             const buffer = await template.toArchive('ergo');
             buffer.should.not.be.null;
             const template2 = await Template.fromArchive(buffer);
@@ -151,6 +152,7 @@ describe('Template', () => {
             template2.getScriptManager().getScripts().length.should.equal(template.getScriptManager().getScripts().length);
             template2.getMetadata().getREADME().should.equal(template.getMetadata().getREADME());
             template2.getMetadata().getSamples().should.eql(template.getMetadata().getSamples());
+            template2.getMetadata().getKeywords().should.eql(template.getMetadata().getKeywords());
             template2.getHash().should.equal(template.getHash());
             const buffer2 = await template2.toArchive('ergo');
             buffer2.should.not.be.null;
@@ -164,11 +166,12 @@ describe('Template', () => {
             template.getScriptManager().getScripts().length.should.equal(1);
             template.getMetadata().getREADME().should.not.be.null;
             template.getMetadata().getRequest().should.not.be.null;
+            template.getMetadata().getKeywords().should.not.be.null;
             template.getName().should.equal('latedeliveryandpenalty');
             template.getDescription().should.equal('Late Delivery and Penalty. In case of delayed delivery except for Force Majeure cases, the Seller shall pay to the Buyer for every 9 DAY of delay penalty amounting to 7% of the total value of the Equipment whose delivery has been delayed. Any fractional part of a DAY is to be considered a full DAY. The total amount of penalty shall not however, exceed 2% of the total value of the Equipment involved in late delivery. If the delay is more than 2 WEEK, the Buyer is entitled to terminate this Contract.');
             template.getVersion().should.equal('0.0.1');
             template.getMetadata().getSample().should.equal('Late Delivery and Penalty. In case of delayed delivery except for Force Majeure cases, the Seller shall pay to the Buyer for every 9 days of delay penalty amounting to 7% of the total value of the Equipment whose delivery has been delayed. Any fractional part of a days is to be considered a full days. The total amount of penalty shall not however, exceed 2% of the total value of the Equipment involved in late delivery. If the delay is more than 2 weeks, the Buyer is entitled to terminate this Contract.');
-            template.getHash().should.equal('ea38feafc4bf75017b3993235bcdeda1fab0f5e5025719e82bad3e34ee9d0064');
+            template.getHash().should.equal('e23801b499f84b49befb5acc769067eacfedae5368cd7cae37429b0822b945c3');
             const buffer = await template.toArchive('javascript');
             buffer.should.not.be.null;
             const template2 = await Template.fromArchive(buffer);
@@ -179,6 +182,7 @@ describe('Template', () => {
             template2.getScriptManager().getScripts().length.should.equal(template.getScriptManager().getScripts().length);
             template2.getMetadata().getREADME().should.equal(template.getMetadata().getREADME());
             template2.getMetadata().getSamples().should.eql(template.getMetadata().getSamples());
+            template2.getMetadata().getKeywords().should.eql(template.getMetadata().getKeywords());
             template2.getHash().should.equal(template.getHash());
             const buffer2 = await template2.toArchive('javascript');
             buffer2.should.not.be.null;
@@ -194,11 +198,12 @@ describe('Template', () => {
             template.getScriptManager().getLogic().length.should.equal(1);
             template.getMetadata().getREADME().should.not.be.null;
             template.getMetadata().getRequest().should.not.be.null;
+            template.getMetadata().getKeywords().should.not.be.null;
             template.getName().should.equal('latedeliveryandpenalty');
             template.getDescription().should.equal('Late Delivery and Penalty. In case of delayed delivery except for Force Majeure cases, the Seller shall pay to the Buyer for every 9 DAY of delay penalty amounting to 7% of the total value of the Equipment whose delivery has been delayed. Any fractional part of a DAY is to be considered a full DAY. The total amount of penalty shall not however, exceed 2% of the total value of the Equipment involved in late delivery. If the delay is more than 2 WEEK, the Buyer is entitled to terminate this Contract.');
             template.getVersion().should.equal('0.0.1');
             template.getMetadata().getSample().should.equal('Late Delivery and Penalty. In case of delayed delivery except for Force Majeure cases, the Seller shall pay to the Buyer for every 9 days of delay penalty amounting to 7% of the total value of the Equipment whose delivery has been delayed. Any fractional part of a days is to be considered a full days. The total amount of penalty shall not however, exceed 2% of the total value of the Equipment involved in late delivery. If the delay is more than 2 weeks, the Buyer is entitled to terminate this Contract.');
-            template.getHash().should.equal('8336919a11aac0a2a625c8b03670830c22afcc9ae959c97d2328fb8ce6be1c5e');
+            template.getHash().should.equal('44eb1919cb4b3ee7597eb46c527bcc573877add4c25dee98e63f1fb7876a675b');
             template.setArchiveOmitsLogic();
             const buffer = await template.toArchive('ergo');
             buffer.should.not.be.null;
@@ -211,7 +216,8 @@ describe('Template', () => {
             template2.getScriptManager().getScripts().length.should.equal(0);
             template2.getMetadata().getREADME().should.equal(template.getMetadata().getREADME());
             template2.getMetadata().getSamples().should.eql(template.getMetadata().getSamples());
-            template2.getHash().should.equal('cc3ccd0e086a9c049f06c2e5592eb8061b72e99609961c31896b8e62643679c1');
+            template2.getMetadata().getKeywords().should.eql(template.getMetadata().getKeywords());
+            template2.getHash().should.equal('98af228a39f4e574b8f84b4247adc668127c349d9c78b4514dbd1abaa4814724');
             const buffer2 = await template2.toArchive('ergo');
             buffer2.should.not.be.null;
         });
@@ -349,7 +355,8 @@ describe('Template', () => {
                     'template': 'clause',
                     'language': 'ergo',
                     'version': '^0.10.0'
-                }
+                },
+                'keywords': ['1', '2', '3']
             },
             null,
             {
@@ -504,7 +511,7 @@ describe('Template', () => {
     describe('#getHash', () => {
         it('should return a SHA-256 hash', async () => {
             const template = await Template.fromDirectory('./test/data/latedeliveryandpenalty');
-            template.getHash().should.equal('8336919a11aac0a2a625c8b03670830c22afcc9ae959c97d2328fb8ce6be1c5e');
+            template.getHash().should.equal('44eb1919cb4b3ee7597eb46c527bcc573877add4c25dee98e63f1fb7876a675b');
         });
     });
 
