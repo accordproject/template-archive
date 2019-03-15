@@ -7,6 +7,5 @@
         "template": "contract",
         "language": "ergo",
         "version": "^0.10.0"
-    },
-    "keywords": ["1", "2", "3"]
+    }
 }

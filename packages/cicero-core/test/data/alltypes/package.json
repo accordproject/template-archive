@@ -5,6 +5,5 @@
     "cicero": {
       "template": "clause",
       "version": "^0.10.0"
-    },
-    "keywords": ["1", "2", "3"]
+    }
   }

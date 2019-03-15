@@ -6,6 +6,5 @@
       "template": "clause",
       "language": "javascript",
       "version": "^0.10.0"
-    },
-    "keywords": ["1", "2", "3"]
+    }
   }

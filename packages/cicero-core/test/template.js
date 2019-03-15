@@ -65,7 +65,7 @@ async function writeZip(template){
 }
 /* eslint-enable */
 
-describe.only('Template', () => {
+describe('Template', () => {
 
     describe('#fromDirectory', () => {
 
@@ -141,7 +141,7 @@ describe.only('Template', () => {
             template.getDescription().should.equal('Late Delivery and Penalty. In case of delayed delivery except for Force Majeure cases, the Seller shall pay to the Buyer for every 9 DAY of delay penalty amounting to 7% of the total value of the Equipment whose delivery has been delayed. Any fractional part of a DAY is to be considered a full DAY. The total amount of penalty shall not however, exceed 2% of the total value of the Equipment involved in late delivery. If the delay is more than 2 WEEK, the Buyer is entitled to terminate this Contract.');
             template.getVersion().should.equal('0.0.1');
             template.getMetadata().getSample().should.equal('Late Delivery and Penalty. In case of delayed delivery except for Force Majeure cases, the Seller shall pay to the Buyer for every 9 days of delay penalty amounting to 7% of the total value of the Equipment whose delivery has been delayed. Any fractional part of a days is to be considered a full days. The total amount of penalty shall not however, exceed 2% of the total value of the Equipment involved in late delivery. If the delay is more than 2 weeks, the Buyer is entitled to terminate this Contract.');
-            template.getHash().should.equal('44eb1919cb4b3ee7597eb46c527bcc573877add4c25dee98e63f1fb7876a675b');
+            template.getHash().should.equal('e09b822aef69d0db7666febf6bedc750cd43153890391a4ebc0b481168ea352a');
             const buffer = await template.toArchive('ergo');
             buffer.should.not.be.null;
             const template2 = await Template.fromArchive(buffer);
@@ -171,7 +171,7 @@ describe.only('Template', () => {
             template.getDescription().should.equal('Late Delivery and Penalty. In case of delayed delivery except for Force Majeure cases, the Seller shall pay to the Buyer for every 9 DAY of delay penalty amounting to 7% of the total value of the Equipment whose delivery has been delayed. Any fractional part of a DAY is to be considered a full DAY. The total amount of penalty shall not however, exceed 2% of the total value of the Equipment involved in late delivery. If the delay is more than 2 WEEK, the Buyer is entitled to terminate this Contract.');
             template.getVersion().should.equal('0.0.1');
             template.getMetadata().getSample().should.equal('Late Delivery and Penalty. In case of delayed delivery except for Force Majeure cases, the Seller shall pay to the Buyer for every 9 days of delay penalty amounting to 7% of the total value of the Equipment whose delivery has been delayed. Any fractional part of a days is to be considered a full days. The total amount of penalty shall not however, exceed 2% of the total value of the Equipment involved in late delivery. If the delay is more than 2 weeks, the Buyer is entitled to terminate this Contract.');
-            template.getHash().should.equal('e23801b499f84b49befb5acc769067eacfedae5368cd7cae37429b0822b945c3');
+            template.getHash().should.equal('205663283d35d1a8134a60ea5731af77d3c19976d70efa629c03ae1d00d7db6a');
             const buffer = await template.toArchive('javascript');
             buffer.should.not.be.null;
             const template2 = await Template.fromArchive(buffer);
@@ -203,7 +203,7 @@ describe.only('Template', () => {
             template.getDescription().should.equal('Late Delivery and Penalty. In case of delayed delivery except for Force Majeure cases, the Seller shall pay to the Buyer for every 9 DAY of delay penalty amounting to 7% of the total value of the Equipment whose delivery has been delayed. Any fractional part of a DAY is to be considered a full DAY. The total amount of penalty shall not however, exceed 2% of the total value of the Equipment involved in late delivery. If the delay is more than 2 WEEK, the Buyer is entitled to terminate this Contract.');
             template.getVersion().should.equal('0.0.1');
             template.getMetadata().getSample().should.equal('Late Delivery and Penalty. In case of delayed delivery except for Force Majeure cases, the Seller shall pay to the Buyer for every 9 days of delay penalty amounting to 7% of the total value of the Equipment whose delivery has been delayed. Any fractional part of a days is to be considered a full days. The total amount of penalty shall not however, exceed 2% of the total value of the Equipment involved in late delivery. If the delay is more than 2 weeks, the Buyer is entitled to terminate this Contract.');
-            template.getHash().should.equal('44eb1919cb4b3ee7597eb46c527bcc573877add4c25dee98e63f1fb7876a675b');
+            template.getHash().should.equal('e09b822aef69d0db7666febf6bedc750cd43153890391a4ebc0b481168ea352a');
             template.setArchiveOmitsLogic();
             const buffer = await template.toArchive('ergo');
             buffer.should.not.be.null;
@@ -217,7 +217,7 @@ describe.only('Template', () => {
             template2.getMetadata().getREADME().should.equal(template.getMetadata().getREADME());
             template2.getMetadata().getSamples().should.eql(template.getMetadata().getSamples());
             template2.getMetadata().getKeywords().should.eql(template.getMetadata().getKeywords());
-            template2.getHash().should.equal('98af228a39f4e574b8f84b4247adc668127c349d9c78b4514dbd1abaa4814724');
+            template2.getHash().should.equal('a2493a1e26f817357918e5fa7c8535573d023309048a273476dafc0f9d73b783');
             const buffer2 = await template2.toArchive('ergo');
             buffer2.should.not.be.null;
         });
@@ -511,7 +511,7 @@ describe.only('Template', () => {
     describe('#getHash', () => {
         it('should return a SHA-256 hash', async () => {
             const template = await Template.fromDirectory('./test/data/latedeliveryandpenalty');
-            template.getHash().should.equal('44eb1919cb4b3ee7597eb46c527bcc573877add4c25dee98e63f1fb7876a675b');
+            template.getHash().should.equal('e09b822aef69d0db7666febf6bedc750cd43153890391a4ebc0b481168ea352a');
         });
     });
 
