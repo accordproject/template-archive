@@ -85,7 +85,7 @@ class Metadata {
         }
 
         if(!packageJson.keywords) {
-            throw new Error('package.json is missing the keywords property.');
+            packageJson.keywords = [];
         }
 
         if(packageJson.keywords && !Array.isArray(packageJson.keywords)) {
