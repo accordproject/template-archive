@@ -84,6 +84,14 @@ class Metadata {
             throw new Error('README must be a string');
         }
 
+        if(!packageJson.keywords) {
+            throw new Error('package.json is missing the keywords property.');
+        }
+
+        if(packageJson.keywords && !Array.isArray(packageJson.keywords)) {
+            throw new Error('keywords property in package.json must be an array.');
+        }
+
         this.readme = readme;
         this.samples = samples;
         this.request = request;
