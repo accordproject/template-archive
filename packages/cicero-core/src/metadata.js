@@ -84,6 +84,14 @@ class Metadata {
             throw new Error('README must be a string');
         }
 
+        if(!packageJson.keywords) {
+            packageJson.keywords = [];
+        }
+
+        if(packageJson.keywords && !Array.isArray(packageJson.keywords)) {
+            throw new Error('keywords property in package.json must be an array.');
+        }
+
         this.readme = readme;
         this.samples = samples;
         this.request = request;
@@ -248,6 +256,18 @@ class Metadata {
      */
     getName() {
         return this.packageJson.name;
+    }
+
+    /**
+     * Returns the name for this template.
+     * @return {Array} the name of the template
+     */
+    getKeywords() {
+        if (this.packageJson.keywords.length < 1 || this.packageJson.keywords === undefined) {
+            return [];
+        } else {
+            return this.packageJson.keywords;
+        }
     }
 
     /**
