@@ -70,14 +70,12 @@ describe('Metadata', () => {
             (() => new Metadata({
                 name: 'template',
                 cicero: {template: 'contract',version:'^0.3.0-0'},
-
             }, null)).should.throw('sample.txt is required');
         });
         it('should throw an error if samples is not an object', () => {
             (() => new Metadata({
                 name: 'template',
                 cicero: {template: 'contract',version:'^0.3.0-0'},
-
             }, null, 'sample')).should.throw('sample.txt is required');
         });
 
@@ -85,7 +83,6 @@ describe('Metadata', () => {
             (() => new Metadata({
                 name: 'template',
                 cicero: {template: 'contract',version:'^0.3.0-0'},
-
             }, null, {}, 'request')).should.throw('request.json must be an object');
         });
 
@@ -94,7 +91,6 @@ describe('Metadata', () => {
             (() => new Metadata({
                 name: 'template (no 1.)',
                 cicero: {template: 'contract',version:'^0.3.0-0'},
-
             }, null, {})).should.throw('template name can only contain lowercase alphanumerics, _ or -');
         });
 
@@ -102,7 +98,6 @@ describe('Metadata', () => {
             (() => new Metadata({
                 name: 'template',
                 cicero: {template: 'contract',version:'^0.3.0-0'},
-
             }, {}, {})).should.throw('README must be a string');
         });
 
@@ -110,7 +105,6 @@ describe('Metadata', () => {
             return (() => new Metadata({
                 name: 'template',
                 cicero: {template: 'other',language:'ergo'},
-
             }, null, {})).should.throw('A cicero template must be either a "contract" or a "clause".');
         });
 
@@ -118,7 +112,6 @@ describe('Metadata', () => {
             return (() => new Metadata({
                 name: 'template',
                 cicero: {template: 'contract',language:'ergo'},
-
             }, null, {})).should.throw('package.json is missing the cicero.version property.');
         });
 
@@ -138,7 +131,6 @@ describe('Metadata', () => {
             return (() => new Metadata({
                 name: 'template',
                 cicero: {template: 'clause',language:'BLAH'},
-
             }, null, {})).should.throw('A cicero template language must be either "ergo" or "javascript".');
         });
 
@@ -150,7 +142,6 @@ describe('Metadata', () => {
                     version: 'BLAH',
                     language: 'ergo'
                 },
-
             }, null, {})).should.throw('The cicero target version must be a valid semantic version (semver) number.');
         });
 
@@ -162,7 +153,6 @@ describe('Metadata', () => {
                     version: '0.0.0',
                     language: 'ergo'
                 },
-
             }, null, {})).should.throw('The template targets Cicero (0.0.0) but the Cicero version is ');
         });
     });
@@ -183,7 +173,6 @@ describe('Metadata', () => {
             const md = new Metadata({
                 name: 'template',
                 cicero: {template: 'contract',language:'ergo',version:'^0.10.0'},
-
             }, null, {});
             should.not.exist(md.getSample('en'));
             should.not.exist(md.getSample());
@@ -194,7 +183,6 @@ describe('Metadata', () => {
             const md = new Metadata({
                 name: 'template',
                 cicero: {template: 'contract',language:'ergo',version:'^0.10.0'},
-
             }, null, {
                 default: 'sample'
             });
@@ -208,7 +196,6 @@ describe('Metadata', () => {
             const md = new Metadata({
                 name: 'template',
                 cicero: {template: 'contract',language:'ergo',version:'^0.10.0'},
-
             }, null, {});
             md.getTemplateType().should.be.equal(0);
         });
@@ -216,7 +203,6 @@ describe('Metadata', () => {
             const md = new Metadata({
                 name: 'template',
                 cicero: {template: 'contract',language:'ergo',version:'^0.10.0'},
-
             }, null, {});
             md.getTemplateType().should.be.equal(0);
         });
@@ -224,7 +210,6 @@ describe('Metadata', () => {
             const md = new Metadata({
                 name: 'template',
                 cicero: {template: 'clause',language:'ergo',version:'^0.10.0'},
-
             }, null, {});
             md.getTemplateType().should.be.equal(1);
         });
@@ -236,7 +221,6 @@ describe('Metadata', () => {
             const md = new Metadata({
                 name: 'template',
                 cicero: {template: 'contract',language:'ergo',version:caretRange(ciceroVersion)},
-
             }, null, {});
             md.satisfiesTargetVersion(ciceroVersion).should.be.equal(true);
         });
@@ -244,7 +228,6 @@ describe('Metadata', () => {
             const md = new Metadata({
                 name: 'template',
                 cicero: {template: 'contract',language:'ergo',version:'^0.10.0'},
-
             }, null, {});
             md.satisfiesTargetVersion(ciceroVersion).should.be.equal(true);
         });
@@ -252,7 +235,6 @@ describe('Metadata', () => {
             const md = new Metadata({
                 name: 'template',
                 cicero: {template: 'contract',language:'ergo',version:caretRange(ciceroVersion)},
-
             }, null, {});
             const version = `${incPatch(trimPreRelease(ciceroVersion))}-20190114233635`;
             md.satisfiesTargetVersion(version).should.be.equal(true);
@@ -261,7 +243,6 @@ describe('Metadata', () => {
             const md = new Metadata({
                 name: 'template',
                 cicero: {template: 'contract',language:'ergo',version:'^0.10.0'},
-
             }, null, {});
             md.satisfiesTargetVersion('0.10.1-20190114233635').should.be.equal(true);
         });
@@ -269,7 +250,6 @@ describe('Metadata', () => {
             const md = new Metadata({
                 name: 'template',
                 cicero: {template: 'contract',language:'ergo',version:'^0.10.0'},
-
             }, null, {});
             md.targetVersion = '^0.9.0';
             md.satisfiesTargetVersion(ciceroVersion).should.be.equal(false);
@@ -278,7 +258,6 @@ describe('Metadata', () => {
             const md = new Metadata({
                 name: 'template',
                 cicero: {template: 'contract',language:'ergo',version:'^0.10.0'},
-
             }, null, {});
             md.targetVersion = '^0.9.0';
             md.satisfiesTargetVersion('0.10.0-20190114233635').should.be.equal(true);
@@ -287,7 +266,6 @@ describe('Metadata', () => {
             const md = new Metadata({
                 name: 'template',
                 cicero: {template: 'contract',language:'ergo',version:'^0.10.0'},
-
             }, null, {});
             md.targetVersion = '^0.9.0';
             md.satisfiesTargetVersion('0.10.1-20190114233635').should.be.equal(false);
@@ -296,7 +274,6 @@ describe('Metadata', () => {
             const md = new Metadata({
                 name: 'template',
                 cicero: {template: 'contract',language:'ergo',version:'^0.10.0'},
-
             }, null, {});
             md.targetVersion = '^0.11.0';
             md.satisfiesTargetVersion(ciceroVersion).should.be.equal(false);
@@ -305,7 +282,6 @@ describe('Metadata', () => {
             const md = new Metadata({
                 name: 'template',
                 cicero: {template: 'contract',language:'ergo',version:'^0.10.0'},
-
             }, null, {});
             md.targetVersion = '^0.11.0';
             md.satisfiesTargetVersion('0.10.0-20190114233635').should.be.equal(false);
