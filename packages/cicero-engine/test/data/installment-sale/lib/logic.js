@@ -15,18 +15,18 @@
  * @param {org.accordproject.installmentsale.InstallmentSaleState} context.state - the state
  */
 function orgXaccordprojectXinstallmentsaleXInstallmentSale_PayInstallment(context) {
-  let pcontext = { 'request' : serializer.toJSON(context.request,{permitResourcesForRelationships:true}), 'state': serializer.toJSON(context.state,{permitResourcesForRelationships:true}), 'contract': serializer.toJSON(context.contract,{permitResourcesForRelationships:true}), 'emit': context.emit, 'now': context.now};
+  let pcontext = { 'request' : context.request, 'state': context.state, 'contract': context.contract, 'emit': context.emit, 'now': context.now};
   //logger.info('ergo context: '+JSON.stringify(pcontext))
   let result = new orgXaccordprojectXinstallmentsaleXInstallmentSale().PayInstallment(pcontext);
   if (result.hasOwnProperty('left')) {
     //logger.info('ergo result: '+JSON.stringify(result))
     context.response = result.left.response ?
-         serializer.fromJSON(result.left.response, {validate: false, acceptResourcesForRelationships: true},{permitResourcesForRelationships:true})
-       : serializer.fromJSON({ '$class': 'org.accordproject.cicero.runtime.Response' });
-    context.state = serializer.fromJSON(result.left.state, {validate: false, acceptResourcesForRelationships: true});
+         result.left.response
+       : { '$class': 'org.accordproject.cicero.runtime.Response' };
+    context.state = result.left.state;
     let emitResult = [];
     for (let i = 0; i < result.left.emit.length; i++) {
-      emitResult.push(serializer.fromJSON(result.left.emit[i], {validate: false, acceptResourcesForRelationships: true}));
+      emitResult.push(result.left.emit[i]);
     }
     context.emit = emitResult;
     return context;
@@ -45,18 +45,18 @@ function orgXaccordprojectXinstallmentsaleXInstallmentSale_PayInstallment(contex
  * @param {org.accordproject.installmentsale.InstallmentSaleState} context.state - the state
  */
 function orgXaccordprojectXinstallmentsaleXInstallmentSale_PayLastInstallment(context) {
-  let pcontext = { 'request' : serializer.toJSON(context.request,{permitResourcesForRelationships:true}), 'state': serializer.toJSON(context.state,{permitResourcesForRelationships:true}), 'contract': serializer.toJSON(context.contract,{permitResourcesForRelationships:true}), 'emit': context.emit, 'now': context.now};
+  let pcontext = { 'request' : context.request, 'state': context.state, 'contract': context.contract, 'emit': context.emit, 'now': context.now};
   //logger.info('ergo context: '+JSON.stringify(pcontext))
   let result = new orgXaccordprojectXinstallmentsaleXInstallmentSale().PayLastInstallment(pcontext);
   if (result.hasOwnProperty('left')) {
     //logger.info('ergo result: '+JSON.stringify(result))
     context.response = result.left.response ?
-         serializer.fromJSON(result.left.response, {validate: false, acceptResourcesForRelationships: true},{permitResourcesForRelationships:true})
-       : serializer.fromJSON({ '$class': 'org.accordproject.cicero.runtime.Response' });
-    context.state = serializer.fromJSON(result.left.state, {validate: false, acceptResourcesForRelationships: true});
+         result.left.response
+       : { '$class': 'org.accordproject.cicero.runtime.Response' };
+    context.state = result.left.state;
     let emitResult = [];
     for (let i = 0; i < result.left.emit.length; i++) {
-      emitResult.push(serializer.fromJSON(result.left.emit[i], {validate: false, acceptResourcesForRelationships: true}));
+      emitResult.push(result.left.emit[i]);
     }
     context.emit = emitResult;
     return context;
@@ -231,18 +231,18 @@ class orgXaccordprojectXinstallmentsaleXInstallmentSale {
 }
 const contract = new orgXaccordprojectXinstallmentsaleXInstallmentSale();
 function __dispatch(context) {
-  let pcontext = { 'request' : serializer.toJSON(context.request,{permitResourcesForRelationships:true}), 'state': serializer.toJSON(context.state,{permitResourcesForRelationships:true}), 'contract': serializer.toJSON(context.contract,{permitResourcesForRelationships:true}), 'emit': context.emit, 'now': context.now};
+  let pcontext = { 'request' : context.request, 'state': context.state, 'contract': context.contract, 'emit': context.emit, 'now': context.now};
   //logger.info('ergo context: '+JSON.stringify(pcontext))
   let result = new orgXaccordprojectXinstallmentsaleXInstallmentSale().main(pcontext);
   if (result.hasOwnProperty('left')) {
     //logger.info('ergo result: '+JSON.stringify(result))
     context.response = result.left.response ?
-         serializer.fromJSON(result.left.response, {validate: false, acceptResourcesForRelationships: true},{permitResourcesForRelationships:true})
-       : serializer.fromJSON({ '$class': 'org.accordproject.cicero.runtime.Response' });
-    context.state = serializer.fromJSON(result.left.state, {validate: false, acceptResourcesForRelationships: true});
+         result.left.response
+       : { '$class': 'org.accordproject.cicero.runtime.Response' };
+    context.state = result.left.state;
     let emitResult = [];
     for (let i = 0; i < result.left.emit.length; i++) {
-      emitResult.push(serializer.fromJSON(result.left.emit[i], {validate: false, acceptResourcesForRelationships: true}));
+      emitResult.push(result.left.emit[i]);
     }
     context.emit = emitResult;
     return context;
@@ -252,18 +252,18 @@ function __dispatch(context) {
   }
 }
 function __init(context) {
-  let pcontext = { 'state': { '$class': 'org.accordproject.cicero.contract.AccordContractState', 'stateId' : 'org.accordproject.cicero.contract.AccordContractState#1' }, 'contract': serializer.toJSON(context.contract,{permitResourcesForRelationships:true}), 'emit': context.emit, 'now': context.now};
+  let pcontext = { 'state': { '$class': 'org.accordproject.cicero.contract.AccordContractState', 'stateId' : 'org.accordproject.cicero.contract.AccordContractState#1' }, 'contract': context.contract, 'emit': context.emit, 'now': context.now};
   //logger.info('ergo context: '+JSON.stringify(pcontext))
   let result = new orgXaccordprojectXinstallmentsaleXInstallmentSale().init(pcontext);
   if (result.hasOwnProperty('left')) {
     //logger.info('ergo result: '+JSON.stringify(result))
     context.response = result.left.response ?
-         serializer.fromJSON(result.left.response, {validate: false, acceptResourcesForRelationships: true},{permitResourcesForRelationships:true})
-       : serializer.fromJSON({ '$class': 'org.accordproject.cicero.runtime.Response' });
-    context.state = serializer.fromJSON(result.left.state, {validate: false, acceptResourcesForRelationships: true});
+         result.left.response
+       : { '$class': 'org.accordproject.cicero.runtime.Response' };
+    context.state = result.left.state;
     let emitResult = [];
     for (let i = 0; i < result.left.emit.length; i++) {
-      emitResult.push(serializer.fromJSON(result.left.emit[i], {validate: false, acceptResourcesForRelationships: true}));
+      emitResult.push(result.left.emit[i]);
     }
     context.emit = emitResult;
     return context;

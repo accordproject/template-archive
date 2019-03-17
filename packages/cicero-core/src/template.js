@@ -648,10 +648,10 @@ class Template {
                 Logger.debug(method, 'Added model files to model manager');
                 Logger.debug(method, 'Adding Logic files to script manager');
                 scriptFiles.forEach(function (obj) {
-                    template.getTemplateLogic().addLogicFile(obj.name, obj.contents);
+                    template.getTemplateLogic().addLogicFile(obj.contents, obj.name);
                 });
                 // Compile Ergo
-                template.getTemplateLogic().compileLogic(false);
+                template.getTemplateLogic().compileLogic(true);
 
                 Logger.debug(method, 'Added JavaScript files to script manager');
 
@@ -998,7 +998,7 @@ class Template {
                         throw new Error('Ergo template but contains JavaScript logic');
                     }
                     Logger.debug(method, 'Found script file ', path);
-                    template.getTemplateLogic().addLogic(truncatedPath, contents);
+                    template.getTemplateLogic().addLogicFile(contents, truncatedPath);
                 }
             });
 
@@ -1007,7 +1007,7 @@ class Template {
             }
 
             // Compile Ergo
-            template.getTemplateLogic().compileLogic(false);
+            template.getTemplateLogic().compileLogic(true);
 
             // check the template model
             template.getTemplateModel();

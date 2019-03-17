@@ -51,7 +51,7 @@
     "@accordproject/cicero-tools": "0.10.2",
     "@accordproject/ergo-compiler": "0.6.4-20190313182634",
     "composer-concerto": "0.60.0",
-    "uuid": "3.2.1",
+    "uuid": "3.3.2",
     "yargs": "9.0.1"
   },
   "license-check-config": {
