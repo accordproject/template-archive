@@ -651,7 +651,7 @@ class Template {
                     template.getTemplateLogic().addLogicFile(obj.contents, obj.name);
                 });
                 // Compile Ergo
-                template.getTemplateLogic().compileLogic(true);
+                template.getTemplateLogic().compileLogicSync(true);
 
                 Logger.debug(method, 'Added JavaScript files to script manager');
 
@@ -1007,7 +1007,7 @@ class Template {
             }
 
             // Compile Ergo
-            template.getTemplateLogic().compileLogic(true);
+            template.getTemplateLogic().compileLogicSync(true);
 
             // check the template model
             template.getTemplateModel();
