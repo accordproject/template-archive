@@ -26,7 +26,7 @@ const templateGrammar = require('./tdl.js');
 const GrammarVisitor = require('./grammarvisitor');
 const uuid = require('uuid');
 const nunjucks = require('nunjucks');
-const crypto = require('crypto');
+const DateTimeFormatParser = require('./datetimeformatparser');
 
 // This required because only compiled nunjucks templates are supported browser-side
 // https://mozilla.github.io/nunjucks/api.html#browser-usage
@@ -37,7 +37,7 @@ if(process.browser){
 }
 
 /**
- * Generates and manages the parser for a template.
+ * Generates and manages a Nearley parser for a template.
  * @class
  * @public
  * @memberof module:cicero-core
@@ -132,7 +132,6 @@ class ParserManager {
             autoescape: false  // Required to allow nearley syntax strings
         });
         const combined = nunjucks.render('template.ne', parts);
-        console.log(combined);
         logger.debug('Generated template grammar' + combined);
 
         this.setGrammar(combined);
@@ -144,14 +143,17 @@ class ParserManager {
      * @param {object} ast  - the AST from which to build the grammar
      * @param {ClassDeclaration} templateModel  - the type of the parent class for this AST
      * @param {String} prefix - A unique prefix for the grammar rules
-     * @param {Object} parts - Result object to acculumate rules
+     * @param {Object} parts - Result object to acculumate rules and required sub-grammars
      */
     buildGrammarRules(ast, templateModel, prefix, parts) {
-        // now we create each subordinate rule in turn
+
+        // these are the rules for variables
         const rules = {};
+
+        // these are the rules for static text
         let textRules = {};
 
-        // create the root rule, for the Template Model
+        // generate all the rules for the static text
         textRules.prefix = prefix;
         textRules.symbols = [];
         ast.data.forEach((element, index) => {
@@ -162,11 +164,16 @@ class ParserManager {
                 textRules.symbols.push(prefix + index);
             }
         }, this);
+
+        // the result of parsing is an instance of the template model
         textRules.class = templateModel.getFullyQualifiedName();
         const identifier = templateModel.getIdentifierFieldName();
         if (identifier !== null) {
             textRules.identifier = `${identifier} : "${uuid.v4()}"`;
         }
+
+        // we then bind each variable in the template model
+        // to the first occurence of the variable in the template grammar
         textRules.properties = [];
         templateModel.getProperties().forEach((property, index) => {
             const sep = index < templateModel.getProperties().length - 1 ? ',' : '';
@@ -189,139 +196,21 @@ class ParserManager {
                     symbols: [this.cleanChunk(element.value)],
                 });
                 break;
-            case 'BooleanBinding':
+            case 'BooleanBinding': {
+                const property = ParserManager.getProperty(templateModel, element.fieldName.value);
+                if(property.getType() !== 'Boolean') {
+                    throw new Error(`A boolean binding can only be used with a boolean property. Property ${element.fieldName.value} has type ${property.getType()}`);
+                }
                 parts.modelRules.push({
                     prefix: rule,
                     symbols: [`${element.string.value}:? {% (d) => {return d[0] !== null;}%} # ${element.fieldName.value}`],
                 });
+            }
                 break;
             case 'FormattedBinding':
-                {
-                    const propertyName = element.fieldName.value;
-                    const property = templateModel.getProperty(propertyName);
-                    if (!property) {
-                        throw new Error(`Template references a property '${propertyName}' that is not declared in the template model '${templateModel.getFullyQualifiedName()}'. Details: ${JSON.stringify(element)}`);
-                    }
-                    let type = property.getType();
-                    // let type = element.format.value;
-                    if( property.getType() !== 'DateTime') {
-                        throw new Error('Formatted types are currently only supported for DateTime properties.');
-                    }
-
-                    // we only include the datetime grammar if used
-                    if(!parts.grammars.dateTime) {
-                        parts.grammars.dateTime = require('./grammars/datetime');
-                        parts.grammars.dateTimeEn = require('./grammars/datetime-en');
-                    }
-
-                    // push the formatting rule
-                    const formatString = ParserManager.formatStringToRuleAction(element.format.value);
-                    const formattingRuleName = type + '_' + ParserManager.formatStringToRuleName(formatString);
-                    const formattingRuleAction =
-`{% (d) => {
-    return {
-        "$class" : "ParsedDateTime",
-        "year": d[4], 
-        "month": d[2], 
-        "day": d[0], 
-        "hour": d[6], 
-        "minute": d[8], 
-        "second": d[10], 
-        "millisecond": d[12], 
-        "timezone": d[13]
-    };}
-%}`;
-                    parts.modelRules.push({
-                        prefix: formattingRuleName,
-                        symbols: [`${formatString} ${formattingRuleAction} # ${propertyName} as ${element.format.value}`],
-                    });
-                    let action = '{% id %}';
-                    let suffix = ':';
-                    // TODO (DCS) need a serialization for arrays
-                    if (property.isArray()) {
-                        throw new Error('Arrays are not yet supported!');
-                        // suffix += '+';
-                    }
-                    if (property.isOptional()) {
-                        suffix += '?';
-                    }
-                    if (suffix === ':') {
-                        suffix = '';
-                    }
-                    parts.modelRules.push({
-                        prefix: rule,
-                        symbols: [`${formattingRuleName}${suffix} ${action} # ${propertyName}`],
-                    });
-                }
-                break;
             case 'Binding':
-                {
-                    const propertyName = element.fieldName.value;
-                    const property = templateModel.getProperty(propertyName);
-                    if (!property) {
-                        throw new Error(`Template references a property '${propertyName}' that is not declared in the template model '${templateModel.getFullyQualifiedName()}'. Details: ${JSON.stringify(element)}`);
-                    }
-                    let type = property.getType();
-                    // relationships need to be transformed into strings
-                    if (property instanceof RelationshipDeclaration) {
-                        type = 'String';
-                    }
-                    let action = '{% id %}';
-                    const decorator = property.getDecorator('AccordType');
-                    if (decorator) {
-                        if (decorator.getArguments().length > 0) {
-                            type = decorator.getArguments()[0];
-                        }
-                        if (decorator.getArguments().length > 1) {
-                            action = decorator.getArguments()[1];
-                        }
-                    }
-                    let suffix = ':';
-                    // TODO (DCS) need a serialization for arrays
-                    if (property.isArray()) {
-                        throw new Error('Arrays are not yet supported!');
-                        // suffix += '+';
-                    }
-                    if (property.isOptional()) {
-                        suffix += '?';
-                    }
-                    if (suffix === ':') {
-                        suffix = '';
-                    }
-                    parts.modelRules.push({
-                        prefix: rule,
-                        symbols: [`${type}${suffix} ${action} # ${propertyName}`],
-                    });
-                }
-                break;
             case 'ClauseBinding':
-                {
-                    const propertyName = element.fieldName.value;
-                    const clauseTemplate = element.template;
-                    const property = templateModel.getProperty(propertyName);
-                    if (!property) {
-                        throw new Error(`Template references a property '${propertyName}' that is not declared in the template model '${templateModel.getFullyQualifiedName()}'. Details: ${JSON.stringify(element)}`);
-                    }
-                    const clauseTemplateModel = this.template.getIntrospector().getClassDeclaration(property.getFullyQualifiedTypeName());
-                    this.buildGrammarRules(clauseTemplate, clauseTemplateModel, propertyName, parts);
-                    let suffix = ':';
-                    // TODO (DCS) need a serialization for arrays
-                    if (property.isArray()) {
-                        throw new Error('Arrays are not yet supported!');
-                        // suffix += '+';
-                    }
-                    if (property.isOptional()) {
-                        suffix += '?';
-                    }
-                    if (suffix === ':') {
-                        suffix = '';
-                    }
-
-                    parts.modelRules.push({
-                        prefix: rule,
-                        symbols: [`${element.fieldName.value}${suffix} {% id %}\n`],
-                    });
-                }
+                this.handleBinding(parts, rule, element);
                 break;
             default:
                 throw new Error(`Unrecognized type ${element.type}`);
@@ -330,58 +219,101 @@ class ParserManager {
     }
 
     /**
-     * Converts a format string to a Nearley action
-     * @param {string} formatString - the input format string
-     * @returns {string} a version that can be used as the action of a rule
+     * Throws an error if a template variable doesn't exist on the model.
+     * @param {*} templateModel - the model for the template
+     * @param {String} propertyName - the name of the property
+     * @returns {*} the property
      */
-    static formatStringToRuleAction(formatString) {
-        const input = formatString.substr(1,formatString.length -2);
+    static getProperty(templateModel, propertyName) {
+        const property = templateModel.getProperty(propertyName);
+        if (!property) {
+            throw new Error(`Template references a property '${propertyName}' that is not declared in the template model '${templateModel.getFullyQualifiedName()}'`);
+        }
 
-        // anything that is not part of an existing rule we need to convert to a quoted string
-        const ruleNames = 'DMHmsSYTZ';
-        let result = '';
-        let state = 'unknown';
+        return property;
+    }
 
-        for (let i = 0; i < input.length; i++) {
-            const char = input.charAt(i);
-            const isRule = ruleNames.indexOf(char) >= 0;
 
-            // initialize state
-            if(state === 'unknown' ) {
-                if(isRule) {
-                    state = 'rule';
-                }
-                else {
-                    state = 'notrule';
-                }
+    /**
+     * Utility method to generate a grammar rule for a variable binding
+     * @param {*} parts - the parts, where the rule will be added
+     * @param {*} rule - the rule we are processing in the AST
+     * @param {*} element - the current element in the AST
+     */
+    handleBinding(parts, rule, element) {
+        const templateModel = this.template.getTemplateModel();
+        const propertyName = element.fieldName.value;
+        const property = templateModel.getProperty(propertyName);
+        if (!property) {
+            throw new Error(`Template references a property '${propertyName}' that is not declared in the template model '${templateModel.getFullyQualifiedName()}'. Details: ${JSON.stringify(element)}`);
+        }
+
+        let action = null;
+        let suffix = ':';
+        let type = property.getType();
+
+        // allow the type to define a custom action using a decorator
+        const decorator = property.getDecorator('AccordType');
+        if (decorator) {
+            if (decorator.getArguments().length > 0) {
+                type = decorator.getArguments()[0];
             }
-
-            if(isRule) {
-                if(state === 'notrule') {
-                    result += '" '; // close quotes
-                }
-                state = 'rule';
-                result += char;
-            }
-            else {
-                if( state === 'rule') {
-                    result += ' "'; // open quotes
-                }
-                state = 'notrule';
-                result += char;
+            if (decorator.getArguments().length > 1) {
+                action = decorator.getArguments()[1];
             }
         }
 
-        return result;
-    }
+        // otherwise the action is id
+        if(!action) {
+            action = '{% id %}';
+        }
 
-    /**
-     * Cleans a format string so it can be used as part of a Nearley rule
-     * @param {string} formatString - the input format string
-     * @returns {string} a version safe for including in a nearley rule
-     */
-    static formatStringToRuleName(formatString) {
-        return crypto.createHash('md5').update(formatString).digest('hex');
+        if( element.type === 'FormattedBinding' ) {
+            if( property.getType() !== 'DateTime') {
+                throw new Error('Formatted types are currently only supported for DateTime properties.');
+            }
+
+            // we only include the datetime grammar if custom formats are used
+            if(!parts.grammars.dateTime) {
+                parts.grammars.dateTime = require('./grammars/datetime');
+                parts.grammars.dateTimeEn = require('./grammars/datetime-en');
+            }
+
+            // push the formatting rule
+            const formatRule = DateTimeFormatParser.buildDateTimeFormatRule(element.format.value);
+            type = formatRule.name;
+            const ruleExists = parts.modelRules.filter(rule => (rule.prefix === formatRule.name));
+            if(!ruleExists) {
+                parts.modelRules.push({
+                    prefix: formatRule.name,
+                    symbols: [`${formatRule.tokens} ${formatRule.action} # ${propertyName} as ${element.format.value}`],
+                });
+            }
+        } else if( element.type === 'ClauseBinding') {
+            const clauseTemplate = element.template;
+            const clauseTemplateModel = this.template.getIntrospector().getClassDeclaration(property.getFullyQualifiedTypeName());
+            this.buildGrammarRules(clauseTemplate, clauseTemplateModel, propertyName, parts);
+        }
+        else {
+            // relationships need to be transformed into strings
+            if (property instanceof RelationshipDeclaration) {
+                type = 'String';
+            }
+        }
+
+        if (property.isArray()) {
+            suffix += '+';
+        }
+        if (property.isOptional()) {
+            suffix += '?';
+        }
+        if (suffix === ':') {
+            suffix = '';
+        }
+        parts.modelRules.push({
+            prefix: rule,
+            symbols: [`${type}${suffix} ${action} # ${propertyName}`],
+        });
     }
 
     /**
