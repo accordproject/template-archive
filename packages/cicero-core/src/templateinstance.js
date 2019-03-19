@@ -190,12 +190,13 @@ class TemplateInstance {
      * @private
      */
     static getFormattedDate(date) {
-        let year = date.getUTCFullYear();
+        let utcDate = date.utc();
+        let year = utcDate.year().toString();
 
-        let month = (1 + date.getUTCMonth()).toString();
+        let month = (1 + utcDate.month()).toString();
         month = month.length > 1 ? month : '0' + month;
 
-        let day = date.getUTCDate().toString();
+        let day = utcDate.date().toString();
         day = day.length > 1 ? day : '0' + day;
 
         return month + '/' + day + '/' + year;
@@ -280,6 +281,14 @@ class TemplateInstance {
      */
     getTemplate() {
         return this.template;
+    }
+
+    /**
+     * Returns the template logic for this clause
+     * @return {TemplateLogic} the template for this clause
+     */
+    getTemplateLogic() {
+        return this.template.getTemplateLogic();
     }
 
     /**

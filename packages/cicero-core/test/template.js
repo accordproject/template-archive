@@ -514,6 +514,14 @@ describe('Template', () => {
         });
     });
 
+    describe('#getTemplateLogic', () => {
+        it('should return a Template Logic', async () => {
+            const TemplateLogic = require('@accordproject/ergo-compiler').TemplateLogic;
+            const template = await Template.fromDirectory('./test/data/latedeliveryandpenalty');
+            template.getTemplateLogic('cicero').should.be.an.instanceof(TemplateLogic);
+        });
+    });
+
     describe('#getFactory', () => {
         it('should return a Factory', async () => {
             const Factory = require('composer-concerto').Factory;
