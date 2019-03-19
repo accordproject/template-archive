@@ -61,11 +61,10 @@
     "webpack-cli": "^3.1.0"
   },
   "dependencies": {
-    "@accordproject/ergo-compiler": "0.6.4-20190313182634",
+    "@accordproject/ergo-compiler": "0.6.4-20190319173619",
     "acorn": "^5.1.2",
     "axios": "0.18.0",
-    "composer-concerto": "0.60.0",
-    "composer-concerto-tools": "^0.50.7",
+    "composer-concerto": "0.70.0",
     "debug": "4.0.1",
     "fast-safe-stringify": "2.0.5",
     "glob": "7.1.2",
