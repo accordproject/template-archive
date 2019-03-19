@@ -134,6 +134,7 @@ class ParserManager {
         const combined = nunjucks.render('template.ne', parts);
         logger.debug('Generated template grammar' + combined);
 
+        console.log(combined);
         this.setGrammar(combined);
         this.templatizedGrammar = templatizedGrammar;
     }
@@ -237,10 +238,10 @@ class ParserManager {
     /**
      * Utility method to generate a grammar rule for a variable binding
      * @param {*} parts - the parts, where the rule will be added
-     * @param {*} rule - the rule we are processing in the AST
+     * @param {*} inputRule - the rule we are processing in the AST
      * @param {*} element - the current element in the AST
      */
-    handleBinding(parts, rule, element) {
+    handleBinding(parts, inputRule, element) {
         const templateModel = this.template.getTemplateModel();
         const propertyName = element.fieldName.value;
         const property = templateModel.getProperty(propertyName);
@@ -279,10 +280,10 @@ class ParserManager {
                 parts.grammars.dateTimeEn = require('./grammars/datetime-en');
             }
 
-            // push the formatting rule
+            // push the formatting rule, iff it has not been already declared
             const formatRule = DateTimeFormatParser.buildDateTimeFormatRule(element.format.value);
             type = formatRule.name;
-            const ruleExists = parts.modelRules.filter(rule => (rule.prefix === formatRule.name));
+            const ruleExists = parts.modelRules.some(rule => (rule.prefix === formatRule.name));
             if(!ruleExists) {
                 parts.modelRules.push({
                     prefix: formatRule.name,
@@ -311,7 +312,7 @@ class ParserManager {
             suffix = '';
         }
         parts.modelRules.push({
-            prefix: rule,
+            prefix: inputRule,
             symbols: [`${type}${suffix} ${action} # ${propertyName}`],
         });
     }

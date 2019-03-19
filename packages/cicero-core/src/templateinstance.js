@@ -16,7 +16,7 @@
 
 const logger = require('./logger');
 const crypto = require('crypto');
-const moment = require('moment');
+const moment = require('moment-mini');
 const RelationshipDeclaration = require('composer-concerto').RelationshipDeclaration;
 
 /**
@@ -117,17 +117,29 @@ class TemplateInstance {
     }
 
     /**
+     * Left pads a number
+     * @param {*} n - the number
+     * @param {*} width - the number of chars to pad to
+     * @param {string} z - the pad character
+     * @return {string} the left padded string
+     */
+    static pad(n, width, z = '0') {
+        n = n + '';
+        return n.length >= width ? n : new Array(width - n.length + 1).join(z) + n;
+    }
+
+    /**
      * Recursive function that converts all instances of ParsedDateTime
-     * to a Date.
+     * to a Moment.
      * @param {*} obj the input object
      * @returns {*} the converted object
      */
     static convertDateTimes(obj) {
         if(obj.$class === 'ParsedDateTime') {
-            // 2013-02-08 09:30:26.123+07
-            const instance = moment(obj.year + '-' + obj.month + '-' + obj.day + ' ' +
-                    obj.hour + ':' + obj.minute + ':' + obj.second + '.' + obj.millisecond + obj.timezone );
-            return instance.toDate().toISOString();
+            // 2013-01-01T00:00:00-13:00
+            const input = `${obj.year}-${TemplateInstance.pad(obj.month,2)}-${TemplateInstance.pad(obj.day,2)}T${TemplateInstance.pad(obj.hour,2)}:${TemplateInstance.pad(obj.minute,2)}:${TemplateInstance.pad(obj.second,2)}.${TemplateInstance.pad(obj.millisecond,3)}${obj.timezone}`;
+            const instance = moment.parseZone(input);
+            return instance.isUtc() ? instance.format('YYYY-MM-DDTHH:mm:ss.SSS[Z]') : instance.format('YYYY-MM-DDTHH:mm:ss.SSSZ');
         }
         else if( typeof obj === 'object' && obj !== null) {
             Object.entries(obj).forEach(
@@ -174,7 +186,7 @@ class TemplateInstance {
             case 'FormattedBinding':
             case 'Binding': {
                 const property = this.getTemplate().getTemplateModel().getProperty(thing.fieldName.value);
-                result += this.convertPropertyToString(property, this.composerData[property.getName()]);
+                result += this.convertPropertyToString(property, this.composerData[property.getName()], thing.format.value);
             }
                 break;
 
@@ -211,19 +223,14 @@ class TemplateInstance {
     /**
      * Returns a MM/dd/yyyy formatted date
      * @param {Date} date - the date to format
+     * @param {string} format - the optional format string
      * @returns {string} formatted date
      * @private
      */
-    static getFormattedDate(date) {
-        let year = date.getUTCFullYear();
-
-        let month = (1 + date.getUTCMonth()).toString();
-        month = month.length > 1 ? month : '0' + month;
-
-        let day = date.getUTCDate().toString();
-        day = day.length > 1 ? day : '0' + day;
-
-        return month + '/' + day + '/' + year;
+    static getFormattedDate(date, format='MM/DD/YYYY') {
+        console.log('******' + format);
+        const instance = moment.parseZone(date);
+        return instance.format(format);
     }
 
 
@@ -231,10 +238,11 @@ class TemplateInstance {
      * Converts a composer object to a string
      * @param {Property} property - the composer property
      * @param {object} obj - the instance to convert
+     * @param {string} format - the optional format string to use
      * @returns {string} the parseable string representation of the object
      * @private
      */
-    convertPropertyToString(property, obj) {
+    convertPropertyToString(property, obj, format) {
 
         if(property instanceof RelationshipDeclaration) {
             return `"${obj.getIdentifier()}"`;
@@ -266,8 +274,7 @@ class TemplateInstance {
         case 'Double':
             return obj.toString();
         case 'DateTime':
-            //return obj.toISOString();
-            return TemplateInstance.getFormattedDate(obj);
+            return TemplateInstance.getFormattedDate(obj, format);
         case 'Boolean':
             if(obj) {
                 return 'true';

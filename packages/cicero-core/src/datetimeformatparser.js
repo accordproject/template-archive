@@ -80,6 +80,9 @@ class DateTimeFormatParser {
                     }
                     else {
                         parsedDateTime += `   "${fieldName}": d[${index-1}]`;
+                        if(index < fields.length-2 ) {
+                            parsedDateTime += ',';
+                        }
                         tokens += field + ' ';
                         fieldNames.push(fieldName);
                     }

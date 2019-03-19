@@ -61,7 +61,7 @@ describe.only('FormattedDates', () => {
             const clause = new Clause(template);
             clause.parse(formattedDatesInput);
             const nl = clause.generateText();
-            formattedDatesInput.should.equal(nl);
+            nl.should.equal(formattedDatesInput);
         });
     });
 });
