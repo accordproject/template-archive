@@ -27,7 +27,7 @@ const Field = require('composer-concerto').Field;
 const ModelFile = require('composer-concerto').ModelFile;
 const ModelManager = require('composer-concerto').ModelManager;
 const RelationshipDeclaration = require('composer-concerto').RelationshipDeclaration;
-const fileWriter = require('composer-concerto-tools').FileWriter;
+const fileWriter = require('composer-concerto').FileWriter;
 
 describe('CordaVisitor', function () {
     let cordaVisit;

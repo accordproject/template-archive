@@ -15,7 +15,6 @@
 'use strict';
 
 module.exports.AbstractPlugin = require('composer-concerto-tools').CodeGen.AbstractPlugin;
-module.exports.FileWriter = require('composer-concerto-tools').CodeGen.FileWriter;
 
 module.exports.GoLangVisitor = require('composer-concerto-tools').CodeGen.GoLangVisitor;
 module.exports.JSONSchemaVisitor = require('composer-concerto-tools').CodeGen.JSONSchemaVisitor;
@@ -23,6 +22,7 @@ module.exports.XmlSchemaVisitor = require('composer-concerto-tools').CodeGen.Xml
 module.exports.PlantUMLVisitor = require('composer-concerto-tools').CodeGen.PlantUMLVisitor;
 module.exports.TypescriptVisitor = require('composer-concerto-tools').CodeGen.TypescriptVisitor;
 module.exports.JavaVisitor = require('composer-concerto-tools').CodeGen.JavaVisitor;
+module.exports.FileWriter = require('composer-concerto').FileWriter;
 
 module.exports.CordaVisitor = require('./fromcto/corda/cordavisitor');
 
