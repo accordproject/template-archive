@@ -25,7 +25,7 @@ const languageTagRegex = require('ietf-language-tag-regex');
 const RelationshipDeclaration = require('composer-concerto').RelationshipDeclaration;
 const DefaultArchiveLoader = require('./loaders/defaultarchiveloader');
 const TemplateLogic = require('@accordproject/ergo-compiler').TemplateLogic;
-const Writer = require('composer-concerto-tools').Writer;
+const Writer = require('composer-concerto').Writer;
 const Logger = require('@accordproject/ergo-compiler').Logger;
 const nearley = require('nearley');
 const compile = require('nearley/lib/compile');
@@ -74,7 +74,7 @@ class Template {
      * @param {object} request - the JS object for the sample request
      */
     constructor(packageJson, readme, samples, request) {
-        this.templateLogic = new TemplateLogic();
+        this.templateLogic = new TemplateLogic('cicero');
         this.metadata = new Metadata(packageJson, readme, samples, request);
         this.grammar = null;
         this.grammarAst = null;
@@ -648,12 +648,10 @@ class Template {
                 Logger.debug(method, 'Added model files to model manager');
                 Logger.debug(method, 'Adding Logic files to script manager');
                 scriptFiles.forEach(function (obj) {
-                    const objExt = '.' +  obj.name.split('.').pop();
-                    let scriptObject = template.getScriptManager().createScript(obj.name, objExt, obj.contents);
-                    template.getScriptManager().addScript(scriptObject); // Adds all js files to script manager
+                    template.getTemplateLogic().addLogicFile(obj.contents, obj.name);
                 });
                 // Compile Ergo
-                template.getScriptManager().compileLogic();
+                template.getTemplateLogic().compileLogicSync(true);
 
                 Logger.debug(method, 'Added JavaScript files to script manager');
 
@@ -786,8 +784,7 @@ class Template {
             dir: true
         }));
         if (!this.archiveOmitsLogic) {
-            let scriptManager = this.getScriptManager();
-            let scriptFiles = scriptManager.getAllScripts();
+            const scriptFiles = this.getScriptManager().getAllScripts();
             scriptFiles.forEach(function (file) {
                 let fileIdentifier = file.getIdentifier();
                 let fileName = fsPath.basename(fileIdentifier);
@@ -979,7 +976,6 @@ class Template {
             Logger.debug(method, 'Added model files', modelFiles.length);
 
             // find script files outside the npm install directory
-            const scriptFiles = [];
             let isErgoTemplate = template.getMetadata().getLanguage() === 0 ? true : false;
             Template.processDirectory(path, {
                 accepts: function (file) {
@@ -991,23 +987,18 @@ class Template {
                     return !isFileInNodeModuleDir(dir, path);
                 },
                 process: function (filePath, contents) {
-                    let pathObj = fsPath.parse(filePath);
                     // Make paths for the script manager relative to the root folder of the template
                     const resolvedPath = fsPath.resolve(path);
                     const resolvedFilePath = fsPath.resolve(filePath);
                     const truncatedPath = resolvedFilePath.replace(resolvedPath+'/', '');
-                    if (pathObj.ext.toLowerCase() === '.ergo') {
-                        if(!isErgoTemplate) {
-                            throw new Error('JavaScript template but contains Ergo logic');
-                        }
-                    } else if (pathObj.ext.toLowerCase() === '.js') {
-                        if(isErgoTemplate) {
-                            throw new Error('Ergo template but contains JavaScript logic');
-                        }
+                    let pathExt = fsPath.parse(truncatedPath).ext.toLowerCase();
+                    if (pathExt === '.ergo'&&!isErgoTemplate) {
+                        throw new Error('JavaScript template but contains Ergo logic');
+                    } else if (pathExt === '.js' && isErgoTemplate) {
+                        throw new Error('Ergo template but contains JavaScript logic');
                     }
-                    const scriptObject = template.getScriptManager().createScript(truncatedPath, pathObj.ext.toLowerCase(), contents);
-                    scriptFiles.push(scriptObject);
                     Logger.debug(method, 'Found script file ', path);
+                    template.getTemplateLogic().addLogicFile(contents, truncatedPath);
                 }
             });
 
@@ -1015,14 +1006,8 @@ class Template {
                 throw new Error('Failed to find a model file.');
             }
 
-            for (let script of scriptFiles) {
-                template.getScriptManager().addScript(script);
-            }
-
             // Compile Ergo
-            template.getScriptManager().compileLogic();
-
-            Logger.debug(method, 'Added script files', scriptFiles.length);
+            template.getTemplateLogic().compileLogicSync(true);
 
             // check the template model
             template.getTemplateModel();
@@ -1116,6 +1101,16 @@ class Template {
      */
     accept(visitor, parameters) {
         return visitor.visit(this, parameters);
+    }
+
+    /**
+     * Provides access to the template logic for this business
+     * network. The template logic encapsulate the code necessary to
+     * execute the clause or contract.
+     * @return {TemplateLogic} the TemplateLogic for this business network
+     */
+    getTemplateLogic() {
+        return this.templateLogic;
     }
 
     /**

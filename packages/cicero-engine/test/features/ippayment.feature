@@ -21,7 +21,7 @@ Feature: IP Payment Contract
 {
     "$class": "org.accordproject.ippayment.PayOut",
     "totalAmount": 77.4,
-    "dueBy": "2018-04-12T05:00:00.000Z"
+    "dueBy": "2018-04-12T00:00:00.000-05:00"
 }
 """
 
@@ -41,7 +41,7 @@ Scenario: Payment of a specified amount should be made
 {
     "$class": "org.accordproject.ippayment.PayOut",
     "totalAmount": 81.45,
-    "dueBy": "2018-04-12T05:00:00.000Z"
+    "dueBy": "2018-04-12T03:00:00.000-02:00"
 }
 """
 
@@ -61,6 +61,6 @@ Scenario: Payment of a specified amount should be made
 {
     "$class": "org.accordproject.ippayment.PayOut",
     "totalAmount": 52.3,
-    "dueBy": "2018-04-12T05:00:00.000Z"
+    "dueBy": "2018-04-11T22:00:00.000-07:00"
 }
 """

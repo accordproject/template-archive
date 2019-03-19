@@ -61,12 +61,11 @@
     "webpack-cli": "^3.1.0"
   },
   "dependencies": {
-    "@accordproject/ergo-compiler": "0.6.4-20190313182634",
+    "@accordproject/ergo-compiler": "0.6.4-20190319173619",
     "acorn": "^5.1.2",
-    "axios": "0.17.1",
-    "composer-concerto": "0.60.0",
-    "composer-concerto-tools": "^0.50.7",
-    "debug": "^2.6.9",
+    "axios": "0.18.0",
+    "composer-concerto": "0.70.0",
+    "debug": "4.0.1",
     "fast-safe-stringify": "2.0.5",
     "glob": "7.1.2",
     "ietf-language-tag-regex": "0.0.5",
@@ -82,7 +81,7 @@
     "request-promise-native": "1.0.5",
     "semver": "5.6.0",
     "triple-beam": "1.3.0",
-    "uuid": "3.2.1",
+    "uuid": "3.3.2",
     "winston": "^3.2.1",
     "xregexp": "4.1.1"
   },

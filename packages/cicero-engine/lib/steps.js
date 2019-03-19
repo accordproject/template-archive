@@ -65,23 +65,6 @@ async function send(engine,clause,request,state,currentTime) {
 }
 
 /**
- * Compare actual result and expected result
- *
- * @param {string} expected the result as specified in the test workload
- * @param {string} actual the result as returned by the engine
- */
-function compare(expected,actual) {
-    // Some basic deep comparison for arrays, since Chai doesn't do the right thing
-    if (Array.isArray(actual)) {
-        for (let i = 0; i < expected.length; i++) {
-            expect(actual[i]).to.deep.include(expected[i]);
-        }
-    } else {
-        expect(actual).to.deep.include(expected);
-    }
-}
-
-/**
  * Load a clause from directory
  *
  * @param {string} templateDir the directory for the template
@@ -157,7 +140,7 @@ Then('the initial state( of the contract) should be', function (expectedState) {
             this.answer = actualAnswer;
             expect(actualAnswer).to.have.property('state');
             expect(actualAnswer).to.not.have.property('error');
-            return compare(state,actualAnswer.state);
+            return Util.compareSuccess({ state },actualAnswer);
         });
 });
 
@@ -168,13 +151,13 @@ Then('the initial state( of the contract) should be the default state', function
             this.answer = actualAnswer;
             expect(actualAnswer).to.have.property('state');
             expect(actualAnswer).to.not.have.property('error');
-            return compare(state,actualAnswer.state);
+            return Util.compareSuccess({ state },actualAnswer);
         });
 });
 
 Then('the contract data should be', async function (contractData) {
     const expectedData = JSON.parse(contractData);
-    return compare(expectedData,this.clause.getData());
+    return Util.compareComponent(expectedData,this.clause.getData());
 });
 
 Then('it should respond with', function (expectedResponse) {
@@ -182,14 +165,14 @@ Then('it should respond with', function (expectedResponse) {
     if (this.answer) {
         expect(this.answer).to.have.property('response');
         expect(this.answer).to.not.have.property('error');
-        return compare(response,this.answer.response);
+        return Util.compareSuccess({ response },this.answer);
     } else {
         return send(this.engine,this.clause,this.request,this.state,this.currentTime)
             .then((actualAnswer) => {
                 this.answer = actualAnswer;
                 expect(actualAnswer).to.have.property('response');
                 expect(actualAnswer).to.not.have.property('error');
-                return compare(response,actualAnswer.response);
+                return Util.compareSuccess({ response },actualAnswer);
             });
     }
 });
@@ -199,14 +182,14 @@ Then('the new state( of the contract) should be', function (expectedState) {
     if (this.answer) {
         expect(this.answer).to.have.property('state');
         expect(this.answer).to.not.have.property('error');
-        return compare(state,this.answer.state);
+        return Util.compareSuccess({ state },this.answer);
     } else {
         return send(this.engine,this.clause,this.request,this.state,this.currentTime)
             .then((actualAnswer) => {
                 this.answer = actualAnswer;
                 expect(actualAnswer).to.have.property('state');
                 expect(actualAnswer).to.not.have.property('error');
-                return compare(state,actualAnswer.state);
+                return Util.compareSuccess({ state },actualAnswer);
             });
     }
 });
@@ -216,14 +199,14 @@ Then('the following obligations should have( also) been emitted', function (expe
     if (this.answer) {
         expect(this.answer).to.have.property('emit');
         expect(this.answer).to.not.have.property('error');
-        return compare(emit,this.answer.emit);
+        return Util.compareSuccess({ emit },this.answer);
     } else {
         return send(this.engine,this.clause,this.request,this.state,this.currentTime)
             .then((actualAnswer) => {
                 this.answer = actualAnswer;
                 expect(actualAnswer).to.have.property('emit');
                 expect(actualAnswer).to.not.have.property('error');
-                return compare(emit,actualAnswer.emit);
+                return Util.compareSuccess({ emit },actualAnswer);
             });
     }
 });
