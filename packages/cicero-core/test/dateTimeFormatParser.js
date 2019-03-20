@@ -58,7 +58,7 @@ describe.only('DateTimeFormatParser', () => {
         });
 
         it('should identity timezone', async function() {
-            DateTimeFormatParser.parseDateTimeFormatField('TZ').should.eql('timezone');
+            DateTimeFormatParser.parseDateTimeFormatField('Z').should.eql('timezone');
         });
 
         it('should return null for anything else', async function() {
@@ -68,9 +68,9 @@ describe.only('DateTimeFormatParser', () => {
 
     describe('#buildDateTimeFormatRule', () => {
 
-        it('should parse DD MMM YYYY HH:mm:ss.SSS TZ', async function() {
-            const result = DateTimeFormatParser.buildDateTimeFormatRule('"DD MMM YYYY HH:mm:ss.SSS TZ"');
-            result.tokens.should.eql('DD  " " MMM  " " YYYY  " " HH  ":" mm  ":" ss  "." SSS  " " TZ ');
+        it('should parse DD MMM YYYY HH:mm:ss.SSS Z', async function() {
+            const result = DateTimeFormatParser.buildDateTimeFormatRule('"DD MMM YYYY HH:mm:ss.SSS Z"');
+            result.tokens.should.eql('DD  " " MMM  " " YYYY  " " HH  ":" mm  ":" ss  "." SSS Z');
             result.action.should.eql('{% (d) => {return {"$class" : "ParsedDateTime",   "day": d[0],   "month": d[2],   "year": d[4],   "hour": d[6],   "minute": d[8],   "second": d[10],   "millisecond": d[12],   "timezone": d[14]};}%}');
         });
 
@@ -98,9 +98,9 @@ describe.only('DateTimeFormatParser', () => {
             result.action.should.eql('{% (d) => {return {"$class" : "ParsedDateTime",   "month": d[0],   "day": d[2],   "year": d[4]};}%}');
         });
 
-        it('should parse MM/DD/YYYY HH:mm:ss TZ', async function() {
-            const result = DateTimeFormatParser.buildDateTimeFormatRule('"MM/DD/YYYY HH:mm:ss TZ"');
-            result.tokens.should.eql( 'MM  "/" DD  "/" YYYY  " " HH  ":" mm  ":" ss  " " TZ ');
+        it('should parse MM/DD/YYYY HH:mm:ss Z', async function() {
+            const result = DateTimeFormatParser.buildDateTimeFormatRule('"MM/DD/YYYY HH:mm:ss Z"');
+            result.tokens.should.eql( 'MM  "/" DD  "/" YYYY  " " HH  ":" mm  ":" ss Z');
             result.action.should.eql('{% (d) => {return {"$class" : "ParsedDateTime",   "month": d[0],   "day": d[2],   "year": d[4],   "hour": d[6],   "minute": d[8],   "second": d[10],   "timezone": d[12]};}%}');
         });
 

@@ -70,15 +70,8 @@ YYYY ->[0-9] [0-9] [0-9] [0-9]
 {% (d) => {return parseInt('' + d[0] + d[1] + d[2] + d[3])}%}
 
 # Timezone Offset
-TZ_OFFSET -> ("+"|"-") HH ":" mm
+Z -> ("+"|"-") HH ":" mm
 {% (d) => {return d[0] + d[1] + ":" + d[3]}%}
-
-# UTC time
-UTC -> "Z" {% id %}
-
-# Timezone (either UTC or an offset)
-TZ -> TZ_OFFSET {% id %} | 
-      UTC {% id %}
 `;
 
 module.exports = DATE_TIME_GRAMMAR;

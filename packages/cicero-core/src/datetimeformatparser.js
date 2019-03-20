@@ -50,7 +50,7 @@ class DateTimeFormatParser {
             return 'second';
         case 'SSS':
             return 'millisecond';
-        case 'TZ':
+        case 'Z':
             return 'timezone';
         default:
             return null;
@@ -64,17 +64,26 @@ class DateTimeFormatParser {
      */
     static buildDateTimeFormatRule(formatString) {
         const input = formatString.substr(1,formatString.length -2);
-        const fields = input.split(/(TZ|DD|D|MMMM|MMM|MM|M|YYYY|HH|H|mm|ss|SSS)+/);
+        const fields = input.split(/(Z|DD|D|MMMM|MMM|MM|M|YYYY|HH|H|mm|ss|SSS)+/);
         let tokens = '';
 
         let parsedDateTime = '{"$class" : "ParsedDateTime",';
         let fieldNames = [];
+        let end = fields.length-1;
+        let hasTimeZone = DateTimeFormatParser.parseDateTimeFormatField(fields[fields.length-2]) === 'timezone';
+
+        if(hasTimeZone)  {
+            end = fields.length-3;
+        }
 
         fields.forEach((field, index) => {
-            if(index > 0 && index < fields.length-1) {
+            if(index > 0 && index < end) {
                 const fieldName = DateTimeFormatParser.parseDateTimeFormatField(field);
 
                 if(fieldName) {
+                    if(fieldName === 'timezone') {
+                        throw new Error('Timezone must be last format field.');
+                    }
                     if(fieldNames.indexOf(fieldName) >= 0) {
                         throw new Error(`Duplicate ${fieldName} field in date time format string: ${formatString}`);
                     }
@@ -92,6 +101,11 @@ class DateTimeFormatParser {
                 }
             }
         });
+
+        if(hasTimeZone) {
+            tokens += 'Z';
+            parsedDateTime += `   "timezone": d[${fields.length-2}]`;
+        }
 
         parsedDateTime += '}';
 
