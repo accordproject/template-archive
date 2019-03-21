@@ -49,8 +49,8 @@
   },
   "dependencies": {
     "@accordproject/cicero-core": "0.11.0",
-    "@accordproject/ergo-compiler": "0.7.0",
-    "@accordproject/ergo-engine": "0.7.0",
+    "@accordproject/ergo-compiler": "0.7.3-20190321033913",
+    "@accordproject/ergo-engine": "0.7.3-20190321033913",
     "composer-concerto": "0.70.0",
     "moment-mini": "2.22.1",
     "vm2": "3.5.0"

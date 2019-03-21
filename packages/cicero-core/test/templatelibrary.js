@@ -45,6 +45,19 @@ describe('TemplateLibrary', () => {
             templateIndex.should.have.property('helloworld@0.3.0');
         });
 
+        it('should retrieve index from cache', async function() {
+            const templateLibrary = new TemplateLibrary();
+            const templateIndex = await templateLibrary.getTemplateIndex();
+            templateIndex.should.have.property('helloworld@0.3.0');
+            const templateIndexTwice = await templateLibrary.getTemplateIndex();
+            templateIndexTwice.should.have.property('helloworld@0.3.0');
+        });
+
+        it('should fail to retrieve index', async function() {
+            const templateLibrary = new TemplateLibrary('http://foo.bar');
+            return templateLibrary.getTemplateIndex().should.be.rejectedWith('Error: getaddrinfo ENOTFOUND foo.bar foo.bar:80');
+        });
+
         it('should retrieve index for latest versions', async function() {
             const templateLibrary = new TemplateLibrary();
             const templateIndex = await templateLibrary.getTemplateIndex({latestVersion: true});
@@ -100,7 +113,7 @@ describe('TemplateLibrary', () => {
         });
     });
 
-    describe('#getTemplate', () => {
+    describe.skip('#getTemplate', () => {
 
         it('should retrieve a template', async function() {
             const templateLibrary = new TemplateLibrary();
