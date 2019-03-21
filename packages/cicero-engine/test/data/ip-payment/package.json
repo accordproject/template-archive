@@ -7,7 +7,7 @@
     "cicero": {
         "template": "clause",
         "language": "ergo",
-        "version": "^0.10.0"
+        "version": "^0.11.0"
     },
     "devDependencies": {
         "mocha": "5.2.0"
