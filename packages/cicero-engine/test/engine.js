@@ -22,6 +22,7 @@ const chai = require('chai');
 
 chai.should();
 chai.use(require('chai-things'));
+chai.use(require('chai-as-promised'));
 
 const fs = require('fs');
 const path = require('path');
@@ -50,34 +51,61 @@ describe('EngineLatePenalty', () => {
 
         it('should execute a late delivery and penalty smart clause', async function () {
             const request = {};
-            request.$class = 'io.clause.latedeliveryandpenalty.LateDeliveryAndPenaltyRequest';
+            request.$class = 'org.accordproject.latedeliveryandpenalty.LateDeliveryAndPenaltyRequest';
             request.forceMajeure = false;
-            request.agreedDelivery = '2017-10-07T16:38:01.412Z';
+            request.agreedDelivery = '2017-10-07T16:38:01Z';
             request.goodsValue = 200.00;
             request.transactionId = '402c8f50-9e61-433e-a7c1-afe61c06ef00';
-            request.timestamp = '2017-11-12T17:38:01.412Z';
             const state = {};
             state.$class = 'org.accordproject.cicero.contract.AccordContractState';
             state.stateId = '1';
-            const result = await engine.execute(clause, request, state);
+            const result = await engine.execute(clause, request, state, '2017-11-12T17:38:01Z');
             result.should.not.be.null;
             result.response.penalty.should.equal(110);
             result.response.buyerMayTerminate.should.equal(true);
         });
 
-        it('should execute a late delivery and penalty smart clause (with a Period)', async function () {
+        it('should execute a late delivery and penalty smart clause in the ET timezone', async function () {
             const request = {};
-            request.$class = 'org.accordproject.simplelatedeliveryandpenalty.SimpleLateDeliveryAndPenaltyRequest';
-            request.agreedDelivery = '2017-10-07T16:38:01.412Z';
+            request.$class = 'org.accordproject.latedeliveryandpenalty.LateDeliveryAndPenaltyRequest';
+            request.forceMajeure = false;
+            request.agreedDelivery = '2017-11-10T16:38:01-05:00';
             request.goodsValue = 200.00;
             request.transactionId = '402c8f50-9e61-433e-a7c1-afe61c06ef00';
-            request.timestamp = '2017-11-12T17:38:01.412Z';
             const state = {};
             state.$class = 'org.accordproject.cicero.contract.AccordContractState';
             state.stateId = '1';
-            const result = await engine.execute(clause2, request, state);
+            const result = await engine.execute(clause, request, state, '2017-11-12T17:38:01-05:00');
             result.should.not.be.null;
-            result.response.penalty.should.equal(52.5);
+            result.response.penalty.should.equal(21);
+            result.response.buyerMayTerminate.should.equal(false);
+        });
+
+        it('should fail to execute if the current time is not in the right format', async function () {
+            const request = {};
+            request.$class = 'org.accordproject.latedeliveryandpenalty.LateDeliveryAndPenaltyRequest';
+            request.forceMajeure = false;
+            request.agreedDelivery = '2017-11-10T16:38:01-05:00';
+            request.goodsValue = 200.00;
+            request.transactionId = '402c8f50-9e61-433e-a7c1-afe61c06ef00';
+            const state = {};
+            state.$class = 'org.accordproject.cicero.contract.AccordContractState';
+            state.stateId = '1';
+            return engine.execute(clause, request, state, '2017-11-12').should.be.rejectedWith('2017-11-12 is not a valid moment with the format \'YYYY-MM-DDTHH:mm:ssZ\'');
+        });
+
+        it('should execute a late delivery and penalty smart clause with a time period', async function () {
+            const request = {};
+            request.$class = 'org.accordproject.simplelatedeliveryandpenalty.SimpleLateDeliveryAndPenaltyRequest';
+            request.agreedDelivery = '2017-10-07T16:38:01Z';
+            request.goodsValue = 200.00;
+            request.transactionId = '402c8f50-9e61-433e-a7c1-afe61c06ef00';
+            const state = {};
+            state.$class = 'org.accordproject.cicero.contract.AccordContractState';
+            state.stateId = '1';
+            const result = await engine.execute(clause2, request, state, '2019-11-12T17:38:01Z');
+            result.should.not.be.null;
+            result.response.penalty.should.equal(87.5);
             result.response.buyerMayTerminate.should.equal(true);
         });
     });
@@ -160,10 +188,7 @@ describe('EngineHelloWorld', () => {
         });
 
         it('should execute a smart clause with state initialization', async function () {
-            const request = {
-                '$class': 'org.accordproject.cicero.runtime.Request'
-            };
-            const result = await engine.init(clause, request);
+            const result = await engine.init(clause);
             result.state.should.not.be.null;
             const state = result.state;
             state.$class.should.equal('org.accordproject.cicero.contract.AccordContractState');
@@ -278,11 +303,7 @@ describe('EngineHelloEmitInit', () => {
     describe('#executeandemitinit', function () {
 
         it('should execute a smart clause which emits during initialization', async function () {
-            const request = {
-                '$class': 'org.accordproject.helloemit.MyInitRequest',
-                'input': 'Accord Project'
-            };
-            const result = await engine.init(clause, request);
+            const result = await engine.init(clause);
             result.should.not.be.null;
             result.response.should.not.be.null;
             result.emit[0].$class.should.equal('org.accordproject.helloemit.Greeting');
@@ -317,7 +338,7 @@ describe('EngineSaft', () => {
             state.stateId = '1';
             const result = await engine.execute(clause, request, state);
             result.should.not.be.null;
-            result.response.tokenAmount.should.equal(100);
+            result.response.tokenAmount.doubleValue.should.equal(100);
             result.response.tokenAddress.should.equal('Daniel Charles Selman');
         });
     });
@@ -336,22 +357,29 @@ describe('BogusClauses', () => {
 
     afterEach(() => {});
 
-    it('should throw error when no annotation in JavaScript logic', async () => {
-        return (() => engine.buildDispatchFunction(clause)).should.throw('Did not find any function declarations with the @AccordClauseLogic annotation');
+    it('should throw error when no __dispatch in JavaScript logic', async () => {
+        const scriptManager = clause.getTemplate().getScriptManager();
+        return (() => scriptManager.hasDispatch()).should.throw('Function __dispatch was not found in logic');
+    });
+    it('should throw error when no __init in JavaScript logic', async () => {
+        const scriptManager = clause.getTemplate().getScriptManager();
+        return (() => scriptManager.hasInit()).should.throw('Function __init was not found in logic');
     });
     it('should throw an error when JavaScript logic is missing', async function() {
         // Turn all JavaScript logic into something else
-        clause.getTemplate().getScriptManager().getAllScripts().forEach(function (element) {
+        const scriptManager = clause.getTemplate().getScriptManager();
+        scriptManager.getAllScripts().forEach(function (element) {
             if (element.getLanguage() === '.js') {
                 element.language = '.ergo';
             }
         }, this);
-        (() => engine.compileJsClause(clause)).should.throw('Did not find any JavaScript logic');
+        (() => engine.getErgoEngine().compileJsLogic(scriptManager)).should.throw('Did not find any JavaScript logic');
     });
     it('should throw an error when all logic is missing', async function() {
         // Remove all scripts
-        clause.getTemplate().getScriptManager().scripts = {};
-        (() => engine.compileJsClause(clause)).should.throw('Did not find any JavaScript logic');
+        const scriptManager = clause.getTemplate().getScriptManager();
+        scriptManager.scripts = {};
+        (() => engine.getErgoEngine().compileJsLogic(scriptManager)).should.throw('Did not find any JavaScript logic');
     });
 });
 describe('EngineInstallmentSaleJs', () => {
@@ -390,25 +418,21 @@ describe('EngineInstallmentSaleJs', () => {
         });
 
         it('should initialize a smart clause', async function () {
-            const request = {};
-            request.$class = 'org.accordproject.installmentsale.InitializeRequest';
-            request.firstMonth = 1.0;
-            const result = await engine.init(clause, request);
+            const result = await engine.init(clause);
             result.should.not.be.null;
             result.response.should.not.be.null;
             result.state.balance_remaining.should.equal(10000.00);
             result.state.total_paid.should.equal(0.0);
+            result.state.next_payment_month.should.equal(3.0);
         });
 
         it('should initialize a smart clause and execute one installment', async function () {
-            const request = {};
-            request.$class = 'org.accordproject.installmentsale.InitializeRequest';
-            request.firstMonth = 1.0;
-            const result = await engine.init(clause, request);
+            const result = await engine.init(clause);
             result.should.not.be.null;
             result.response.should.not.be.null;
             result.state.balance_remaining.should.equal(10000.00);
             result.state.total_paid.should.equal(0.0);
+            result.state.next_payment_month.should.equal(3.0);
             const request1 = {};
             request1.$class = 'org.accordproject.installmentsale.Installment';
             request1.amount = 2500.00;
@@ -417,38 +441,8 @@ describe('EngineInstallmentSaleJs', () => {
             result1.response.balance.should.equal(7612.499999999999);
             result1.state.balance_remaining.should.equal(7612.499999999999);
             result1.state.total_paid.should.equal(2500.00);
+            result1.state.next_payment_month.should.equal(4.0);
         });
-    });
-});
-describe('EngineInstallmentSaleJsErr', () => {
-
-    let engine;
-    let clause;
-    const testLatePenaltyInput = fs.readFileSync(path.resolve(__dirname, 'data/installment-sale-err', 'sample.txt'), 'utf8');
-
-    beforeEach(async function () {
-        engine = new Engine();
-        const template = await Template.fromDirectory('./test/data/installment-sale-err');
-        clause = new Clause(template);
-        clause.parse(testLatePenaltyInput);
-    });
-
-    afterEach(() => {});
-
-    describe('#execute', function () {
-
-        it('should fail initialization when more than one initialization clause', async () => {
-            try {
-                const request = {};
-                request.$class = 'org.accordproject.installmentsale.InitializeRequest';
-                request.firstMonth = 1.0;
-                const result = await engine.init(clause, request);
-                return result;
-            } catch (err) {
-                err.message.should.equal('Should have at most one function declaration with the @AccordClauseLogicInit annotation');
-            }
-        });
-
     });
 });
 describe('EngineInstallmentSaleErgo', () => {
@@ -487,10 +481,7 @@ describe('EngineInstallmentSaleErgo', () => {
         });
 
         it('should initialize a smart clause', async function () {
-            const request = {};
-            request.$class = 'org.accordproject.installmentsale.InitializeRequest';
-            request.firstMonth = 1.0;
-            const result = await engine.init(clause, request);
+            const result = await engine.init(clause);
             result.should.not.be.null;
             result.response.should.not.be.null;
             result.state.balance_remaining.should.equal(10000.00);
@@ -498,10 +489,7 @@ describe('EngineInstallmentSaleErgo', () => {
         });
 
         it('should initialize a smart clause and execute one installment', async function () {
-            const request = {};
-            request.$class = 'org.accordproject.installmentsale.InitializeRequest';
-            request.firstMonth = 1.0;
-            const result = await engine.init(clause, request);
+            const result = await engine.init(clause);
             result.should.not.be.null;
             result.response.should.not.be.null;
             result.state.balance_remaining.should.equal(10000.00);

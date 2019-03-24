@@ -16,8 +16,8 @@
 
 const fsPath = require('path');
 const RelationshipDeclaration = require('composer-concerto').RelationshipDeclaration;
-const Writer = require('composer-concerto-tools').Writer;
-const logger = require('./logger');
+const Writer = require('composer-concerto').Writer;
+const logger = require('@accordproject/ergo-compiler').Logger;
 const nearley = require('nearley');
 const compile = require('nearley/lib/compile');
 const generate = require('nearley/lib/generate');

@@ -14,11 +14,11 @@
 
 'use strict';
 
-const CiceroModelManager = require('../lib/ciceromodelmanager');
-const Writer = require('composer-concerto-tools').Writer;
+const APModelManager = require('@accordproject/ergo-compiler').APModelManager;
+const Logger = require('@accordproject/ergo-compiler').Logger;
+const Writer = require('composer-concerto').Writer;
 const GrammarVisitor = require('../lib/grammarvisitor');
 const ParserManager = require('../lib/parsermanager');
-const logger = require('../lib/logger');
 const nunjucks = require('nunjucks');
 
 const fs = require('fs');
@@ -58,7 +58,7 @@ describe('GrammarVisitor', () => {
 
         it('should generate grammar from a modelmanager', async () => {
 
-            const mm = new CiceroModelManager();
+            const mm = new APModelManager();
 
             const timemodel = fs.readFileSync(path.resolve(__dirname, 'data/models', 'time.cto'), 'utf8');
             mm.addModelFile(timemodel, 'time.cto', true);
@@ -82,7 +82,7 @@ describe('GrammarVisitor', () => {
 
             const generatedGrammar = parameters.rules;
             generatedGrammar.should.not.be.empty;
-            logger.debug('Generated grammar', generatedGrammar);
+            Logger.debug('Generated grammar', generatedGrammar);
 
             const combined = nunjucks.renderString(ruleTemplate, {modelRules: generatedGrammar});
 
@@ -93,7 +93,7 @@ describe('GrammarVisitor', () => {
 
         it('should generate grammar from a model with relationships', async () => {
 
-            const mm = new CiceroModelManager();
+            const mm = new APModelManager();
             if(mm.getModelFile('org.accordproject.common') === undefined){
                 const model = fs.readFileSync(path.resolve(__dirname, 'data/models', 'common.cto'), 'utf8');
                 mm.addModelFile(model, 'common.cto', true);
@@ -118,7 +118,7 @@ describe('GrammarVisitor', () => {
 
             const generatedGrammar = parameters.rules;
             generatedGrammar.should.not.be.empty;
-            logger.debug('Generated grammar', generatedGrammar);
+            Logger.debug('Generated grammar', generatedGrammar);
 
             const combined = nunjucks.renderString(ruleTemplate, {modelRules: generatedGrammar});
 
@@ -129,7 +129,7 @@ describe('GrammarVisitor', () => {
 
         it('should generate grammar from a model with optional fields', async () => {
 
-            const mm = new CiceroModelManager();
+            const mm = new APModelManager();
             if(mm.getModelFile('org.accordproject.common') === undefined){
                 const model = fs.readFileSync(path.resolve(__dirname, 'data/models', 'common.cto'), 'utf8');
                 mm.addModelFile(model, 'common.cto');
@@ -151,7 +151,7 @@ describe('GrammarVisitor', () => {
 
             const generatedGrammar = parameters.rules;
             generatedGrammar.should.not.be.empty;
-            logger.debug('Generated grammar', generatedGrammar);
+            Logger.debug('Generated grammar', generatedGrammar);
 
             const combined = nunjucks.renderString(ruleTemplate, {modelRules: generatedGrammar});
 

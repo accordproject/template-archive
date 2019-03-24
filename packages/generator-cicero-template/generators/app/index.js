@@ -63,6 +63,11 @@ module.exports = class extends Generator {
             this.destinationPath(this.props.templateName),
             { data: this.props }
         );
+        this.fs.copy(
+            this.templatePath('./.*'),
+            this.destinationPath(this.props.templateName),
+            { data: this.props }
+        );
     }
 
     /**

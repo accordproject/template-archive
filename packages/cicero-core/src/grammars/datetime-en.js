@@ -16,32 +16,32 @@
 
 const DATE_TIME_GRAMMAR_EN = `
 # short month name
-MMM -> "Jan" {% (d) => {return 1;}%} | 
-       "Feb" {% (d) => {return 2;}%} | 
-	   "Mar" {% (d) => {return 3;}%} |
-	   "Apr" {% (d) => {return 4;}%} | 
-	   "May" {% (d) => {return 5;}%} |
-	   "Jun" {% (d) => {return 6;}%} |
-	   "Jul" {% (d) => {return 7;}%} |
-	   "Aug" {% (d) => {return 8;}%} |
-	   "Sep" {% (d) => {return 9;}%} |
-	   "Oct" {% (d) => {return 10;}%} |
-	   "Nov" {% (d) => {return 11;}%} |
-	   "Dec" {% (d) => {return 12;}%}
+MMM -> "Jan" {% (d) => {return 0;}%} | 
+       "Feb" {% (d) => {return 1;}%} | 
+	   "Mar" {% (d) => {return 2;}%} |
+	   "Apr" {% (d) => {return 3;}%} | 
+	   "May" {% (d) => {return 4;}%} |
+	   "Jun" {% (d) => {return 5;}%} |
+	   "Jul" {% (d) => {return 6;}%} |
+	   "Aug" {% (d) => {return 7;}%} |
+	   "Sep" {% (d) => {return 8;}%} |
+	   "Oct" {% (d) => {return 9;}%} |
+	   "Nov" {% (d) => {return 10;}%} |
+	   "Dec" {% (d) => {return 11;}%}
 
 # long month name
-MMMM -> "January" {% (d) => {return 1;}%} | 
-       "February" {% (d) => {return 2;}%} | 
-	   "March" {% (d) => {return 3;}%} |
-	   "April" {% (d) => {return 4;}%} | 
-	   "May" {% (d) => {return 5;}%} |
-	   "June" {% (d) => {return 6;}%} |
-	   "July" {% (d) => {return 7;}%} |
-	   "August" {% (d) => {return 8;}%} |
-	   "September" {% (d) => {return 9;}%} |
-	   "October" {% (d) => {return 10;}%} |
-	   "November" {% (d) => {return 11;}%} |
-	   "December" {% (d) => {return 12;}%}
+MMMM -> "January" {% (d) => {return 0;}%} | 
+       "February" {% (d) => {return 1;}%} | 
+	   "March" {% (d) => {return 2;}%} |
+	   "April" {% (d) => {return 3;}%} | 
+	   "May" {% (d) => {return 4;}%} |
+	   "June" {% (d) => {return 5;}%} |
+	   "July" {% (d) => {return 6;}%} |
+	   "August" {% (d) => {return 7;}%} |
+	   "September" {% (d) => {return 8;}%} |
+	   "October" {% (d) => {return 9;}%} |
+	   "November" {% (d) => {return 10;}%} |
+	   "December" {% (d) => {return 11;}%}
 `;
 
 module.exports = DATE_TIME_GRAMMAR_EN;

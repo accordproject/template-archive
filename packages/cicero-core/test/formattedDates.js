@@ -25,7 +25,7 @@ chai.should();
 chai.use(require('chai-things'));
 chai.use(require('chai-as-promised'));
 
-describe.only('FormattedDates', () => {
+describe('FormattedDates', () => {
 
     const formattedDatesInput = fs.readFileSync(path.resolve(__dirname, 'data/formatted-dates', 'sample.txt'), 'utf8');
 
@@ -45,10 +45,11 @@ describe.only('FormattedDates', () => {
             const clause = new Clause(template);
             clause.parse(formattedDatesInput);
             const result = clause.getData();
+            console.log(JSON.stringify(result, null,4));
             delete result.clauseId;
             const data = {
                 $class: 'org.accordproject.test.TemplateModel',
-                dateTimeProperty: '2018-01-01T05:15:20.123Z',
+                dateTimeProperty: '2018-01-01T05:15:20.123+01:02',
             };
             result.should.eql(data);
         });

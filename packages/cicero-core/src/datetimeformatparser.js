@@ -25,7 +25,8 @@ const crypto = require('crypto');
 class DateTimeFormatParser {
     /**
      * Given a format field (like HH or D) this method returns
-     * a logical name for the field.
+     * a logical name for the field. Note the logical names
+     * have been picked to align with the moment constructor that takes an object.
      * @param {string} field - the input format field
      * @returns {string} the field designator
      */
@@ -33,23 +34,23 @@ class DateTimeFormatParser {
         switch(field) {
         case 'D':
         case 'DD':
-            return 'day';
+            return 'days';
         case 'M':
         case 'MM':
         case 'MMM':
         case 'MMMM':
-            return 'month';
+            return 'months';
         case 'YYYY':
-            return 'year';
+            return 'years';
         case 'H':
         case 'HH':
-            return 'hour';
+            return 'hours';
         case 'mm':
-            return 'minute';
+            return 'minutes';
         case 'ss':
-            return 'second';
+            return 'seconds';
         case 'SSS':
-            return 'millisecond';
+            return 'milliseconds';
         case 'Z':
             return 'timezone';
         default:
@@ -63,48 +64,48 @@ class DateTimeFormatParser {
      * @returns {{tokens: String, action: String, name: String }} the tokens and action and name to use for the Nearley rule
      */
     static buildDateTimeFormatRule(formatString) {
-        const input = formatString.substr(1,formatString.length -2);
-        const fields = input.split(/(Z|DD|D|MMMM|MMM|MM|M|YYYY|HH|H|mm|ss|SSS)+/);
-        let tokens = '';
+        // strip quotes
+        let input = formatString.substr(1,formatString.length -2);
+        const lastCharacter = input.charAt(input.length-1);
+        let hasTimeZone = DateTimeFormatParser.parseDateTimeFormatField(lastCharacter) === 'timezone';
 
-        let parsedDateTime = '{"$class" : "ParsedDateTime",';
-        let fieldNames = [];
-        let end = fields.length-1;
-        let hasTimeZone = DateTimeFormatParser.parseDateTimeFormatField(fields[fields.length-2]) === 'timezone';
-
-        if(hasTimeZone)  {
-            end = fields.length-3;
+        if(hasTimeZone) {
+            // strip Z
+            input = input.substr(0,input.length-1);
         }
 
-        fields.forEach((field, index) => {
-            if(index > 0 && index < end) {
-                const fieldName = DateTimeFormatParser.parseDateTimeFormatField(field);
+        const fields = input.split(/(DD|D|MMMM|MMM|MM|M|YYYY|HH|H|mm|ss|SSS)+/);
+        // remove the first and last (empty) items
+        fields.shift();
+        fields.pop();
+        let tokens = '';
+        let parsedDateTime = '{"$class" : "ParsedDateTime",';
+        let fieldNames = [];
 
-                if(fieldName) {
-                    if(fieldName === 'timezone') {
-                        throw new Error('Timezone must be last format field.');
-                    }
-                    if(fieldNames.indexOf(fieldName) >= 0) {
-                        throw new Error(`Duplicate ${fieldName} field in date time format string: ${formatString}`);
-                    }
-                    else {
-                        parsedDateTime += `   "${fieldName}": d[${index-1}]`;
-                        if(index < fields.length-2 ) {
-                            parsedDateTime += ',';
-                        }
-                        tokens += field + ' ';
-                        fieldNames.push(fieldName);
-                    }
+        fields.forEach((field, index) => {
+            const fieldName = DateTimeFormatParser.parseDateTimeFormatField(field);
+
+            if(fieldName) {
+                if(fieldNames.indexOf(fieldName) >= 0) {
+                    throw new Error(`Duplicate ${fieldName} field in date time format string: ${formatString}`);
                 }
                 else {
-                    tokens += ` "${field}" `;
+                    parsedDateTime += `   "${fieldName}": d[${index}]`;
+                    if(index < fields.length-1 ) {
+                        parsedDateTime += ',';
+                    }
+                    tokens += field + ' ';
+                    fieldNames.push(fieldName);
                 }
+            }
+            else {
+                tokens += ` "${field}" `;
             }
         });
 
         if(hasTimeZone) {
             tokens += 'Z';
-            parsedDateTime += `   "timezone": d[${fields.length-2}]`;
+            parsedDateTime += `,   "timezone": d[${fields.length}]`;
         }
 
         parsedDateTime += '}';

@@ -4,12 +4,6 @@ import org.accordproject.cicero.contract.* from https://models.accordproject.org
 import org.accordproject.cicero.runtime.* from https://models.accordproject.org/cicero/runtime.cto
 import org.accordproject.money.MonetaryAmount from https://models.accordproject.org/money.cto
 
-transaction InitializeRequest {
-  o Double firstMonth
-}
-transaction InitializeResponse {
-}
-
 transaction Installment extends Request {
   o Double amount
 }
@@ -61,4 +55,5 @@ asset InstallmentSaleContract extends AccordContract {
   o Double TOTAL_DUE_BEFORE_CLOSING
   o Double MIN_PAYMENT
   o Double DUE_AT_CLOSING
+  o Integer FIRST_MONTH
 }

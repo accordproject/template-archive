@@ -14,7 +14,7 @@
 
 'use strict';
 
-const logger = require('./logger');
+const Logger = require('@accordproject/ergo-compiler').Logger;
 const crypto = require('crypto');
 const moment = require('moment-mini');
 const RelationshipDeclaration = require('composer-concerto').RelationshipDeclaration;
@@ -60,7 +60,7 @@ class TemplateInstance {
         }
 
         // downloadExternalDependencies the data using the template model
-        logger.debug('Setting clause data: ' + JSON.stringify(data));
+        Logger.debug('Setting clause data: ' + JSON.stringify(data));
         const resource = this.getTemplate().getSerializer().fromJSON(data);
         resource.validate();
 
@@ -106,7 +106,7 @@ class TemplateInstance {
             }, this);
         }
         let ast = parser.results[0];
-        logger.debug('Result of parsing: ' + JSON.stringify(ast));
+        Logger.debug('Result of parsing: ' + JSON.stringify(ast));
 
         if(!ast) {
             throw new Error('Parsing clause text returned a null AST. This may mean the text is valid, but not complete.');
@@ -136,10 +136,11 @@ class TemplateInstance {
      */
     static convertDateTimes(obj) {
         if(obj.$class === 'ParsedDateTime') {
-            // 2013-01-01T00:00:00-13:00
-            const input = `${obj.year}-${TemplateInstance.pad(obj.month,2)}-${TemplateInstance.pad(obj.day,2)}T${TemplateInstance.pad(obj.hour,2)}:${TemplateInstance.pad(obj.minute,2)}:${TemplateInstance.pad(obj.second,2)}.${TemplateInstance.pad(obj.millisecond,3)}${obj.timezone}`;
-            const instance = moment.parseZone(input);
-            return instance.isUtc() ? instance.format('YYYY-MM-DDTHH:mm:ss.SSS[Z]') : instance.format('YYYY-MM-DDTHH:mm:ss.SSSZ');
+            const instance = moment([obj.years, obj.months, obj.days, obj.hours, obj.minutes, obj.seconds, obj.milliseconds])
+                .utcOffset(obj.timezone, true);
+            const result = instance.format('YYYY-MM-DDTHH:mm:ss.SSSZ');
+            console.log('result : ' + result);
+            return result;
         }
         else if( typeof obj === 'object' && obj !== null) {
             Object.entries(obj).forEach(
@@ -186,7 +187,8 @@ class TemplateInstance {
             case 'FormattedBinding':
             case 'Binding': {
                 const property = this.getTemplate().getTemplateModel().getProperty(thing.fieldName.value);
-                result += this.convertPropertyToString(property, this.composerData[property.getName()], thing.format.value);
+                const value = this.composerData[property.getName()];
+                result += this.convertPropertyToString(property, value, thing.format ? thing.format.value : null);
             }
                 break;
 
@@ -221,14 +223,15 @@ class TemplateInstance {
     }
 
     /**
-     * Returns a MM/dd/yyyy formatted date
-     * @param {Date} date - the date to format
-     * @param {string} format - the optional format string
-     * @returns {string} formatted date
+     * Returns moment Date object parsed using a format string
+     * @param {Date} date - date/time string to parse
+     * @param {string} format - the optional format string. If not specified
+     * this defaults to 'MM/DD/YYYY'
+     * @returns {string} ISO-8601 formatted date as a string
      * @private
      */
-    static getFormattedDate(date, format='MM/DD/YYYY') {
-        console.log('******' + format);
+    static parseDateTimeStringToIsoString(date, format='MM/DD/YYYY') {
+        console.log('parseDateTimeStringToIsoString: ' + format + ':' + date );
         const instance = moment.parseZone(date);
         return instance.format(format);
     }
@@ -244,12 +247,21 @@ class TemplateInstance {
      */
     convertPropertyToString(property, obj, format) {
 
+        if(property.isOptional() === false && !obj) {
+            throw new Error(`Required property ${property.getFullyQualifiedName()} is null.`);
+        }
+
         if(property instanceof RelationshipDeclaration) {
             return `"${obj.getIdentifier()}"`;
         }
 
         if(property.isTypeEnum()) {
             return obj;
+        }
+
+        if(format) {
+            // strip quotes
+            format = format.substr(1, format.length-2);
         }
 
         // uncomment this code when the templates support arrays
@@ -274,7 +286,7 @@ class TemplateInstance {
         case 'Double':
             return obj.toString();
         case 'DateTime':
-            return TemplateInstance.getFormattedDate(obj, format);
+            return TemplateInstance.parseDateTimeStringToIsoString(obj, format);
         case 'Boolean':
             if(obj) {
                 return 'true';
@@ -312,6 +324,14 @@ class TemplateInstance {
      */
     getTemplate() {
         return this.template;
+    }
+
+    /**
+     * Returns the template logic for this clause
+     * @return {TemplateLogic} the template for this clause
+     */
+    getTemplateLogic() {
+        return this.template.getTemplateLogic();
     }
 
     /**

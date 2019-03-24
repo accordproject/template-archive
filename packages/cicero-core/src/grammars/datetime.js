@@ -70,8 +70,8 @@ YYYY ->[0-9] [0-9] [0-9] [0-9]
 {% (d) => {return parseInt('' + d[0] + d[1] + d[2] + d[3])}%}
 
 # Timezone Offset
-Z -> ("+"|"-") HH ":" mm
-{% (d) => {return d[0] + d[1] + ":" + d[3]}%}
+Z -> ("+"|"-") [0-9] [0-9] ":" [0-9] [0-9]
+{% (d) => {return d[0] + d[1] + d[2] + ":" + d[4] + d[5]}%}
 `;
 
 module.exports = DATE_TIME_GRAMMAR;

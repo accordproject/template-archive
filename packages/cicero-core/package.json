@@ -1,6 +1,6 @@
 {
   "name": "@accordproject/cicero-core",
-  "version": "0.10.1",
+  "version": "0.11.1",
   "description": "Cicero Core - implementation of Accord Protocol Template Specification",
   "engines": {
     "node": ">=8",
@@ -23,7 +23,7 @@
     "lint": "eslint .",
     "postlint": "npm run licchk",
     "licchk": "license-check",
-    "test": "mocha && nyc mocha"
+    "test": "npm run build && mocha && nyc mocha"
   },
   "repository": {
     "type": "git",
@@ -49,24 +49,23 @@
     "babel-core": "^7.0.0-bridge.0",
     "babel-loader": "^8.0.4",
     "babel-preset-env": "^1.7.0",
-    "chai": "3.5.0",
-    "chai-as-promised": "6.0.0",
+    "chai": "4.2.0",
+    "chai-as-promised": "7.1.1",
     "chai-things": "0.2.0",
     "eslint": "4.19.1",
     "license-check": "1.1.5",
-    "mocha": "5.1.1",
+    "mocha": "5.2.0",
     "nyc": "11.7.2",
     "raw-loader": "^0.5.1",
     "webpack": "^4.16.3",
     "webpack-cli": "^3.1.0"
   },
   "dependencies": {
-    "@accordproject/ergo-compiler": "0.6.2",
+    "@accordproject/ergo-compiler": "0.7.3",
     "acorn": "^5.1.2",
-    "axios": "0.17.1",
+    "axios": "0.18.0",
     "composer-concerto": "0.70.0",
-    "composer-concerto-tools": "^0.50.6",
-    "debug": "^2.6.9",
+    "debug": "4.0.1",
     "fast-safe-stringify": "2.0.5",
     "glob": "7.1.2",
     "ietf-language-tag-regex": "0.0.5",
@@ -74,7 +73,7 @@
     "json-stable-stringify": "1.0.1",
     "jszip": "3.1.5",
     "minimatch": "3.0.4",
-    "moment-mini": "^2.22.1",
+    "moment-mini": "2.22.1",
     "moo": "0.4.3",
     "nearley": "2.15.1",
     "node-cache": "4.2.0",
@@ -83,7 +82,7 @@
     "request-promise-native": "1.0.5",
     "semver": "5.6.0",
     "triple-beam": "1.3.0",
-    "uuid": "3.2.1",
+    "uuid": "3.3.2",
     "winston": "^3.2.1",
     "xregexp": "4.1.1"
   },

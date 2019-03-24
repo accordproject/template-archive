@@ -15,7 +15,7 @@
 'use strict';
 
 const axios = require('axios');
-const Logger = require('../logger');
+const Logger = require('@accordproject/ergo-compiler').Logger;
 
 /**
  * Loads archives from an HTTP(S) URL using the axios library.

@@ -5,8 +5,10 @@ namespace org.accordproject.saft
 
 import org.accordproject.cicero.contract.* from https://models.accordproject.org/cicero/contract.cto
 import org.accordproject.cicero.runtime.* from https://models.accordproject.org/cicero/runtime.cto
+import org.accordproject.money.* from https://models.accordproject.org/money.cto
+import org.accordproject.usa.business.BusinessEntity from https://models.accordproject.org/usa/business.cto
 import org.accordproject.usa.state.State from https://models.accordproject.org/usa/state.cto
-import org.accordproject.money.CurrencyCode from https://models.accordproject.org/money.cto
+
 
 /**
  * The network has launched!
@@ -26,23 +28,23 @@ transaction Terminate extends Request {
   /**
    * How many funds remain, we need to reimburse them
    */
-  o Double remainingFunds
+  o MonetaryAmount remainingFunds
 
   /**
    * What was the total amount invested
    */
-  o Double totalInvested
+  o MonetaryAmount totalInvested
 }
 
 /**
  * Whether the network launches or terminates, we need to payout
  */
-transaction Payout extends Response {
+transaction Payout {
 
   /**
    * The amount to payout
    */
- o Double tokenAmount
+ o MonetaryAmount tokenAmount
 
  /**
   * The address to payout to
@@ -52,18 +54,9 @@ transaction Payout extends Response {
 }
 
 /**
- * Company types
- */
-enum CompanyType {
-  o Incorporated
-  o Limited
-  o SA
-}
-
-/**
  * Defines the data model for the Saft template.
  */
-asset TemplateModel extends AccordContract {
+asset SaftContract extends AccordContract {
   /**
    * The name of the token to be sold
    */
@@ -77,7 +70,7 @@ asset TemplateModel extends AccordContract {
   /**
    * Type of company
    */
-  o CompanyType companyType
+  o BusinessEntity companyType
 
   /**
    * The state the company is incorporated in
@@ -92,7 +85,7 @@ asset TemplateModel extends AccordContract {
   /**
    * The amount of coin being purchased
    */
-  o Double purchaseAmount
+  o MonetaryAmount purchaseAmount
 
   /**
    * The currency for the purchase
@@ -102,7 +95,7 @@ asset TemplateModel extends AccordContract {
   /**
    * The minimum amount that needs to be raised
    */
-  o Double netProceedLimit
+  o MonetaryAmount netProceedLimit
 
   /**
    * The date of the purchase

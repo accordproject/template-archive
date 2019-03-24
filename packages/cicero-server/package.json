@@ -1,6 +1,6 @@
 {
   "name": "@accordproject/cicero-server",
-  "version": "0.10.1",
+  "version": "0.11.1",
   "description": "Cicero Server - wraps the Cicero Engine and exposes it as a RESTful service",
   "engines": {
     "node": ">=8",
@@ -39,22 +39,22 @@
   },
   "homepage": "https://github.com/accordproject/cicero#readme",
   "devDependencies": {
-    "chai": "3.5.0",
-    "chai-as-promised": "6.0.0",
+    "chai": "4.2.0",
+    "chai-as-promised": "7.1.1",
     "chai-things": "0.2.0",
     "decache": "4.4.0",
     "eslint": "4.19.1",
     "jsdoc": "3.5.5",
     "license-check": "1.1.5",
-    "mocha": "5.1.1",
+    "mocha": "5.2.0",
     "mockery": "2.0.0",
     "nyc": "11.7.2",
     "sinon": "4.0.1",
     "supertest": "3.0.0"
   },
   "dependencies": {
-    "@accordproject/cicero-core": "0.10.1",
-    "@accordproject/cicero-engine": "0.10.1",
+    "@accordproject/cicero-core": "0.11.1",
+    "@accordproject/cicero-engine": "0.11.1",
     "express": "4.16.2"
   },
   "license-check-config": {
