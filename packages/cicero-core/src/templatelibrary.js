@@ -122,12 +122,10 @@ class TemplateLibrary {
      */
     async getTemplateIndex(options) {
         const cacheKey = this.getTemplateIndexCacheKey(options);
-        if (cacheKey) {
-            const result = globalTemplateIndexCache.get(cacheKey);
-            if (result) {
-                Logger.info('Returning template index from cache');
-                return Promise.resolve(result);
-            }
+        const result = globalTemplateIndexCache.get(cacheKey);
+        if (result) {
+            Logger.info('Returning template index from cache');
+            return Promise.resolve(result);
         }
 
         const httpOptions = {
@@ -150,9 +148,7 @@ class TemplateLibrary {
                     templateIndex = TemplateLibrary.filterTemplateIndexCiceroVersion(templateIndex, options.ciceroVersion);
                 }
 
-                if (cacheKey) {
-                    globalTemplateIndexCache.set(cacheKey, templateIndex);
-                }
+                globalTemplateIndexCache.set(cacheKey, templateIndex);
 
                 return templateIndex;
             })
@@ -207,12 +203,11 @@ class TemplateLibrary {
      */
     async getTemplate(templateUri) {
         const cacheKey = this.getTemplateCacheKey(templateUri);
-        if (cacheKey) {
-            const result = globalTemplateCache.get(cacheKey);
-            if (result) {
-                Logger.info('Returning template from cache', templateUri);
-                return result;
-            }
+
+        const result = globalTemplateCache.get(cacheKey);
+        if (result) {
+            Logger.info('Returning template from cache', templateUri);
+            return result;
         }
 
         const templateUriInfo = TemplateLibrary.parseURI(templateUri);
@@ -231,9 +226,7 @@ class TemplateLibrary {
             Logger.warn(`Requested template ${templateUri} but the hash of the template is ${templateHash}`);
         }
 
-        if (cacheKey) {
-            globalTemplateCache.set(cacheKey, template);
-        }
+        globalTemplateCache.set(cacheKey, template);
 
         return template;
     }

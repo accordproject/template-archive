@@ -301,30 +301,30 @@ describe('Template', () => {
         });
     });
 
-    describe.skip('#fromUrl', () => {
+    describe('#fromUrl', () => {
 
         it('should throw an error if an archive loader cannot be found', async () => {
-            const url = 'ab://ip-payment@0.8.0#hash';
-            return (() => Template.fromUrl(url, null)).should.throw('Failed to find a model file loader that can handle: ab://ip-payment@0.8.0#hash');
+            const url = 'ab://ip-payment@0.9.0#hash';
+            return (() => Template.fromUrl(url, null)).should.throw('Failed to find a model file loader that can handle: ab://ip-payment@0.9.0#hash');
         });
 
         it('should create a template from an archive at a given URL', async () => {
-            const url = 'https://templates.accordproject.org/archives/ip-payment@0.8.0.cta';
+            const url = 'https://templates.accordproject.org/archives/ip-payment@0.9.0.cta';
             return Template.fromUrl(url, null).should.be.fulfilled;
         });
 
         it('should create a template from an archive at a given AP URL', async () => {
-            const url = 'ap://ip-payment@0.8.0#hash';
+            const url = 'ap://ip-payment@0.9.0#hash';
             return Template.fromUrl(url, null).should.be.fulfilled;
         });
 
         it('should throw an error if creating a template from a wrongly formed AP URL', async () => {
-            const url = 'ap://ip-payment@0.8.0';
-            return (() => Template.fromUrl(url, null)).should.throw('Invalid template specifier. Must contain @ and #: ap://ip-payment@0.8.0');
+            const url = 'ap://ip-payment@0.9.0';
+            return (() => Template.fromUrl(url, null)).should.throw('Invalid template specifier. Must contain @ and #: ap://ip-payment@0.9.0');
         });
 
         it('should create a template from an archive at a given github URL', async () => {
-            const url = 'github://accordproject/cicero-template-library/master/build/archives/ip-payment@0.8.0.cta';
+            const url = 'github://accordproject/cicero-template-library/master/build/archives/ip-payment@0.9.0.cta';
             return Template.fromUrl(url, {'encoding':null,'headers':{'Accept': '*/*','Accept-Encoding': 'deflate, gzip'}}).should.be.fulfilled;
         });
 
