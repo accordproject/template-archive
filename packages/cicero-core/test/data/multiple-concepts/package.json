@@ -4,7 +4,7 @@
     "description": "\"Dan Selman\" agrees to spend 100.0 conga coins on \"swag\"",
     "cicero": {
       "template": "clause",
-      "language": "javascript",
+      "language": "ergo",
       "version": "^0.11.0"
     }
   }

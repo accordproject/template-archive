@@ -45,7 +45,6 @@ describe('FormattedDates', () => {
             const clause = new Clause(template);
             clause.parse(formattedDatesInput);
             const result = clause.getData();
-            console.log(JSON.stringify(result, null,4));
             delete result.clauseId;
             const data = {
                 $class: 'org.accordproject.test.TemplateModel',

@@ -94,7 +94,7 @@ class TemplateInstance {
      * @param {string} text  - the data for the clause
      */
     parse(text) {
-        let parser = this.getTemplate().getParser();
+        let parser = this.getTemplate().getParserManager().getParser();
         parser.feed(text);
         if (parser.results.length !== 1) {
             const head = JSON.stringify(parser.results[0]);
@@ -162,7 +162,7 @@ class TemplateInstance {
             throw new Error('Data has not been set. Call setData or parse before calling this method.');
         }
 
-        const ast = this.getTemplate().getTemplateAst();
+        const ast = this.getTemplate().getParserManager().getTemplateAst();
         // console.log('AST: ' + JSON.stringify(ast, null, 4));
 
         let result = '';
@@ -230,7 +230,10 @@ class TemplateInstance {
      * @returns {string} ISO-8601 formatted date as a string
      * @private
      */
-    static parseDateTimeStringToIsoString(date, format='MM/DD/YYYY') {
+    static formatDateTime(date, format) {
+        if(!format) {
+            format = 'MM/DD/YYYY';
+        }
         console.log('parseDateTimeStringToIsoString: ' + format + ':' + date );
         const instance = moment.parseZone(date);
         return instance.format(format);
@@ -286,7 +289,7 @@ class TemplateInstance {
         case 'Double':
             return obj.toString();
         case 'DateTime':
-            return TemplateInstance.parseDateTimeStringToIsoString(obj, format);
+            return TemplateInstance.formatDateTime(obj, format);
         case 'Boolean':
             if(obj) {
                 return 'true';

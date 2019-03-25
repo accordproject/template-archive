@@ -42,7 +42,7 @@ class TemplateLibrary {
      * @param {string} url - the url to connect to. Defaults to
      * https://templates.accordproject.org
      */
-    constructor(url) {
+    constructor(url=null) {
         this.url = url || 'https://templates.accordproject.org';
         Logger.info('Creating TemplateLibrary for ' + this.url);
     }

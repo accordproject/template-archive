@@ -134,7 +134,7 @@ class ParserManager {
         const combined = nunjucks.render('template.ne', parts);
         logger.debug('Generated template grammar' + combined);
 
-        console.log(combined);
+        // console.log(combined);
         this.setGrammar(combined);
         this.templatizedGrammar = templatizedGrammar;
     }
@@ -211,7 +211,7 @@ class ParserManager {
             case 'FormattedBinding':
             case 'Binding':
             case 'ClauseBinding':
-                this.handleBinding(parts, rule, element);
+                this.handleBinding(templateModel, parts, rule, element);
                 break;
             default:
                 throw new Error(`Unrecognized type ${element.type}`);
@@ -237,17 +237,14 @@ class ParserManager {
 
     /**
      * Utility method to generate a grammar rule for a variable binding
+     * @param {ClassDeclaration} templateModel - the current template model
      * @param {*} parts - the parts, where the rule will be added
      * @param {*} inputRule - the rule we are processing in the AST
      * @param {*} element - the current element in the AST
      */
-    handleBinding(parts, inputRule, element) {
-        const templateModel = this.template.getTemplateModel();
+    handleBinding(templateModel, parts, inputRule, element) {
         const propertyName = element.fieldName.value;
-        const property = templateModel.getProperty(propertyName);
-        if (!property) {
-            throw new Error(`Template references a property '${propertyName}' that is not declared in the template model '${templateModel.getFullyQualifiedName()}'. Details: ${JSON.stringify(element)}`);
-        }
+        const property = ParserManager.getProperty(templateModel, propertyName);
 
         let action = null;
         let suffix = ':';
