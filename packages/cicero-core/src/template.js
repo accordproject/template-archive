@@ -201,7 +201,7 @@ class Template {
      * @param {object} options - additional options
      * @return {Promise} a Promise to the template
      */
-    static async fromUrl(url, options) {
+    static async fromUrl(url, options=null) {
         return TemplateLoader.fromUrl(Template, url, options);
     }
 

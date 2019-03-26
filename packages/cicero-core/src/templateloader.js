@@ -172,6 +172,8 @@ class TemplateLoader {
     static async fromArchive(Template, buffer) {
         const method = 'fromArchive';
         const zip = await JSZip.loadAsync(buffer);
+        // const allFiles = await TemplateLoader.loadZipFilesContents(zip, /.*/);
+        // console.log(allFiles);
         const ctoModelFiles = [];
         const ctoModelFileNames = [];
         const sampleTextFiles = {};
@@ -236,9 +238,8 @@ class TemplateLoader {
      */
     static async fromUrl(Template, url, options) {
         const loader = new DefaultArchiveLoader();
-        return loader.load(url, options).then(function (buffer) {
-            return TemplateLoader.fromArchive(Template, buffer);
-        });
+        const buffer = await loader.load(url, options);
+        return TemplateLoader.fromArchive(Template, buffer);
     }
 
     /**
