@@ -1,6 +1,3 @@
-/**
- * Data Model for the SAFT contract
- */
 namespace org.accordproject.saft
 
 import org.accordproject.cicero.contract.* from https://models.accordproject.org/cicero/contract.cto

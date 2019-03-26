@@ -250,7 +250,7 @@ class ParserManager {
         let suffix = ':';
         let type = property.getType();
 
-        // allow the type to define a custom action using a decorator
+        // allow the type and action to be defined using a decorator
         const decorator = property.getDecorator('AccordType');
         if (decorator) {
             if (decorator.getArguments().length > 0) {
@@ -261,42 +261,42 @@ class ParserManager {
             }
         }
 
-        // otherwise the action is id
+        // if the type/action have not been set explicity, then we infer them
         if(!action) {
             action = '{% id %}';
-        }
 
-        if( element.type === 'FormattedBinding' ) {
-            if( property.getType() !== 'DateTime') {
-                throw new Error('Formatted types are currently only supported for DateTime properties.');
-            }
+            if( element.type === 'FormattedBinding' ) {
+                if( property.getType() !== 'DateTime') {
+                    throw new Error('Formatted types are currently only supported for DateTime properties.');
+                }
 
-            // we only include the datetime grammar if custom formats are used
-            if(!parts.grammars.dateTime) {
-                parts.grammars.dateTime = require('./grammars/datetime');
-                parts.grammars.dateTimeEn = require('./grammars/datetime-en');
-            }
+                // we only include the datetime grammar if custom formats are used
+                if(!parts.grammars.dateTime) {
+                    parts.grammars.dateTime = require('./grammars/datetime');
+                    parts.grammars.dateTimeEn = require('./grammars/datetime-en');
+                }
 
-            // push the formatting rule, iff it has not been already declared
-            const formatRule = DateTimeFormatParser.buildDateTimeFormatRule(element.format.value);
-            type = formatRule.name;
-            const ruleExists = parts.modelRules.some(rule => (rule.prefix === formatRule.name));
-            if(!ruleExists) {
-                parts.modelRules.push({
-                    prefix: formatRule.name,
-                    symbols: [`${formatRule.tokens} ${formatRule.action} # ${propertyName} as ${element.format.value}`],
-                });
+                // push the formatting rule, iff it has not been already declared
+                const formatRule = DateTimeFormatParser.buildDateTimeFormatRule(element.format.value);
+                type = formatRule.name;
+                const ruleExists = parts.modelRules.some(rule => (rule.prefix === formatRule.name));
+                if(!ruleExists) {
+                    parts.modelRules.push({
+                        prefix: formatRule.name,
+                        symbols: [`${formatRule.tokens} ${formatRule.action} # ${propertyName} as ${element.format.value}`],
+                    });
+                }
+            } else if( element.type === 'ClauseBinding') {
+                const clauseTemplate = element.template;
+                const clauseTemplateModel = this.template.getIntrospector().getClassDeclaration(property.getFullyQualifiedTypeName());
+                this.buildGrammarRules(clauseTemplate, clauseTemplateModel, propertyName, parts);
+                type = element.fieldName.value;
             }
-        } else if( element.type === 'ClauseBinding') {
-            const clauseTemplate = element.template;
-            const clauseTemplateModel = this.template.getIntrospector().getClassDeclaration(property.getFullyQualifiedTypeName());
-            this.buildGrammarRules(clauseTemplate, clauseTemplateModel, propertyName, parts);
-            type = element.fieldName.value;
-        }
-        else {
-            // relationships need to be transformed into strings
-            if (property instanceof RelationshipDeclaration) {
-                type = 'String';
+            else {
+                // relationships need to be transformed into strings
+                if (property instanceof RelationshipDeclaration) {
+                    type = 'String';
+                }
             }
         }
 
@@ -309,6 +309,9 @@ class ParserManager {
         if (suffix === ':') {
             suffix = '';
         }
+
+        // console.log(`${inputRule} => ${type}${suffix} ${action} # ${propertyName}`);
+
         parts.modelRules.push({
             prefix: inputRule,
             symbols: [`${type}${suffix} ${action} # ${propertyName}`],

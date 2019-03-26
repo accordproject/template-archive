@@ -51,7 +51,7 @@ YEAR -> DOUBLE_NUMBER DOUBLE_NUMBER
 DATE -> MONTH "/" DAY "/" YEAR
 {% (d) => {return '' + d[4] + '-' + d[0] + '-' + d[2]}%}
 
-Word -> [\S]:*
+Word -> [\\S]:*
 {% (d) => {return d[0].join('');}%}
 
 BRACKET_PHRASE -> "[" Word (__ Word):* "]" {% ((d) => {return d[1] + ' ' + flatten(d[2]).join(" ");}) %}
