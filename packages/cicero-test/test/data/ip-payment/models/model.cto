@@ -1,0 +1,39 @@
+namespace org.accordproject.ippayment
+
+import org.accordproject.cicero.contract.* from https://models.accordproject.org/cicero/contract.cto
+import org.accordproject.cicero.runtime.* from https://models.accordproject.org/cicero/runtime.cto
+import org.accordproject.time.* from https://models.accordproject.org/v2.0/time.cto
+
+/**
+ * Requesting a payment
+ */
+transaction PaymentRequest extends Request {
+  o Double netSaleRevenue
+  o Double sublicensingRevenue
+  o DateTime permissionGrantedBy optional
+}
+
+/**
+ * PayOut response
+ */
+transaction PayOut extends Response {
+  o Double totalAmount
+  o DateTime dueBy
+}
+
+/**
+ * The template model
+ */
+asset IntellectualPropertyPaymentClause extends AccordClause {
+  /* royalty */
+  o String royaltyText
+  o Double royaltyRate
+
+  /* sub-licensing */
+  o String sublicensingRoyaltyText
+  o Double sublicensingRoyaltyRate
+
+  /* payment */
+  o Duration paymentPeriod
+  o Duration paymentPeriodWithPermission
+}

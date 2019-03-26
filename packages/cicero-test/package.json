@@ -1,0 +1,87 @@
+{
+  "name": "@accordproject/cicero-test",
+  "version": "0.11.1",
+  "description": "Cicero Test - Testing support for Cicero based on cucumber",
+  "engines": {
+    "node": ">=8",
+    "npm": ">=3"
+  },
+  "publishConfig": {
+    "access": "public"
+  },
+  "main": "index.js",
+  "scripts": {
+    "pretest": "npm run lint",
+    "lint": "eslint .",
+    "postlint": "npm run licchk",
+    "licchk": "license-check",
+    "test:cucumber": "cucumber-js test/features --require lib/steps.js --world-parameters '{\"rootdir\":\"./test\"}' && cucumber-js test/data/helloemit/test --require lib/steps.js --world-parameters '{\"rootdir\":\"./test/data/helloemit\"}'",
+    "test:all": "npm run test:cucumber",
+    "test:cov": "nyc npm run test:all",
+    "test": "npm run test:all && npm run test:cov"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/accordproject/cicero.git"
+  },
+  "keywords": [
+    "accord",
+    "legal",
+    "tech",
+    "smart",
+    "contract"
+  ],
+  "author": "clause.io",
+  "license": "Apache-2.0",
+  "bugs": {
+    "url": "https://github.com/accordproject/cicero/issues"
+  },
+  "homepage": "https://github.com/accordproject/cicero#readme",
+  "devDependencies": {
+    "eslint": "4.19.1",
+    "license-check": "1.1.5",
+    "mocha": "5.2.0",
+    "nyc": "11.7.2"
+  },
+  "dependencies": {
+    "@accordproject/cicero-core": "0.11.1",
+    "@accordproject/cicero-engine": "0.11.1",
+    "@accordproject/ergo-test": "0.7.4-20190326151943",
+    "chai": "4.2.0",
+    "chai-things": "0.2.0",
+    "cucumber": "^5.1.0"
+  },
+  "license-check-config": {
+    "src": [
+      "**/*.js",
+      "!./test/data/**/*",
+      "!./coverage/**/*",
+      "!./node_modules/**/*",
+      "!./out/**/*"
+    ],
+    "path": "header.txt",
+    "blocking": true,
+    "logInfo": false,
+    "logError": true
+  },
+  "nyc": {
+    "produce-source-map": "true",
+    "sourceMap": "inline",
+    "reporter": [
+      "lcov",
+      "text-summary",
+      "html",
+      "json"
+    ],
+    "include": [
+      "lib/**/*.js"
+    ],
+    "exclude": [],
+    "all": true,
+    "check-coverage": true,
+    "statements": 93,
+    "branches": 70,
+    "functions": 92,
+    "lines": 93
+  }
+}

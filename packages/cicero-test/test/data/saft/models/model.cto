@@ -1,0 +1,146 @@
+/**
+ * Data Model for the SAFT contract
+ */
+namespace org.accordproject.saft
+
+import org.accordproject.cicero.contract.* from https://models.accordproject.org/cicero/contract.cto
+import org.accordproject.cicero.runtime.* from https://models.accordproject.org/cicero/runtime.cto
+import org.accordproject.money.* from https://models.accordproject.org/money.cto
+import org.accordproject.usa.business.BusinessEntity from https://models.accordproject.org/usa/business.cto
+import org.accordproject.usa.state.State from https://models.accordproject.org/usa/state.cto
+
+
+/**
+ * The network has launched!
+ */
+transaction Launch extends Request {
+  /**
+   * The exchange rate to use
+   */
+  o Double exchangeRate
+}
+
+/**
+ * The network has been terminated. :-(
+ */
+transaction Terminate extends Request {
+
+  /**
+   * How many funds remain, we need to reimburse them
+   */
+  o MonetaryAmount remainingFunds
+
+  /**
+   * What was the total amount invested
+   */
+  o MonetaryAmount totalInvested
+}
+
+/**
+ * Whether the network launches or terminates, we need to payout
+ */
+transaction Payout {
+
+  /**
+   * The amount to payout
+   */
+ o MonetaryAmount tokenAmount
+
+ /**
+  * The address to payout to
+  * TODO - this needs to be captured in the contract
+  */
+ o String tokenAddress
+}
+
+/**
+ * Defines the data model for the Saft template.
+ */
+asset SaftContract extends AccordContract {
+  /**
+   * The name of the token to be sold
+   */
+  o String token
+
+  /**
+   * The name of the company selling the token
+   */
+  o String company
+
+  /**
+   * Type of company
+   */
+  o BusinessEntity companyType
+
+  /**
+   * The state the company is incorporated in
+   */
+  o State state
+
+  /**
+   * Whether the contract has an amendmentProvision
+   */
+  o Boolean amendmentProvision
+
+  /**
+   * The amount of coin being purchased
+   */
+  o MonetaryAmount purchaseAmount
+
+  /**
+   * The currency for the purchase
+   */
+  o CurrencyCode currency
+
+  /**
+   * The minimum amount that needs to be raised
+   */
+  o MonetaryAmount netProceedLimit
+
+  /**
+   * The date of the purchase
+   */
+  o DateTime date
+
+  /**
+   * The launch date
+   */
+  o DateTime deadlineDate
+
+  /**
+   * The discount rate as a percentage
+   */
+  o Double discountRatePercentage
+
+  /**
+   * The name of the network being launched
+   */
+  o String network
+
+  /**
+   * The name of the coin to be used to purchase
+   */
+  o String coin
+
+  /**
+   * The exchanges used for pricing
+   */
+  o String exchanges
+
+  /**
+   * The name of the company representative (first, last)
+   */
+  @AccordType("Word __ Word", "{% (d) => {return `${d[0]} ${d[2]}`;} %}")
+  o String companyRepresentative
+
+  /**
+   * The name of the purchaser (first, middle, last)
+   */
+  @AccordType("Word __ Word __ Word", "{% (d) => {return `${d[0]} ${d[2]} ${d[4]}`;} %}")
+  o String purchaser
+
+  /**
+   * The description of the offering
+   */
+  o String description
+}

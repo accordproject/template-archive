@@ -710,7 +710,7 @@ class Template {
         let scriptManager = this.getScriptManager();
         let scriptFiles = scriptManager.getScripts();
         scriptFiles.forEach(function (file) {
-            content.scripts[file.getName()] = file.contents;
+            content.scripts[file.getIdentifier()] = file.contents;
         });
 
         const hasher = crypto.createHash('sha256');
@@ -784,7 +784,12 @@ class Template {
             dir: true
         }));
         if (!this.archiveOmitsLogic) {
-            const scriptFiles = this.getScriptManager().getAllScripts();
+            let scriptFiles;
+            if (this.getMetadata().getLanguage() === 0) {
+                scriptFiles = this.getScriptManager().getAllScripts();
+            } else {
+                scriptFiles = this.getScriptManager().getScripts();
+            }
             scriptFiles.forEach(function (file) {
                 let fileIdentifier = file.getIdentifier();
                 let fileName = fsPath.basename(fileIdentifier);

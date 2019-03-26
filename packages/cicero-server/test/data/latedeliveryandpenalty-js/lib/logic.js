@@ -16,22 +16,7 @@
 function orgXaccordprojectXlatedeliveryandpenaltyXLateDeliveryAndPenalty_latedeliveryandpenalty(context) {
   let pcontext = { 'request' : context.request, 'state': context.state, 'contract': context.contract, 'emit': context.emit, 'now': context.now};
   //logger.info('ergo context: '+JSON.stringify(pcontext))
-  let result = new orgXaccordprojectXlatedeliveryandpenaltyXLateDeliveryAndPenalty().latedeliveryandpenalty(pcontext);
-  if (result.hasOwnProperty('left')) {
-    //logger.info('ergo result: '+JSON.stringify(result))
-    context.response = result.left.response ?
-         result.left.response
-       : { '$class': 'org.accordproject.cicero.runtime.Response' };
-    context.state = result.left.state;
-    let emitResult = [];
-    for (let i = 0; i < result.left.emit.length; i++) {
-      emitResult.push(result.left.emit[i]);
-    }
-    context.emit = emitResult;
-    return context;
-  } else {
-    throw new Error(result.right.message);
-  }
+  return new orgXaccordprojectXlatedeliveryandpenaltyXLateDeliveryAndPenalty().latedeliveryandpenalty(pcontext);
 }
 class orgXaccordprojectXlatedeliveryandpenaltyXLateDeliveryAndPenalty {
   main(context) {
@@ -1171,42 +1156,12 @@ const contract = new orgXaccordprojectXlatedeliveryandpenaltyXLateDeliveryAndPen
 function __dispatch(context) {
   let pcontext = { 'request' : context.request, 'state': context.state, 'contract': context.contract, 'emit': context.emit, 'now': context.now};
   //logger.info('ergo context: '+JSON.stringify(pcontext))
-  let result = new orgXaccordprojectXlatedeliveryandpenaltyXLateDeliveryAndPenalty().main(pcontext);
-  if (result.hasOwnProperty('left')) {
-    //logger.info('ergo result: '+JSON.stringify(result))
-    context.response = result.left.response ?
-         result.left.response
-       : { '$class': 'org.accordproject.cicero.runtime.Response' };
-    context.state = result.left.state;
-    let emitResult = [];
-    for (let i = 0; i < result.left.emit.length; i++) {
-      emitResult.push(result.left.emit[i]);
-    }
-    context.emit = emitResult;
-    return context;
-  } else {
-    throw new Error(result.right.message);
-  }
+  return new orgXaccordprojectXlatedeliveryandpenaltyXLateDeliveryAndPenalty().main(pcontext);
 }
 function __init(context) {
   let pcontext = { 'request' : context.request, 'state': { '$class': 'org.accordproject.cicero.contract.AccordContractState', 'stateId' : 'org.accordproject.cicero.contract.AccordContractState#1' }, 'contract': context.contract, 'emit': context.emit, 'now': context.now};
   //logger.info('ergo context: '+JSON.stringify(pcontext))
-  let result = new orgXaccordprojectXlatedeliveryandpenaltyXLateDeliveryAndPenalty().init(pcontext);
-  if (result.hasOwnProperty('left')) {
-    //logger.info('ergo result: '+JSON.stringify(result))
-    context.response = result.left.response ?
-         result.left.response
-       : { '$class': 'org.accordproject.cicero.runtime.Response' };
-    context.state = result.left.state;
-    let emitResult = [];
-    for (let i = 0; i < result.left.emit.length; i++) {
-      emitResult.push(result.left.emit[i]);
-    }
-    context.emit = emitResult;
-    return context;
-  } else {
-    throw new Error(result.right.message);
-  }
+  return new orgXaccordprojectXlatedeliveryandpenaltyXLateDeliveryAndPenalty().init(pcontext);
 }
 
 /*eslint-enable no-unused-vars*/
@@ -1955,3 +1910,20 @@ function dateTimeEndOf(part, date) {
     mustBeUnit(part);
     return date.endOf(part);
 }
+
+/* Unwrapping errors on output */
+function unwrapError(result) {
+    if (result.hasOwnProperty('left')) {
+        return toLeft(result);
+    } else {
+        var failure = toRight(result);
+        var message = "Unknown Ergo Logic Error (Please file a GitHub issue)";
+        if (either(cast(["org.accordproject.ergo.stdlib.ErgoErrorResponse"],failure))) {
+            message = unbrand(toLeft(cast(["org.accordproject.ergo.stdlib.ErgoErrorResponse"],failure))).message;
+        } else {
+            message = JSON.stringify(toRight(cast(["org.accordproject.ergo.stdlib.ErgoErrorResponse"],failure)));
+        }
+        throw new Error("[Ergo] " + message);
+    }
+}
+

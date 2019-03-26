@@ -1,0 +1,12 @@
+namespace org.accordproject.ergo.math
+
+define constant PI = 4.0 * atan(1.0)
+define constant E = exp(1.0)
+
+define function degreesToRadians(degrees: Double) {
+    return (degrees * PI) / 180.0
+}
+
+define function radiansToDegrees(radians: Double) {
+    return (radians * 180.0) /PI
+}

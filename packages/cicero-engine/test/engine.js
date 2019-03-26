@@ -373,13 +373,14 @@ describe('BogusClauses', () => {
                 element.language = '.ergo';
             }
         }, this);
-        (() => engine.getErgoEngine().compileJsLogic(scriptManager)).should.throw('Did not find any JavaScript logic');
+        scriptManager.compiledScript = null;
+        (() => engine.getErgoEngine().cacheJsScript(scriptManager)).should.throw('Did not find any compiled JavaScript logic');
     });
     it('should throw an error when all logic is missing', async function() {
         // Remove all scripts
         const scriptManager = clause.getTemplate().getScriptManager();
-        scriptManager.scripts = {};
-        (() => engine.getErgoEngine().compileJsLogic(scriptManager)).should.throw('Did not find any JavaScript logic');
+        scriptManager.clearScripts();
+        (() => engine.getErgoEngine().cacheJsScript(scriptManager)).should.throw('Did not find any compiled JavaScript logic');
     });
 });
 describe('EngineInstallmentSaleJs', () => {
