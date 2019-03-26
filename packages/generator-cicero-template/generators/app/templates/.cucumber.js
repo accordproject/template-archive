@@ -1,1 +1,1 @@
-require('@accordproject/cicero-engine/lib/steps');
+require('@accordproject/cicero-test').Steps;
