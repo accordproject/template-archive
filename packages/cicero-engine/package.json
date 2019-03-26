@@ -16,8 +16,7 @@
     "postlint": "npm run licchk",
     "licchk": "license-check",
     "test:mocha": "mocha",
-    "test:cucumber": "cucumber-js test/features --require lib/steps.js --world-parameters '{\"rootdir\":\"./test\"}' && cucumber-js test/data/helloemit/test --require lib/steps.js --world-parameters '{\"rootdir\":\"./test/data/helloemit\"}'",
-    "test:all": "npm run test:mocha && npm run test:cucumber",
+    "test:all": "npm run test:mocha",
     "test:cov": "nyc npm run test:all",
     "test": "npm run test:all && npm run test:cov"
   },
@@ -49,11 +48,10 @@
   },
   "dependencies": {
     "@accordproject/cicero-core": "0.11.1",
-    "@accordproject/ergo-compiler": "0.7.3",
-    "@accordproject/ergo-engine": "0.7.3",
+    "@accordproject/ergo-compiler": "0.7.4-20190326151943",
+    "@accordproject/ergo-engine": "0.7.4-20190326151943",
     "composer-concerto": "0.70.0",
-    "moment-mini": "2.22.1",
-    "vm2": "3.5.0"
+    "moment-mini": "2.22.1"
   },
   "license-check-config": {
     "src": [

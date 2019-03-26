@@ -19,10 +19,10 @@ const Path = require('path');
 const Chai = require('chai');
 const expect = Chai.expect;
 
+const Util = require('@accordproject/ergo-test/lib/util');
 const Template = require('@accordproject/cicero-core').Template;
 const Clause = require('@accordproject/cicero-core').Clause;
-const Util = require('@accordproject/ergo-engine').Util;
-const Engine = require('./engine');
+const Engine = require('@accordproject/cicero-engine').Engine;
 
 const { Before, Given, When, Then, setDefaultTimeout } = require('cucumber');
 

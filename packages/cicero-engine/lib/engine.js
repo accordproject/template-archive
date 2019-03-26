@@ -64,7 +64,7 @@ class Engine {
         const clauseId = clause.getIdentifier();
         const contract = clause.getData();
 
-        return this.ergoEngine.init(templateLogic,clauseId,contract,currentTime);
+        return this.ergoEngine.init(templateLogic,clauseId,contract,{},currentTime);
     }
 
     /**

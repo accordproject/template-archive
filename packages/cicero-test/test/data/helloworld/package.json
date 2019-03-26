@@ -1,0 +1,10 @@
+{
+    "name": "helloworld",
+    "version": "0.0.5",
+    "description": "This is the Hello World of Accord Protocol Templates. Executing the clause will simply echo back the text that occurs after the string `Hello` prepended to text that is passed in the request.",
+    "cicero": {
+        "template": "clause",
+        "language": "ergo",
+        "version": "^0.11.0"
+    }
+}
