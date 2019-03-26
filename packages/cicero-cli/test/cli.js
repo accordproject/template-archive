@@ -80,31 +80,11 @@ describe('cicero-cli', () => {
     describe('#archive', async () => {
         it('should create a valid ergo archive', async () => {
             const archiveName = 'test.cta';
-            const result = await Commands.archive('ergo', template, archiveName, false);
+            const result = await Commands.archive('ergo', template, archiveName);
             result.should.eql(true);
             const newTemplate = await Template.fromArchive(fs.readFileSync(archiveName));
             newTemplate.should.not.be.null;
-            newTemplate.hasNoLogic().should.equal(false);
-            fs.unlinkSync(archiveName);
-        });
-
-        it('should create a valid javascript archive', async () => {
-            const archiveName = 'test.cta';
-            const result = await Commands.archive('javascript', template, archiveName, false);
-            result.should.eql(true);
-            const newTemplate = await Template.fromArchive(fs.readFileSync(archiveName));
-            newTemplate.should.not.be.null;
-            newTemplate.hasNoLogic().should.equal(false);
-            fs.unlinkSync(archiveName);
-        });
-
-        it('should omit logic when creating a valid archive', async () => {
-            const archiveName = 'test.cta';
-            const result = await Commands.archive('ergo', template, archiveName, true);
-            result.should.eql(true);
-            const newTemplate = await Template.fromArchive(fs.readFileSync(archiveName));
-            newTemplate.should.not.be.null;
-            newTemplate.hasNoLogic().should.equal(true);
+            newTemplate.hasLogic().should.equal(true);
             fs.unlinkSync(archiveName);
         });
 
