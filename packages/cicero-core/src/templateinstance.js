@@ -234,7 +234,6 @@ class TemplateInstance {
         if(!format) {
             format = 'MM/DD/YYYY';
         }
-        console.log('parseDateTimeStringToIsoString: ' + format + ':' + date );
         const instance = moment.parseZone(date);
         return instance.format(format);
     }

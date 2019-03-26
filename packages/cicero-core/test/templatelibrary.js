@@ -73,7 +73,7 @@ describe('TemplateLibrary', () => {
 
         it('should retrieve latest version index for cicero version 0.10.1', async function() {
             const templateLibrary = new TemplateLibrary();
-            const templateIndex = await templateLibrary.getTemplateIndex({latestVersion: true, ciceroVersion: '0.10.1'});
+            const templateIndex = await templateLibrary.getTemplateIndex({latestVersion: true, ciceroVersion: '0.11.1'});
             templateIndex.should.not.have.property('helloworld@0.0.5');
             templateIndex.should.not.have.property('helloworld@0.2.0');
             templateIndex.should.not.have.property('helloworld@0.2.1');
@@ -82,7 +82,7 @@ describe('TemplateLibrary', () => {
             templateIndex.should.not.have.property('helloworld@0.5.0');
             templateIndex.should.not.have.property('helloworld@0.6.0');
             templateIndex.should.not.have.property('helloworld@0.7.2');
-            templateIndex.should.have.property('helloworld@0.8.0');
+            templateIndex.should.have.property('helloworld@0.9.0');
         });
 
         it('should retrieve latest version index for cicero version 0.10.0-20190129142217', async function() {
@@ -96,20 +96,6 @@ describe('TemplateLibrary', () => {
             templateIndex.should.not.have.property('helloworld@0.5.0');
             templateIndex.should.not.have.property('helloworld@0.6.0');
             templateIndex.should.have.property('helloworld@0.7.2');
-        });
-
-        it('should retrieve latest version index for cicero version 0.10.2-20190129142217', async function() {
-            const templateLibrary = new TemplateLibrary();
-            const templateIndex = await templateLibrary.getTemplateIndex({latestVersion: true, ciceroVersion: '0.10.2-20190129142217'});
-            templateIndex.should.not.have.property('helloworld@0.0.5');
-            templateIndex.should.not.have.property('helloworld@0.2.0');
-            templateIndex.should.not.have.property('helloworld@0.2.1');
-            templateIndex.should.not.have.property('helloworld@0.3.0');
-            templateIndex.should.not.have.property('helloworld@0.4.0');
-            templateIndex.should.not.have.property('helloworld@0.5.0');
-            templateIndex.should.not.have.property('helloworld@0.6.0');
-            templateIndex.should.not.have.property('helloworld@0.7.2');
-            templateIndex.should.have.property('helloworld@0.8.0');
         });
     });
 

@@ -291,6 +291,7 @@ class ParserManager {
             const clauseTemplate = element.template;
             const clauseTemplateModel = this.template.getIntrospector().getClassDeclaration(property.getFullyQualifiedTypeName());
             this.buildGrammarRules(clauseTemplate, clauseTemplateModel, propertyName, parts);
+            type = element.fieldName.value;
         }
         else {
             // relationships need to be transformed into strings
