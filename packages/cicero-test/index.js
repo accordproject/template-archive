@@ -19,5 +19,5 @@
  * @module cicero-engine
  */
 
-module.exports.Engine = require('./lib/engine.js');
+module.exports.Steps = require('./lib/steps.js');
 module.exports.version = require('./package.json');
