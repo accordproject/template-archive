@@ -2,7 +2,7 @@
   "name": "@accordproject/cicero-engine",
   "version": "0.11.1",
   "description": "Cicero Engine - Node.js VM based implementation of Accord Protcol Template Specification execution",
-  "engsines": {
+  "engines": {
     "node": ">=8",
     "npm": ">=3"
   },
