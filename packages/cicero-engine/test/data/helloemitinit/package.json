@@ -2,9 +2,9 @@
     "name": "helloemit",
     "version": "0.0.5",
     "description": "This is the Hello World of Accord Protocol Templates with Emit.",
-    "cicero": {
+    "accordproject": {
       "template": "clause",
-      "language": "ergo",
-      "version": "^0.11.0"
+      "ergo": "0.7.3",
+      "cicero": "^0.12.0"
     }
 }

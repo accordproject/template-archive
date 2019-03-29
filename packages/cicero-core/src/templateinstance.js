@@ -139,7 +139,6 @@ class TemplateInstance {
             const instance = moment([obj.years, obj.months, obj.days, obj.hours, obj.minutes, obj.seconds, obj.milliseconds])
                 .utcOffset(obj.timezone, true);
             const result = instance.format('YYYY-MM-DDTHH:mm:ss.SSSZ');
-            console.log('result : ' + result);
             return result;
         }
         else if( typeof obj === 'object' && obj !== null) {
