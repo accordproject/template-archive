@@ -47,7 +47,7 @@
     "eslint": "4.19.1",
     "license-check": "1.1.5",
     "mocha": "5.2.0",
-    "nyc": "11.7.2",
+    "nyc": "13.3.0",
     "tmp-promise": "1.0.4"
   },
   "dependencies": {
@@ -55,7 +55,7 @@
     "@accordproject/cicero-engine": "0.11.1",
     "@accordproject/cicero-tools": "0.11.1",
     "@accordproject/cicero-test": "0.11.1",
-    "composer-concerto": "0.70.1",
+    "composer-concerto": "0.70.2",
     "uuid": "3.3.2",
     "yargs": "9.0.1"
   },

@@ -44,13 +44,13 @@
     "eslint": "4.19.1",
     "license-check": "1.1.5",
     "mocha": "5.2.0",
-    "nyc": "11.7.2"
+    "nyc": "13.3.0"
   },
   "dependencies": {
     "@accordproject/cicero-core": "0.11.1",
-    "@accordproject/ergo-compiler": "0.7.4-20190329154009",
-    "@accordproject/ergo-engine": "0.7.4-20190329154009",
-    "composer-concerto": "0.70.1",
+    "@accordproject/ergo-compiler": "0.7.4-20190329204625",
+    "@accordproject/ergo-engine": "0.7.4-20190329204625",
+    "composer-concerto": "0.70.2",
     "moment-mini": "2.22.1"
   },
   "license-check-config": {
