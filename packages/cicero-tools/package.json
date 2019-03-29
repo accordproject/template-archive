@@ -51,8 +51,8 @@
     "webpack-cli": "^3.1.0"
   },
   "dependencies": {
-    "composer-concerto": "0.70.0",
-    "composer-concerto-tools": "^0.60.0",
+    "composer-concerto": "0.70.1",
+    "composer-concerto-tools": "^0.60.1",
     "uuid": "3.3.2",
     "yargs": "9.0.1"
   },

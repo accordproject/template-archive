@@ -14,7 +14,7 @@
 
 'use strict';
 
-const ErgoEngine = require('@accordproject/ergo-engine').Engine;
+const ErgoEngine = require('@accordproject/ergo-engine').VMEngine;
 
 /**
  * <p>
