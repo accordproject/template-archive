@@ -48,7 +48,7 @@
     "license-check": "1.1.5",
     "mocha": "5.2.0",
     "mockery": "2.0.0",
-    "nyc": "11.7.2",
+    "nyc": "13.3.0",
     "sinon": "4.0.1",
     "supertest": "3.0.0"
   },
