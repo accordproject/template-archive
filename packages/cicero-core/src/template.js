@@ -44,8 +44,8 @@ class Template {
      * @param {object} request - the JS object for the sample request
      */
     constructor(packageJson, readme, samples, request) {
-        this.templateLogic = new TemplateLogic('cicero');
         this.metadata = new Metadata(packageJson, readme, samples, request);
+        this.templateLogic = new TemplateLogic(this.metadata.getRuntime());
         this.parserManager = new ParserManager(this);
     }
 
@@ -68,7 +68,7 @@ class Template {
 
         let modelType = 'org.accordproject.cicero.contract.AccordContract';
 
-        if(this.getMetadata().getPackageJson().cicero.template !== 'contract') {
+        if(this.getMetadata().getTemplateType() !== 0) {
             modelType = 'org.accordproject.cicero.contract.AccordClause';
         }
 

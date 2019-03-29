@@ -18,16 +18,9 @@ const Logger = require('@accordproject/ergo-compiler').Logger;
 const ciceroVersion = require('../package.json').version;
 const semver = require('semver');
 
-// This code is derived from BusinessNetworkMetadata in Hyperleger Composer composer-common.
-
 const templateTypes = {
     CONTRACT: 0,
     CLAUSE: 1
-};
-
-const languageTypes = {
-    ERGO: 0,
-    JAVASCRIPT: 1
 };
 
 /**
@@ -60,8 +53,47 @@ class Metadata {
      */
     constructor(packageJson, readme, samples, request) {
 
+        // name of the runtime that this template targets (if the template contains compiled code)
+        this.runtimeName = null;
+
+        // the version of Cicero that this template is compatible with
+        this.ciceroVersion = null;
+
+        // the version of Ergo that the Ergo source in this template is compatible with (if the tempalte contains source code)
+        this.ergoVersion = null;
+
         if(!packageJson || typeof(packageJson) !== 'object') {
             throw new Error('package.json is required and must be an object');
+        }
+
+        if(!packageJson.accordproject) {
+            throw new Error('Failed to find accordproject metadata in package.json');
+        }
+
+        if (!packageJson.accordproject.cicero) {
+            throw new Error('Failed to find accordproject cicero version in package.json');
+        }
+
+        if(!semver.valid(semver.coerce(packageJson.accordproject.cicero))){
+            throw new Error('The cicero version must be a valid semantic version (semver) number.');
+        }
+
+        this.ciceroVersion = packageJson.accordproject.cicero;
+
+        if (!this.satisfiesTargetVersion(ciceroVersion)){
+            const msg = `The template targets Cicero (${this.ciceroVersion}) but the Cicero version is ${ciceroVersion}.`;
+            Logger.error(msg);
+            throw new Error(msg);
+        }
+
+        // the runtime property is optional, and is only present for templates that have been compiled
+        if (packageJson.accordproject.runtime) {
+            this.runtime = packageJson.accordproject.runtime;
+        }
+
+        // ergo property is optional, must be present for templates containing Ergo code
+        if (packageJson.accordproject.ergo) {
+            this.ergoVersion = packageJson.accordproject.ergo;
         }
 
         if(!samples || typeof(samples) !== 'object') {
@@ -94,50 +126,18 @@ class Metadata {
         this.samples = samples;
         this.request = request;
 
-        // Set defaults
         this.type = templateTypes.CONTRACT;
-        this.language = languageTypes.ERGO;
-        this.targetVersion = ciceroVersion;
-
-        if (packageJson.cicero && packageJson.cicero.template) {
-            if(packageJson.cicero.template !== 'contract' &&
-            packageJson.cicero.template !== 'clause'){
+        if (packageJson.accordproject && packageJson.accordproject.template) {
+            if(packageJson.accordproject.template !== 'contract' &&
+            packageJson.accordproject.template !== 'clause'){
                 throw new Error('A cicero template must be either a "contract" or a "clause".');
             }
 
-            if(packageJson.cicero.template === 'clause'){
+            if(packageJson.accordproject.template === 'clause'){
                 this.type = templateTypes.CLAUSE;
             }
         } else {
             Logger.warn('No cicero template type specified. Assuming that this is a contract template');
-        }
-
-        if (packageJson.cicero && packageJson.cicero.language) {
-            if(packageJson.cicero.language !== 'ergo' &&
-            packageJson.cicero.language !== 'javascript'){
-                throw new Error('A cicero template language must be either "ergo" or "javascript".');
-            }
-
-            if(packageJson.cicero.language === 'javascript'){
-                this.language = languageTypes.JAVASCRIPT;
-            }
-        } else {
-            Logger.warn('No cicero template language specified. Assuming that this is an ergo template');
-        }
-
-        if (packageJson.cicero && packageJson.cicero.version) {
-            if(!semver.valid(semver.coerce(packageJson.cicero.version))){
-                throw new Error('The cicero target version must be a valid semantic version (semver) number.');
-            }
-            this.targetVersion = packageJson.cicero.version;
-        } else {
-            throw new Error('package.json is missing the cicero.version property.');
-        }
-
-        if (!this.satisfiesTargetVersion(ciceroVersion)){
-            const msg = `The template targets Cicero (${this.targetVersion}) but the Cicero version is ${ciceroVersion}.`;
-            Logger.error(msg);
-            throw new Error(msg);
         }
     }
 
@@ -171,21 +171,31 @@ class Metadata {
     }
 
     /**
-     * Returns either a 0 (for an ergo template), or 1 (for a javascript template)
-     * @returns {number} the template language
+     * Returns the name of the runtime target for this template, or null if this template
+     * has not been compiled for a specific runtime.
+     * @returns {string} the name of the runtime
      */
-    getLanguage(){
-        return this.language;
+    getRuntime(){
+        return this.runtime;
     }
 
     /**
-     * Returns the target semantic version for this template.
-     * i.e. which version of cicero was this template built for?
+     * Returns the Ergo version that the Ergo code in this template is compatible with. This
+     * is null for templates that do not contain source Ergo code.
+     * @returns {string} the version of Ergo
+     */
+    getErgoVersion(){
+        return this.ergoVersion;
+    }
+
+    /**
+     * Returns the version of Cicero that this template is compatible with.
+     * i.e. which version of the runtime was this template built for?
      * The version string conforms to the semver definition
      * @returns {string} the semantic version
      */
-    getTargetVersion(){
-        return this.targetVersion;
+    getCiceroVersion(){
+        return this.ciceroVersion;
     }
 
     /**
@@ -194,7 +204,7 @@ class Metadata {
      * @returns {string} the semantic version
      */
     satisfiesTargetVersion(version){
-        return semver.satisfies(version, this.getTargetVersion(), { includePrerelease: true });
+        return semver.satisfies(version, this.getCiceroVersion(), { includePrerelease: true });
     }
 
     /**
@@ -291,22 +301,13 @@ class Metadata {
     }
 
     /**
-     * Return new Metadata for a target language
-     * @param {string} language - the target language
+     * Return new Metadata for a target runtime
+     * @param {string} runtimeName - the target runtime name
      * @return {object} the new Metadata
      */
-    createTargetMetadata(language) {
-        //  Defaults to ERGO
-        if (language === undefined || language === null) { language = 'ergo'; }
-        //  Has to be either JAVASCRIPT or ERGO
-        if (language !== 'javascript' && language !== 'ergo') {
-            throw new Error(`language should be either 'ergo' or 'javascript' but is '${language}'`);
-        }
-        if (this.language === languageTypes.JAVASCRIPT && language === 'ergo') {
-            throw new Error('Cannot export JavaScript archive to Ergo');
-        }
+    createTargetMetadata(runtimeName) {
         const packageJson = JSON.parse(JSON.stringify(this.packageJson));
-        packageJson.cicero.language = language;
+        packageJson.accordproject.runtime = runtimeName;
         return new Metadata(packageJson, this.readme, this.samples, this.request);
     }
 

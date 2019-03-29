@@ -2,11 +2,11 @@
     "name": "<%= data.templateName %>",
     "version": "0.0.0",
     "description": "Name of the person to greet: \"Dan\".\nThank you!",
-    "cicero": {
-      "version": "^<%= data.engineVersion %>",
-      "language": "ergo",
-      "template": "contract"
-    },
+    "accordproject": {
+        "template": "contract",
+        "ergo": "0.7.3",
+        "cicero": "^<%= data.engineVersion %>"
+      },
     "devDependencies": {
         "cucumber": "^5.1.0",
         "chai": "4.2.0",

@@ -2,9 +2,9 @@
     "name": "formatted-dates",
     "version": "0.0.1",
     "description": "Test formatted dates",
-    "cicero": {
+    "accordproject": {
       "template": "clause",
-      "version": "^0.11.0",
-      "language" : "ergo"
+      "ergo": "0.7.3",
+      "cicero": "^0.12.0"
     }
   }

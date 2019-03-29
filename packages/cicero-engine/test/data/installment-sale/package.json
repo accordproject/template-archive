@@ -4,9 +4,9 @@
     "description": "This is a clause for a simple installment sale.",
     "author": "Accord Project",
     "license": "Apache-2.0",
-    "cicero": {
-        "template": "contract",
-        "language": "javascript",
-        "version": "^0.11.0"
-    }
+    "accordproject": {
+        "template": "clause",
+        "ergo": "0.7.3",
+        "cicero": "^0.12.0"
+      }
 }

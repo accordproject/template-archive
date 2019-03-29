@@ -204,21 +204,27 @@ class TemplateLoader {
         // create the template
         const template = new (Function.prototype.bind.call(Template, null, packageJsonObject, readmeContents, sampleTextFiles, requestContents));
 
-        // check the archive's language
-        if(template.getMetadata().getLanguage() === 1) {
-            throw new Error('Since Cicero v0.11.0 JavaScript logic is no longer supported. Migrate logic to Ergo or use an older version of Cicero.');
-        }
-
         // add model files
         Logger.debug(method, 'Adding model files to model manager');
         template.getModelManager().addModelFiles(ctoModelFiles, ctoModelFileNames, true); // validation is disabled
 
         // load and add the ergo files
-        Logger.debug(method, 'Adding Logic files to script manager');
-        const scriptFiles = await TemplateLoader.loadZipFilesContents(zip, /lib\/.*\.ergo$/);
-        scriptFiles.forEach(function (obj) {
-            template.getTemplateLogic().addLogicFile(obj.contents, obj.name);
-        });
+        if(template.getMetadata().getErgoVersion()) {
+            Logger.debug(method, 'Adding Ergo files to script manager');
+            const scriptFiles = await TemplateLoader.loadZipFilesContents(zip, /lib\/.*\.ergo$/);
+            scriptFiles.forEach(function (obj) {
+                template.getTemplateLogic().addLogicFile(obj.contents, obj.name);
+            });
+        }
+
+        // load and add compiled JS files - we assume all runtimes are JS based (review!)
+        if(template.getMetadata().getRuntime()) {
+            Logger.debug(method, 'Adding JS files to script manager');
+            const scriptFiles = await TemplateLoader.loadZipFilesContents(zip, /lib\/.*\.js$/);
+            scriptFiles.forEach(function (obj) {
+                template.getTemplateLogic().addLogicFile(obj.contents, obj.name);
+            });
+        }
 
         // check the integrity of the model and logic of the template
         template.validate();
@@ -300,13 +306,27 @@ class TemplateLoader {
         await template.getModelManager().updateExternalModels();
         Logger.debug(method, 'Added model files', modelFiles.length);
 
-        const ergoFiles = await TemplateLoader.loadFilesContents(path, /.*\.ergo$/);
-        ergoFiles.forEach((file) => {
-            const resolvedPath = fsPath.resolve(path);
-            const resolvedFilePath = fsPath.resolve(file.name);
-            const truncatedPath = resolvedFilePath.replace(resolvedPath+'/', '');
-            template.getTemplateLogic().addLogicFile(file.contents, truncatedPath);
-        });
+        // load and add the ergo files
+        if(template.getMetadata().getErgoVersion()) {
+            const ergoFiles = await TemplateLoader.loadFilesContents(path, /.*\.ergo$/);
+            ergoFiles.forEach((file) => {
+                const resolvedPath = fsPath.resolve(path);
+                const resolvedFilePath = fsPath.resolve(file.name);
+                const truncatedPath = resolvedFilePath.replace(resolvedPath+'/', '');
+                template.getTemplateLogic().addLogicFile(file.contents, truncatedPath);
+            });
+        }
+
+        // load and add compiled JS files - we assume all runtimes are JS based (review!)
+        if(template.getMetadata().getRuntime()) {
+            const jsFiles = await TemplateLoader.loadFilesContents(path, /.*\.js$/);
+            jsFiles.forEach((file) => {
+                const resolvedPath = fsPath.resolve(path);
+                const resolvedFilePath = fsPath.resolve(file.name);
+                const truncatedPath = resolvedFilePath.replace(resolvedPath+'/', '');
+                template.getTemplateLogic().addLogicFile(file.contents, truncatedPath);
+            });
+        }
 
         // check the template
         template.validate();
