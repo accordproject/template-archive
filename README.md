@@ -15,9 +15,9 @@ Cicero is an Open Source implementation of the [Accord Project Template Specific
 
 You can read the latest user documentation here: http://docs.accordproject.org.
 
-## Smart Clause™
+## Smart Clause
 
-Using Cicero you can take any existing natural language text (typically a clause or a contract) and declaratively bind it to a data model. Cicero generates a parser (using the Earley parser algorithm) to parse and validate source text, extracting machine readable/computable data. The Cicero engine can then be used to execute a Smart Clause™ (an instance of a template) against a JSON payload. Smart Clause™ software can be used to add computable functionality to any document. Clauses are typically stateless (idempotent) functions. They receive an incoming request and the template data, and they produce a response.
+Using Cicero you can take any existing natural language text (typically a clause or a contract) and declaratively bind it to a data model. Cicero generates a parser (using the Earley parser algorithm) to parse and validate source text, extracting machine readable/computable data. The Cicero engine can then be used to execute a Smart Clause (an instance of a template) against a JSON payload. Smart Clause software can be used to add computable functionality to any document. Clauses are typically stateless (idempotent) functions. They receive an incoming request and the template data, and they produce a response.
 
 ## Get Involved!
 
@@ -29,10 +29,13 @@ https://calendar.google.com/calendar/event?action=TEMPLATE&tmeid=MjZvYzIzZHVrYnI
 ## Structure of the Code Repository
 
 Top level repository (cicero), with sub packages. Each sub-package is published as an independent npm module using `lerna`:
-* cicero-core :  `Template` and `Clause` classes to manage the grammar, models and logic.
-* cicero-engine :  A Node.js VM based execution engine
-* cicero-cli : Command line utility for testing
-* generator-cicero-template: Utility to generate a new template
+* cicero-cli : Command line interface (for parsing, execution, creating archives) for Accord Project legal templates
+* cicero-core : Core classes to manage the grammar, models and logic of Accord Project legal templates
+* cicero-engine : A Node.js VM based execution engine for Accord Project legal templates
+* cicero-server: Exposes the Cicero Engine as a RESTful service
+* cicero-test : Cucumber based testing for Accord Project legal templates
+* cicero-tools : Tools for generating code (UML, Java, etc.) from Accord Project legal templates
+* generator-cicero-template: Utility to create a self-contained directory for a new Accord Project legal template
 
 ## License <a name="license"></a>
 Accord Project source code files are made available under the Apache License, Version 2.0 (Apache-2.0), located in the LICENSE file. Accord Project documentation files are made available under the Creative Commons Attribution 4.0 International License (CC-BY-4.0), available at http://creativecommons.org/licenses/by/4.0/.

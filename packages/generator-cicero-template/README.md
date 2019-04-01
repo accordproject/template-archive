@@ -1,5 +1,11 @@
 # Code generator for a Cicero Templates
 
+Utility to create a self-contained directory for a new Accord Project legal template
+
+## Documentation
+
+http://docs.accordproject.org
+
 ## Installation
 
 First, install [Yeoman](http://yeoman.io) and generator-cicero-template using [npm](https://www.npmjs.com/) (we assume you have pre-installed [node.js](https://nodejs.org/)).
@@ -22,14 +28,8 @@ yo cicero-template
  * Yeoman can be too opinionated at times but is easily convinced not to be.
  * Feel free to [learn more about Yeoman](http://yeoman.io/).
 
-## License
+## License <a name="license"></a>
+Accord Project source code files are made available under the Apache License, Version 2.0 (Apache-2.0), located in the LICENSE file. Accord Project documentation files are made available under the Creative Commons Attribution 4.0 International License (CC-BY-4.0), available at http://creativecommons.org/licenses/by/4.0/.
 
-Apache-2.0 © [Accord](https://github.com/accordproject/cicero)
+© 2017-2019 Clause, Inc.
 
-
-[npm-image]: https://badge.fury.io/js/generator-cicero-template.svg
-[npm-url]: https://npmjs.org/package/generator-cicero-template
-[travis-image]: https://travis-ci.org/accordproject/generator-cicero-template.svg?branch=master
-[travis-url]: https://travis-ci.org/accordproject/generator-cicero-template
-[daviddm-image]: https://david-dm.org/accordproject/generator-cicero-template.svg?theme=shields.io
-[daviddm-url]: https://david-dm.org/accordproject/generator-cicero-template
