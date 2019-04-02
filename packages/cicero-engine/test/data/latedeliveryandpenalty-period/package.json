@@ -4,7 +4,7 @@
     "description": "A Late Delivery And Penalty clause (simple).",
     "license": "Apache-2.0",
     "accordproject": {
-        "template": "clause",
+        "template": "contract",
         "ergo": "0.7.3",
         "cicero": "^0.11.1"
       }

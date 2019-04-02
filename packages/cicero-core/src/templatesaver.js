@@ -89,7 +89,7 @@ class TemplateSaver {
         zip.file('lib/', null, Object.assign({}, options, {
             dir: true
         }));
-        const scriptFiles = template.getScriptManager().getAllScripts();
+        const scriptFiles = template.getScriptManager().getScriptsForTarget(language);
         scriptFiles.forEach(function (file) {
             let fileIdentifier = file.getIdentifier();
             let fileName = fsPath.basename(fileIdentifier);
