@@ -274,7 +274,7 @@ describe('Metadata', () => {
                 name: 'template',
                 cicero: {template: 'contract',language:'ergo',version:'^0.11.0'}
             }, null, {});
-            md.targetVersion = '^0.12.0';
+            md.targetVersion = '^0.11.1';
             md.satisfiesTargetVersion(ciceroVersion).should.be.equal(false);
         });
         it('should not satisfy when target version has a higher minor number as cicero version (with prerelease tag)', () => {
@@ -282,7 +282,7 @@ describe('Metadata', () => {
                 name: 'template',
                 cicero: {template: 'contract',language:'ergo',version:'^0.11.0'}
             }, null, {});
-            md.targetVersion = '^0.12.0';
+            md.targetVersion = '^0.11.1';
             md.satisfiesTargetVersion('0.11.0-20190114233635').should.be.equal(false);
         });
     });
