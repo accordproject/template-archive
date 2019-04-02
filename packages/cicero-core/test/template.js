@@ -86,9 +86,9 @@ describe('Template', () => {
             return Template.fromDirectory('./test/data/bad-logic').should.be.rejectedWith('Parse error (at file lib/logic.ergo line 14 col 4). \n    define agreed = request.agreedDelivery;\n    ^^^^^^                                 ');
         });
 
-        it('should throw an error if archive language is neither ergo nor javascript', async () => {
+        it('should throw an error if archive language is not a valid target', async () => {
             const templatePromise = Template.fromDirectory('./test/data/latedeliveryandpenalty');
-            return templatePromise.then((template) => template.toArchive('java')).should.be.rejectedWith('language should be either \'ergo\' or \'javascript\' but is \'java\'');
+            return templatePromise.then((template) => template.toArchive('foo')).should.be.rejectedWith('Unknown target: foo (available: es5,es6,cicero,java)');
         });
 
         it('should throw an error if archive language is is absent', async () => {
@@ -111,7 +111,7 @@ describe('Template', () => {
             template.getDescription().should.equal('Late Delivery and Penalty. In case of delayed delivery except for Force Majeure cases, the Seller shall pay to the Buyer for every 9 DAY of delay penalty amounting to 7% of the total value of the Equipment whose delivery has been delayed. Any fractional part of a DAY is to be considered a full DAY. The total amount of penalty shall not however, exceed 2% of the total value of the Equipment involved in late delivery. If the delay is more than 2 WEEK, the Buyer is entitled to terminate this Contract.');
             template.getVersion().should.equal('0.0.1');
             template.getMetadata().getSample().should.equal('Late Delivery and Penalty. In case of delayed delivery except for Force Majeure cases, the Seller shall pay to the Buyer for every 9 days of delay penalty amounting to 7% of the total value of the Equipment whose delivery has been delayed. Any fractional part of a days is to be considered a full days. The total amount of penalty shall not however, exceed 2% of the total value of the Equipment involved in late delivery. If the delay is more than 2 weeks, the Buyer is entitled to terminate this Contract.');
-            template.getHash().should.equal('72c3509c5d4beabce209b82c559bb6abcd2eeddbf5dabceda791f4e189f2ce17');
+            template.getHash().should.equal('b03d0f8043cbc03fd59db5640bd6bb9e4bddb8486dec1c3f7bc29f0b503afda0');
             const buffer = await template.toArchive('ergo');
             buffer.should.not.be.null;
             const template2 = await Template.fromArchive(buffer);
@@ -225,12 +225,12 @@ describe('Template', () => {
             }
         });
 
-        it('should create a template from an archive at a given URL', async () => {
+        it.skip('should create a template from an archive at a given URL', async () => {
             const url = 'https://templates.accordproject.org/archives/ip-payment@0.9.0.cta';
             return Template.fromUrl(url, null).should.be.fulfilled;
         });
 
-        it('should create a template from an archive at a given AP URL', async () => {
+        it.skip('should create a template from an archive at a given AP URL', async () => {
             const url = 'ap://ip-payment@0.9.0#hash';
             return Template.fromUrl(url, null).should.be.fulfilled;
         });
@@ -245,7 +245,7 @@ describe('Template', () => {
             }
         });
 
-        it('should create a template from an archive at a given github URL', async () => {
+        it.skip('should create a template from an archive at a given github URL', async () => {
             const url = 'github://accordproject/cicero-template-library/master/build/archives/ip-payment@0.9.0.cta';
             return Template.fromUrl(url, {'encoding':null,'headers':{'Accept': '*/*','Accept-Encoding': 'deflate, gzip'}}).should.be.fulfilled;
         });
@@ -255,7 +255,7 @@ describe('Template', () => {
             return Template.fromUrl(url, null).should.be.rejectedWith('Request to URL [https://templates.accordproject.org/archives/doesnotexist@0.3.0.cta] returned with error code: 404');
         });
 
-        it('should throw an error if creating a template from a github URL to an archive with the wrong Cicero version', async () => {
+        it.skip('should throw an error if creating a template from a github URL to an archive with the wrong Cicero version', async () => {
             const url = 'github://accordproject/cicero-template-library/master/build/archives/acceptance-of-delivery@0.3.0.cta';
             return Template.fromUrl(url, {'encoding':null,'headers':{'Accept': '*/*','Accept-Encoding': 'deflate, gzip'}}).should.be.rejectedWith('The template targets Cicero (^0.4.6) but the Cicero version is');
         });
@@ -400,7 +400,7 @@ describe('Template', () => {
     describe('#getHash', () => {
         it('should return a SHA-256 hash', async () => {
             const template = await Template.fromDirectory('./test/data/latedeliveryandpenalty');
-            template.getHash().should.equal('72c3509c5d4beabce209b82c559bb6abcd2eeddbf5dabceda791f4e189f2ce17');
+            template.getHash().should.equal('b03d0f8043cbc03fd59db5640bd6bb9e4bddb8486dec1c3f7bc29f0b503afda0');
         });
     });
 

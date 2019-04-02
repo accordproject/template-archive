@@ -45,7 +45,7 @@ class Template {
      */
     constructor(packageJson, readme, samples, request) {
         this.metadata = new Metadata(packageJson, readme, samples, request);
-        this.templateLogic = new TemplateLogic(this.metadata.getRuntime());
+        this.templateLogic = new TemplateLogic('cicero');
         this.parserManager = new ParserManager(this);
     }
 
@@ -71,7 +71,6 @@ class Template {
         if(this.getMetadata().getTemplateType() !== 0) {
             modelType = 'org.accordproject.cicero.contract.AccordClause';
         }
-
         const templateModels = this.getIntrospector().getClassDeclarations().filter((item) => {
             return !item.isAbstract() && Template.instanceOf(item,modelType);
         });

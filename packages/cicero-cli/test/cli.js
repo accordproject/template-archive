@@ -442,7 +442,7 @@ describe('cicero-cli', () => {
         it('should generate a JavaScript archive', async () => {
             const tmpFile = await tmp.file();
             const tmpArchive = tmpFile.path + '.cta';
-            await Commands.archive('javascript', template, tmpArchive, false);
+            await Commands.archive('cicero', template, tmpArchive, false);
             fs.readFileSync(tmpArchive).length.should.be.above(0);
             tmpFile.cleanup();
         });
@@ -450,7 +450,7 @@ describe('cicero-cli', () => {
             const tmpFile = await tmp.file();
             const tmpArchive = tmpFile.path + '.cta';
             return Commands.archive('foo', template, tmpArchive, false)
-                .should.be.rejectedWith('language should be either \'ergo\' or \'javascript\' but is \'foo\'');
+                .should.be.rejectedWith('Unknown target: foo (available: es5,es6,cicero,java)');
         });
         it('no args specified', () => {
             process.chdir(path.resolve(__dirname, 'data/latedeliveryandpenalty/'));

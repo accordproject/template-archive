@@ -83,10 +83,10 @@ class Commands {
         argv.template = path.resolve(argv.template);
 
         const packageJsonExists = fs.existsSync(path.resolve(argv.template,'package.json'));
-        let isCiceroTemplate = false;
+        let isAPTemplate = false;
         if(packageJsonExists){
             let packageJsonContents = JSON.parse(fs.readFileSync(path.resolve(argv.template,'package.json')),'utf8');
-            isCiceroTemplate = packageJsonContents.cicero;
+            isAPTemplate = packageJsonContents.accordproject;
         }
 
         if(!argv.sample){
@@ -99,7 +99,7 @@ class Commands {
         }
 
         let sampleExists = fs.existsSync(argv.sample);
-        if(!packageJsonExists || !isCiceroTemplate){
+        if(!packageJsonExists || !isAPTemplate){
             throw new Error(`${argv.template} is not a valid cicero template. Make sure that package.json exists and that it has a cicero entry.`);
         } else if (!sampleExists){
             throw new Error('A sample text file is required. Try the --sample flag or create a sample.txt in the root folder of your template.');
@@ -206,10 +206,10 @@ class Commands {
         argv.template = path.resolve(argv.template);
 
         const packageJsonExists = fs.existsSync(path.resolve(argv.template,'package.json'));
-        let isCiceroTemplate = false;
+        let isAPTemplate = false;
         if(packageJsonExists){
             let packageJsonContents = JSON.parse(fs.readFileSync(path.resolve(argv.template,'package.json')),'utf8');
-            isCiceroTemplate = packageJsonContents.cicero;
+            isAPTemplate = packageJsonContents.accordproject;
         }
 
         if(!argv.sample){
@@ -241,7 +241,7 @@ class Commands {
                 requestExists = false;
             }
         }
-        if(!packageJsonExists || !isCiceroTemplate){
+        if(!packageJsonExists || !isAPTemplate){
             throw new Error(`${argv.template} is not a valid cicero template. Make sure that package.json exists and that it has a cicero entry.`);
         } else if (!sampleExists){
             throw new Error('A sample text file is required. Try the --sample flag or create a sample.txt in the root folder of your template.');
@@ -272,10 +272,10 @@ class Commands {
         argv.template = path.resolve(argv.template);
 
         const packageJsonExists = fs.existsSync(path.resolve(argv.template,'package.json'));
-        let isCiceroTemplate = false;
+        let isAPTemplate = false;
         if(packageJsonExists){
             let packageJsonContents = JSON.parse(fs.readFileSync(path.resolve(argv.template,'package.json')),'utf8');
-            isCiceroTemplate = packageJsonContents.cicero;
+            isAPTemplate = packageJsonContents.accordproject;
         }
 
         if(!argv.sample){
@@ -288,7 +288,7 @@ class Commands {
         }
 
         let sampleExists = fs.existsSync(argv.sample);
-        if(!packageJsonExists || !isCiceroTemplate){
+        if(!packageJsonExists || !isAPTemplate){
             throw new Error(`${argv.template} is not a valid cicero template. Make sure that package.json exists and that it has a cicero entry.`);
         } else if (!sampleExists){
             throw new Error('A sample text file is required. Try the --sample flag or create a sample.txt in the root folder of your template.');
@@ -364,10 +364,10 @@ class Commands {
         argv.template = path.resolve(argv.template);
 
         const packageJsonExists = fs.existsSync(path.resolve(argv.template,'package.json'));
-        let isCiceroTemplate = false;
+        let isAPTemplate = false;
         if(packageJsonExists){
             let packageJsonContents = JSON.parse(fs.readFileSync(path.resolve(argv.template,'package.json')),'utf8');
-            isCiceroTemplate = packageJsonContents.cicero;
+            isAPTemplate = packageJsonContents.accordproject;
         }
 
         if(!argv.language){
@@ -379,7 +379,7 @@ class Commands {
             Logger.info(`creating ${argv.language} archive for template ${argv.template}`);
         }
 
-        if(!packageJsonExists || !isCiceroTemplate){
+        if(!packageJsonExists || !isAPTemplate){
             throw new Error(`${argv.template} is not a valid cicero template. Make sure that package.json exists and that it has a cicero entry.`);
         } else {
             return argv;

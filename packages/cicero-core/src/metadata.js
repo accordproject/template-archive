@@ -15,6 +15,7 @@
 'use strict';
 
 const Logger = require('@accordproject/ergo-compiler').Logger;
+const ErgoCompiler = require('@accordproject/ergo-compiler').Compiler;
 const ciceroVersion = require('../package.json').version;
 const semver = require('semver');
 
@@ -52,9 +53,8 @@ class Metadata {
      * THe `default` key represents sample template text in a non-specified language, stored in a file called `sample.txt`.
      */
     constructor(packageJson, readme, samples, request) {
-
         // name of the runtime that this template targets (if the template contains compiled code)
-        this.runtimeName = null;
+        this.runtime = null;
 
         // the version of Cicero that this template is compatible with
         this.ciceroVersion = null;
@@ -80,16 +80,19 @@ class Metadata {
 
         this.ciceroVersion = packageJson.accordproject.cicero;
 
-        if (!this.satisfiesTargetVersion(ciceroVersion)){
+        if (!this.satisfiesCiceroVersion(ciceroVersion)){
             const msg = `The template targets Cicero (${this.ciceroVersion}) but the Cicero version is ${ciceroVersion}.`;
             Logger.error(msg);
             throw new Error(msg);
         }
 
         // the runtime property is optional, and is only present for templates that have been compiled
-        if (packageJson.accordproject.runtime) {
-            this.runtime = packageJson.accordproject.runtime;
+        if (packageJson.accordproject.runtime && packageJson.accordproject.runtime !== 'ergo') {
+            ErgoCompiler.isValidTarget(packageJson.accordproject.runtime);
+        } else {
+            packageJson.accordproject.runtime = 'ergo';
         }
+        this.runtime = packageJson.accordproject.runtime;
 
         // ergo property is optional, must be present for templates containing Ergo code
         if (packageJson.accordproject.ergo) {
@@ -203,7 +206,7 @@ class Metadata {
      * @param {string} version the cicero version to check against
      * @returns {string} the semantic version
      */
-    satisfiesTargetVersion(version){
+    satisfiesCiceroVersion(version){
         return semver.satisfies(version, this.getCiceroVersion(), { includePrerelease: true });
     }
 

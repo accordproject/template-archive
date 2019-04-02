@@ -118,7 +118,7 @@ describe('TemplateLibrary', () => {
 
     describe('#getTemplate', () => {
 
-        it('should retrieve a template', async function() {
+        it.skip('should retrieve a template', async function() {
             const templateLibrary = new TemplateLibrary();
             const template = await templateLibrary.getTemplate('ap://ip-payment@0.9.0#e1913e9f773ee3ed78f0aa3d0b2e30affe86936c3cb015c05d6bdd00481e3313');
             template.getIdentifier().should.equal('ip-payment@0.9.0');
