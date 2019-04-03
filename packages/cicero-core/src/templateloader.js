@@ -296,7 +296,7 @@ class TemplateLoader {
         const template = new (Function.prototype.bind.call(Template, null, packageJsonObject, readmeContents, sampleTextFiles, requestJsonObject));
         const modelFiles = [];
         const modelFileNames = [];
-        const ctoFiles = await TemplateLoader.loadFilesContents(path, /.*\.cto$/);
+        const ctoFiles = await TemplateLoader.loadFilesContents(path, /models\/.*\.cto$/);
         ctoFiles.forEach((file) => {
             modelFileNames.push(file.name);
             modelFiles.push(file.contents);
@@ -308,7 +308,7 @@ class TemplateLoader {
 
         // load and add the ergo files
         if(template.getMetadata().getErgoVersion()) {
-            const ergoFiles = await TemplateLoader.loadFilesContents(path, /.*\.ergo$/);
+            const ergoFiles = await TemplateLoader.loadFilesContents(path, /lib\/.*\.ergo$/);
             ergoFiles.forEach((file) => {
                 const resolvedPath = fsPath.resolve(path);
                 const resolvedFilePath = fsPath.resolve(file.name);
@@ -319,7 +319,7 @@ class TemplateLoader {
 
         // load and add compiled JS files - we assume all runtimes are JS based (review!)
         if(template.getMetadata().getRuntime()) {
-            const jsFiles = await TemplateLoader.loadFilesContents(path, /.*\.js$/);
+            const jsFiles = await TemplateLoader.loadFilesContents(path, /lib\/.*\.js$/);
             jsFiles.forEach((file) => {
                 const resolvedPath = fsPath.resolve(path);
                 const resolvedFilePath = fsPath.resolve(file.name);
