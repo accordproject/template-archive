@@ -108,7 +108,6 @@ class Commands {
             argv[argName] = argDefaultFun(argv, argDefaultName);
         }
 
-        console.log(`argv[argName] : ${fs.existsSync(argv[argName][0])}`);
         let argExists = true;
         if (Array.isArray(argv[argName])) {
             // All files should exist
