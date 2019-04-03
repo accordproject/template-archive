@@ -35,11 +35,106 @@ const TypescriptVisitor = CodeGen.TypescriptVisitor;
  * @memberof module:cicero-cli
  */
 class Commands {
+    /**
+     * Whether the template path is to a file (template archive)
+     * @param {string} templatePath to the template path directory or file
+     * @return {boolean} true if the path is to a file, false otherwise
+     */
+    static isTemplateArchive(templatePath) {
+        return fs.lstatSync(templatePath).isFile();
+    }
+
+    /**
+     * Return a promise to a template from either a directory or an archive file
+     * @param {string} templatePath to the template path directory or file
+     * @return {Promise<Template>} a Promise to the instantiated template
+     */
+    static loadTemplate(templatePath) {
+        if (Commands.isTemplateArchive(templatePath)) {
+            const buffer = fs.readFileSync(templatePath);
+            return Template.fromArchive(buffer);
+        } else {
+            return Template.fromDirectory(templatePath);
+        }
+    }
+
+    /**
+     * Common default params before we create an archive using a template
+     *
+     * @param {object} argv the inbound argument values object
+     * @returns {object} a modfied argument object
+     */
+    static validateCommonArgs(argv) {
+        // the user typed 'cicero [command] [template]'
+        if(argv._.length === 2){
+            argv.template = argv._[1];
+        }
+
+        if(!argv.template){
+            Logger.info('Using current directory as template folder');
+            argv.template = '.';
+        }
+
+        argv.template = path.resolve(argv.template);
+
+        if (!Commands.isTemplateArchive(argv.template)) {
+            const packageJsonExists = fs.existsSync(path.resolve(argv.template,'package.json'));
+            let isAPTemplate = false;
+            if(packageJsonExists){
+                let packageJsonContents = JSON.parse(fs.readFileSync(path.resolve(argv.template,'package.json')),'utf8');
+                isAPTemplate = packageJsonContents.accordproject;
+            }
+
+            if(!packageJsonExists || !isAPTemplate){
+                throw new Error(`${argv.template} is not a valid cicero template. Make sure that package.json exists and that it has a cicero entry.`);
+            }
+        }
+
+        return argv;
+    }
+
+    /**
+     * Set a default for a file argument
+     *
+     * @param {object} argv the inbound argument values object
+     * @param {string} argName the argument name
+     * @param {string} argDefaultName the argument default name
+     * @param {Function} argDefaultFun how to compute the argument default
+     * @returns {object} a modified argument object
+     */
+    static setDefaultFileArg(argv, argName, argDefaultName, argDefaultFun) {
+        if(!argv[argName]){
+            Logger.info(`Loading a default ${argDefaultName} file.`);
+            argv[argName] = argDefaultFun(argv, argDefaultName);
+        }
+
+        console.log(`argv[argName] : ${fs.existsSync(argv[argName][0])}`);
+        let argExists = true;
+        if (Array.isArray(argv[argName])) {
+            // All files should exist
+            for (let i = 0; i < argv[argName].length; i++) {
+                if (fs.existsSync(argv[argName][i]) && argExists) {
+                    argExists = true;
+                } else {
+                    argExists = false;
+                }
+            }
+        } else {
+            // This file should exist
+            argExists = fs.existsSync(argv[argName]);
+        }
+
+        if (!argExists){
+            throw new Error(`A ${argDefaultName} file is required. Try the --${argName} flag or create a ${argDefaultName} in the root folder of your template.`);
+        } else {
+            return argv;
+        }
+    }
 
     /**
      * Parse a sample text using a template
      *
-     * @param {string} templatePath to the template directory
+     * @param {string} templatePath to the template path directory or file
      * @param {string} samplePath to the sample file
      * @param {string} outPath to the contract file
      * @returns {object} Promise to the result of parsing
@@ -48,7 +143,7 @@ class Commands {
         let clause;
         const sampleText = fs.readFileSync(samplePath, 'utf8');
 
-        return Template.fromDirectory(templatePath)
+        return Commands.loadTemplate(templatePath)
             .then((template) => {
                 clause = new Clause(template);
                 clause.parse(sampleText);
@@ -70,48 +165,20 @@ class Commands {
      * @returns {object} a modfied argument object
      */
     static validateParseArgs(argv) {
-        // the user typed 'cicero parse dir'
-        if(argv._.length === 2){
-            argv.template = argv._[1];
-        }
-
-        if(!argv.template){
-            Logger.info('Using current directory as template folder');
-            argv.template = '.';
-        }
-
-        argv.template = path.resolve(argv.template);
-
-        const packageJsonExists = fs.existsSync(path.resolve(argv.template,'package.json'));
-        let isAPTemplate = false;
-        if(packageJsonExists){
-            let packageJsonContents = JSON.parse(fs.readFileSync(path.resolve(argv.template,'package.json')),'utf8');
-            isAPTemplate = packageJsonContents.accordproject;
-        }
-
-        if(!argv.sample){
-            Logger.info('Loading a default sample.txt file.');
-            argv.sample = path.resolve(argv.template,'sample.txt');
-        }
+        argv = Commands.validateCommonArgs(argv);
+        argv = Commands.setDefaultFileArg(argv, 'sample', 'sample.txt', ((argv, argDefaultName) => { return path.resolve(argv.template,argDefaultName); }));
 
         if(argv.verbose) {
             Logger.info(`parse sample ${argv.sample} using a template ${argv.template}`);
         }
 
-        let sampleExists = fs.existsSync(argv.sample);
-        if(!packageJsonExists || !isAPTemplate){
-            throw new Error(`${argv.template} is not a valid cicero template. Make sure that package.json exists and that it has a cicero entry.`);
-        } else if (!sampleExists){
-            throw new Error('A sample text file is required. Try the --sample flag or create a sample.txt in the root folder of your template.');
-        } else {
-            return argv;
-        }
+        return argv;
     }
 
     /**
      * Initializes a sample text using a template
      *
-     * @param {string} templatePath to the template directory
+     * @param {string} templatePath to the template path directory or file
      * @param {string} samplePath to the sample file
      * @param {string} currentTime - the definition of 'now'
      * @returns {object} Promise to the result of execution
@@ -121,7 +188,7 @@ class Commands {
         const sampleText = fs.readFileSync(samplePath, 'utf8');
 
         const engine = new Engine();
-        return Template.fromDirectory(templatePath)
+        return Commands.loadTemplate(templatePath)
             .then((template) => {
                 // Initialize clause
                 clause = new Clause(template);
@@ -138,7 +205,7 @@ class Commands {
     /**
      * Execute a sample text using a template
      *
-     * @param {string} templatePath to the template directory
+     * @param {string} templatePath to the template path directory or file
      * @param {string} samplePath to the sample file
      * @param {string[]} requestsPath to the array of request files
      * @param {string} statePath to the state file
@@ -155,7 +222,7 @@ class Commands {
         }
 
         const engine = new Engine();
-        return Template.fromDirectory(templatePath)
+        return Commands.loadTemplate(templatePath)
             .then(async (template) => {
                 // Initialize clause
                 clause = new Clause(template);
@@ -193,63 +260,16 @@ class Commands {
      * @returns {object} a modfied argument object
      */
     static validateExecuteArgs(argv) {
-        // the user typed 'cicero execute dir'
-        if(argv._.length === 2){
-            argv.template = argv._[1];
-        }
-
-        if(!argv.template){
-            Logger.info('Using current directory as template folder');
-            argv.template = '.';
-        }
-
-        argv.template = path.resolve(argv.template);
-
-        const packageJsonExists = fs.existsSync(path.resolve(argv.template,'package.json'));
-        let isAPTemplate = false;
-        if(packageJsonExists){
-            let packageJsonContents = JSON.parse(fs.readFileSync(path.resolve(argv.template,'package.json')),'utf8');
-            isAPTemplate = packageJsonContents.accordproject;
-        }
-
-        if(!argv.sample){
-            Logger.info('Loading a default sample.txt file.');
-            argv.sample = path.resolve(argv.template,'sample.txt');
-        }
-
-        if(!argv.request){
-            Logger.info('Loading a single default request.json file.');
-            argv.request = [path.resolve(argv.template,'request.json')];
-        }
-
-        if(!argv.state){
-            Logger.info('Loading a default state.json file.');
-            argv.state = path.resolve(argv.template,'state.json');
-        }
+        argv = Commands.validateCommonArgs(argv);
+        argv = Commands.setDefaultFileArg(argv, 'sample', 'sample.txt', ((argv, argDefaultName) => { return path.resolve(argv.template,argDefaultName); }));
+        argv = Commands.setDefaultFileArg(argv, 'request', 'request.json', ((argv, argDefaultName) => { return [path.resolve(argv.template,argDefaultName)]; }));
+        argv = Commands.setDefaultFileArg(argv, 'state', 'state.json', ((argv, argDefaultName) => { return path.resolve(argv.template,argDefaultName); }));
 
         if(argv.verbose) {
             Logger.info(`execute sample ${argv.sample} using a template ${argv.template} with request ${argv.request} with state ${argv.state}`);
         }
 
-        let sampleExists = fs.existsSync(argv.sample);
-        // All requests should exist
-        let requestExists = true;
-        for (let i = 0; i < argv.request.length; i++) {
-            if (fs.existsSync(argv.request[i]) && requestExists) {
-                requestExists = true;
-            } else {
-                requestExists = false;
-            }
-        }
-        if(!packageJsonExists || !isAPTemplate){
-            throw new Error(`${argv.template} is not a valid cicero template. Make sure that package.json exists and that it has a cicero entry.`);
-        } else if (!sampleExists){
-            throw new Error('A sample text file is required. Try the --sample flag or create a sample.txt in the root folder of your template.');
-        } else if(!requestExists){
-            throw new Error('A request file is required. Try the --request flag or create a request.json in the root folder of your template.');
-        } else {
-            return argv;
-        }
+        return argv;
     }
 
     /**
@@ -259,55 +279,27 @@ class Commands {
      * @returns {object} a modfied argument object
      */
     static validateInitArgs(argv) {
-        // the user typed 'cicero execute dir'
-        if(argv._.length === 2){
-            argv.template = argv._[1];
-        }
-
-        if(!argv.template){
-            Logger.info('Using current directory as template folder');
-            argv.template = '.';
-        }
-
-        argv.template = path.resolve(argv.template);
-
-        const packageJsonExists = fs.existsSync(path.resolve(argv.template,'package.json'));
-        let isAPTemplate = false;
-        if(packageJsonExists){
-            let packageJsonContents = JSON.parse(fs.readFileSync(path.resolve(argv.template,'package.json')),'utf8');
-            isAPTemplate = packageJsonContents.accordproject;
-        }
-
-        if(!argv.sample){
-            Logger.info('Loading a default sample.txt file.');
-            argv.sample = path.resolve(argv.template,'sample.txt');
-        }
+        argv = Commands.validateCommonArgs(argv);
+        argv = Commands.setDefaultFileArg(argv, 'sample', 'sample.txt', ((argv, argDefaultName) => { return path.resolve(argv.template,argDefaultName); }));
 
         if(argv.verbose) {
             Logger.info(`initialize sample ${argv.sample} using a template ${argv.template}`);
         }
 
-        let sampleExists = fs.existsSync(argv.sample);
-        if(!packageJsonExists || !isAPTemplate){
-            throw new Error(`${argv.template} is not a valid cicero template. Make sure that package.json exists and that it has a cicero entry.`);
-        } else if (!sampleExists){
-            throw new Error('A sample text file is required. Try the --sample flag or create a sample.txt in the root folder of your template.');
-        } else {
-            return argv;
-        }
+        return argv;
     }
 
     /**
      * Converts the model for a template into code
      *
      * @param {string} format the format to generate
-     * @param {string} templatePath to the template directory
+     * @param {string} templatePath to the template path directory or file
      * @param {string} outputDirectory the output directory
      * @returns {object} Promise to the result of code generation
      */
     static generate(format, templatePath, outputDirectory) {
 
-        return Template.fromDirectory(templatePath)
+        return Commands.loadTemplate(templatePath)
             .then((template) => {
 
                 let visitor = null;
@@ -351,53 +343,28 @@ class Commands {
      * @returns {object} a modfied argument object
      */
     static validateArchiveArgs(argv) {
-        // the user typed 'cicero archive dir'
-        if(argv._.length === 2){
-            argv.template = argv._[1];
+        argv = Commands.validateCommonArgs(argv);
+
+        if(!argv.target){
+            Logger.info('Using ergo as the default target for the archive.');
+            argv.target = 'ergo';
         }
 
-        if(!argv.template){
-            Logger.info('Using current directory as template folder');
-            argv.template = '.';
-        }
-
-        argv.template = path.resolve(argv.template);
-
-        const packageJsonExists = fs.existsSync(path.resolve(argv.template,'package.json'));
-        let isAPTemplate = false;
-        if(packageJsonExists){
-            let packageJsonContents = JSON.parse(fs.readFileSync(path.resolve(argv.template,'package.json')),'utf8');
-            isAPTemplate = packageJsonContents.accordproject;
-        }
-
-        if(!argv.language){
-            Logger.info('Using ergo as default language archive.');
-            argv.language = 'ergo';
-        }
-
-        if(argv.verbose) {
-            Logger.info(`creating ${argv.language} archive for template ${argv.template}`);
-        }
-
-        if(!packageJsonExists || !isAPTemplate){
-            throw new Error(`${argv.template} is not a valid cicero template. Make sure that package.json exists and that it has a cicero entry.`);
-        } else {
-            return argv;
-        }
+        return argv;
     }
 
     /**
      * Create an archive using a template
      *
-     * @param {string} language - target language for the archive (should be either 'ergo' or 'javascript')
-     * @param {string} templatePath to the template directory
+     * @param {string} target - target language for the archive (should be either 'ergo' or 'cicero')
+     * @param {string} templatePath to the template path directory or file
      * @param {string} archiveFile to the archive file
      * @returns {object} Promise to the code creating an archive
      */
-    static archive(language, templatePath, archiveFile) {
-        return Template.fromDirectory(templatePath)
+    static archive(target, templatePath, archiveFile) {
+        return Commands.loadTemplate(templatePath)
             .then((template) => {
-                return template.toArchive(language);
+                return template.toArchive(target);
             })
             .then((archive) => {
                 Logger.info('Creating archive: ' + archiveFile);

@@ -39,21 +39,20 @@ require('yargs')
 
         try {
             argv = Commands.validateParseArgs(argv);
+            return Commands.parse(argv.template, argv.sample, argv.out)
+                .then((result) => {
+                    Logger.info(JSON.stringify(result));
+                })
+                .catch((err) => {
+                    Logger.error(err.message);
+                });
         } catch (err){
             Logger.error(err.message);
             return;
         }
-
-        return Commands.parse(argv.template, argv.sample, argv.out)
-            .then((result) => {
-                Logger.info(JSON.stringify(result));
-            })
-            .catch((err) => {
-                Logger.error(err.message);
-            });
     })
     .command('archive', 'archive a template directory', (yargs) => {
-        yargs.option('language', {
+        yargs.option('target', {
             describe: 'the target language of the archive',
             type: 'string',
             default: 'ergo'
@@ -78,15 +77,14 @@ require('yargs')
 
         try {
             argv = Commands.validateArchiveArgs(argv);
+            return Commands.archive(argv.target, argv.template, argv.archiveFile, argv.omitLogic)
+                .catch((err) => {
+                    Logger.error(err.message);
+                });
         } catch (err){
             Logger.error(err.message);
             return;
         }
-
-        return Commands.archive(argv.language, argv.template, argv.archiveFile, argv.omitLogic)
-            .catch((err) => {
-                Logger.error(err.message);
-            });
     })
     .command('execute', 'execute a clause with JSON request', (yargs) => {
         yargs.option('template', {
@@ -114,17 +112,16 @@ require('yargs')
 
         try {
             argv = Commands.validateExecuteArgs(argv);
+            return Commands.execute(argv.template, argv.sample, argv.request, argv.state, argv.currentTime)
+                .then((result) => {
+                    Logger.info(JSON.stringify(result));
+                })
+                .catch((err) => {
+                    Logger.error(err.message);
+                });
         } catch (err){
             Logger.error(err.message);
         }
-
-        return Commands.execute(argv.template, argv.sample, argv.request, argv.state, argv.currentTime)
-            .then((result) => {
-                Logger.info(JSON.stringify(result));
-            })
-            .catch((err) => {
-                Logger.error(err.message);
-            });
     })
     .command('init', 'initialize a clause', (yargs) => {
         yargs.option('template', {
@@ -144,17 +141,16 @@ require('yargs')
 
         try {
             argv = Commands.validateInitArgs(argv);
+            return Commands.init(argv.template, argv.sample, argv.currentTime)
+                .then((result) => {
+                    Logger.info(JSON.stringify(result));
+                })
+                .catch((err) => {
+                    Logger.error(err.message);
+                });
         } catch (err){
             Logger.error(err.message);
         }
-
-        return Commands.init(argv.template, argv.sample, argv.currentTime)
-            .then((result) => {
-                Logger.info(JSON.stringify(result));
-            })
-            .catch((err) => {
-                Logger.error(err.message);
-            });
     })
     .command('generate', 'generate code from the template model', (yargs) => {
         yargs.option('template', {
@@ -179,18 +175,17 @@ require('yargs')
 
         try {
             argv = Commands.validateExecuteArgs(argv);
+            return Commands.generate(argv.format, argv.template, argv.outputDirectory)
+                .then((result) => {
+                    Logger.info('Completed.');
+                })
+                .catch((err) => {
+                    Logger.error(err.message + ' ' + JSON.stringify(err));
+                });
         } catch (err){
             Logger.error(err.message);
             return;
         }
-
-        return Commands.generate(argv.format, argv.template, argv.outputDirectory)
-            .then((result) => {
-                Logger.info('Completed.');
-            })
-            .catch((err) => {
-                Logger.error(err.message + ' ' + JSON.stringify(err));
-            });
     })
     .option('verbose', {
         alias: 'v',
