@@ -22,8 +22,8 @@ const languageTagRegex = require('ietf-language-tag-regex');
 const DefaultArchiveLoader = require('./loaders/defaultarchiveloader');
 const Logger = require('@accordproject/ergo-compiler').Logger;
 const promisify = require('util').promisify;
-const readdir = promisify(fs.readdir);
-const stat = promisify(fs.stat);
+const readdir = fs.readdir ? promisify(fs.readdir) : undefined;
+const stat = fs.stat ? promisify(fs.stat) : undefined;
 
 const ENCODING = 'utf8';
 // Matches 'sample.txt' or 'sample_TAG.txt' where TAG is an IETF language tag (BCP 47)
