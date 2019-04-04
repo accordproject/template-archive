@@ -25,43 +25,48 @@ chai.should();
 chai.use(require('chai-things'));
 chai.use(require('chai-as-promised'));
 
+const getTestTemplates = p => fs.readdirSync(p).filter(f => {return f.startsWith('formatted-dates-') && fs.statSync(path.join(p, f)).isDirectory();});
+const testTemplates = getTestTemplates(path.resolve(__dirname, 'data/'));
+
 describe('FormattedDates', () => {
 
-    const formattedDatesInput = fs.readFileSync(path.resolve(__dirname, 'data/formatted-dates', 'sample.txt'), 'utf8');
+    testTemplates.forEach(testTemplate => {
+        describe('#constructor', () => {
 
-    describe('#constructor', () => {
-
-        it('should create a template that uses formatted dates', async function() {
-            const template = await Template.fromDirectory('./test/data/formatted-dates');
-            const clause = new Clause(template);
-            clause.should.not.be.null;
+            it('should create a template that uses formatted dates', async function() {
+                const location = path.resolve(__dirname, `data/${testTemplate}`);
+                const template = await Template.fromDirectory(location);
+                const clause = new Clause(template);
+                clause.should.not.be.null;
+            });
         });
-    });
 
-    describe('#parse', () => {
+        describe('#parse', () => {
 
-        it('should be able to set the data from formatted-dates natural language text', async function() {
-            const template = await Template.fromDirectory('./test/data/formatted-dates');
-            const clause = new Clause(template);
-            clause.parse(formattedDatesInput);
-            const result = clause.getData();
-            delete result.clauseId;
-            const data = {
-                $class: 'org.accordproject.test.TemplateModel',
-                dateTimeProperty: '2018-01-01T05:15:20.123+01:02',
-            };
-            result.should.eql(data);
+            it('should be able to set the data from formatted-dates natural language text', async function() {
+                const location = path.resolve(__dirname, `data/${testTemplate}`);
+                const template = await Template.fromDirectory(location);
+                const clause = new Clause(template);
+                const formattedDatesInput = fs.readFileSync(path.resolve(__dirname, 'data/', testTemplate + '/sample.txt'), 'utf8');
+                clause.parse(formattedDatesInput);
+                const result = clause.getData();
+                delete result.clauseId;
+                const expected = JSON.parse(fs.readFileSync(path.resolve(__dirname, 'data/', testTemplate + '/expected.json'), 'utf8'));
+                result.should.eql(expected);
+            });
         });
-    });
 
-    describe('#generateText', () => {
+        describe('#generateText', () => {
 
-        it('should be able to roundtrip formatted-dates natural language text', async function() {
-            const template = await Template.fromDirectory('./test/data/formatted-dates');
-            const clause = new Clause(template);
-            clause.parse(formattedDatesInput);
-            const nl = clause.generateText();
-            nl.should.equal(formattedDatesInput);
+            it('should be able to roundtrip formatted-dates natural language text', async function() {
+                const location = path.resolve(__dirname, `data/${testTemplate}`);
+                const template = await Template.fromDirectory(location);
+                const clause = new Clause(template);
+                const formattedDatesInput = fs.readFileSync(path.resolve(__dirname, 'data/', testTemplate + '/sample.txt'), 'utf8');
+                clause.parse(formattedDatesInput);
+                const nl = clause.generateText();
+                nl.should.equal(formattedDatesInput);
+            });
         });
     });
 });

@@ -41,11 +41,11 @@ DD -> [0-3] [0-9] {% (d, location, reject) =>
 
 # month ordinal (1 to 12)
 M -> [1-12]
-{% (d) => {return parseInt(d[0])}%}
+{% (d) => {return parseInt(d[0])-1}%}
 
 # month ordinal, with leading zero (01 to 12)
-MM -> [0] [1-9] {% (d) => {return toNumber(d)}%} |
-      [1] [0-2] {% (d) => {return toNumber(d)}%}
+MM -> [0] [1-9] {% (d) => {return toNumber(d)-1}%} |
+      [1] [0-2] {% (d) => {return toNumber(d)-1}%}
 	   
 # 24 hour (0 to 23)
 H -> [0-9]

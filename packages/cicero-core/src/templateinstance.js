@@ -136,9 +136,24 @@ class TemplateInstance {
      */
     static convertDateTimes(obj) {
         if(obj.$class === 'ParsedDateTime') {
-            const instance = moment([obj.years, obj.months, obj.days, obj.hours, obj.minutes, obj.seconds, obj.milliseconds])
-                .utcOffset(obj.timezone, true);
+
+            let instance = null;
+
+            if(obj.timezone) {
+                instance = moment([obj.years, obj.months, obj.days, obj.hours, obj.minutes, obj.seconds, obj.milliseconds])
+                    .utcOffset(obj.timezone, true);
+            }
+            else {
+                instance = moment(obj);
+            }
+
+            if(!instance) {
+                throw new Error(`Failed to handle datetime ${JSON.stringify(obj, null, 4)}`);
+            }
             const result = instance.format('YYYY-MM-DDTHH:mm:ss.SSSZ');
+            if(result === 'Invalid date') {
+                throw new Error(`Failed to handle datetime ${JSON.stringify(obj, null, 4)}`);
+            }
             return result;
         }
         else if( typeof obj === 'object' && obj !== null) {

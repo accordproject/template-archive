@@ -1,0 +1,10 @@
+{
+    "name": "formatted-dates",
+    "version": "0.0.1",
+    "description": "Test formatted dates",
+    "accordproject": {
+      "template": "clause",
+      "ergo": "0.7.3",
+      "cicero": "^0.11.1"
+    }
+  }
