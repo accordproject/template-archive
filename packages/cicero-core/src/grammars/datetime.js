@@ -18,13 +18,27 @@ const DATE_TIME_GRAMMAR =
 `
 @{%
 function toNumber(d) {
-	return parseInt('' + d[0] + d[1]);
+	if(d[1]) {
+		return parseInt('' + d[0] + d[1]);
+	}
+	else {
+		return parseInt('' + d[0]);
+	}
 }
 %}
 
-# day ordinal (1 to 31)
-D -> [1-31]
-{% (d) => {return parseInt(d[0])}%}
+# day ordinal, without leading zero (1 to 31)
+D -> [1-3] [0-9] {% (d, location, reject) => 
+   {
+	   const result = toNumber(d); 
+	   if (result > 31) {
+		   return reject;
+	   }
+	   else {
+		   return result;
+	   }
+   } %} | 
+      [1-9] {% (d) => {return toNumber(d)}%}
 
 # day ordinal, with leading zero (00 to 31), disallow 00
 DD -> [0-3] [0-9] {% (d, location, reject) => 
@@ -40,8 +54,17 @@ DD -> [0-3] [0-9] {% (d, location, reject) =>
       [3] [0-1] {% (d) => {return toNumber(d)}%}
 
 # month ordinal (1 to 12)
-M -> [1-12]
-{% (d) => {return parseInt(d[0])-1}%}
+M -> [1-9] | [1-9] [0-2] {% (d, location, reject) => 
+	{
+		const result = toNumber(d); 
+		if (result > 12) {
+			return reject;
+		}
+		else {
+			return result-1;
+		}
+	}
+%}
 
 # month ordinal, with leading zero (01 to 12)
 MM -> [0] [1-9] {% (d) => {return toNumber(d)-1}%} |

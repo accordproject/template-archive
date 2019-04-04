@@ -28,10 +28,10 @@ chai.use(require('chai-as-promised'));
 const getTestTemplates = p => fs.readdirSync(p).filter(f => {return f.startsWith('formatted-dates-') && fs.statSync(path.join(p, f)).isDirectory();});
 const testTemplates = getTestTemplates(path.resolve(__dirname, 'data/'));
 
-describe('FormattedDates', () => {
+describe.only('FormattedDates', () => {
 
     testTemplates.forEach(testTemplate => {
-        describe('#constructor', () => {
+        describe(`#constructor - ${testTemplate}`, () => {
 
             it('should create a template that uses formatted dates', async function() {
                 const location = path.resolve(__dirname, `data/${testTemplate}`);
@@ -41,7 +41,7 @@ describe('FormattedDates', () => {
             });
         });
 
-        describe('#parse', () => {
+        describe(`#parse - ${testTemplate}`, () => {
 
             it('should be able to set the data from formatted-dates natural language text', async function() {
                 const location = path.resolve(__dirname, `data/${testTemplate}`);
@@ -56,7 +56,7 @@ describe('FormattedDates', () => {
             });
         });
 
-        describe('#generateText', () => {
+        describe(`#generateText - ${testTemplate}`, () => {
 
             it('should be able to roundtrip formatted-dates natural language text', async function() {
                 const location = path.resolve(__dirname, `data/${testTemplate}`);
