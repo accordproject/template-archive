@@ -67,6 +67,12 @@ class Metadata {
         }
 
         if(!packageJson.accordproject) {
+            // Catches the previous format for the package.json with `cicero`
+            if (packageJson.cicero && packageJson.cicero.version) {
+                const msg = `The template targets Cicero (${packageJson.cicero.version}) but the Cicero version is ${ciceroVersion}.`;
+                Logger.error(msg);
+                throw new Error(msg);
+            }
             throw new Error('Failed to find accordproject metadata in package.json');
         }
 
