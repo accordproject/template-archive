@@ -32,6 +32,11 @@ require('yargs')
             describe: 'path to the output file',
             type: 'string'
         });
+        yargs.option('currentTime', {
+            describe: 'execute with this current time',
+            type: 'string',
+            default: null
+        });
     }, (argv) => {
         if (argv.verbose) {
             Logger.info(`parse sample ${argv.sample} using a template ${argv.template}`);
@@ -39,7 +44,7 @@ require('yargs')
 
         try {
             argv = Commands.validateParseArgs(argv);
-            return Commands.parse(argv.template, argv.sample, argv.out)
+            return Commands.parse(argv.template, argv.sample, argv.out, argv.currentTime)
                 .then((result) => {
                     Logger.info(JSON.stringify(result));
                 })

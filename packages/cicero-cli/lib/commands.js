@@ -136,16 +136,17 @@ class Commands {
      * @param {string} templatePath to the template path directory or file
      * @param {string} samplePath to the sample file
      * @param {string} outPath to the contract file
+     * @param {string} currentTime - the definition of 'now'
      * @returns {object} Promise to the result of parsing
      */
-    static parse(templatePath, samplePath, outPath) {
+    static parse(templatePath, samplePath, outPath, currentTime) {
         let clause;
         const sampleText = fs.readFileSync(samplePath, 'utf8');
 
         return Commands.loadTemplate(templatePath)
             .then((template) => {
                 clause = new Clause(template);
-                clause.parse(sampleText);
+                clause.parse(sampleText, currentTime);
                 if (outPath) {
                     Logger.info('Creating file: ' + outPath);
                     fs.writeFileSync(outPath, JSON.stringify(clause.getData()));
@@ -191,7 +192,7 @@ class Commands {
             .then((template) => {
                 // Initialize clause
                 clause = new Clause(template);
-                clause.parse(sampleText);
+                clause.parse(sampleText, currentTime);
 
                 return engine.init(clause, currentTime);
             })
@@ -225,7 +226,7 @@ class Commands {
             .then(async (template) => {
                 // Initialize clause
                 clause = new Clause(template);
-                clause.parse(sampleText);
+                clause.parse(sampleText, currentTime);
 
                 let stateJson;
                 if(!fs.existsSync(statePath)) {

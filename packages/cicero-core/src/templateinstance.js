@@ -16,7 +16,11 @@
 
 const Logger = require('@accordproject/ergo-compiler').Logger;
 const crypto = require('crypto');
+const Util = require('@accordproject/ergo-compiler').Util;
 const moment = require('moment-mini');
+// Make sure Moment serialization preserves utcOffset. See https://momentjs.com/docs/#/displaying/as-json/
+moment.fn.toJSON = Util.momentToJson;
+
 const RelationshipDeclaration = require('composer-concerto').RelationshipDeclaration;
 
 /**
@@ -92,8 +96,13 @@ class TemplateInstance {
     /**
      * Set the data for the clause by parsing natural language text.
      * @param {string} text  - the data for the clause
+     * @param {string} currentTime - the definition of 'now' (optional)
      */
-    parse(text) {
+    parse(text, currentTime) {
+        // Set the current time and UTC Offset
+        const now = Util.setCurrentTime(currentTime);
+        const utcOffset = now.utcOffset();
+
         let parser = this.getTemplate().getParserManager().getParser();
         parser.feed(text);
         if (parser.results.length !== 1) {
@@ -112,7 +121,7 @@ class TemplateInstance {
             throw new Error('Parsing clause text returned a null AST. This may mean the text is valid, but not complete.');
         }
 
-        ast = TemplateInstance.convertDateTimes(ast);
+        ast = TemplateInstance.convertDateTimes(ast, utcOffset);
         this.setData(ast);
     }
 
@@ -132,9 +141,10 @@ class TemplateInstance {
      * Recursive function that converts all instances of ParsedDateTime
      * to a Moment.
      * @param {*} obj the input object
+     * @param {number} utcOffset - the default utcOffset
      * @returns {*} the converted object
      */
-    static convertDateTimes(obj) {
+    static convertDateTimes(obj, utcOffset) {
         if(obj.$class === 'ParsedDateTime') {
 
             let instance = null;
@@ -144,7 +154,8 @@ class TemplateInstance {
                     .utcOffset(obj.timezone, true);
             }
             else {
-                instance = moment(obj);
+                instance = moment(obj)
+                    .utcOffset(utcOffset, true);
             }
 
             if(!instance) {
@@ -158,7 +169,7 @@ class TemplateInstance {
         }
         else if( typeof obj === 'object' && obj !== null) {
             Object.entries(obj).forEach(
-                ([key, value]) => {obj[key] = TemplateInstance.convertDateTimes(value);}
+                ([key, value]) => {obj[key] = TemplateInstance.convertDateTimes(value, utcOffset);}
             );
         }
 

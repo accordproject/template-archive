@@ -128,6 +128,36 @@ describe('Template', () => {
             buffer2.should.not.be.null;
         });
 
+        it('should roundtrip a compiled template (JavaScript)', async function() {
+            const template = await Template.fromDirectory('./test/data/latedeliveryandpenalty_js');
+            template.getIdentifier().should.equal('latedeliveryandpenalty@0.0.1');
+            template.getModelManager().getModelFile('io.clause.latedeliveryandpenalty').should.not.be.null;
+            template.getParserManager().getGrammar().should.not.be.null;
+            template.getScriptManager().getScripts().length.should.equal(1);
+            template.getMetadata().getREADME().should.not.be.null;
+            template.getMetadata().getRequest().should.not.be.null;
+            template.getMetadata().getKeywords().should.not.be.null;
+            template.getName().should.equal('latedeliveryandpenalty');
+            template.getDescription().should.equal('Late Delivery and Penalty. In case of delayed delivery except for Force Majeure cases, the Seller shall pay to the Buyer for every 9 DAY of delay penalty amounting to 7% of the total value of the Equipment whose delivery has been delayed. Any fractional part of a DAY is to be considered a full DAY. The total amount of penalty shall not however, exceed 2% of the total value of the Equipment involved in late delivery. If the delay is more than 2 WEEK, the Buyer is entitled to terminate this Contract.');
+            template.getVersion().should.equal('0.0.1');
+            template.getMetadata().getSample().should.equal('Late Delivery and Penalty. In case of delayed delivery except for Force Majeure cases, the Seller shall pay to the Buyer for every 9 days of delay penalty amounting to 7% of the total value of the Equipment whose delivery has been delayed. Any fractional part of a days is to be considered a full days. The total amount of penalty shall not however, exceed 2% of the total value of the Equipment involved in late delivery. If the delay is more than 2 weeks, the Buyer is entitled to terminate this Contract.');
+            template.getHash().should.equal('a9b497326f46ad446beb66c2d08c11ee2b3164e642db230581c75a151ffb5d14');
+            const buffer = await template.toArchive('cicero');
+            buffer.should.not.be.null;
+            const template2 = await Template.fromArchive(buffer);
+            template2.getIdentifier().should.equal(template.getIdentifier());
+            template2.getModelManager().getModelFile('io.clause.latedeliveryandpenalty').should.not.be.null;
+            template2.getParserManager().getGrammar().should.not.be.null;
+            template2.getParserManager().getTemplatizedGrammar().should.equal(template.getParserManager().getTemplatizedGrammar());
+            template2.getScriptManager().getScripts().length.should.equal(template.getScriptManager().getScripts().length);
+            template2.getMetadata().getREADME().should.equal(template.getMetadata().getREADME());
+            template2.getMetadata().getKeywords().should.eql(template.getMetadata().getKeywords());
+            template2.getMetadata().getSamples().should.eql(template.getMetadata().getSamples());
+            template2.getHash().should.equal(template.getHash());
+            const buffer2 = await template2.toArchive('cicero');
+            buffer2.should.not.be.null;
+        });
+
         it('should throw an error if multiple template models are found', async () => {
             return Template.fromDirectory('./test/data/multiple-concepts').should.be.rejectedWith('Found multiple instances of org.accordproject.cicero.contract.AccordClause in conga. The model for the template must contain a single asset that extends org.accordproject.cicero.contract.AccordClause.');
         });

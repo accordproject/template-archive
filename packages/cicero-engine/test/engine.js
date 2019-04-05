@@ -111,6 +111,70 @@ describe('EngineLatePenalty', () => {
     });
 });
 
+describe('EngineLatePenalty (JavaScript)', () => {
+
+    let engine;
+    let clause;
+    const testLatePenaltyInput = fs.readFileSync(path.resolve(__dirname, 'data/latedeliveryandpenalty_js', 'sample.txt'), 'utf8');
+
+    beforeEach(async function () {
+        engine = new Engine();
+        const template = await Template.fromDirectory('./test/data/latedeliveryandpenalty_js');
+        clause = new Clause(template);
+        clause.parse(testLatePenaltyInput);
+    });
+
+    afterEach(() => {});
+
+    describe('#executejavascript', function () {
+
+        it('should execute a late delivery and penalty smart clause (JavaScript)', async function () {
+            const request = {};
+            request.$class = 'org.accordproject.latedeliveryandpenalty.LateDeliveryAndPenaltyRequest';
+            request.forceMajeure = false;
+            request.agreedDelivery = '2017-10-07T16:38:01Z';
+            request.goodsValue = 200.00;
+            request.transactionId = '402c8f50-9e61-433e-a7c1-afe61c06ef00';
+            const state = {};
+            state.$class = 'org.accordproject.cicero.contract.AccordContractState';
+            state.stateId = '1';
+            const result = await engine.execute(clause, request, state, '2017-11-12T17:38:01Z');
+            result.should.not.be.null;
+            result.response.penalty.should.equal(110);
+            result.response.buyerMayTerminate.should.equal(true);
+        });
+
+        it('should execute a late delivery and penalty smart clause in the ET timezone (JavaScript)', async function () {
+            const request = {};
+            request.$class = 'org.accordproject.latedeliveryandpenalty.LateDeliveryAndPenaltyRequest';
+            request.forceMajeure = false;
+            request.agreedDelivery = '2017-11-10T16:38:01-05:00';
+            request.goodsValue = 200.00;
+            request.transactionId = '402c8f50-9e61-433e-a7c1-afe61c06ef00';
+            const state = {};
+            state.$class = 'org.accordproject.cicero.contract.AccordContractState';
+            state.stateId = '1';
+            const result = await engine.execute(clause, request, state, '2017-11-12T17:38:01-05:00');
+            result.should.not.be.null;
+            result.response.penalty.should.equal(21);
+            result.response.buyerMayTerminate.should.equal(false);
+        });
+
+        it('should fail to execute if the current time is not in the right format (JavaScript)', async function () {
+            const request = {};
+            request.$class = 'org.accordproject.latedeliveryandpenalty.LateDeliveryAndPenaltyRequest';
+            request.forceMajeure = false;
+            request.agreedDelivery = '2017-11-10T16:38:01-05:00';
+            request.goodsValue = 200.00;
+            request.transactionId = '402c8f50-9e61-433e-a7c1-afe61c06ef00';
+            const state = {};
+            state.$class = 'org.accordproject.cicero.contract.AccordContractState';
+            state.stateId = '1';
+            return engine.execute(clause, request, state, '2017-11-12').should.be.rejectedWith('2017-11-12 is not a valid moment with the format \'YYYY-MM-DDTHH:mm:ssZ\'');
+        });
+    });
+});
+
 describe('EngineHelloWorld', () => {
 
     let engine;

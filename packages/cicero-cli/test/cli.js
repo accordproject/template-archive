@@ -30,6 +30,7 @@ const Commands = require('../lib/commands');
 
 describe('cicero-cli', () => {
     const template = path.resolve(__dirname, 'data/latedeliveryandpenalty/');
+    const templateJs = path.resolve(__dirname, 'data/latedeliveryandpenalty_js/');
     const templateArchive = path.resolve(__dirname, 'data/latedeliveryandpenalty.cta');
     const sample = path.resolve(__dirname, 'data/latedeliveryandpenalty/', 'sample.txt');
     const request = path.resolve(__dirname, 'data/latedeliveryandpenalty/', 'request.json');
@@ -247,6 +248,15 @@ describe('cicero-cli', () => {
     describe('#executeergo', () => {
         it('should execute a clause in ergo using a template', async () => {
             const response = await Commands.execute(template, sample, [request], state);
+            response.response.$class.should.be.equal('org.accordproject.latedeliveryandpenalty.LateDeliveryAndPenaltyResponse');
+            response.response.penalty.should.be.equal(4);
+            response.response.buyerMayTerminate.should.be.equal(true);
+        });
+    });
+
+    describe('#executejavascript', () => {
+        it('should execute a clause in ergo using a template', async () => {
+            const response = await Commands.execute(templateJs, sample, [request], state);
             response.response.$class.should.be.equal('org.accordproject.latedeliveryandpenalty.LateDeliveryAndPenaltyResponse');
             response.response.penalty.should.be.equal(4);
             response.response.buyerMayTerminate.should.be.equal(true);

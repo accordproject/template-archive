@@ -48,7 +48,7 @@ describe('FormattedDates', () => {
                 const template = await Template.fromDirectory(location);
                 const clause = new Clause(template);
                 const formattedDatesInput = fs.readFileSync(path.resolve(__dirname, 'data/', testTemplate + '/sample.txt'), 'utf8');
-                clause.parse(formattedDatesInput);
+                clause.parse(formattedDatesInput, '2019-01-04T00:00:00Z');
                 const result = clause.getData();
                 delete result.clauseId;
                 const expected = JSON.parse(fs.readFileSync(path.resolve(__dirname, 'data/', testTemplate + '/expected.json'), 'utf8'));
