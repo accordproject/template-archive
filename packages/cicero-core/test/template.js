@@ -111,7 +111,7 @@ describe('Template', () => {
             template.getDescription().should.equal('Late Delivery and Penalty. In case of delayed delivery except for Force Majeure cases, the Seller shall pay to the Buyer for every 9 DAY of delay penalty amounting to 7% of the total value of the Equipment whose delivery has been delayed. Any fractional part of a DAY is to be considered a full DAY. The total amount of penalty shall not however, exceed 2% of the total value of the Equipment involved in late delivery. If the delay is more than 2 WEEK, the Buyer is entitled to terminate this Contract.');
             template.getVersion().should.equal('0.0.1');
             template.getMetadata().getSample().should.equal('Late Delivery and Penalty. In case of delayed delivery except for Force Majeure cases, the Seller shall pay to the Buyer for every 9 days of delay penalty amounting to 7% of the total value of the Equipment whose delivery has been delayed. Any fractional part of a days is to be considered a full days. The total amount of penalty shall not however, exceed 2% of the total value of the Equipment involved in late delivery. If the delay is more than 2 weeks, the Buyer is entitled to terminate this Contract.');
-            template.getHash().should.equal('b03d0f8043cbc03fd59db5640bd6bb9e4bddb8486dec1c3f7bc29f0b503afda0');
+            template.getHash().should.equal('d6d3e3816f4d0deaa659f9b1c7efcb00005da19e6d615c2b7ccf3997a6eab855');
             const buffer = await template.toArchive('ergo');
             buffer.should.not.be.null;
             const template2 = await Template.fromArchive(buffer);
@@ -141,7 +141,7 @@ describe('Template', () => {
             template.getDescription().should.equal('Late Delivery and Penalty. In case of delayed delivery except for Force Majeure cases, the Seller shall pay to the Buyer for every 9 DAY of delay penalty amounting to 7% of the total value of the Equipment whose delivery has been delayed. Any fractional part of a DAY is to be considered a full DAY. The total amount of penalty shall not however, exceed 2% of the total value of the Equipment involved in late delivery. If the delay is more than 2 WEEK, the Buyer is entitled to terminate this Contract.');
             template.getVersion().should.equal('0.0.1');
             template.getMetadata().getSample().should.equal('Late Delivery and Penalty. In case of delayed delivery except for Force Majeure cases, the Seller shall pay to the Buyer for every 9 days of delay penalty amounting to 7% of the total value of the Equipment whose delivery has been delayed. Any fractional part of a days is to be considered a full days. The total amount of penalty shall not however, exceed 2% of the total value of the Equipment involved in late delivery. If the delay is more than 2 weeks, the Buyer is entitled to terminate this Contract.');
-            template.getHash().should.equal('a9b497326f46ad446beb66c2d08c11ee2b3164e642db230581c75a151ffb5d14');
+            template.getHash().should.equal('075a57a1b043ee1345c1b48aa2be76ed9196311b7236249ac07acc00df83191f');
             const buffer = await template.toArchive('cicero');
             buffer.should.not.be.null;
             const template2 = await Template.fromArchive(buffer);
@@ -255,13 +255,13 @@ describe('Template', () => {
             }
         });
 
-        it.skip('should create a template from an archive at a given URL', async () => {
-            const url = 'https://templates.accordproject.org/archives/ip-payment@0.9.0.cta';
+        it('should create a template from an archive at a given URL', async () => {
+            const url = 'https://templates.accordproject.org/archives/ip-payment@0.10.0.cta';
             return Template.fromUrl(url, null).should.be.fulfilled;
         });
 
-        it.skip('should create a template from an archive at a given AP URL', async () => {
-            const url = 'ap://ip-payment@0.9.0#hash';
+        it('should create a template from an archive at a given AP URL', async () => {
+            const url = 'ap://ip-payment@0.10.0#hash';
             return Template.fromUrl(url, null).should.be.fulfilled;
         });
 
@@ -275,8 +275,8 @@ describe('Template', () => {
             }
         });
 
-        it.skip('should create a template from an archive at a given github URL', async () => {
-            const url = 'github://accordproject/cicero-template-library/master/build/archives/ip-payment@0.9.0.cta';
+        it('should create a template from an archive at a given github URL', async () => {
+            const url = 'github://accordproject/cicero-template-library/master/build/archives/ip-payment@0.10.0.cta';
             return Template.fromUrl(url, {'encoding':null,'headers':{'Accept': '*/*','Accept-Encoding': 'deflate, gzip'}}).should.be.fulfilled;
         });
 
@@ -285,7 +285,7 @@ describe('Template', () => {
             return Template.fromUrl(url, null).should.be.rejectedWith('Request to URL [https://templates.accordproject.org/archives/doesnotexist@0.3.0.cta] returned with error code: 404');
         });
 
-        it.skip('should throw an error if creating a template from a github URL to an archive with the wrong Cicero version', async () => {
+        it('should throw an error if creating a template from a github URL to an archive with the wrong Cicero version', async () => {
             const url = 'github://accordproject/cicero-template-library/master/build/archives/acceptance-of-delivery@0.3.0.cta';
             return Template.fromUrl(url, {'encoding':null,'headers':{'Accept': '*/*','Accept-Encoding': 'deflate, gzip'}}).should.be.rejectedWith('The template targets Cicero (^0.4.6) but the Cicero version is');
         });
@@ -430,7 +430,7 @@ describe('Template', () => {
     describe('#getHash', () => {
         it('should return a SHA-256 hash', async () => {
             const template = await Template.fromDirectory('./test/data/latedeliveryandpenalty');
-            template.getHash().should.equal('b03d0f8043cbc03fd59db5640bd6bb9e4bddb8486dec1c3f7bc29f0b503afda0');
+            template.getHash().should.equal('d6d3e3816f4d0deaa659f9b1c7efcb00005da19e6d615c2b7ccf3997a6eab855');
         });
     });
 
