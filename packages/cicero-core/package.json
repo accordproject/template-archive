@@ -73,7 +73,7 @@
     "moo": "0.4.3",
     "nearley": "2.15.1",
     "node-cache": "4.2.0",
-    "nunjucks": "3.1.2",
+    "nunjucks": "3.2.0",
     "request": "2.87.0",
     "request-promise-native": "1.0.5",
     "semver": "5.6.0",
