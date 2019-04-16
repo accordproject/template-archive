@@ -84,7 +84,7 @@ describe('TemplateLibrary', () => {
             templateIndex.should.not.have.property('helloworld@0.7.2');
             templateIndex.should.not.have.property('helloworld@0.8.0');
             templateIndex.should.not.have.property('helloworld@0.9.0');
-            templateIndex.should.have.property('helloworld@0.10.0');
+            templateIndex.should.have.property('helloworld@0.10.1');
         });
 
         it('should retrieve latest version index for cicero version 0.12.0-20190129142217', async function() {
@@ -115,7 +115,7 @@ describe('TemplateLibrary', () => {
             templateIndex.should.not.have.property('helloworld@0.7.2');
             templateIndex.should.not.have.property('helloworld@0.8.0');
             templateIndex.should.not.have.property('helloworld@0.9.0');
-            templateIndex.should.have.property('helloworld@0.10.0');
+            templateIndex.should.have.property('helloworld@0.10.1');
         });
     });
 

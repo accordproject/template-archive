@@ -1,0 +1,4 @@
+{
+    "$class" : "org.accordproject.test.TemplateModel",
+    "dateTimeProperty" : "2018-01-01T05:15:20.000+01:02"
+}

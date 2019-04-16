@@ -150,8 +150,7 @@ class TemplateInstance {
             let instance = null;
 
             if(obj.timezone) {
-                instance = moment([obj.years, obj.months, obj.days, obj.hours, obj.minutes, obj.seconds, obj.milliseconds])
-                    .utcOffset(obj.timezone, true);
+                instance = moment(obj).utcOffset(obj.timezone, true);
             }
             else {
                 instance = moment(obj)

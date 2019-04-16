@@ -42,7 +42,6 @@ class Engine {
      * using the Composer serializer.
      * @param {string} currentTime - the definition of 'now'
      * @return {Promise} a promise that resolves to a result for the clause
-     * @private
      */
     async execute(clause, request, state, currentTime) {
         const templateLogic = clause.getTemplateLogic();
@@ -57,7 +56,6 @@ class Engine {
      * @param {Clause} clause  - the clause to execute
      * @param {string} currentTime - the definition of 'now'
      * @return {Promise} a promise that resolves to a result for the clause initialization
-     * @private
      */
     async init(clause, currentTime) {
         const templateLogic = clause.getTemplateLogic();
@@ -68,8 +66,8 @@ class Engine {
     }
 
     /**
-     * Provides access to the Ergo engine.
-     * @return {ErgoEngine} the underlying Ergo Engine
+     * Provides access to the underlying Ergo engine.
+     * @return {ErgoEngine} the Ergo Engine for this Engine
      */
     getErgoEngine() {
         return this.ergoEngine;
