@@ -1,0 +1,1 @@
+{"$class":"org.accordproject.latedeliveryandpenalty.TemplateModel","clauseId":"426d00d8-4293-4244-bd25-e66aa21eb0a4","forceMajeure":true,"penaltyDuration":{"$class":"org.accordproject.time.Duration","amount":9,"unit":"days"},"penaltyPercentage":7,"capPercentage":2,"termination":{"$class":"org.accordproject.time.Duration","amount":2,"unit":"weeks"},"fractionalPart":"days"}
