@@ -100,6 +100,7 @@ class Commands {
      * @param {string} argName the argument name
      * @param {string} argDefaultName the argument default name
      * @param {Function} argDefaultFun how to compute the argument default
+     * @param {object} argDefaultValue an optional default value if all else fails
      * @returns {object} a modified argument object
      */
     static setDefaultFileArg(argv, argName, argDefaultName, argDefaultFun) {
@@ -263,7 +264,7 @@ class Commands {
         argv = Commands.validateCommonArgs(argv);
         argv = Commands.setDefaultFileArg(argv, 'sample', 'sample.txt', ((argv, argDefaultName) => { return path.resolve(argv.template,argDefaultName); }));
         argv = Commands.setDefaultFileArg(argv, 'request', 'request.json', ((argv, argDefaultName) => { return [path.resolve(argv.template,argDefaultName)]; }));
-        argv = Commands.setDefaultFileArg(argv, 'state', 'state.json', ((argv, argDefaultName) => { return path.resolve(argv.template,argDefaultName); }));
+        //argv = Commands.setDefaultFileArg(argv, 'state', 'state.json', ((argv, argDefaultName) => { return path.resolve(argv.template,argDefaultName); }));
 
         if(argv.verbose) {
             Logger.info(`execute sample ${argv.sample} using a template ${argv.template} with request ${argv.request} with state ${argv.state}`);
