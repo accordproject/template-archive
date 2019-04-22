@@ -150,9 +150,36 @@ class Commands {
                 clause.parse(sampleText, currentTime);
                 if (outPath) {
                     Logger.info('Creating file: ' + outPath);
-                    fs.writeFileSync(outPath, JSON.stringify(clause.getData()));
+                    fs.writeFileSync(outPath, JSON.stringify(clause.getData(),null,2));
                 }
                 return clause.getData();
+            })
+            .catch((err) => {
+                Logger.error(err.message);
+            });
+    }
+
+    /**
+     * Generate a sample text from JSON data using a template
+     *
+     * @param {string} templatePath to the template path directory or file
+     * @param {string} dataPath to the data file
+     * @param {string} outPath to the contract file
+     * @returns {object} Promise to the result of parsing
+     */
+    static generateText(templatePath, dataPath, outPath) {
+        let clause;
+        const dataJson = JSON.parse(fs.readFileSync(dataPath, 'utf8'));
+
+        return Commands.loadTemplate(templatePath)
+            .then((template) => {
+                clause = new Clause(template);
+                clause.setData(dataJson);
+                if (outPath) {
+                    Logger.info('Creating file: ' + outPath);
+                    fs.writeFileSync(outPath, clause.generateText());
+                }
+                return clause.generateText();
             })
             .catch((err) => {
                 Logger.error(err.message);
@@ -171,6 +198,23 @@ class Commands {
 
         if(argv.verbose) {
             Logger.info(`parse sample ${argv.sample} using a template ${argv.template}`);
+        }
+
+        return argv;
+    }
+
+    /**
+     * Set default params before we generatet a sample text using a template
+     *
+     * @param {object} argv the inbound argument values object
+     * @returns {object} a modfied argument object
+     */
+    static validateGenerateTextArgs(argv) {
+        argv = Commands.validateCommonArgs(argv);
+        argv = Commands.setDefaultFileArg(argv, 'data', 'data.json', ((argv, argDefaultName) => { return path.resolve(argv.template,argDefaultName); }));
+
+        if(argv.verbose) {
+            Logger.info(`generate text from data ${argv.data} using a template ${argv.template}`);
         }
 
         return argv;

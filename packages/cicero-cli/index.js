@@ -56,6 +56,38 @@ require('yargs')
             return;
         }
     })
+    .command('generateText', 'generate sample text from template data', (yargs) => {
+        yargs.option('template', {
+            describe: 'path to the directory with the template',
+            type: 'string'
+        });
+        yargs.option('data', {
+            describe: 'path to the template data text',
+            type: 'string'
+        });
+        yargs.option('out', {
+            describe: 'path to the output file',
+            type: 'string'
+        });
+    }, (argv) => {
+        if (argv.verbose) {
+            Logger.info(`generate text from data ${argv.data} using a template ${argv.template}`);
+        }
+
+        try {
+            argv = Commands.validateGenerateTextArgs(argv);
+            return Commands.generateText(argv.template, argv.data, argv.out)
+                .then((result) => {
+                    Logger.info(result);
+                })
+                .catch((err) => {
+                    Logger.error(err.message);
+                });
+        } catch (err){
+            Logger.error(err.message);
+            return;
+        }
+    })
     .command('archive', 'archive a template directory', (yargs) => {
         yargs.option('target', {
             describe: 'the target language of the archive',
