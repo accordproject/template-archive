@@ -33,9 +33,11 @@ describe('cicero-cli', () => {
     const templateJs = path.resolve(__dirname, 'data/latedeliveryandpenalty_js/');
     const templateArchive = path.resolve(__dirname, 'data/latedeliveryandpenalty.cta');
     const sample = path.resolve(__dirname, 'data/latedeliveryandpenalty/', 'sample.txt');
+    const data = path.resolve(__dirname, 'data/latedeliveryandpenalty/', 'data.json');
     const request = path.resolve(__dirname, 'data/latedeliveryandpenalty/', 'request.json');
     const state = path.resolve(__dirname, 'data/latedeliveryandpenalty/', 'state.json');
-    const contract = path.resolve(__dirname, 'data/latedeliveryandpenalty/', 'contract.json');
+    const dataOut = path.resolve(__dirname, 'data/latedeliveryandpenalty/', 'data_out.json');
+    const sampleOut = path.resolve(__dirname, 'data/latedeliveryandpenalty/', 'sample_out.txt');
     const parseReponse = {
         '$class':'org.accordproject.latedeliveryandpenalty.TemplateModel',
         'forceMajeure':true,
@@ -53,8 +55,10 @@ describe('cicero-cli', () => {
         },
         'fractionalPart':'days'
     };
+    const generateTextResponse = 'Late Delivery and Penalty. In case of delayed delivery except for Force Majeure cases, the Seller shall pay to the Buyer for every 9 days of delay penalty amounting to 7% of the total value of the Equipment whose delivery has been delayed. Any fractional part of a days is to be considered a full days. The total amount of penalty shall not however, exceed 2% of the total value of the Equipment involved in late delivery. If the delay is more than 2 weeks, the Buyer is entitled to terminate this Contract.';
 
     const sampleErr = path.resolve(__dirname, 'data/latedeliveryandpenalty/', 'sample_err.txt');
+    const dataErr = path.resolve(__dirname, 'data/latedeliveryandpenalty/', 'data_err.json');
     const stateErr = path.resolve(__dirname, 'data/latedeliveryandpenalty/', 'state_err.json');
     const requestErr = path.resolve(__dirname, 'data/latedeliveryandpenalty/', 'request_err.json');
 
@@ -79,9 +83,36 @@ describe('cicero-cli', () => {
 
     describe('#parsesave', async () => {
         it('should parse a clause using a template and save to a JSON file', async () => {
-            const result = await Commands.parse(template, sample, contract);
+            const result = await Commands.parse(template, sample, dataOut);
             delete result.clauseId;
             result.should.eql(parseReponse);
+        });
+    });
+
+    describe('#generateText', () => {
+        it('should generate the text for a clause using a template', async () => {
+            const result = await Commands.generateText(template, data, null);
+            delete result.clauseId;
+            result.should.eql(generateTextResponse);
+        });
+
+        it('should generate the text for a clause using a template archive', async () => {
+            const result = await Commands.generateText(templateArchive, data, null);
+            delete result.clauseId;
+            result.should.eql(generateTextResponse);
+        });
+
+        it('should fail generating the text for a clause using a template', async () => {
+            const result = await Commands.generateText(template, dataErr, null);
+            should.equal(result,undefined);
+        });
+    });
+
+    describe('#generateTextsave', async () => {
+        it('should generate the text for a clause using a template and save to a JSON file', async () => {
+            const result = await Commands.generateText(template, data, sampleOut);
+            delete result.clauseId;
+            result.should.eql(generateTextResponse);
         });
     });
 
@@ -181,6 +212,92 @@ describe('cicero-cli', () => {
                 _: ['parse'],
                 sample: 'sample_en.txt'
             })).should.throw('A sample.txt file is required. Try the --sample flag or create a sample.txt in the root folder of your template.');
+        });
+    });
+
+    describe('#validateGenerateTextArgs', () => {
+        it('no args specified', () => {
+            process.chdir(path.resolve(__dirname, 'data/latedeliveryandpenalty/'));
+            const args  = Commands.validateGenerateTextArgs({
+                _: ['generateText'],
+            });
+            args.template.should.match(/cicero-cli\/test\/data\/latedeliveryandpenalty$/);
+            args.data.should.match(/data.json$/);
+        });
+        it('all args specified', () => {
+            process.chdir(path.resolve(__dirname, 'data/latedeliveryandpenalty/'));
+            const args  = Commands.validateGenerateTextArgs({
+                _: ['generateText'],
+                template: './',
+                data: 'data.json'
+            });
+            args.template.should.match(/cicero-cli\/test\/data\/latedeliveryandpenalty$/);
+            args.data.should.match(/data.json$/);
+        });
+        it('all args specified, parent folder', () => {
+            process.chdir(path.resolve(__dirname, 'data/'));
+            const args  = Commands.validateGenerateTextArgs({
+                _: ['generateText'],
+                template: 'latedeliveryandpenalty',
+                data: 'latedeliveryandpenalty/data.json'
+            });
+            args.template.should.match(/cicero-cli\/test\/data\/latedeliveryandpenalty$/);
+            args.data.should.match(/data.json$/);
+        });
+        it('all args specified, archive', () => {
+            process.chdir(path.resolve(__dirname, 'data/'));
+            const args  = Commands.validateGenerateTextArgs({
+                _: ['generateText'],
+                template: 'latedeliveryandpenalty.cta',
+                data: 'latedeliveryandpenalty/data.json'
+            });
+            args.template.should.match(/cicero-cli\/test\/data\/latedeliveryandpenalty.cta$/);
+            args.data.should.match(/data.json$/);
+        });
+        it('all args specified, parent folder, no sample', () => {
+            process.chdir(path.resolve(__dirname, 'data/'));
+            const args  = Commands.validateGenerateTextArgs({
+                _: ['generateText'],
+                template: 'latedeliveryandpenalty',
+            });
+            args.template.should.match(/cicero-cli\/test\/data\/latedeliveryandpenalty$/);
+            args.data.should.match(/data.json$/);
+        });
+        it('all args specified, child folder, no sample', () => {
+            process.chdir(path.resolve(__dirname, 'data/latedeliveryandpenalty/grammar'));
+            const args  = Commands.validateGenerateTextArgs({
+                _: ['generateText'],
+                template: '../',
+            });
+            args.template.should.match(/cicero-cli\/test\/data\/latedeliveryandpenalty$/);
+            args.data.should.match(/data.json$/);
+        });
+        it('no flags specified', () => {
+            const args  = Commands.validateGenerateTextArgs({
+                _: ['generateText', path.resolve(__dirname, 'data/latedeliveryandpenalty/')],
+            });
+            args.template.should.match(/cicero-cli\/test\/data\/latedeliveryandpenalty$/);
+            args.data.should.match(/data.json$/);
+        });
+        it('verbose flag specified', () => {
+            process.chdir(path.resolve(__dirname, 'data/latedeliveryandpenalty/'));
+            Commands.validateGenerateTextArgs({
+                _: ['generateText'],
+                verbose: true
+            });
+        });
+        it('bad package.json', () => {
+            process.chdir(path.resolve(__dirname, 'data/'));
+            (() => Commands.validateGenerateTextArgs({
+                _: ['generateText'],
+            })).should.throw(' not a valid cicero template. Make sure that package.json exists and that it has a cicero entry.');
+        });
+        it('bad data.json', () => {
+            process.chdir(path.resolve(__dirname, 'data/latedeliveryandpenalty/'));
+            (() => Commands.validateGenerateTextArgs({
+                _: ['generateText'],
+                data: 'data_en.json'
+            })).should.throw('A data.json file is required. Try the --data flag or create a data.json in the root folder of your template.');
         });
     });
 

@@ -107,6 +107,17 @@ Given('that the contract says', async function (contractText) {
     this.clause.parse(contractText);
 });
 
+Given('that the contract data is', async function (contractData) {
+    const dataJson = JSON.parse(contractData);
+    if (!this.clause) {
+        const templateDir = Path.resolve(Util.resolveRootDir(this.parameters),'.');
+        const clause = await loadClause(templateDir);
+        this.request = clause.getTemplate().getMetadata().getRequest();
+        this.clause = clause;
+    }
+    this.clause.setData(dataJson);
+});
+
 Given('the default( sample) contract', async function () {
     if (!this.clause) {
         const templateDir = Path.resolve(Util.resolveRootDir(this.parameters),'.');
