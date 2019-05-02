@@ -48,9 +48,8 @@
   },
   "dependencies": {
     "@accordproject/cicero-core": "0.12.1",
-    "@accordproject/ergo-compiler": "0.8.1",
-    "@accordproject/ergo-engine": "0.8.1",
-    "composer-concerto": "0.70.2",
+    "@accordproject/ergo-compiler": "0.8.2",
+    "@accordproject/ergo-engine": "0.8.2",
     "moment-mini": "2.22.1"
   },
   "license-check-config": {

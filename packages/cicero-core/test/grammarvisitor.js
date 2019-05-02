@@ -16,7 +16,7 @@
 
 const APModelManager = require('@accordproject/ergo-compiler').APModelManager;
 const Logger = require('@accordproject/ergo-compiler').Logger;
-const Writer = require('composer-concerto').Writer;
+const Writer = require('@accordproject/ergo-compiler').ComposerConcerto.Writer;
 const GrammarVisitor = require('../lib/grammarvisitor');
 const ParserManager = require('../lib/parsermanager');
 const nunjucks = require('nunjucks');

@@ -15,12 +15,12 @@
 'use strict';
 
 const APModelManager = require('@accordproject/ergo-compiler').APModelManager;
-const Field = require('composer-concerto').Field;
-const ModelFile = require('composer-concerto').ModelFile;
-const RelationshipDeclaration = require('composer-concerto').RelationshipDeclaration;
-const EnumDeclaration = require('composer-concerto').EnumDeclaration;
-const EnumValueDeclaration = require('composer-concerto').EnumValueDeclaration;
-const ClassDeclaration = require('composer-concerto').ClassDeclaration;
+const Field = require('@accordproject/ergo-compiler').ComposerConcerto.Field;
+const ModelFile = require('@accordproject/ergo-compiler').ComposerConcerto.ModelFile;
+const RelationshipDeclaration = require('@accordproject/ergo-compiler').ComposerConcerto.RelationshipDeclaration;
+const EnumDeclaration = require('@accordproject/ergo-compiler').ComposerConcerto.EnumDeclaration;
+const EnumValueDeclaration = require('@accordproject/ergo-compiler').ComposerConcerto.EnumValueDeclaration;
+const ClassDeclaration = require('@accordproject/ergo-compiler').ComposerConcerto.ClassDeclaration;
 const util = require('util');
 const debug = require('debug')('cicero:grammarvisitor');
 
