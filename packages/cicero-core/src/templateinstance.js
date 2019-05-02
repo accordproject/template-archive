@@ -21,7 +21,7 @@ const moment = require('moment-mini');
 // Make sure Moment serialization preserves utcOffset. See https://momentjs.com/docs/#/displaying/as-json/
 moment.fn.toJSON = Util.momentToJson;
 
-const RelationshipDeclaration = require('composer-concerto').RelationshipDeclaration;
+const RelationshipDeclaration = require('@accordproject/ergo-compiler').ComposerConcerto.RelationshipDeclaration;
 
 /**
  * A TemplateInstance is an instance of a Clause or Contract template. It is executable business logic, linked to

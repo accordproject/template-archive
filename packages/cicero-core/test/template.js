@@ -444,7 +444,7 @@ describe('Template', () => {
 
     describe('#getFactory', () => {
         it('should return a Factory', async () => {
-            const Factory = require('composer-concerto').Factory;
+            const Factory = require('@accordproject/ergo-compiler').ComposerConcerto.Factory;
             const template = await Template.fromDirectory('./test/data/latedeliveryandpenalty');
             template.getFactory().should.be.an.instanceof(Factory);
         });
@@ -452,7 +452,7 @@ describe('Template', () => {
 
     describe('#getSerializer', () => {
         it('should return a Serializer', async () => {
-            const Serializer = require('composer-concerto').Serializer;
+            const Serializer = require('@accordproject/ergo-compiler').ComposerConcerto.Serializer;
             const template = await Template.fromDirectory('./test/data/latedeliveryandpenalty');
             template.getSerializer().should.be.an.instanceof(Serializer);
         });
