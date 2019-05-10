@@ -178,12 +178,21 @@ class TemplateInstance {
     /**
      * Generates the natural language text for a clause; combining the text from the template
      * and the clause data.
+     * @param {*} [options] text generation options. options.wrapVariables encloses variables
+     * and editable sections in '{{' and '}}'
      * @returns {string} the natural language text for the clause; created by combining the structure of
      * the template with the JSON data for the clause.
      */
-    generateText() {
+    generateText(options) {
         if(!this.composerData) {
             throw new Error('Data has not been set. Call setData or parse before calling this method.');
+        }
+
+        let startVar = '';
+        let endVar = '';
+        if(options && options.wrapVariables) {
+            startVar = '{{';
+            endVar = '}}';
         }
 
         const ast = this.getTemplate().getParserManager().getTemplateAst();
@@ -203,7 +212,7 @@ class TemplateInstance {
             case 'BooleanBinding': {
                 const property = this.getTemplate().getTemplateModel().getProperty(thing.fieldName.value);
                 if(this.composerData[property.getName()]) {
-                    result += thing.string.value.substring(1,thing.string.value.length-1);
+                    result += startVar + thing.string.value.substring(1,thing.string.value.length-1) + endVar;
                 }
             }
                 break;
@@ -212,7 +221,7 @@ class TemplateInstance {
             case 'Binding': {
                 const property = this.getTemplate().getTemplateModel().getProperty(thing.fieldName.value);
                 const value = this.composerData[property.getName()];
-                result += this.convertPropertyToString(property, value, thing.format ? thing.format.value : null);
+                result += startVar + this.convertPropertyToString(property, value, thing.format ? thing.format.value : null) + endVar;
             }
                 break;
 
