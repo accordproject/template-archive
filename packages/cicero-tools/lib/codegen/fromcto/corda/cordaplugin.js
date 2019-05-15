@@ -57,7 +57,7 @@ class CordaPlugin extends AbstractPlugin {
         if(clazz.getFullyQualifiedName() === 'org.accordproject.money.MonetaryAmount') {
             parameters.fileWriter.writeLine(1, `
    public Amount<Currency> getCurrency() {
-      return Currencies.DOLLARS(doubleValue);
+        return Amount.fromDecimal(BigDecimal.valueOf(doubleValue), Currency.getInstance("USD"));
    }
 `
             );
