@@ -30,9 +30,9 @@ class CordaPlugin extends AbstractPlugin {
         // add Corda-specific imports
         parameters.fileWriter.writeLine(0, 'import net.corda.core.serialization.CordaSerializable;');
         if(clazz.getFullyQualifiedName() === 'org.accordproject.money.MonetaryAmount') {
+            parameters.fileWriter.writeLine(0, 'import java.math.BigDecimal;');
             parameters.fileWriter.writeLine(0, 'import java.util.Currency;');
             parameters.fileWriter.writeLine(0, 'import net.corda.core.contracts.Amount;');
-            parameters.fileWriter.writeLine(0, 'import net.corda.finance.Currencies;');
         }
     }
 
@@ -57,7 +57,7 @@ class CordaPlugin extends AbstractPlugin {
         if(clazz.getFullyQualifiedName() === 'org.accordproject.money.MonetaryAmount') {
             parameters.fileWriter.writeLine(1, `
    public Amount<Currency> getCurrency() {
-        return Amount.fromDecimal(BigDecimal.valueOf(doubleValue), Currency.getInstance("USD"));
+        return Amount.fromDecimal(BigDecimal.valueOf(doubleValue), Currency.getInstance(currencyCode.name()));
    }
 `
             );
