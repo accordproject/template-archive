@@ -203,6 +203,7 @@ class ParserManager {
             const element = rules[rule];
             switch (element.type) {
             case 'Chunk':
+            case 'ExprChunk':
             case 'LastChunk':
                 parts.modelRules.push({
                     prefix: rule,
@@ -224,6 +225,12 @@ class ParserManager {
             case 'Binding':
             case 'ClauseBinding':
                 this.handleBinding(templateModel, parts, rule, element);
+                break;
+            case 'Expr':
+                parts.modelRules.push({
+                    prefix: rule,
+                    symbols: ['Any'],
+                });
                 break;
             default:
                 ParserManager._throwTemplateExceptionForElement(`Unrecognized type ${element.type}`, element);
@@ -291,17 +298,6 @@ class ParserManager {
         let suffix = ':';
         let type = property.getType();
 
-        // allow the type and action to be defined using a decorator
-        const decorator = property.getDecorator('AccordType');
-        if (decorator) {
-            if (decorator.getArguments().length > 0) {
-                type = decorator.getArguments()[0];
-            }
-            if (decorator.getArguments().length > 1) {
-                action = decorator.getArguments()[1];
-            }
-        }
-
         // if the type/action have not been set explicity, then we infer them
         if(!action) {
             action = '{% id %}';
@@ -356,6 +352,7 @@ class ParserManager {
 
         parts.modelRules.push({
             prefix: inputRule,
+            //symbols: [`"[{" ${type}${suffix} "}]" ${action} # ${propertyName}`],
             symbols: [`${type}${suffix} ${action} # ${propertyName}`],
         });
     }

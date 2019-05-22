@@ -51,6 +51,12 @@ const lexer = moo.states({
             push: 'var',
             value: x => escapeNearley(x.slice(0, -2))
         },
+        ExprChunk: {
+            match: /[^]*?{{/,
+            lineBreaks: true,
+            push: 'expr',
+            value: x => escapeNearley(x.slice(0, -2))
+        },
         // we now need to consume everything up until the end of the buffer.
         // note that the order of these two rules is important!
         LastChunk : {
@@ -80,6 +86,13 @@ varend: {
             value: x => x.slice(1)
         },
         clauseclose: /\//
+    },
+    expr: {
+exprend: {
+            match: /[^]*?}}/,
+            lineBreaks: true,
+            pop: true
+        },
     },
 });
 %}
@@ -113,14 +126,27 @@ CLAUSE_TEMPLATE -> CLAUSE_ITEM:* %LastChunk:?
 
 CONTRACT_ITEM -> 
       %Chunk {% id %} 
+    | %ExprChunk {% id %} 
     | VARIABLE {% id %}
     | CLAUSE_VARIABLE_INLINE {% id %}
     | CLAUSE_VARIABLE_EXTERNAL {% id %}
+    | CLAUSE_EXPR {% id %}
+
+# An expression
+CLAUSE_EXPR -> %exprend
+{% (data) => {
+        return {
+            type: 'Expr'
+        }
+    }
+%}
 
 # An item is either a chunk of text or an embedded variable
 CLAUSE_ITEM -> 
       %Chunk {% id %} 
+    | %ExprChunk {% id %} 
     | VARIABLE {% id %}
+    | CLAUSE_EXPR {% id %}
 
 CLAUSE_VARIABLE_INLINE -> %clauseidstart %varend CLAUSE_TEMPLATE %clauseidend %varend
 {% (data,l,reject) => {

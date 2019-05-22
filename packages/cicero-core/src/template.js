@@ -45,7 +45,7 @@ class Template {
      */
     constructor(packageJson, readme, samples, request, options) {
         this.metadata = new Metadata(packageJson, readme, samples, request);
-        this.logicManager = new LogicManager('cicero', options);
+        this.logicManager = new LogicManager('cicero', null, options);
         this.parserManager = new ParserManager(this);
     }
 

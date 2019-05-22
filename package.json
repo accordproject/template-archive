@@ -88,8 +88,6 @@
       ".aux",
       ".v.d",
       ".ctoj",
-      ".ml",
-      ".mli",
       ".depends",
       ".annot",
       ".byte",

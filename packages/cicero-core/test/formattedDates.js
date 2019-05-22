@@ -28,7 +28,7 @@ chai.use(require('chai-as-promised'));
 const getTestTemplates = p => fs.readdirSync(p).filter(f => {return f.startsWith('formatted-dates-') && fs.statSync(path.join(p, f)).isDirectory();});
 const testTemplates = getTestTemplates(path.resolve(__dirname, 'data/'));
 
-describe('FormattedDates', () => {
+describe.skip('FormattedDates', () => {
 
     testTemplates.forEach(testTemplate => {
         describe(`#constructor - ${testTemplate}`, () => {
