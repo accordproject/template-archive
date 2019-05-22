@@ -119,8 +119,8 @@ describe('Template', () => {
             template.getDisplayName().should.equal('Latedeliveryandpenalty');
             template.getDescription().should.equal('Late Delivery and Penalty. In case of delayed delivery except for Force Majeure cases, the Seller shall pay to the Buyer for every 9 DAY of delay penalty amounting to 7% of the total value of the Equipment whose delivery has been delayed. Any fractional part of a DAY is to be considered a full DAY. The total amount of penalty shall not however, exceed 2% of the total value of the Equipment involved in late delivery. If the delay is more than 2 WEEK, the Buyer is entitled to terminate this Contract.');
             template.getVersion().should.equal('0.0.1');
-            template.getMetadata().getSample().should.equal('Late Delivery and Penalty. In case of delayed delivery except for Force Majeure cases, the Seller shall pay to the Buyer for every 9 days of delay penalty amounting to 7% of the total value of the Equipment whose delivery has been delayed. Any fractional part of a days is to be considered a full days. The total amount of penalty shall not however, exceed 2% of the total value of the Equipment involved in late delivery. If the delay is more than 2 weeks, the Buyer is entitled to terminate this Contract.');
-            template.getHash().should.equal('de336475a4a565606e7d61b36e37aa78f26b91a0c8cf04f039219ef5a86ebacf');
+            template.getMetadata().getSample().should.equal('Late Delivery and Penalty. In case of delayed delivery except for Force Majeure cases, the Seller shall pay to the Buyer for every 9 days of delay penalty amounting to 7.0% of the total value of the Equipment whose delivery has been delayed. Any fractional part of a days is to be considered a full days. The total amount of penalty shall not however, exceed 2.0% of the total value of the Equipment involved in late delivery. If the delay is more than 2 weeks, the Buyer is entitled to terminate this Contract.');
+            template.getHash().should.equal('19e096392ea7a140e258540656a5bc27fabbd7b5dcc43881cbd34a0ab02b64e2');
             const buffer = await template.toArchive('ergo');
             buffer.should.not.be.null;
             const template2 = await Template.fromArchive(buffer);
@@ -474,7 +474,7 @@ describe('Template', () => {
     describe('#getHash', () => {
         it('should return a SHA-256 hash', async () => {
             const template = await Template.fromDirectory('./test/data/latedeliveryandpenalty', options);
-            template.getHash().should.equal('de336475a4a565606e7d61b36e37aa78f26b91a0c8cf04f039219ef5a86ebacf');
+            template.getHash().should.equal('19e096392ea7a140e258540656a5bc27fabbd7b5dcc43881cbd34a0ab02b64e2');
         });
     });
 

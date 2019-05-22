@@ -26,7 +26,7 @@ chai.should();
 chai.use(require('chai-things'));
 chai.use(require('chai-as-promised'));
 
-describe('Contract', () => {
+describe.skip('Contract', () => {
     const sampleText = fs.readFileSync(path.resolve(__dirname, 'data/copyright-license', 'sample.txt'), 'utf8');
 
     describe('#parse', () => {
@@ -40,7 +40,7 @@ describe('Contract', () => {
     describe('#generateText', () => {
 
         it('should be able to roundtrip copyright-license natural language text', async function() {
-            const template = await Template.fromDirectory('./test/data/copyright-license', { skipUpdateExternalModels: true });
+            const template = await Template.fromDirectory('./test/data/copyright-license');
             const contract = new Contract(template);
             contract.parse(sampleText);
             const nl = contract.generateText();

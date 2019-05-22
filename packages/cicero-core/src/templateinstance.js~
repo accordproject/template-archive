@@ -22,8 +22,11 @@ const Util = require('@accordproject/ergo-compiler').Util;
 const moment = require('moment-mini');
 // Make sure Moment serialization preserves utcOffset. See https://momentjs.com/docs/#/displaying/as-json/
 moment.fn.toJSON = Util.momentToJson;
+<<<<<<< HEAD
 const TemplateLoader = require('./templateloader');
+=======
 const ErgoEngine = require('@accordproject/ergo-engine/index.browser.js').EvalEngine;
+>>>>>>> (feat) Initial support for dynamic templates
 
 const RelationshipDeclaration = require('@accordproject/ergo-compiler').ComposerConcerto.RelationshipDeclaration;
 

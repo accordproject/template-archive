@@ -48,6 +48,7 @@ Word -> [\\S]:*
 
 BRACKET_PHRASE -> "[" Word (__ Word):* "]" {% ((d) => {return d[1] + ' ' + flatten(d[2]).join(" ");}) %}
 
+Any -> "{{" [^]:* "}}"
 String -> dqstring {% id %}
 Double -> decimal {% id %}
 Integer -> int {% id %}

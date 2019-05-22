@@ -52,7 +52,10 @@ require('yargs')
 
         try {
             argv = Commands.validateParseArgs(argv);
-            return Commands.parse(argv.template, argv.sample, argv.out, argv.currentTime, argv.warnings)
+            const options = {
+                warnings: argv.warnings,
+            };
+            return Commands.parse(argv.template, argv.sample, argv.out, argv.currentTime, options)
                 .then((result) => {
                     if(result) {Logger.info(JSON.stringify(result));}
                 })
@@ -82,6 +85,16 @@ require('yargs')
             type: 'boolean',
             default: false
         });
+        yargs.option('wrapVariables', {
+            describe: 'wrap variables in curly braces',
+            type: 'boolean',
+            default: false
+        });
+        yargs.option('template', {
+            describe: 'path to the template (.tem) file',
+            type: 'string',
+            default: null
+        });
     }, (argv) => {
         if (argv.verbose) {
             Logger.info(`generate text from data ${argv.data} using a template ${argv.template}`);
@@ -89,7 +102,12 @@ require('yargs')
 
         try {
             argv = Commands.validateGenerateTextArgs(argv);
-            return Commands.generateText(argv.template, argv.data, argv.out, argv.warnings)
+            const options = {
+                markdown: argv.markdown,
+                wrapVariables: argv.wrapVariables,
+                warnings: argv.warnings,
+            };
+            return Commands.generateText(argv.template, argv.data, argv.out, options)
                 .then((result) => {
                     if(result) {Logger.info(result);}
                 })
@@ -128,7 +146,10 @@ require('yargs')
 
         try {
             argv = Commands.validateArchiveArgs(argv);
-            return Commands.archive(argv.target, argv.template, argv.archiveFile, argv.warnings)
+            const options = {
+                warnings: argv.warnings,
+            };
+            return Commands.archive(argv.target, argv.template, argv.archiveFile, options)
                 .catch((err) => {
                     Logger.error(err.message);
                 });
@@ -168,7 +189,10 @@ require('yargs')
 
         try {
             argv = Commands.validateExecuteArgs(argv);
-            return Commands.execute(argv.template, argv.sample, argv.request, argv.state, argv.currentTime, argv.warnings)
+            const options = {
+                warnings: argv.warnings,
+            };
+            return Commands.execute(argv.template, argv.sample, argv.request, argv.state, argv.currentTime, options)
                 .then((result) => {
                     if(result) {Logger.info(JSON.stringify(result));}
                 })
@@ -202,7 +226,10 @@ require('yargs')
 
         try {
             argv = Commands.validateInitArgs(argv);
-            return Commands.init(argv.template, argv.sample, argv.currentTime, argv.warnings)
+            const options = {
+                warnings: argv.warnings,
+            };
+            return Commands.init(argv.template, argv.sample, argv.currentTime, options)
                 .then((result) => {
                     if(result) {Logger.info(JSON.stringify(result));}
                 })
@@ -241,7 +268,10 @@ require('yargs')
 
         try {
             argv = Commands.validateExecuteArgs(argv);
-            return Commands.generate(argv.format, argv.template, argv.outputDirectory, argv.warnings)
+            const options = {
+                warnings: argv.warnings,
+            };
+            return Commands.generate(argv.format, argv.template, argv.outputDirectory, options)
                 .then((result) => {
                     Logger.info('Completed.');
                 })

@@ -321,6 +321,26 @@ class TemplateLoader {
             });
         }
 
+
+        // load and add the template
+        let templatizedGrammar = await TemplateLoader.loadFileContents(path, 'grammar/template.tem', false, false);
+        let templatizedGrammarMd = await TemplateLoader.loadFileContents(path, 'grammar/template.md', false, false);
+
+        if(templatizedGrammarMd) {
+            template.parserManager.buildGrammar(templatizedGrammarMd, true);
+            Logger.debug(method, 'Loaded template.md', templatizedGrammarMd);
+        }
+        else {
+            if(!templatizedGrammar) {
+                throw new Error('A template must either contain a template.tem or template.md file.');
+            }
+            template.getLogicManager().addTemplateFile(templatizedGrammar,'grammar/template.tem');
+            template.parserManager.buildGrammar(templatizedGrammar, false);
+            Logger.debug(method, 'Loaded template.tem', templatizedGrammar);
+        }
+
+        Logger.debug(method, 'Loaded template.tem', template_txt);
+
         // load and add the ergo files
         if(template.getMetadata().getErgoVersion()) {
             const ergoFiles = await TemplateLoader.loadFilesContents(path, /lib[/\\].*\.ergo$/);
@@ -345,21 +365,6 @@ class TemplateLoader {
 
         // check the template
         template.validate();
-
-        let templatizedGrammar = await TemplateLoader.loadFileContents(path, 'grammar/template.tem', false, false);
-        let templatizedGrammarMd = await TemplateLoader.loadFileContents(path, 'grammar/template.md', false, false);
-
-        if(templatizedGrammarMd) {
-            template.parserManager.buildGrammar(templatizedGrammarMd, true);
-            Logger.debug(method, 'Loaded template.md', templatizedGrammarMd);
-        }
-        else {
-            if(!templatizedGrammar) {
-                throw new Error('A template must either contain a template.tem or template.md file.');
-            }
-            template.parserManager.buildGrammar(templatizedGrammar, false);
-            Logger.debug(method, 'Loaded template.tem', templatizedGrammar);
-        }
 
         return template;
     }

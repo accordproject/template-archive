@@ -66,6 +66,26 @@ class Engine {
     }
 
     /**
+     * Generate Text for a clause
+     * @param {Clause} clause  - the clause to execute
+     * @param {string} currentTime - the definition of 'now'
+     * @return {Promise} a promise that resolves to a result for the clause initialization
+     */
+    async generateText(clause, currentTime) {
+        const logicManager = clause.getLogicManager();
+        const clauseId = clause.getIdentifier();
+        const contract = clause.getData();
+
+        const params = {
+            options: {
+                '$class': 'org.accordproject.markdown.MarkdownOptions',
+                'wrapVariables': false,
+            }
+        };
+        return this.ergoEngine.generateText(logicManager,clauseId,contract,params,currentTime);
+    }
+
+    /**
      * Provides access to the underlying Ergo engine.
      * @return {ErgoEngine} the Ergo Engine for this Engine
      */

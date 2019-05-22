@@ -21,7 +21,7 @@ THIS DOCUMENT HAS NOT BEEN APPROVED BY AN AUTHORISED PERSON. ANY INVESTMENT TO W
 SAFT
 (Simple Agreement for Future Tokens)
 
-THIS CERTIFIES THAT in exchange for the payment by the undersigned purchaser (the “Purchaser”) of 25.00 USD (the “Purchase Amount”) on or about 10/04/2017, "Clause", a NY corporation (the “Company”), hereby issues to the Purchaser the right (the “Right”) to certain units of "Clause Token" (the “Token”), subject to the terms set forth below.
+THIS CERTIFIES THAT in exchange for the payment by the undersigned purchaser (the “Purchaser”) of 25 USD (the “Purchase Amount”) on or about 10/04/2017, "Clause", a NY corporation (the “Company”), hereby issues to the Purchaser the right (the “Right”) to certain units of "Clause Token" (the “Token”), subject to the terms set forth below.
 
 1.   Events
  
@@ -86,8 +86,8 @@ IN WITNESS WHEREOF, the undersigned have caused this instrument to be duly execu
 
 "Clause"
 
-By: Peter Hunn
+By: "Peter Hunn"
 
 PURCHASER
 
-By: Daniel Charles Selman
+By: "Daniel Charles Selman"

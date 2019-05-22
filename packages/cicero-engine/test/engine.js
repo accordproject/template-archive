@@ -245,6 +245,15 @@ describe('EngineHelloWorld', () => {
             }
         });
     });
+    describe('#generateText', function () {
+
+        it('should generate text for a smart clause', async function () {
+            const result = await engine.generateText(clause);
+            result.should.not.be.null;
+            result.response.should.equal(`Name of the person to greet: Fred Blogs.
+Thank you!`);
+        });
+    });
 });
 describe('EngineHelloModule', () => {
 
@@ -367,6 +376,23 @@ describe('EngineSaft', () => {
             result.response.tokenAddress.should.equal('Daniel Charles Selman');
         });
     });
+
+    describe.skip('#generateText', function () {
+
+        it('should generate text for a smart clause', async function () {
+            const request = {};
+            const NS = 'org.accordproject.saft';
+            request.$class = `${NS}.Launch`;
+            request.exchangeRate = 100;
+            const state = {};
+            state.$class = 'org.accordproject.cicero.contract.AccordContractState';
+            state.stateId = '1';
+            const result = await engine.generateText(clause);
+            result.should.not.be.null;
+            result.response.should.equal(saftInput);
+        });
+    });
+
 });
 describe('BogusClauses', () => {
     let engine;
