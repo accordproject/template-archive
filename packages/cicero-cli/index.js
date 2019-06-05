@@ -100,21 +100,17 @@ require('yargs')
         });
         yargs.option('archiveFile', {
             describe: 'file name for the archive',
-            type: 'string'
-        });
-        yargs.option('omitLogic', {
-            describe: 'omit the logic in the archive',
-            type: 'boolean',
-            default: false
+            type: 'string',
+            default: null
         });
     }, (argv) => {
         if (argv.verbose) {
-            Logger.info(`archive the template in the directory ${argv.template} into the file ${argv.archiveFile}`);
+            Logger.info(`archive the template in the directory ${argv.template}`);
         }
 
         try {
             argv = Commands.validateArchiveArgs(argv);
-            return Commands.archive(argv.target, argv.template, argv.archiveFile, argv.omitLogic)
+            return Commands.archive(argv.target, argv.template, argv.archiveFile)
                 .catch((err) => {
                     Logger.error(err.message);
                 });
