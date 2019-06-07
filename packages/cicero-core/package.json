@@ -17,6 +17,7 @@
   "scripts": {
     "webpack": "webpack --config webpack.config.js --mode production",
     "build": "babel src -d lib --copy-files && nearleyc ./src/tdl.ne -o ./lib/tdl.js && node scripts/nunjucks-precompile.js",
+    "build:watch": "babel src -d lib --copy-files --watch",
     "prepublishOnly": "npm run build && npm run webpack",
     "prepare": "npm run build",
     "pretest": "npm run lint",

@@ -46,7 +46,7 @@ require('yargs')
             argv = Commands.validateParseArgs(argv);
             return Commands.parse(argv.template, argv.sample, argv.out, argv.currentTime)
                 .then((result) => {
-                    Logger.info(JSON.stringify(result));
+                    if(result) {Logger.info(JSON.stringify(result));}
                 })
                 .catch((err) => {
                     Logger.error(err.message);
@@ -78,7 +78,7 @@ require('yargs')
             argv = Commands.validateGenerateTextArgs(argv);
             return Commands.generateText(argv.template, argv.data, argv.out)
                 .then((result) => {
-                    Logger.info(result);
+                    if(result) {Logger.info(JSON.stringify(result));}
                 })
                 .catch((err) => {
                     Logger.error(err.message);
@@ -147,7 +147,7 @@ require('yargs')
             argv = Commands.validateExecuteArgs(argv);
             return Commands.execute(argv.template, argv.sample, argv.request, argv.state, argv.currentTime)
                 .then((result) => {
-                    Logger.info(JSON.stringify(result));
+                    if(result) {Logger.info(JSON.stringify(result));}
                 })
                 .catch((err) => {
                     Logger.error(err.message);
@@ -176,7 +176,7 @@ require('yargs')
             argv = Commands.validateInitArgs(argv);
             return Commands.init(argv.template, argv.sample, argv.currentTime)
                 .then((result) => {
-                    Logger.info(JSON.stringify(result));
+                    if(result) {Logger.info(JSON.stringify(result));}
                 })
                 .catch((err) => {
                     Logger.error(err.message);
