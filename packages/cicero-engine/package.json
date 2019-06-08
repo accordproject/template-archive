@@ -48,8 +48,8 @@
   },
   "dependencies": {
     "@accordproject/cicero-core": "0.12.3",
-    "@accordproject/ergo-compiler": "0.8.2",
-    "@accordproject/ergo-engine": "0.8.2",
+    "@accordproject/ergo-compiler": "0.8.4",
+    "@accordproject/ergo-engine": "0.8.4",
     "moment-mini": "2.22.1"
   },
   "license-check-config": {

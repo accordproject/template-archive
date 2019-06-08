@@ -1,7 +1,7 @@
 {
     "source": {
         "include": ["packages"],
-        "exclude": ["packages/generator-cicero-template"],
+        "exclude": ["packages/generator-cicero-template", "packages/cicero-core/umd","packages/cicero-core/lib"],
         "includePattern": ".+\\.js(doc|x)?$",
         "excludePattern": ".?\/(coverage|out|node_modules|test)\/.+"
     },
