@@ -72,3 +72,5 @@ typings/
 
 # User Data
 userdata.json
+
+@models.accordproject.org*.cto
