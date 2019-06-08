@@ -62,7 +62,7 @@
     "webpack-cli": "^3.1.0"
   },
   "dependencies": {
-    "@accordproject/ergo-compiler": "0.8.2",
+    "@accordproject/ergo-compiler": "0.8.3",
     "axios": "0.18.0",
     "composer-concerto": "0.70.3",
     "debug": "4.1.0",
