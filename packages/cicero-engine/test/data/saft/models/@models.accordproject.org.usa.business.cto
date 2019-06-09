@@ -1,0 +1,17 @@
+namespace org.accordproject.usa.business
+
+/**
+ * Types of businesses in the USA
+ * Taken from: https://en.wikipedia.org/wiki/List_of_business_entities#United_States
+ */
+enum BusinessEntity {
+  o GENERAL_PARTNERSHIP
+  o LP
+  o LLP
+  o LLLP
+  o LLC
+  o PLLC
+  o CORP
+  o PC
+  o DBA
+}

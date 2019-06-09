@@ -72,6 +72,3 @@ typings/
 
 # User Data
 userdata.json
-
-# Derived CTO files
-@models.accordproject.org*.cto

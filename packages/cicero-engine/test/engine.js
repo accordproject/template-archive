@@ -27,18 +27,25 @@ chai.use(require('chai-as-promised'));
 const fs = require('fs');
 const path = require('path');
 
+const options = { skipUpdateExternalModels: true };
+
 describe('EngineLatePenalty', () => {
 
     let engine;
     let clause;
     let clause2;
+    let template;
+    let template2;
     const testLatePenaltyInput = fs.readFileSync(path.resolve(__dirname, 'data/latedeliveryandpenalty', 'sample.txt'), 'utf8');
     const testLatePenaltyPeriodInput = fs.readFileSync(path.resolve(__dirname, 'data/latedeliveryandpenalty-period', 'sample.txt'), 'utf8');
 
+    before(async () => {
+        template = await Template.fromDirectory('./test/data/latedeliveryandpenalty', options);
+        template2 = await Template.fromDirectory('./test/data/latedeliveryandpenalty-period', options);
+    });
+
     beforeEach(async function () {
         engine = new Engine();
-        const template = await Template.fromDirectory('./test/data/latedeliveryandpenalty');
-        const template2 = await Template.fromDirectory('./test/data/latedeliveryandpenalty-period');
         clause = new Clause(template);
         clause.parse(testLatePenaltyInput);
         clause2 = new Clause(template2);
@@ -119,7 +126,7 @@ describe('EngineLatePenalty (JavaScript)', () => {
 
     beforeEach(async function () {
         engine = new Engine();
-        const template = await Template.fromDirectory('./test/data/latedeliveryandpenalty_js');
+        const template = await Template.fromDirectory('./test/data/latedeliveryandpenalty_js', options);
         clause = new Clause(template);
         clause.parse(testLatePenaltyInput);
     });
@@ -183,7 +190,7 @@ describe('EngineHelloWorld', () => {
 
     beforeEach(async function () {
         engine = new Engine();
-        const template = await Template.fromDirectory('./test/data/helloworld');
+        const template = await Template.fromDirectory('./test/data/helloworld', options);
         clause = new Clause(template);
         clause.parse(helloWorldInput);
     });
@@ -247,7 +254,7 @@ describe('EngineHelloModule', () => {
 
     beforeEach(async function () {
         engine = new Engine();
-        const template = await Template.fromDirectory('./test/data/hellomodule');
+        const template = await Template.fromDirectory('./test/data/hellomodule', options);
         clause = new Clause(template);
         clause.parse(helloWorldInput);
     });
@@ -278,7 +285,7 @@ describe('EngineHelloEmit', () => {
 
     beforeEach(async function () {
         engine = new Engine();
-        const template = await Template.fromDirectory('./test/data/helloemit');
+        const template = await Template.fromDirectory('./test/data/helloemit', options);
         clause = new Clause(template);
         clause.parse(helloEmitInput);
     });
@@ -311,7 +318,7 @@ describe('EngineHelloEmitInit', () => {
 
     beforeEach(async function () {
         engine = new Engine();
-        const template = await Template.fromDirectory('./test/data/helloemitinit');
+        const template = await Template.fromDirectory('./test/data/helloemitinit', options);
         clause = new Clause(template);
         clause.parse(helloEmitInitInput);
     });
@@ -337,7 +344,7 @@ describe('EngineSaft', () => {
 
     beforeEach(async function () {
         engine = new Engine();
-        const template = await Template.fromDirectory('./test/data/saft');
+        const template = await Template.fromDirectory('./test/data/saft', options);
         clause = new Clause(template);
         clause.parse(saftInput);
     });
@@ -368,7 +375,7 @@ describe('BogusClauses', () => {
 
     beforeEach(async function () {
         engine = new Engine();
-        const template = await Template.fromDirectory('./test/data/no-logic');
+        const template = await Template.fromDirectory('./test/data/no-logic', options);
         clause = new Clause(template);
         clause.parse(testNoLogic);
     });
@@ -410,7 +417,7 @@ describe('EngineInstallmentSaleErgo', () => {
 
     beforeEach(async function () {
         engine = new Engine();
-        const template = await Template.fromDirectory('./test/data/installment-sale-ergo');
+        const template = await Template.fromDirectory('./test/data/installment-sale-ergo', options);
         clause = new Clause(template);
         clause.parse(testLatePenaltyInput);
     });
