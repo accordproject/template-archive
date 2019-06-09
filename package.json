@@ -32,7 +32,7 @@
     "postinstall": "npm run pkgcheck && npm run bootstrap",
     "bootstrap": "lerna bootstrap",
     "pretest": "npm run doc && npm run licchk",
-    "test": "lerna exec -- npm run test",
+    "test": "lerna exec -- npm run test:cov",
     "publish": "./scripts/manualrelease.sh",
     "repoclean": "lerna clean",
     "licchk": "license-check-and-add",
