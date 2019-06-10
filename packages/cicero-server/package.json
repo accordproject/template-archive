@@ -19,7 +19,8 @@
     "lint": "eslint .",
     "postlint": "npm run licchk",
     "licchk": "license-check",
-    "test": "mocha && nyc mocha"
+    "test": "mocha",
+    "test:cov": "nyc npm run test"
   },
   "repository": {
     "type": "git",

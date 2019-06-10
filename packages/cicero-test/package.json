@@ -17,8 +17,8 @@
     "licchk": "license-check",
     "test:cucumber": "cucumber-js test/features --require lib/steps.js --world-parameters '{\"rootdir\":\"./test\"}' && cucumber-js test/data/helloemit/test --require lib/steps.js --world-parameters '{\"rootdir\":\"./test/data/helloemit\"}'",
     "test:all": "npm run test:cucumber",
-    "test:cov": "nyc npm run test:all",
-    "test": "npm run test:all && npm run test:cov"
+    "test:cov": "nyc npm run test",
+    "test": "npm run test:all"
   },
   "repository": {
     "type": "git",

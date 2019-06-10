@@ -65,39 +65,45 @@ async function writeZip(template){
 }
 /* eslint-enable */
 
+const options = { skipUpdateExternalModels: true };
+
 describe('Template', () => {
 
     describe('#fromDirectory', () => {
 
         it('should create a template from a directory with no @AccordClauseLogic in logic', () => {
-            return Template.fromDirectory('./test/data/no-logic').should.be.fulfilled;
+            return Template.fromDirectory('./test/data/no-logic', options).should.be.fulfilled;
         });
 
         it('should create a template from a directory with no logic', async () => {
-            const template = await Template.fromDirectory('./test/data/text-only');
+            const template = await Template.fromDirectory('./test/data/text-only', options);
             template.hasLogic().should.equal(false);
         });
 
+        it('should create a template from a directory and download external models by default', async () => {
+            return Template.fromDirectory('./test/data/text-only').should.be.fulfilled;
+        });
+
         it('should create a template from a directory', () => {
-            return Template.fromDirectory('./test/data/latedeliveryandpenalty').should.be.fulfilled;
+            return Template.fromDirectory('./test/data/latedeliveryandpenalty', options).should.be.fulfilled;
         });
 
         it('should throw error when Ergo logic does not parse', async () => {
-            return Template.fromDirectory('./test/data/bad-logic').should.be.rejectedWith('Parse error (at file lib/logic.ergo line 14 col 4). \n    define agreed = request.agreedDelivery;\n    ^^^^^^                                 ');
+            return Template.fromDirectory('./test/data/bad-logic', options).should.be.rejectedWith('Parse error (at file lib/logic.ergo line 14 col 4). \n    define agreed = request.agreedDelivery;\n    ^^^^^^                                 ');
         });
 
         it('should throw an error if archive language is not a valid target', async () => {
-            const templatePromise = Template.fromDirectory('./test/data/latedeliveryandpenalty');
+            const templatePromise = Template.fromDirectory('./test/data/latedeliveryandpenalty', options);
             return templatePromise.then((template) => template.toArchive('foo')).should.be.rejectedWith('Unknown target: foo (available: es5,es6,cicero,java)');
         });
 
         it('should throw an error if archive language is is absent', async () => {
-            const templatePromise = Template.fromDirectory('./test/data/latedeliveryandpenalty');
+            const templatePromise = Template.fromDirectory('./test/data/latedeliveryandpenalty', options);
             return templatePromise.then((template) => template.toArchive()).should.be.rejectedWith('language is required and must be a string');
         });
 
         it('should roundtrip a source template (Ergo)', async function() {
-            const template = await Template.fromDirectory('./test/data/latedeliveryandpenalty');
+            const template = await Template.fromDirectory('./test/data/latedeliveryandpenalty', options);
             template.hasLogic().should.equal(true);
             template.getIdentifier().should.equal('latedeliveryandpenalty@0.0.1');
             template.getModelManager().getModelFile('io.clause.latedeliveryandpenalty').should.not.be.null;
@@ -107,7 +113,7 @@ describe('Template', () => {
             template.getMetadata().getREADME().should.not.be.null;
             template.getMetadata().getRequest().should.not.be.null;
             template.getMetadata().getKeywords().should.not.be.null;
-            template.getName().should.equal('latedeliveryandpenalty');
+            template.getName().should.equal('latedeliveryandpenalty', options);
             template.getDescription().should.equal('Late Delivery and Penalty. In case of delayed delivery except for Force Majeure cases, the Seller shall pay to the Buyer for every 9 DAY of delay penalty amounting to 7% of the total value of the Equipment whose delivery has been delayed. Any fractional part of a DAY is to be considered a full DAY. The total amount of penalty shall not however, exceed 2% of the total value of the Equipment involved in late delivery. If the delay is more than 2 WEEK, the Buyer is entitled to terminate this Contract.');
             template.getVersion().should.equal('0.0.1');
             template.getMetadata().getSample().should.equal('Late Delivery and Penalty. In case of delayed delivery except for Force Majeure cases, the Seller shall pay to the Buyer for every 9 days of delay penalty amounting to 7% of the total value of the Equipment whose delivery has been delayed. Any fractional part of a days is to be considered a full days. The total amount of penalty shall not however, exceed 2% of the total value of the Equipment involved in late delivery. If the delay is more than 2 weeks, the Buyer is entitled to terminate this Contract.');
@@ -129,7 +135,7 @@ describe('Template', () => {
         });
 
         it('should roundtrip a compiled template (JavaScript)', async function() {
-            const template = await Template.fromDirectory('./test/data/latedeliveryandpenalty_js');
+            const template = await Template.fromDirectory('./test/data/latedeliveryandpenalty_js', options);
             template.getIdentifier().should.equal('latedeliveryandpenalty@0.0.1');
             template.getModelManager().getModelFile('io.clause.latedeliveryandpenalty').should.not.be.null;
             template.getParserManager().getGrammar().should.not.be.null;
@@ -159,16 +165,16 @@ describe('Template', () => {
         });
 
         it('should throw an error if multiple template models are found', async () => {
-            return Template.fromDirectory('./test/data/multiple-concepts').should.be.rejectedWith('Found multiple instances of org.accordproject.cicero.contract.AccordClause in conga. The model for the template must contain a single asset that extends org.accordproject.cicero.contract.AccordClause.');
+            return Template.fromDirectory('./test/data/multiple-concepts', options).should.be.rejectedWith('Found multiple instances of org.accordproject.cicero.contract.AccordClause in conga. The model for the template must contain a single asset that extends org.accordproject.cicero.contract.AccordClause.');
         });
 
         it('should throw an error if no template models are found', async () => {
-            return Template.fromDirectory('./test/data/no-concepts').should.be.rejectedWith('Failed to find an asset that extends org.accordproject.cicero.contract.AccordClause in conga. The model for the template must contain a single asset that extends org.accordproject.cicero.contract.AccordClause.');
+            return Template.fromDirectory('./test/data/no-concepts', options).should.be.rejectedWith('Failed to find an asset that extends org.accordproject.cicero.contract.AccordClause in conga. The model for the template must contain a single asset that extends org.accordproject.cicero.contract.AccordClause.');
         });
 
         it('should throw an error if a package.json file does not exist', async () => {
             try {
-                await Template.fromDirectory('./test/data/no-packagejson');
+                await Template.fromDirectory('./test/data/no-packagejson', options);
                 assert.isOk(false,'should throw an error if a package.json file does not exist');
             }
             catch(err) {
@@ -177,12 +183,12 @@ describe('Template', () => {
         });
 
         it('should create a template from a directory with a locale sample', () => {
-            return Template.fromDirectory('./test/data/locales-conga').should.be.fulfilled;
+            return Template.fromDirectory('./test/data/locales-conga', options).should.be.fulfilled;
         });
 
         it('should throw an error if a sample.txt file does not exist', async () => {
             try {
-                await Template.fromDirectory('./test/data/no-sample');
+                await Template.fromDirectory('./test/data/no-sample', options);
                 assert.isOk(false,'should throw an error if a sample.txt file does not exist');
             }
             catch(err) {
@@ -192,7 +198,7 @@ describe('Template', () => {
 
         it('should throw an error if the locale is not in the IETF format', async () => {
             try {
-                await Template.fromDirectory('./test/data/bad-locale');
+                await Template.fromDirectory('./test/data/bad-locale', options);
                 assert.isOk(false,'should throw an error if the locale is not in the IETF format');
             }
             catch(err) {
@@ -202,23 +208,23 @@ describe('Template', () => {
 
         // Test case for issue #23
         it('should create template from a directory that has node_modules with duplicate namespace', () => {
-            return Template.fromDirectory('./test/data/with-node_modules').should.be.fulfilled;
+            return Template.fromDirectory('./test/data/with-node_modules', options).should.be.fulfilled;
         });
 
         it('should throw an error for property that is not declared', () => {
-            return Template.fromDirectory('./test/data/bad-property').should.be.rejectedWith('Template references a property \'currency\' that is not declared in the template model');
+            return Template.fromDirectory('./test/data/bad-property', options).should.be.rejectedWith('Template references a property \'currency\' that is not declared in the template model');
         });
 
         it('should throw an error for clause property that is not declared', () => {
-            return Template.fromDirectory('./test/data/bad-copyright-license').should.be.rejectedWith('Template references a property \'badPaymentClause\' that is not declared in the template model');
+            return Template.fromDirectory('./test/data/bad-copyright-license', options).should.be.rejectedWith('Template references a property \'badPaymentClause\' that is not declared in the template model');
         });
 
         it('should create an archive for a template with two Ergo modules', async () => {
-            return Template.fromDirectory('./test/data/hellomodule').should.be.fulfilled;
+            return Template.fromDirectory('./test/data/hellomodule', options).should.be.fulfilled;
         });
 
         it('should fail creating an archive for a template for a wrong Ergo module call', async () => {
-            return Template.fromDirectory('./test/data/hellomodule-bug').should.be.rejectedWith('Type error (at file lib/logic.ergo line 23 col 11). This operator received unexpected arguments');
+            return Template.fromDirectory('./test/data/hellomodule-bug', options).should.be.rejectedWith('Type error (at file lib/logic.ergo line 23 col 11). This operator received unexpected arguments');
         });
     });
 
@@ -299,12 +305,12 @@ describe('Template', () => {
     describe('#setSamples', () => {
 
         it('should not throw for valid samples object', async () => {
-            const template = await Template.fromDirectory('./test/data/latedeliveryandpenalty');
+            const template = await Template.fromDirectory('./test/data/latedeliveryandpenalty', options);
             return (() => template.setSamples({ default: 'sample text' })).should.not.throw();
         });
 
         it('should throw for null samples object', async () => {
-            const template = await Template.fromDirectory('./test/data/latedeliveryandpenalty');
+            const template = await Template.fromDirectory('./test/data/latedeliveryandpenalty', options);
             return (() => template.setSamples(null)).should.throw('sample.txt is required');
         });
     });
@@ -312,7 +318,7 @@ describe('Template', () => {
     describe('#setSample', () => {
 
         it('should not throw for valid sample object', async () => {
-            const template = await Template.fromDirectory('./test/data/latedeliveryandpenalty');
+            const template = await Template.fromDirectory('./test/data/latedeliveryandpenalty', options);
             return (() => template.setSample('sample text','default')).should.not.throw();
         });
     });
@@ -320,7 +326,7 @@ describe('Template', () => {
     describe('#setRequest', () => {
 
         it('should set a new request', async () => {
-            const template = await Template.fromDirectory('./test/data/latedeliveryandpenalty');
+            const template = await Template.fromDirectory('./test/data/latedeliveryandpenalty', options);
             const newrequest = {};
             newrequest.$class = 'io.clause.latedeliveryandpenalty.LateDeliveryAndPenaltyRequest';
             newrequest.forceMajeure = true;
@@ -338,7 +344,7 @@ describe('Template', () => {
     describe('#setReadme', () => {
 
         it('should not throw for valid readme text', async () => {
-            const template = await Template.fromDirectory('./test/data/latedeliveryandpenalty');
+            const template = await Template.fromDirectory('./test/data/latedeliveryandpenalty', options);
             return (() => template.setReadme('readme text')).should.not.throw();
         });
     });
@@ -346,7 +352,7 @@ describe('Template', () => {
     describe('#getRequestTypes', () => {
 
         it('should return request types for single accordclauselogic function', async () => {
-            const template = await Template.fromDirectory('./test/data/latedeliveryandpenalty');
+            const template = await Template.fromDirectory('./test/data/latedeliveryandpenalty', options);
             const types = template.getRequestTypes();
             types.should.be.eql([
                 'io.clause.latedeliveryandpenalty.LateDeliveryAndPenaltyRequest',
@@ -354,7 +360,7 @@ describe('Template', () => {
         });
 
         it('should return empty array when no logic is defined', async () => {
-            const template = await Template.fromDirectory('./test/data/no-logic');
+            const template = await Template.fromDirectory('./test/data/no-logic', options);
             const types = template.getRequestTypes();
             types.should.be.eql([]);
         });
@@ -363,7 +369,7 @@ describe('Template', () => {
     describe('#getResponseTypes', () => {
 
         it('should return response type for single accordclauselogic function', async () => {
-            const template = await Template.fromDirectory('./test/data/latedeliveryandpenalty');
+            const template = await Template.fromDirectory('./test/data/latedeliveryandpenalty', options);
             const types = template.getResponseTypes();
             types.should.be.eql([
                 'io.clause.latedeliveryandpenalty.LateDeliveryAndPenaltyResponse',
@@ -380,7 +386,7 @@ describe('Template', () => {
     describe('#getEmitTypes', () => {
 
         it('should return the default emit type for a clause without emit type declaration', async () => {
-            const template = await Template.fromDirectory('./test/data/latedeliveryandpenalty');
+            const template = await Template.fromDirectory('./test/data/latedeliveryandpenalty', options);
             const types = template.getEmitTypes();
             types.should.be.eql([
                 'org.accordproject.base.Event',
@@ -388,7 +394,7 @@ describe('Template', () => {
         });
 
         it('should return emit type when declared in a clause', async () => {
-            const template = await Template.fromDirectory('./test/data/helloemit');
+            const template = await Template.fromDirectory('./test/data/helloemit', options);
             const types = template.getEmitTypes();
             types.should.be.eql([
                 'org.accordproject.helloemit.Greeting',
@@ -396,7 +402,7 @@ describe('Template', () => {
         });
 
         it('should return empty array when no logic is defined', async () => {
-            const template = await Template.fromDirectory('./test/data/no-logic');
+            const template = await Template.fromDirectory('./test/data/no-logic', options);
             const types = template.getEmitTypes();
             types.should.be.eql([]);
         });
@@ -405,7 +411,7 @@ describe('Template', () => {
     describe('#getStateTypes', () => {
 
         it('should return the default state type for a clause without state type declaration', async () => {
-            const template = await Template.fromDirectory('./test/data/latedeliveryandpenalty');
+            const template = await Template.fromDirectory('./test/data/latedeliveryandpenalty', options);
             const types = template.getStateTypes();
             types.should.be.eql([
                 'org.accordproject.cicero.contract.AccordContractState',
@@ -413,7 +419,7 @@ describe('Template', () => {
         });
 
         it('should return state type when declared in a clause', async () => {
-            const template = await Template.fromDirectory('./test/data/helloemit');
+            const template = await Template.fromDirectory('./test/data/helloemit', options);
             const types = template.getStateTypes();
             types.should.be.eql([
                 'org.accordproject.cicero.contract.AccordContractState',
@@ -421,7 +427,7 @@ describe('Template', () => {
         });
 
         it('should return empty array when no logic is defined', async () => {
-            const template = await Template.fromDirectory('./test/data/no-logic');
+            const template = await Template.fromDirectory('./test/data/no-logic', options);
             const types = template.getStateTypes();
             types.should.be.eql([]);
         });
@@ -429,7 +435,7 @@ describe('Template', () => {
 
     describe('#getHash', () => {
         it('should return a SHA-256 hash', async () => {
-            const template = await Template.fromDirectory('./test/data/latedeliveryandpenalty');
+            const template = await Template.fromDirectory('./test/data/latedeliveryandpenalty', options);
             template.getHash().should.equal('d6d3e3816f4d0deaa659f9b1c7efcb00005da19e6d615c2b7ccf3997a6eab855');
         });
     });
@@ -437,7 +443,7 @@ describe('Template', () => {
     describe('#getTemplateLogic', () => {
         it('should return a Template Logic', async () => {
             const TemplateLogic = require('@accordproject/ergo-compiler').TemplateLogic;
-            const template = await Template.fromDirectory('./test/data/latedeliveryandpenalty');
+            const template = await Template.fromDirectory('./test/data/latedeliveryandpenalty', options);
             template.getTemplateLogic('cicero').should.be.an.instanceof(TemplateLogic);
         });
     });
@@ -445,7 +451,7 @@ describe('Template', () => {
     describe('#getFactory', () => {
         it('should return a Factory', async () => {
             const Factory = require('@accordproject/ergo-compiler').ComposerConcerto.Factory;
-            const template = await Template.fromDirectory('./test/data/latedeliveryandpenalty');
+            const template = await Template.fromDirectory('./test/data/latedeliveryandpenalty', options);
             template.getFactory().should.be.an.instanceof(Factory);
         });
     });
@@ -453,14 +459,14 @@ describe('Template', () => {
     describe('#getSerializer', () => {
         it('should return a Serializer', async () => {
             const Serializer = require('@accordproject/ergo-compiler').ComposerConcerto.Serializer;
-            const template = await Template.fromDirectory('./test/data/latedeliveryandpenalty');
+            const template = await Template.fromDirectory('./test/data/latedeliveryandpenalty', options);
             template.getSerializer().should.be.an.instanceof(Serializer);
         });
     });
 
     describe('#setPackageJson', () => {
         it('should set the package json of the metadata', async () => {
-            const template = await Template.fromDirectory('./test/data/latedeliveryandpenalty');
+            const template = await Template.fromDirectory('./test/data/latedeliveryandpenalty', options);
             const packageJson = template.getMetadata().getPackageJson();
             packageJson.name = 'new_name';
             template.setPackageJson(packageJson);
@@ -470,7 +476,7 @@ describe('Template', () => {
 
     describe('#setKeywords', () => {
         it('should set the keywords of the metadatas package json', async () => {
-            const template = await Template.fromDirectory('./test/data/latedeliveryandpenalty');
+            const template = await Template.fromDirectory('./test/data/latedeliveryandpenalty', options);
             const packageJson = template.getMetadata().getPackageJson();
             packageJson.keywords = ['payment', 'car', 'automobile'];
             template.setPackageJson(packageJson);
@@ -478,7 +484,7 @@ describe('Template', () => {
         });
 
         it('should find a specific keyword of the metadatas package json', async () => {
-            const template = await Template.fromDirectory('./test/data/latedeliveryandpenalty');
+            const template = await Template.fromDirectory('./test/data/latedeliveryandpenalty', options);
             const packageJson = template.getMetadata().getPackageJson();
             packageJson.keywords = ['payment', 'car', 'automobile'];
             template.setPackageJson(packageJson);
@@ -486,7 +492,7 @@ describe('Template', () => {
         });
 
         it('should return empty array if no keywords exist', async () => {
-            const template = await Template.fromDirectory('./test/data/latedeliveryandpenalty');
+            const template = await Template.fromDirectory('./test/data/latedeliveryandpenalty', options);
             const packageJson = template.getMetadata().getPackageJson();
             packageJson.keywords = [];
             template.setPackageJson(packageJson);
@@ -497,7 +503,7 @@ describe('Template', () => {
     describe('#getLogic', () => {
 
         it('should return all Ergo scripts', async () => {
-            const template = await Template.fromDirectory('./test/data/latedeliveryandpenalty');
+            const template = await Template.fromDirectory('./test/data/latedeliveryandpenalty', options);
             template.getScriptManager().getLogic().length.should.equal(1);
         });
     });
@@ -508,7 +514,7 @@ describe('Template', () => {
             const visitor = {
                 visit: function(thing, parameters){}
             };
-            const template = await Template.fromDirectory('./test/data/latedeliveryandpenalty');
+            const template = await Template.fromDirectory('./test/data/latedeliveryandpenalty', options);
             return (() => template.accept(visitor,{})).should.not.throw();
         });
     });

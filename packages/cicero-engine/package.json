@@ -18,7 +18,7 @@
     "test:mocha": "mocha",
     "test:all": "npm run test:mocha",
     "test:cov": "nyc npm run test:all",
-    "test": "npm run test:all && npm run test:cov"
+    "test": "npm run test:all"
   },
   "repository": {
     "type": "git",
