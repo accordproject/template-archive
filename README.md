@@ -36,12 +36,10 @@ Top level repository (cicero), with sub packages. Each sub-package is published 
 * cicero-tools : Tools for generating code (UML, Java, etc.) from Accord Project legal templates
 * generator-cicero-template: Utility to create a self-contained directory for a new Accord Project legal template
 
-© 2017-2019 Clause, Inc.
-
 ---
 
 <a href="https://docs.accordproject.org/">
-	<img src="assets/APLogo.png" alt="Accord Project Logo" />
+	<img src="assets/APLogo.png" alt="Accord Project Logo" width="880" />
 </a>
 
 Accord Project is an open source, non-profit, initiative working to transform contract management and contract automation by digitizing contracts.
@@ -89,6 +87,8 @@ Join the Accord Project Technology Working Group [Slack channel][slack] to get i
 Accord Project source code files are made available under the [Apache License, Version 2.0][apache].
 
 Accord Project documentation files are made available under the [Creative Commons Attribution 4.0 International License][creativecommons] (CC-BY-4.0).
+
+© 2017-2019 Clause, Inc.
 
 [apspec]: https://docs.accordproject.org/docs/cicero-specification.html
 [apworkgroup]: https://calendar.google.com/calendar/event?action=TEMPLATE&tmeid=MjZvYzIzZHVrYnI1aDVzbjZnMHJqYmtwaGlfMjAxNzExMTVUMjEwMDAwWiBkYW5AY2xhdXNlLmlv&tmsrc=dan%40clause.io
