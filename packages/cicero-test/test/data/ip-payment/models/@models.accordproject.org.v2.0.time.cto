@@ -1,6 +1,12 @@
 namespace org.accordproject.time
 
 /**
+ * WARNING, this file has moved to 
+ * models.accordproject.org/time@0.2.0.cto
+ * To take advantage of semantic versioning you should update your links.
+ */
+
+/**
  * Months of the year
  */
 enum Month {
