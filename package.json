@@ -59,6 +59,7 @@
     "exact_paths_method": "EXCLUDE",
     "exact_paths": [
       ".git",
+      ".github",
       "node_modules",
       "packages",
       "softhsm",
@@ -66,9 +67,7 @@
       "README.md",
       "CONTRIBUTING.md",
       "DEVELOPERS.md",
-      "ISSUE_TEMPLATE.md",
       "NOTICES.md",
-      "PULL_REQUEST_TEMPLATE.md",
       "LICENSE",
       "README.rst",
       "markdown-license.txt",
