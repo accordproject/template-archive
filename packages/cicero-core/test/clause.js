@@ -25,6 +25,8 @@ chai.should();
 chai.use(require('chai-things'));
 chai.use(require('chai-as-promised'));
 
+const options = { skipUpdateExternalModels: true };
+
 describe('Clause', () => {
 
     const testLatePenaltyInput = fs.readFileSync(path.resolve(__dirname, 'data/latedeliveryandpenalty', 'sample.txt'), 'utf8');
@@ -36,13 +38,13 @@ describe('Clause', () => {
     describe('#constructor', () => {
 
         it('should create a clause for a latedeliveryandpenalty template', async function() {
-            const template = await Template.fromDirectory('./test/data/latedeliveryandpenalty');
+            const template = await Template.fromDirectory('./test/data/latedeliveryandpenalty', options);
             const clause = new Clause(template);
             clause.should.not.be.null;
         });
 
         it('should create a clause for a conga template', async function() {
-            const template = await Template.fromDirectory('./test/data/conga');
+            const template = await Template.fromDirectory('./test/data/conga', options);
             const clause = new Clause(template);
             clause.should.not.be.null;
         });
@@ -51,7 +53,7 @@ describe('Clause', () => {
     describe('#setData', () => {
 
         it('should be able to set data', async function() {
-            const template = await Template.fromDirectory('./test/data/latedeliveryandpenalty');
+            const template = await Template.fromDirectory('./test/data/latedeliveryandpenalty', options);
             const clause = new Clause(template);
 
             // check that we can set/get a valid template model
@@ -80,7 +82,7 @@ describe('Clause', () => {
             clause.getDataAsComposerObject().getFullyQualifiedType().should.be.equal('io.clause.latedeliveryandpenalty.TemplateModel');
         });
         it('should throw error for bad $class', async function() {
-            const template = await Template.fromDirectory('./test/data/latedeliveryandpenalty');
+            const template = await Template.fromDirectory('./test/data/latedeliveryandpenalty', options);
             const clause = new Clause(template);
             const data = {
                 $class: 'bad.class.name'
@@ -92,7 +94,7 @@ describe('Clause', () => {
     describe('#toJSON', () => {
 
         it('should get a JSON representation of a clause', async function() {
-            const template = await Template.fromDirectory('./test/data/latedeliveryandpenalty');
+            const template = await Template.fromDirectory('./test/data/latedeliveryandpenalty', options);
             const clause = new Clause(template);
             const data = {
                 $class: 'io.clause.latedeliveryandpenalty.TemplateModel',
@@ -123,7 +125,7 @@ describe('Clause', () => {
     describe('#parse', () => {
 
         it('should be able to set the data from latedeliveryandpenalty natural language text', async function() {
-            const template = await Template.fromDirectory('./test/data/latedeliveryandpenalty');
+            const template = await Template.fromDirectory('./test/data/latedeliveryandpenalty', options);
             const clause = new Clause(template);
             clause.parse(testLatePenaltyInput);
             const data = {
@@ -150,7 +152,7 @@ describe('Clause', () => {
         });
 
         it('should be able to set the data from latedeliveryandpenalty natural language text (with a Period)', async function() {
-            const template = await Template.fromDirectory('./test/data/latedeliveryandpenalty-period');
+            const template = await Template.fromDirectory('./test/data/latedeliveryandpenalty-period', options);
             const clause = new Clause(template);
             clause.parse(testLatePenaltyPeriodInput);
             const data = {
@@ -183,7 +185,7 @@ describe('Clause', () => {
         });
 
         it('should be able to set the data from conga natural language text', async function() {
-            const template = await Template.fromDirectory('./test/data/conga');
+            const template = await Template.fromDirectory('./test/data/conga', options);
             const clause = new Clause(template);
             clause.parse(testCongaInput);
             const data = {
@@ -199,13 +201,13 @@ describe('Clause', () => {
         });
 
         it('should throw an error for empty text', async function() {
-            const template = await Template.fromDirectory('./test/data/conga');
+            const template = await Template.fromDirectory('./test/data/conga', options);
             const clause = new Clause(template);
             (()=> clause.parse('')).should.throw('Parsing clause text returned a null AST. This may mean the text is valid, but not complete.');
         });
 
         it('should be able to set the data for a text-only clause', async function() {
-            const template = await Template.fromDirectory('./test/data/text-only');
+            const template = await Template.fromDirectory('./test/data/text-only', options);
             const clause = new Clause(template);
             clause.parse(testTextOnlyInput);
             const data = {
@@ -231,7 +233,7 @@ describe('Clause', () => {
         });
 
         it('should create a template from a directory no logic', () => {
-            return Template.fromDirectory('./test/data/no-logic').should.be.fulfilled;
+            return Template.fromDirectory('./test/data/no-logic', options).should.be.fulfilled;
         });
 
     });
@@ -239,7 +241,7 @@ describe('Clause', () => {
     describe('#generateText', () => {
 
         it('should be able to roundtrip latedelivery natural language text', async function() {
-            const template = await Template.fromDirectory('./test/data/latedeliveryandpenalty');
+            const template = await Template.fromDirectory('./test/data/latedeliveryandpenalty', options);
             const clause = new Clause(template);
             clause.parse(testLatePenaltyInput);
             const nl = clause.generateText();
@@ -247,7 +249,7 @@ describe('Clause', () => {
         });
 
         it('should be able to roundtrip latedelivery natural language text (with a Period)', async function() {
-            const template = await Template.fromDirectory('./test/data/latedeliveryandpenalty-period');
+            const template = await Template.fromDirectory('./test/data/latedeliveryandpenalty-period', options);
             const clause = new Clause(template);
             clause.parse(testLatePenaltyPeriodInput);
             const nl = clause.generateText();
@@ -255,7 +257,7 @@ describe('Clause', () => {
         });
 
         it('should be able to roundtrip conga natural language text', async function() {
-            const template = await Template.fromDirectory('./test/data/conga');
+            const template = await Template.fromDirectory('./test/data/conga', options);
             const clause = new Clause(template);
             clause.parse(testCongaInput);
             const nl = clause.generateText();
@@ -263,7 +265,7 @@ describe('Clause', () => {
         });
 
         it('should be able to roundtrip alltypes natural language text', async function() {
-            const template = await Template.fromDirectory('./test/data/alltypes');
+            const template = await Template.fromDirectory('./test/data/alltypes', options);
             const clause = new Clause(template);
             clause.parse(testAllTypesInput);
             const nl = clause.generateText();

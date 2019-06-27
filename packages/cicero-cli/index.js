@@ -46,7 +46,7 @@ require('yargs')
             argv = Commands.validateParseArgs(argv);
             return Commands.parse(argv.template, argv.sample, argv.out, argv.currentTime)
                 .then((result) => {
-                    Logger.info(JSON.stringify(result));
+                    if(result) {Logger.info(JSON.stringify(result));}
                 })
                 .catch((err) => {
                     Logger.error(err.message);
@@ -78,7 +78,7 @@ require('yargs')
             argv = Commands.validateGenerateTextArgs(argv);
             return Commands.generateText(argv.template, argv.data, argv.out)
                 .then((result) => {
-                    Logger.info(result);
+                    if(result) {Logger.info(JSON.stringify(result));}
                 })
                 .catch((err) => {
                     Logger.error(err.message);
@@ -100,21 +100,17 @@ require('yargs')
         });
         yargs.option('archiveFile', {
             describe: 'file name for the archive',
-            type: 'string'
-        });
-        yargs.option('omitLogic', {
-            describe: 'omit the logic in the archive',
-            type: 'boolean',
-            default: false
+            type: 'string',
+            default: null
         });
     }, (argv) => {
         if (argv.verbose) {
-            Logger.info(`archive the template in the directory ${argv.template} into the file ${argv.archiveFile}`);
+            Logger.info(`archive the template in the directory ${argv.template}`);
         }
 
         try {
             argv = Commands.validateArchiveArgs(argv);
-            return Commands.archive(argv.target, argv.template, argv.archiveFile, argv.omitLogic)
+            return Commands.archive(argv.target, argv.template, argv.archiveFile)
                 .catch((err) => {
                     Logger.error(err.message);
                 });
@@ -151,7 +147,7 @@ require('yargs')
             argv = Commands.validateExecuteArgs(argv);
             return Commands.execute(argv.template, argv.sample, argv.request, argv.state, argv.currentTime)
                 .then((result) => {
-                    Logger.info(JSON.stringify(result));
+                    if(result) {Logger.info(JSON.stringify(result));}
                 })
                 .catch((err) => {
                     Logger.error(err.message);
@@ -180,7 +176,7 @@ require('yargs')
             argv = Commands.validateInitArgs(argv);
             return Commands.init(argv.template, argv.sample, argv.currentTime)
                 .then((result) => {
-                    Logger.info(JSON.stringify(result));
+                    if(result) {Logger.info(JSON.stringify(result));}
                 })
                 .catch((err) => {
                     Logger.error(err.message);

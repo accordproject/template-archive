@@ -10,5 +10,5 @@
             }
         ]
     ],
-    "plugins": ["@babel/plugin-proposal-object-rest-spread"]
+    "plugins": ["istanbul","@babel/plugin-proposal-object-rest-spread"]
 }

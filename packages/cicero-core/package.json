@@ -1,6 +1,6 @@
 {
   "name": "@accordproject/cicero-core",
-  "version": "0.12.2",
+  "version": "0.12.4",
   "description": "Cicero Core - implementation of Accord Protocol Template Specification",
   "engines": {
     "node": ">=8",
@@ -17,13 +17,15 @@
   "scripts": {
     "webpack": "webpack --config webpack.config.js --mode production",
     "build": "babel src -d lib --copy-files && nearleyc ./src/tdl.ne -o ./lib/tdl.js && node scripts/nunjucks-precompile.js",
+    "build:watch": "babel src -d lib --copy-files --watch",
     "prepublishOnly": "npm run build && npm run webpack",
     "prepare": "npm run build",
-    "pretest": "npm run lint",
+    "pretest": "npm run lint && npm run build",
     "lint": "eslint .",
     "postlint": "npm run licchk",
     "licchk": "license-check",
-    "test": "npm run build && mocha && nyc mocha",
+    "test": "mocha",
+    "test:cov": "nyc npm run test",
     "jsdoc": "jsdoc -c jsdoc.json package.json",
     "typescript": "jsdoc -t node_modules/tsd-jsdoc/dist -r ./src/"
   },
@@ -47,9 +49,12 @@
     "@babel/cli": "^7.4.4",
     "@babel/core": "^7.4.5",
     "@babel/preset-env": "^7.4.5",
+    "@babel/register": "^7.4.4",
+    "@istanbuljs/nyc-config-babel": "^2.1.1",
     "archiver": "3.0.0",
     "babel-core": "^7.0.0-bridge.0",
     "babel-loader": "^8.0.6",
+    "babel-plugin-istanbul": "^5.1.4",
     "babel-preset-env": "^1.7.0",
     "chai": "4.2.0",
     "chai-as-promised": "7.1.1",
@@ -105,12 +110,13 @@
     "sourceMap": "inline",
     "reporter": [
       "lcov",
+      "text",
       "text-summary",
       "html",
       "json"
     ],
     "include": [
-      "lib/**/*.js"
+      "src/**/*.js"
     ],
     "exclude": [
       "lib/tdl.js",

@@ -11,7 +11,7 @@ Cicero allows you to define natural language contract and clause templates that 
 
 You can browse the library of Open Source Cicero contract and clause templates at: https://templates.accordproject.org.
 
-Cicero is an Open Source implementation of the [Accord Project Template Specification](https://docs.accordproject.org/docs/cicero-specification.html). It defines the structure of natural language templates, bound to a data model, that can be executed using request/response JSON messages.
+Cicero is an Open Source implementation of the [Accord Project Template Specification][apspec]. It defines the structure of natural language templates, bound to a data model, that can be executed using request/response JSON messages.
 
 You can read the latest user documentation here: http://docs.accordproject.org.
 
@@ -23,8 +23,7 @@ Using Cicero you can take any existing natural language text (typically a clause
 
 We are an open community and welcome both lawyers and technologists to work on the specifications and code. If you would like to get involved please join the Accord #technology-wg Slack channel by signing up here: https://www.accordproject.org.
 
-[Accord Technology Working Group weekly meeting](
-https://calendar.google.com/calendar/event?action=TEMPLATE&tmeid=MjZvYzIzZHVrYnI1aDVzbjZnMHJqYmtwaGlfMjAxNzExMTVUMjEwMDAwWiBkYW5AY2xhdXNlLmlv&tmsrc=dan%40clause.io)
+[Accord Technology Working Group weekly meeting][apworkgroup]
 
 ## Structure of the Code Repository
 
@@ -37,7 +36,68 @@ Top level repository (cicero), with sub packages. Each sub-package is published 
 * cicero-tools : Tools for generating code (UML, Java, etc.) from Accord Project legal templates
 * generator-cicero-template: Utility to create a self-contained directory for a new Accord Project legal template
 
-## License <a name="license"></a>
-Accord Project source code files are made available under the Apache License, Version 2.0 (Apache-2.0), located in the LICENSE file. Accord Project documentation files are made available under the Creative Commons Attribution 4.0 International License (CC-BY-4.0), available at http://creativecommons.org/licenses/by/4.0/.
+---
 
-© 2017-2019 Clause, Inc.
+<a href="https://www.accordproject.org/">
+  <img src="assets/APLogo.png" alt="Accord Project Logo" width="400" />
+</a>
+
+Accord Project is an open source, non-profit, initiative working to transform contract management and contract automation by digitizing contracts. Accord Project operates under the umbrella of the [Linux Foundation][linuxfound].
+
+## Learn More About Accord Project
+
+### Overview
+* [Accord Project][apmain]
+* [Accord Project News][apnews]
+* [Accord Project Blog][apblog]
+* [Accord Project Slack][apslack]
+* [Accord Project Technical Documentation][apdoc]
+* [Accord Project GitHub][apgit]
+
+
+### Documentation
+* [Getting Started with Accord Project][docwelcome]
+* [Concepts and High-level Architecture][dochighlevel]
+* [How to use the Cicero Templating System][doccicero]
+* [How to Author Accord Project Templates][docstudio]
+* [Ergo Language Guide][docergo]
+
+## Contributing
+
+The Accord Project technology is being developed as open source. All the software packages are being actively maintained on GitHub and we encourage organizations and individuals to contribute requirements, documentation, issues, new templates, and code.
+
+Find out what’s coming on our [blog][apblog].
+
+Join the Accord Project Technology Working Group [Slack channel][apslack] to get involved!
+
+For code contributions, read our [CONTRIBUTING guide][contributing] and information for [DEVELOPERS][developers].
+
+## License <a name="license"></a>
+
+Accord Project source code files are made available under the [Apache License, Version 2.0][apache].
+Accord Project documentation files are made available under the [Creative Commons Attribution 4.0 International License][creativecommons] (CC-BY-4.0).
+
+Copyright 2018-2019 Clause, Inc.
+
+[linuxfound]: https://www.linuxfoundation.org
+[apmain]: https://accordproject.org/ 
+[apworkgroup]: https://calendar.google.com/calendar/event?action=TEMPLATE&tmeid=MjZvYzIzZHVrYnI1aDVzbjZnMHJqYmtwaGlfMjAxNzExMTVUMjEwMDAwWiBkYW5AY2xhdXNlLmlv&tmsrc=dan%40clause.io
+[apblog]: https://medium.com/@accordhq
+[apnews]: https://www.accordproject.org/news/
+[apgit]:  https://github.com/accordproject/
+[apdoc]: https://docs.accordproject.org/
+[apslack]: https://accord-project-slack-signup.herokuapp.com
+
+[docspec]: https://docs.accordproject.org/docs/spec-overview.html
+[docwelcome]: https://docs.accordproject.org/docs/accordproject.html
+[dochighlevel]: https://docs.accordproject.org/docs/spec-concepts.html
+[docergo]: https://docs.accordproject.org/docs/logic-ergo.html
+[docstart]: https://docs.accordproject.org/docs/accordproject.html
+[doccicero]: https://docs.accordproject.org/docs/basic-use.html
+[docstudio]: https://docs.accordproject.org/docs/advanced-latedelivery.html
+
+[contributing]: https://github.com/accordproject/ergo/blob/master/CONTRIBUTING.md
+[developers]: https://github.com/accordproject/ergo/blob/master/DEVELOPERS.md
+
+[apache]: https://github.com/accordproject/template-studio-v2/blob/master/LICENSE
+[creativecommons]: http://creativecommons.org/licenses/by/4.0/

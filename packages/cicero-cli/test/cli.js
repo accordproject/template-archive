@@ -127,6 +127,16 @@ describe('cicero-cli', () => {
             fs.unlinkSync(archiveName);
         });
 
+        it('should create a valid ergo archive with a default name', async () => {
+            const archiveName = 'latedeliveryandpenalty@0.0.1.cta';
+            const result = await Commands.archive('ergo', template, null);
+            result.should.eql(true);
+            const newTemplate = await Template.fromArchive(fs.readFileSync(archiveName));
+            newTemplate.should.not.be.null;
+            newTemplate.hasLogic().should.equal(true);
+            fs.unlinkSync(archiveName);
+        });
+
     });
 
     describe('#validateParseArgs', () => {

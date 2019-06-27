@@ -258,11 +258,9 @@ class TemplateLoader {
      * @return {Promise<Template>} a Promise to the instantiated template
      */
     static async fromDirectory(Template, path, options) {
-
         if (!options) {
             options = {};
         }
-
         const method = 'fromDirectory';
 
         // grab the README.md
@@ -302,8 +300,15 @@ class TemplateLoader {
         });
 
         template.getModelManager().addModelFiles(modelFiles, modelFileNames, true);
-        await template.getModelManager().updateExternalModels();
-        Logger.debug(method, 'Added model files', modelFiles.length);
+        if(!options.skipUpdateExternalModels){
+            await template.getModelManager().updateExternalModels();
+            Logger.debug(method, 'Added model files', modelFiles.length);
+
+            const externalModelFiles = template.getModelManager().getModels();
+            externalModelFiles.forEach(function (file) {
+                fs.writeFileSync(path + '/models/' + file.name, file.content);
+            });
+        }
 
         // load and add the ergo files
         if(template.getMetadata().getErgoVersion()) {

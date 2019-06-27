@@ -1,6 +1,6 @@
 {
   "name": "@accordproject/cicero-tools",
-  "version": "0.12.2",
+  "version": "0.12.4",
   "description": "Cicero Tools",
   "engines": {
     "node": ">=8",
@@ -16,7 +16,8 @@
     "lint": "eslint .",
     "postlint": "npm run licchk",
     "licchk": "license-check",
-    "test": "mocha --recursive && nyc mocha --recursive"
+    "test": "mocha --recursive",
+    "test:cov": "nyc npm run test"
   },
   "repository": {
     "type": "git",
@@ -51,8 +52,8 @@
     "webpack-cli": "^3.1.0"
   },
   "dependencies": {
-    "composer-concerto": "0.70.2",
-    "composer-concerto-tools": "0.60.2",
+    "composer-concerto": "0.70.5",
+    "composer-concerto-tools": "0.60.5",
     "uuid": "3.3.2",
     "yargs": "9.0.1"
   },

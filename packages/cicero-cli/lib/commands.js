@@ -408,13 +408,20 @@ class Commands {
      */
     static archive(target, templatePath, archiveFile) {
         return Commands.loadTemplate(templatePath)
-            .then((template) => {
-                return template.toArchive(target);
-            })
-            .then((archive) => {
-                Logger.info('Creating archive: ' + archiveFile);
-                fs.writeFileSync(archiveFile, archive);
-                return Promise.resolve(true);
+            .then(async (template) => {
+                const archive = await template.toArchive(target);
+                let file;
+                if (archiveFile) {
+                    file = archiveFile;
+                }
+                else {
+                    const templateName = template.getMetadata().getName();
+                    const templateVersion = template.getMetadata().getVersion();
+                    file = `${templateName}@${templateVersion}.cta`;
+                }
+                Logger.info('Creating archive: ' + file);
+                fs.writeFileSync(file, archive);
+                return true;
             });
     }
 }

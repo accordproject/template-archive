@@ -30,7 +30,7 @@ describe('Contract', () => {
 
     describe('#parse', () => {
         it('should be able to set the data from copyright-license natural language text', async function() {
-            const template = await Template.fromDirectory('./test/data/copyright-license');
+            const template = await Template.fromDirectory('./test/data/copyright-license', { skipUpdateExternalModels: true });
             const contract = new Contract(template);
             contract.parse(sampleText);
         });

@@ -1,0 +1,57 @@
+namespace org.accordproject.usa.state
+
+/**
+ * States in the USA
+ */
+enum State {
+  o AL
+  o AK
+  o AZ
+  o AR
+  o CA
+  o CO
+  o CT
+  o DE
+  o FL
+  o GA
+  o HI
+  o ID
+  o IL
+  o IN
+  o IA
+  o KS
+  o KY
+  o LA
+  o ME
+  o MD
+  o MA
+  o MI
+  o MN
+  o MS
+  o MO
+  o MT
+  o NE
+  o NV
+  o NH
+  o NJ
+  o NM
+  o NY
+  o NC
+  o ND
+  o OH
+  o OK
+  o OR
+  o PA
+  o RI
+  o SC
+  o SD
+  o TN
+  o TX
+  o UT
+  o VT
+  o VA
+  o WA
+  o WV
+  o WI
+  o WY
+}
