@@ -18,6 +18,8 @@ const HTTPArchiveLoader = require('./httparchiveloader');
 
 /**
  * Loads Archives from an external source, such as a URL.
+ * @class
+ * @private
  */
 class GitHubArchiveLoader extends HTTPArchiveLoader {
     /**

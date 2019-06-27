@@ -23,7 +23,6 @@ const TemplateInstance = require('./templateinstance.js');
  * calling the parse method and passing in natural language text that conforms to the template grammar.
  * @public
  * @class
- * @memberof module:cicero-core
  */
 class Clause extends TemplateInstance {
 

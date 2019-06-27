@@ -20,8 +20,8 @@ const JSZip = require('jszip');
 /**
  * A utility to persist templates to data sources.
  * @class
- * @internal
- * @memberof module:cicero-core
+ * @abstract
+ * @private
  */
 class TemplateSaver {
 

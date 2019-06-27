@@ -34,7 +34,6 @@ const globalTemplateIndexCache = new NodeCache({ stdTTL: 600, useClones: false }
  * </p>
  * @private
  * @class
- * @memberof module:cicero-template-library
  */
 class TemplateLibrary {
     /**

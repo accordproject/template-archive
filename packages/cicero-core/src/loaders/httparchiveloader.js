@@ -19,6 +19,8 @@ const Logger = require('@accordproject/ergo-compiler').Logger;
 
 /**
  * Loads archives from an HTTP(S) URL using the axios library.
+ * @class
+ * @private
  */
 class HTTPArchiveLoader {
     /**

@@ -32,7 +32,6 @@ const RelationshipDeclaration = require('@accordproject/ergo-compiler').Composer
  * @public
  * @abstract
  * @class
- * @memberof module:cicero-core
  */
 class TemplateInstance {
 

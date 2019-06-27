@@ -22,6 +22,8 @@ const ApArchiveLoader = require('./aparchiveloader');
 /**
  * A default CompositeArchiveLoader implementation which supports
  * ap://, github://, http:// and https:// URLs.
+ * @class
+ * @private
  */
 class DefaultArchiveLoader extends CompositeArchiveLoader {
 

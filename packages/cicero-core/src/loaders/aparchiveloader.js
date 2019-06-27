@@ -17,7 +17,9 @@
 const HTTPArchiveLoader = require('./httparchiveloader');
 
 /**
- * Loads Archives from an Acoord Project URL.
+ * Loads Archives from an Accord Project URL.
+ * @class
+ * @private
  */
 class ApArchiveLoader extends HTTPArchiveLoader {
     /**

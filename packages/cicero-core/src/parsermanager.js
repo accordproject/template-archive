@@ -39,8 +39,6 @@ if(process.browser){
 /**
  * Generates and manages a Nearley parser for a template.
  * @class
- * @public
- * @memberof module:cicero-core
  */
 class ParserManager {
 

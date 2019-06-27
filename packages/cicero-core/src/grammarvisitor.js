@@ -29,7 +29,6 @@ const debug = require('debug')('cicero:grammarvisitor');
  *
  * @private
  * @class
- * @memberof module:cicero-core
  */
 class GrammarVisitor {
     /**

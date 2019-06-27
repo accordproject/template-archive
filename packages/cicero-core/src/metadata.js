@@ -28,7 +28,6 @@ const templateTypes = {
  * Defines the metadata for a Template, including the name, version, README markdown.
  * @class
  * @public
- * @memberof module:cicero-core
  */
 class Metadata {
 

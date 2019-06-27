@@ -33,9 +33,8 @@ const SAMPLE_FILE_REGEXP = xregexp('sample(_(' + IETF_REGEXP + '))?.txt$');
 /**
  * A utility class to create templates from data sources.
  * @class
- * @interal
+ * @private
  * @abstract
- * @memberof module:cicero-core
  */
 class TemplateLoader {
 

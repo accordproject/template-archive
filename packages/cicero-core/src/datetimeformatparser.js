@@ -20,7 +20,6 @@ const crypto = require('crypto');
  * Parses a date/time format string
  * @class
  * @public
- * @memberof module:cicero-core
  */
 class DateTimeFormatParser {
     /**

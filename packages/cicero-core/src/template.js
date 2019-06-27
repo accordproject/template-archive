@@ -30,7 +30,6 @@ const TemplateSaver = require('./templatesaver');
  * @class
  * @public
  * @abstract
- * @memberof module:cicero-core
  */
 class Template {
 
