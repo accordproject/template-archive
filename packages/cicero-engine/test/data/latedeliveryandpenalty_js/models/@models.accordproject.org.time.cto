@@ -1,0 +1,23 @@
+/** This model is deprecated, for Cicero 0.10 or later use v2.0/time.cto instead */
+
+namespace org.accordproject.time
+
+/**
+ * Units for a duration.
+ */
+enum TemporalUnit {
+  o seconds
+  o minutes
+  o hours
+  o days
+  o weeks
+  o years
+}
+
+/**
+ * A duration. For example, 6 hours.
+ */
+concept Duration {
+  o Long amount
+  o TemporalUnit unit
+}

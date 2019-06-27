@@ -1,0 +1,221 @@
+namespace org.accordproject.money
+
+/**
+ * Represents an amount of Cryptocurrency
+ */
+concept CryptoMonetaryAmount {
+  o Double doubleValue
+  o CryptoCurrencyCode cryptoCurrencyCode
+}
+
+/**
+ * Cyptocurrency codes. From https://en.wikipedia.org/wiki/List_of_cryptocurrencies
+ */
+enum CryptoCurrencyCode {
+  o ADA
+  o BCH
+  o BTC
+  o DASH
+  o EOS
+  o ETC
+  o ETH
+  o LTC
+  o NEO
+  o XLM
+  o XMR
+  o XRP
+  o ZEC
+}
+
+/**
+ * Represents an amount of money
+ */
+concept MonetaryAmount {
+  o Double doubleValue // convert to fixed-point?
+  o CurrencyCode currencyCode
+}
+
+/**
+ * ISO 4217 codes. From https://en.wikipedia.org/wiki/ISO_4217
+ * https://www.currency-iso.org/en/home/tables/table-a1.html
+ */
+enum CurrencyCode {
+o AED
+o AFN
+o ALL
+o AMD
+o ANG
+o AOA
+o ARS
+o AUD
+o AWG
+o AZN
+o BAM
+o BBD
+o BDT
+o BGN
+o BHD
+o BIF
+o BMD
+o BND
+o BOB
+o BOV
+o BRL
+o BSD
+o BTN
+o BWP
+o BYN
+o BZD
+o CAD
+o CDF
+o CHE
+o CHF
+o CHW
+o CLF
+o CLP
+o CNY
+o COP
+o COU
+o CRC
+o CUC
+o CUP
+o CVE
+o CZK
+o DJF
+o DKK
+o DOP
+o DZD
+o EGP
+o ERN
+o ETB
+o EUR
+o FJD
+o FKP
+o GBP
+o GEL
+o GHS
+o GIP
+o GMD
+o GNF
+o GTQ
+o GYD
+o HKD
+o HNL
+o HRK
+o HTG
+o HUF
+o IDR
+o ILS
+o INR
+o IQD
+o IRR
+o ISK
+o JMD
+o JOD
+o JPY
+o KES
+o KGS
+o KHR
+o KMF
+o KPW
+o KRW
+o KWD
+o KYD
+o KZT
+o LAK
+o LBP
+o LKR
+o LRD
+o LSL
+o LYD
+o MAD
+o MDL
+o MGA
+o MKD
+o MMK
+o MNT
+o MOP
+o MRU
+o MUR
+o MVR
+o MWK
+o MXN
+o MXV
+o MYR
+o MZN
+o NAD
+o NGN
+o NIO
+o NOK
+o NPR
+o NZD
+o OMR
+o PAB
+o PEN
+o PGK
+o PHP
+o PKR
+o PLN
+o PYG
+o QAR
+o RON
+o RSD
+o RUB
+o RWF
+o SAR
+o SBD
+o SCR
+o SDG
+o SEK
+o SGD
+o SHP
+o SLL
+o SOS
+o SRD
+o SSP
+o STN
+o SVC
+o SYP
+o SZL
+o THB
+o TJS
+o TMT
+o TND
+o TOP
+o TRY
+o TTD
+o TWD
+o TZS
+o UAH
+o UGX
+o USD
+o USN
+o UYI
+o UYU
+o UZS
+o VEF
+o VND
+o VUV
+o WST
+o XAF
+o XAG
+o XAU
+o XBA
+o XBB
+o XBC
+o XBD
+o XCD
+o XDR
+o XOF
+o XPD
+o XPF
+o XPT
+o XSU
+o XTS
+o XUA
+o XXX
+o YER
+o ZAR
+o ZMW
+o ZWL
+}
