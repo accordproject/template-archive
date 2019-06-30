@@ -15,6 +15,7 @@
 'use strict';
 
 const Logger = require('@accordproject/ergo-compiler').Logger;
+const ParseException = require('@accordproject/ergo-compiler').ComposerConcerto.ParseException;
 const crypto = require('crypto');
 const Util = require('@accordproject/ergo-compiler').Util;
 const moment = require('moment-mini');
@@ -93,17 +94,54 @@ class TemplateInstance {
     }
 
     /**
+     * Extract the file location from the parse error
+     * @param {object} error the parse error
+     * @return {object} - the file location information
+     */
+    static locationOfError(error) {
+        if (!error) { return null; }
+        const message = error.message;
+
+        const re = /invalid syntax at line (\d+) col (\d+)([^]*)/mi;
+        const found = message.match(re);
+        if (!found) { return message; }
+
+        let column = parseInt(found[2], 10);
+        let line = parseInt(found[1], 10);
+
+        let token = error.token && error.token.value ? error.token.value : ' ';
+        const endColumn = column + token.length;
+
+        return {
+            start: {
+                line,
+                column,
+            },
+            end: {
+                line,
+                endColumn,//XXX
+            },
+        };
+    }
+
+    /**
      * Set the data for the clause by parsing natural language text.
      * @param {string} text  - the data for the clause
      * @param {string} currentTime - the definition of 'now' (optional)
+     * @param {string} fileName - the fileName for the text (optional)
      */
-    parse(text, currentTime) {
+    parse(text, currentTime, fileName) {
         // Set the current time and UTC Offset
         const now = Util.setCurrentTime(currentTime);
         const utcOffset = now.utcOffset();
 
         let parser = this.getTemplate().getParserManager().getParser();
-        parser.feed(text);
+        try {
+            parser.feed(text);
+        } catch(err) {
+            const fileLocation = TemplateInstance.locationOfError(err);
+            throw new ParseException(err.message, fileLocation, fileName, err.message, 'cicero-core');
+        }
         if (parser.results.length !== 1) {
             const head = JSON.stringify(parser.results[0]);
 
@@ -362,10 +400,10 @@ class TemplateInstance {
 
     /**
      * Returns the template logic for this clause
-     * @return {TemplateLogic} the template for this clause
+     * @return {LogicManager} the template for this clause
      */
-    getTemplateLogic() {
-        return this.template.getTemplateLogic();
+    getLogicManager() {
+        return this.template.getLogicManager();
     }
 
     /**

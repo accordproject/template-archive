@@ -44,11 +44,11 @@ class Engine {
      * @return {Promise} a promise that resolves to a result for the clause
      */
     async execute(clause, request, state, currentTime) {
-        const templateLogic = clause.getTemplateLogic();
+        const logicManager = clause.getLogicManager();
         const clauseId = clause.getIdentifier();
         const contract = clause.getData();
 
-        return this.ergoEngine.execute(templateLogic,clauseId,contract,request,state,currentTime);
+        return this.ergoEngine.execute(logicManager,clauseId,contract,request,state,currentTime);
     }
 
     /**
@@ -58,11 +58,11 @@ class Engine {
      * @return {Promise} a promise that resolves to a result for the clause initialization
      */
     async init(clause, currentTime) {
-        const templateLogic = clause.getTemplateLogic();
+        const logicManager = clause.getLogicManager();
         const clauseId = clause.getIdentifier();
         const contract = clause.getData();
 
-        return this.ergoEngine.init(templateLogic,clauseId,contract,{},currentTime);
+        return this.ergoEngine.init(logicManager,clauseId,contract,{},currentTime);
     }
 
     /**

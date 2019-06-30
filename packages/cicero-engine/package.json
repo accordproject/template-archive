@@ -43,13 +43,13 @@
     "cucumber": "^5.1.0",
     "eslint": "4.19.1",
     "license-check": "1.1.5",
-    "mocha": "5.2.0",
-    "nyc": "13.3.0"
+    "mocha": "6.1.4",
+    "nyc": "14.1.1"
   },
   "dependencies": {
     "@accordproject/cicero-core": "0.12.4",
-    "@accordproject/ergo-compiler": "0.8.5",
-    "@accordproject/ergo-engine": "0.8.5",
+    "@accordproject/ergo-compiler": "0.9.0",
+    "@accordproject/ergo-engine": "0.9.0",
     "moment-mini": "2.22.1"
   },
   "license-check-config": {
