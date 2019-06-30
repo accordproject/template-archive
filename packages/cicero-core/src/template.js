@@ -19,7 +19,7 @@ const Logger = require('@accordproject/ergo-compiler').Logger;
 const ParserManager = require('./parsermanager');
 const crypto = require('crypto');
 const stringify = require('json-stable-stringify');
-const TemplateLogic = require('@accordproject/ergo-compiler').TemplateLogic;
+const LogicManager = require('@accordproject/ergo-compiler').LogicManager;
 const TemplateLoader = require('./templateloader');
 const TemplateSaver = require('./templatesaver');
 
@@ -44,7 +44,7 @@ class Template {
      */
     constructor(packageJson, readme, samples, request) {
         this.metadata = new Metadata(packageJson, readme, samples, request);
-        this.templateLogic = new TemplateLogic('cicero');
+        this.logicManager = new LogicManager('cicero');
         this.parserManager = new ParserManager(this);
     }
 
@@ -55,7 +55,7 @@ class Template {
     validate() {
         this.getModelManager().validateModelFiles();
         this.getTemplateModel();
-        this.getTemplateLogic().compileLogicSync(true);
+        this.getLogicManager().compileLogicSync(true);
     }
 
     /**
@@ -227,10 +227,10 @@ class Template {
      * Provides access to the template logic for this template.
      * The template logic encapsulate the code necessary to
      * execute the clause or contract.
-     * @return {TemplateLogic} the TemplateLogic for this template
+     * @return {LogicManager} the LogicManager for this template
      */
-    getTemplateLogic() {
-        return this.templateLogic;
+    getLogicManager() {
+        return this.logicManager;
     }
 
     /**
@@ -239,7 +239,7 @@ class Template {
      * @return {Introspector} the Introspector for this template
      */
     getIntrospector() {
-        return this.templateLogic.getIntrospector();
+        return this.logicManager.getIntrospector();
     }
 
     /**
@@ -248,7 +248,7 @@ class Template {
      * @return {Factory} the Factory for this template
      */
     getFactory() {
-        return this.templateLogic.getFactory();
+        return this.logicManager.getFactory();
     }
 
     /**
@@ -257,7 +257,7 @@ class Template {
      * @return {Serializer} the Serializer for this template
      */
     getSerializer() {
-        return this.templateLogic.getSerializer();
+        return this.logicManager.getSerializer();
     }
 
     /**
@@ -267,7 +267,7 @@ class Template {
      * @private
      */
     getScriptManager() {
-        return this.templateLogic.getScriptManager();
+        return this.logicManager.getScriptManager();
     }
 
     /**
@@ -277,7 +277,7 @@ class Template {
      * @private
      */
     getModelManager() {
-        return this.templateLogic.getModelManager();
+        return this.logicManager.getModelManager();
     }
 
     /**

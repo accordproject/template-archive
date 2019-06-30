@@ -32,6 +32,7 @@ describe('Clause', () => {
     const testLatePenaltyInput = fs.readFileSync(path.resolve(__dirname, 'data/latedeliveryandpenalty', 'sample.txt'), 'utf8');
     const testLatePenaltyPeriodInput = fs.readFileSync(path.resolve(__dirname, 'data/latedeliveryandpenalty-period', 'sample.txt'), 'utf8');
     const testCongaInput = fs.readFileSync(path.resolve(__dirname, 'data/conga', 'sample.txt'), 'utf8');
+    const testCongaErr = fs.readFileSync(path.resolve(__dirname, 'data/conga', 'sampleErr.txt'), 'utf8');
     const testAllTypesInput = fs.readFileSync(path.resolve(__dirname, 'data/alltypes', 'sample.txt'), 'utf8');
     const testTextOnlyInput = fs.readFileSync(path.resolve(__dirname, 'data/text-only', 'sample.txt'), 'utf8');
 
@@ -41,6 +42,7 @@ describe('Clause', () => {
             const template = await Template.fromDirectory('./test/data/latedeliveryandpenalty', options);
             const clause = new Clause(template);
             clause.should.not.be.null;
+            clause.getLogicManager().should.not.be.null;
         });
 
         it('should create a clause for a conga template', async function() {
@@ -204,6 +206,12 @@ describe('Clause', () => {
             const template = await Template.fromDirectory('./test/data/conga', options);
             const clause = new Clause(template);
             (()=> clause.parse('')).should.throw('Parsing clause text returned a null AST. This may mean the text is valid, but not complete.');
+        });
+
+        it('should throw an error for non-matching text', async function() {
+            const template = await Template.fromDirectory('./test/data/conga', options);
+            const clause = new Clause(template);
+            (()=> clause.parse(testCongaErr)).should.throw('invalid syntax at line 1 col 16:\n\n  "Dan Selman" agees to spend 100 conga coins on "penguins". "thing"\n                 ^\nUnexpected "e"\n');
         });
 
         it('should be able to set the data for a text-only clause', async function() {

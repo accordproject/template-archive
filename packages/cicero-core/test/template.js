@@ -440,11 +440,11 @@ describe('Template', () => {
         });
     });
 
-    describe('#getTemplateLogic', () => {
+    describe('#getLogicManager', () => {
         it('should return a Template Logic', async () => {
-            const TemplateLogic = require('@accordproject/ergo-compiler').TemplateLogic;
+            const LogicManager = require('@accordproject/ergo-compiler').LogicManager;
             const template = await Template.fromDirectory('./test/data/latedeliveryandpenalty', options);
-            template.getTemplateLogic('cicero').should.be.an.instanceof(TemplateLogic);
+            template.getLogicManager('cicero').should.be.an.instanceof(LogicManager);
         });
     });
 

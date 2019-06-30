@@ -212,7 +212,7 @@ class TemplateLoader {
             Logger.debug(method, 'Adding Ergo files to script manager');
             const scriptFiles = await TemplateLoader.loadZipFilesContents(zip, /lib\/.*\.ergo$/);
             scriptFiles.forEach(function (obj) {
-                template.getTemplateLogic().addLogicFile(obj.contents, obj.name);
+                template.getLogicManager().addLogicFile(obj.contents, obj.name);
             });
         }
 
@@ -221,7 +221,7 @@ class TemplateLoader {
             Logger.debug(method, 'Adding JS files to script manager');
             const scriptFiles = await TemplateLoader.loadZipFilesContents(zip, /lib\/.*\.js$/);
             scriptFiles.forEach(function (obj) {
-                template.getTemplateLogic().addLogicFile(obj.contents, obj.name);
+                template.getLogicManager().addLogicFile(obj.contents, obj.name);
             });
         }
 
@@ -317,7 +317,7 @@ class TemplateLoader {
                 const resolvedPath = fsPath.resolve(path);
                 const resolvedFilePath = fsPath.resolve(file.name);
                 const truncatedPath = resolvedFilePath.replace(resolvedPath+'/', '');
-                template.getTemplateLogic().addLogicFile(file.contents, truncatedPath);
+                template.getLogicManager().addLogicFile(file.contents, truncatedPath);
             });
         }
 
@@ -328,7 +328,7 @@ class TemplateLoader {
                 const resolvedPath = fsPath.resolve(path);
                 const resolvedFilePath = fsPath.resolve(file.name);
                 const truncatedPath = resolvedFilePath.replace(resolvedPath+'/', '');
-                template.getTemplateLogic().addLogicFile(file.contents, truncatedPath);
+                template.getLogicManager().addLogicFile(file.contents, truncatedPath);
             });
         }
 

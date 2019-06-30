@@ -147,7 +147,7 @@ class Commands {
         return Commands.loadTemplate(templatePath)
             .then((template) => {
                 clause = new Clause(template);
-                clause.parse(sampleText, currentTime);
+                clause.parse(sampleText, currentTime, samplePath);
                 if (outPath) {
                     Logger.info('Creating file: ' + outPath);
                     fs.writeFileSync(outPath, JSON.stringify(clause.getData(),null,2));

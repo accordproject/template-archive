@@ -263,8 +263,8 @@ class ParserManager {
         if(!action) {
             action = '{% id %}';
 
-            if( element.type === 'FormattedBinding' ) {
-                if( property.getType() !== 'DateTime') {
+            if(element.type === 'FormattedBinding' ) {
+                if(property.getType() !== 'DateTime') {
                     throw new Error('Formatted types are currently only supported for DateTime properties.');
                 }
 
@@ -284,7 +284,7 @@ class ParserManager {
                         symbols: [`${formatRule.tokens} ${formatRule.action} # ${propertyName} as ${element.format.value}`],
                     });
                 }
-            } else if( element.type === 'ClauseBinding') {
+            } else if(element.type === 'ClauseBinding') {
                 const clauseTemplate = element.template;
                 const clauseTemplateModel = this.template.getIntrospector().getClassDeclaration(property.getFullyQualifiedTypeName());
                 this.buildGrammarRules(clauseTemplate, clauseTemplateModel, propertyName, parts);
