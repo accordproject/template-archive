@@ -293,7 +293,7 @@ class ParserManager {
         if(!action) {
             action = '{% id %}';
 
-            if(element.type === 'FormattedBinding' ) {
+            if(property.getType() === 'DateTime' || element.type === 'FormattedBinding' ) {
                 if(property.getType() !== 'DateTime') {
                     ParserManager._throwTemplateExceptionForElement('Formatted types are currently only supported for DateTime properties.', element);
                 }
@@ -305,13 +305,14 @@ class ParserManager {
                 }
 
                 // push the formatting rule, iff it has not been already declared
-                const formatRule = DateTimeFormatParser.buildDateTimeFormatRule(element.format.value);
+                const format = element.format ? element.format.value : '"MM/DD/YYYY"';
+                const formatRule = DateTimeFormatParser.buildDateTimeFormatRule(format);
                 type = formatRule.name;
                 const ruleExists = parts.modelRules.some(rule => (rule.prefix === formatRule.name));
                 if(!ruleExists) {
                     parts.modelRules.push({
                         prefix: formatRule.name,
-                        symbols: [`${formatRule.tokens} ${formatRule.action} # ${propertyName} as ${element.format.value}`],
+                        symbols: [`${formatRule.tokens} ${formatRule.action} # ${propertyName} as ${format}`],
                     });
                 }
             } else if(element.type === 'ClauseBinding') {
