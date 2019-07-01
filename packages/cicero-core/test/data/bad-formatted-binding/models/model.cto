@@ -1,0 +1,30 @@
+namespace org.accordproject.conga
+
+import org.accordproject.cicero.contract.AccordClause from https://models.accordproject.org/cicero/contract.cto
+import org.accordproject.cicero.runtime.Request from https://models.accordproject.org/cicero/runtime.cto
+import org.accordproject.cicero.runtime.Response from https://models.accordproject.org/cicero/runtime.cto
+
+/**
+ * Defines the data model for the Conga template.
+ */
+asset TemplateModel extends AccordClause {
+  o Double amount
+  o String swag
+  --> Participant participant
+  o String maybeThing optional
+}
+
+/**
+ * Defines the input data required by the template
+ */
+transaction Payup extends Request {
+  o String[] qualifierTest optional
+}
+
+/**
+ * Defines the output data for the template
+ */
+transaction CongaResponse extends Response {
+  o String name
+  o Double amount
+}

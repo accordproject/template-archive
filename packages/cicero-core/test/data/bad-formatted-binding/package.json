@@ -1,0 +1,10 @@
+{
+    "name": "conga",
+    "version": "0.0.1",
+    "description": "\"Dan Selman\" agrees to spend 100.0 conga coins on \"swag\"",
+    "accordproject": {
+      "template": "clause",
+      "ergo": "0.8.0",
+      "cicero": "^0.12.0"
+    }
+  }

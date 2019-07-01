@@ -50,6 +50,30 @@ describe('Clause', () => {
             const clause = new Clause(template);
             clause.should.not.be.null;
         });
+
+        it('should fail to create a clause for a template with a missing binding', async function() {
+            try {
+                await Template.fromDirectory('./test/data/bad-binding', options);
+            } catch (err) {
+                err.message.should.equal('Template references a property \'articipant\' that is not declared in the template model \'org.accordproject.conga.TemplateModel\' Line 1 column 3');
+            }
+        });
+
+        it('should fail to create a clause for a template with a wrongly typed boolean binding', async function() {
+            try {
+                await Template.fromDirectory('./test/data/bad-boolean-binding', options);
+            } catch (err) {
+                err.message.should.equal('A boolean binding can only be used with a boolean property. Property participant has type Participant Line 1 column 11');
+            }
+        });
+
+        it('should fail to create a clause for a template with a wrongly typed formatted binding', async function() {
+            try {
+                await Template.fromDirectory('./test/data/bad-formatted-binding', options);
+            } catch (err) {
+                err.message.should.equal('Formatted types are currently only supported for DateTime properties. Line 1 column 3');
+            }
+        });
     });
 
     describe('#setData', () => {
