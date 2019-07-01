@@ -242,6 +242,7 @@ class ParserManager {
      * @throws {TemplateException}
      */
     static _throwTemplateExceptionForElement(message, element) {
+        const fileName = 'grammar/template.tem';
         let column = element.fieldName.col;
         let line = element.fieldName.line;
 
@@ -259,7 +260,7 @@ class ParserManager {
             },
         };
 
-        throw new TemplateException(message, fileLocation, null, null, 'cicero-core');
+        throw new TemplateException(message, fileLocation, fileName, null, 'cicero-core');
     }
 
     /**

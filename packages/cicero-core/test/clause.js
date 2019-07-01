@@ -55,7 +55,7 @@ describe('Clause', () => {
             try {
                 await Template.fromDirectory('./test/data/bad-binding', options);
             } catch (err) {
-                err.message.should.equal('Template references a property \'articipant\' that is not declared in the template model \'org.accordproject.conga.TemplateModel\' Line 1 column 3');
+                err.message.should.equal('Template references a property \'articipant\' that is not declared in the template model \'org.accordproject.conga.TemplateModel\' File grammar/template.tem line 1 column 3');
             }
         });
 
@@ -63,7 +63,7 @@ describe('Clause', () => {
             try {
                 await Template.fromDirectory('./test/data/bad-boolean-binding', options);
             } catch (err) {
-                err.message.should.equal('A boolean binding can only be used with a boolean property. Property participant has type Participant Line 1 column 11');
+                err.message.should.equal('A boolean binding can only be used with a boolean property. Property participant has type Participant File grammar/template.tem line 1 column 11');
             }
         });
 
@@ -71,7 +71,7 @@ describe('Clause', () => {
             try {
                 await Template.fromDirectory('./test/data/bad-formatted-binding', options);
             } catch (err) {
-                err.message.should.equal('Formatted types are currently only supported for DateTime properties. Line 1 column 3');
+                err.message.should.equal('Formatted types are currently only supported for DateTime properties. File grammar/template.tem line 1 column 3');
             }
         });
     });
