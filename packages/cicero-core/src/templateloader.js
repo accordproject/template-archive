@@ -166,9 +166,10 @@ class TemplateLoader {
      * Create a template from an archive.
      * @param {*} Template - the type to construct
      * @param {Buffer} buffer  - the buffer to a Cicero Template Archive (cta) file
+     * @param {object} options - additional options
      * @return {Promise<Template>} a Promise to the template
      */
-    static async fromArchive(Template, buffer) {
+    static async fromArchive(Template, buffer, options) {
         const method = 'fromArchive';
         const zip = await JSZip.loadAsync(buffer);
         // const allFiles = await TemplateLoader.loadZipFilesContents(zip, /.*/);
@@ -201,7 +202,7 @@ class TemplateLoader {
         });
 
         // create the template
-        const template = new (Function.prototype.bind.call(Template, null, packageJsonObject, readmeContents, sampleTextFiles, requestContents));
+        const template = new (Function.prototype.bind.call(Template, null, packageJsonObject, readmeContents, sampleTextFiles, requestContents, options));
 
         // add model files
         Logger.debug(method, 'Adding model files to model manager');
@@ -244,7 +245,7 @@ class TemplateLoader {
     static async fromUrl(Template, url, options) {
         const loader = new DefaultArchiveLoader();
         const buffer = await loader.load(url, options);
-        return TemplateLoader.fromArchive(Template, buffer);
+        return TemplateLoader.fromArchive(Template, buffer, options);
     }
 
     /**
@@ -290,7 +291,7 @@ class TemplateLoader {
         });
 
         // create the template
-        const template = new (Function.prototype.bind.call(Template, null, packageJsonObject, readmeContents, sampleTextFiles, requestJsonObject));
+        const template = new (Function.prototype.bind.call(Template, null, packageJsonObject, readmeContents, sampleTextFiles, requestJsonObject, options));
         const modelFiles = [];
         const modelFileNames = [];
         const ctoFiles = await TemplateLoader.loadFilesContents(path, /models\/.*\.cto$/);

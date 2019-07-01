@@ -47,14 +47,15 @@ class Commands {
     /**
      * Return a promise to a template from either a directory or an archive file
      * @param {string} templatePath to the template path directory or file
+     * @param {Object} [options] - an optional set of options
      * @return {Promise<Template>} a Promise to the instantiated template
      */
-    static loadTemplate(templatePath) {
+    static loadTemplate(templatePath, options) {
         if (Commands.isTemplateArchive(templatePath)) {
             const buffer = fs.readFileSync(templatePath);
-            return Template.fromArchive(buffer);
+            return Template.fromArchive(buffer, options);
         } else {
-            return Template.fromDirectory(templatePath);
+            return Template.fromDirectory(templatePath, options);
         }
     }
 
@@ -138,13 +139,14 @@ class Commands {
      * @param {string} samplePath to the sample file
      * @param {string} outPath to the contract file
      * @param {string} currentTime - the definition of 'now'
+     * @param {boolean} warnings whether to print warnings
      * @returns {object} Promise to the result of parsing
      */
-    static parse(templatePath, samplePath, outPath, currentTime) {
+    static parse(templatePath, samplePath, outPath, currentTime, warnings) {
         let clause;
         const sampleText = fs.readFileSync(samplePath, 'utf8');
 
-        return Commands.loadTemplate(templatePath)
+        return Commands.loadTemplate(templatePath, {warnings})
             .then((template) => {
                 clause = new Clause(template);
                 clause.parse(sampleText, currentTime, samplePath);
@@ -165,13 +167,14 @@ class Commands {
      * @param {string} templatePath to the template path directory or file
      * @param {string} dataPath to the data file
      * @param {string} outPath to the contract file
+     * @param {boolean} warnings whether to print warnings
      * @returns {object} Promise to the result of parsing
      */
-    static generateText(templatePath, dataPath, outPath) {
+    static generateText(templatePath, dataPath, outPath, warnings) {
         let clause;
         const dataJson = JSON.parse(fs.readFileSync(dataPath, 'utf8'));
 
-        return Commands.loadTemplate(templatePath)
+        return Commands.loadTemplate(templatePath, {warnings})
             .then((template) => {
                 clause = new Clause(template);
                 clause.setData(dataJson);
@@ -226,14 +229,15 @@ class Commands {
      * @param {string} templatePath to the template path directory or file
      * @param {string} samplePath to the sample file
      * @param {string} currentTime - the definition of 'now'
+     * @param {boolean} warnings whether to print warnings
      * @returns {object} Promise to the result of execution
      */
-    static init(templatePath, samplePath, currentTime) {
+    static init(templatePath, samplePath, currentTime, warnings) {
         let clause;
         const sampleText = fs.readFileSync(samplePath, 'utf8');
 
         const engine = new Engine();
-        return Commands.loadTemplate(templatePath)
+        return Commands.loadTemplate(templatePath, {warnings})
             .then((template) => {
                 // Initialize clause
                 clause = new Clause(template);
@@ -255,9 +259,10 @@ class Commands {
      * @param {string[]} requestsPath to the array of request files
      * @param {string} statePath to the state file
      * @param {string} currentTime - the definition of 'now'
+     * @param {boolean} warnings whether to print warnings
      * @returns {object} Promise to the result of execution
      */
-    static execute(templatePath, samplePath, requestsPath, statePath, currentTime) {
+    static execute(templatePath, samplePath, requestsPath, statePath, currentTime, warnings) {
         let clause;
         const sampleText = fs.readFileSync(samplePath, 'utf8');
         let requestsJson = [];
@@ -267,7 +272,7 @@ class Commands {
         }
 
         const engine = new Engine();
-        return Commands.loadTemplate(templatePath)
+        return Commands.loadTemplate(templatePath, {warnings})
             .then(async (template) => {
                 // Initialize clause
                 clause = new Clause(template);
@@ -340,11 +345,12 @@ class Commands {
      * @param {string} format the format to generate
      * @param {string} templatePath to the template path directory or file
      * @param {string} outputDirectory the output directory
+     * @param {boolean} warnings whether to print warnings
      * @returns {object} Promise to the result of code generation
      */
-    static generate(format, templatePath, outputDirectory) {
+    static generate(format, templatePath, outputDirectory, warnings) {
 
-        return Commands.loadTemplate(templatePath)
+        return Commands.loadTemplate(templatePath, {warnings})
             .then((template) => {
 
                 let visitor = null;
@@ -404,10 +410,11 @@ class Commands {
      * @param {string} target - target language for the archive (should be either 'ergo' or 'cicero')
      * @param {string} templatePath to the template path directory or file
      * @param {string} archiveFile to the archive file
+     * @param {boolean} warnings whether to print warnings
      * @returns {object} Promise to the code creating an archive
      */
-    static archive(target, templatePath, archiveFile) {
-        return Commands.loadTemplate(templatePath)
+    static archive(target, templatePath, archiveFile, warnings) {
+        return Commands.loadTemplate(templatePath, {warnings})
             .then(async (template) => {
                 const archive = await template.toArchive(target);
                 let file;
