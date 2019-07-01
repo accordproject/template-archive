@@ -15,6 +15,7 @@
 'use strict';
 
 const fsPath = require('path');
+const TemplateException = require('./templateexception');
 const RelationshipDeclaration = require('@accordproject/ergo-compiler').ComposerConcerto.RelationshipDeclaration;
 const Writer = require('@accordproject/ergo-compiler').ComposerConcerto.Writer;
 const Logger = require('@accordproject/ergo-compiler').Logger;
@@ -196,9 +197,9 @@ class ParserManager {
                 });
                 break;
             case 'BooleanBinding': {
-                const property = ParserManager.getProperty(templateModel, element.fieldName.value);
+                const property = ParserManager.getProperty(templateModel, element);
                 if(property.getType() !== 'Boolean') {
-                    throw new Error(`A boolean binding can only be used with a boolean property. Property ${element.fieldName.value} has type ${property.getType()}`);
+                    ParserManager._throwTemplateExceptionForElement(`A boolean binding can only be used with a boolean property. Property ${element.fieldName.value} has type ${property.getType()}`, element);
                 }
                 parts.modelRules.push({
                     prefix: rule,
@@ -212,7 +213,7 @@ class ParserManager {
                 this.handleBinding(templateModel, parts, rule, element);
                 break;
             default:
-                throw new Error(`Unrecognized type ${element.type}`);
+                ParserManager._throwTemplateExceptionForElement(`Unrecognized type ${element.type}`, element);
             }
         }
     }
@@ -220,18 +221,46 @@ class ParserManager {
     /**
      * Throws an error if a template variable doesn't exist on the model.
      * @param {*} templateModel - the model for the template
-     * @param {String} propertyName - the name of the property
+     * @param {*} element - the current element in the AST
      * @returns {*} the property
      */
-    static getProperty(templateModel, propertyName) {
+    static getProperty(templateModel, element) {
+        const propertyName = element.fieldName.value;
         const property = templateModel.getProperty(propertyName);
         if (!property) {
-            throw new Error(`Template references a property '${propertyName}' that is not declared in the template model '${templateModel.getFullyQualifiedName()}'`);
+            ParserManager._throwTemplateExceptionForElement(`Template references a property '${propertyName}' that is not declared in the template model '${templateModel.getFullyQualifiedName()}'`, element);
         }
 
         return property;
     }
 
+
+    /**
+     * Throw a template exception for the element
+     * @param {string} message - the error message
+     * @param {object} element the AST
+     * @throws {TemplateException}
+     */
+    static _throwTemplateExceptionForElement(message, element) {
+        let column = element.fieldName.col;
+        let line = element.fieldName.line;
+
+        let token = element.value ? element.value : ' ';
+        const endColumn = column + token.length;
+
+        const fileLocation = {
+            start: {
+                line,
+                column,
+            },
+            end: {
+                line,
+                endColumn,//XXX
+            },
+        };
+
+        throw new TemplateException(message, fileLocation, null, null, 'cicero-core');
+    }
 
     /**
      * Utility method to generate a grammar rule for a variable binding
@@ -242,7 +271,7 @@ class ParserManager {
      */
     handleBinding(templateModel, parts, inputRule, element) {
         const propertyName = element.fieldName.value;
-        const property = ParserManager.getProperty(templateModel, propertyName);
+        const property = ParserManager.getProperty(templateModel, element);
 
         let action = null;
         let suffix = ':';
@@ -265,7 +294,7 @@ class ParserManager {
 
             if(element.type === 'FormattedBinding' ) {
                 if(property.getType() !== 'DateTime') {
-                    throw new Error('Formatted types are currently only supported for DateTime properties.');
+                    ParserManager._throwTemplateExceptionForElement('Formatted types are currently only supported for DateTime properties.', element);
                 }
 
                 // we only include the datetime grammar if custom formats are used
