@@ -41,10 +41,11 @@ class Template {
      * @param {String} readme  - the readme in markdown for the template (optional)
      * @param {object} samples - the sample text for the template in different locales
      * @param {object} request - the JS object for the sample request
+     * @param {Object} options  - e.g., { warnings: true }
      */
-    constructor(packageJson, readme, samples, request) {
+    constructor(packageJson, readme, samples, request, options) {
         this.metadata = new Metadata(packageJson, readme, samples, request);
-        this.logicManager = new LogicManager('cicero');
+        this.logicManager = new LogicManager('cicero', options);
         this.parserManager = new ParserManager(this);
     }
 
@@ -180,23 +181,24 @@ class Template {
      * @param {Object} [options] - an optional set of options to configure the instance.
      * @return {Promise<Template>} a Promise to the instantiated template
      */
-    static async fromDirectory(path, options) {
+    static async fromDirectory(path, options=null) {
         return TemplateLoader.fromDirectory(Template, path, options);
     }
 
     /**
      * Create a template from an archive.
      * @param {Buffer} buffer  - the buffer to a Cicero Template Archive (cta) file
+     * @param {Object} [options] - an optional set of options to configure the instance.
      * @return {Promise<Template>} a Promise to the template
      */
-    static async fromArchive(buffer) {
-        return TemplateLoader.fromArchive(Template, buffer);
+    static async fromArchive(buffer, options=null) {
+        return TemplateLoader.fromArchive(Template, buffer, options);
     }
 
     /**
      * Create a template from an URL.
      * @param {String} url  - the URL to a Cicero Template Archive (cta) file
-     * @param {object} options - additional options
+     * @param {Object} [options] - an optional set of options to configure the instance.
      * @return {Promise} a Promise to the template
      */
     static async fromUrl(url, options=null) {
