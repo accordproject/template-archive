@@ -163,18 +163,6 @@ class TemplateInstance {
     }
 
     /**
-     * Left pads a number
-     * @param {*} n - the number
-     * @param {*} width - the number of chars to pad to
-     * @param {string} z - the pad character
-     * @return {string} the left padded string
-     */
-    static pad(n, width, z = '0') {
-        n = n + '';
-        return n.length >= width ? n : new Array(width - n.length + 1).join(z) + n;
-    }
-
-    /**
      * Recursive function that converts all instances of ParsedDateTime
      * to a Moment.
      * @param {*} obj the input object
