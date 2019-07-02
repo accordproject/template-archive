@@ -71,9 +71,26 @@ describe('TemplateLibrary', () => {
             templateIndex.should.not.have.property('helloworld@0.2.0');
         });
 
-        it('should retrieve latest version index for cicero version 0.12.0', async function() {
+        it('should retrieve latest version index for cicero version 0.13.0', async function() {
             const templateLibrary = new TemplateLibrary();
-            const templateIndex = await templateLibrary.getTemplateIndex({latestVersion: true, ciceroVersion: '0.12.0'});
+            const templateIndex = await templateLibrary.getTemplateIndex({latestVersion: true, ciceroVersion: '0.13.0'});
+            templateIndex.should.not.have.property('helloworld@0.0.5');
+            templateIndex.should.not.have.property('helloworld@0.2.0');
+            templateIndex.should.not.have.property('helloworld@0.2.1');
+            templateIndex.should.not.have.property('helloworld@0.3.0');
+            templateIndex.should.not.have.property('helloworld@0.4.0');
+            templateIndex.should.not.have.property('helloworld@0.5.0');
+            templateIndex.should.not.have.property('helloworld@0.6.0');
+            templateIndex.should.not.have.property('helloworld@0.7.2');
+            templateIndex.should.not.have.property('helloworld@0.8.0');
+            templateIndex.should.not.have.property('helloworld@0.9.0');
+            templateIndex.should.not.have.property('helloworld@0.10.1');
+            templateIndex.should.have.property('helloworld@0.11.0');
+        });
+
+        it('should retrieve latest version index for cicero version 0.13.0-20190129142217', async function() {
+            const templateLibrary = new TemplateLibrary();
+            const templateIndex = await templateLibrary.getTemplateIndex({latestVersion: false, ciceroVersion: '0.13.0-20190129142217'});
             templateIndex.should.not.have.property('helloworld@0.0.5');
             templateIndex.should.not.have.property('helloworld@0.2.0');
             templateIndex.should.not.have.property('helloworld@0.2.1');
@@ -87,24 +104,9 @@ describe('TemplateLibrary', () => {
             templateIndex.should.have.property('helloworld@0.10.1');
         });
 
-        it('should retrieve latest version index for cicero version 0.12.0-20190129142217', async function() {
+        it('should retrieve latest version index for cicero version 0.13.2-20190129142217', async function() {
             const templateLibrary = new TemplateLibrary();
-            const templateIndex = await templateLibrary.getTemplateIndex({latestVersion: false, ciceroVersion: '0.12.0-20190129142217'});
-            templateIndex.should.not.have.property('helloworld@0.0.5');
-            templateIndex.should.not.have.property('helloworld@0.2.0');
-            templateIndex.should.not.have.property('helloworld@0.2.1');
-            templateIndex.should.not.have.property('helloworld@0.3.0');
-            templateIndex.should.not.have.property('helloworld@0.4.0');
-            templateIndex.should.not.have.property('helloworld@0.5.0');
-            templateIndex.should.not.have.property('helloworld@0.6.0');
-            templateIndex.should.not.have.property('helloworld@0.7.2');
-            templateIndex.should.not.have.property('helloworld@0.8.0');
-            templateIndex.should.have.property('helloworld@0.9.0');
-        });
-
-        it('should retrieve latest version index for cicero version 0.12.2-20190129142217', async function() {
-            const templateLibrary = new TemplateLibrary();
-            const templateIndex = await templateLibrary.getTemplateIndex({latestVersion: true, ciceroVersion: '0.12.2-20190129142217'});
+            const templateIndex = await templateLibrary.getTemplateIndex({latestVersion: true, ciceroVersion: '0.13.1-20190129142217'});
             templateIndex.should.not.have.property('helloworld@0.0.5');
             templateIndex.should.not.have.property('helloworld@0.2.0');
             templateIndex.should.not.have.property('helloworld@0.2.1');
@@ -115,7 +117,8 @@ describe('TemplateLibrary', () => {
             templateIndex.should.not.have.property('helloworld@0.7.2');
             templateIndex.should.not.have.property('helloworld@0.8.0');
             templateIndex.should.not.have.property('helloworld@0.9.0');
-            templateIndex.should.have.property('helloworld@0.10.1');
+            templateIndex.should.not.have.property('helloworld@0.10.1');
+            templateIndex.should.have.property('helloworld@0.11.0');
         });
     });
 
@@ -123,8 +126,8 @@ describe('TemplateLibrary', () => {
 
         it('should retrieve a template', async function() {
             const templateLibrary = new TemplateLibrary();
-            const template = await templateLibrary.getTemplate('ap://ip-payment@0.10.0#e15bf357f83901845de5f8fdd43982d9e210cecc4632299c4d0d628302fe6e04');
-            template.getIdentifier().should.equal('ip-payment@0.10.0');
+            const template = await templateLibrary.getTemplate('ap://ip-payment@0.11.0#e15bf357f83901845de5f8fdd43982d9e210cecc4632299c4d0d628302fe6e04');
+            template.getIdentifier().should.equal('ip-payment@0.11.0');
         });
     });
 
