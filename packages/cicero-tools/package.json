@@ -35,9 +35,9 @@
   },
   "homepage": "https://github.com/accordproject/cicero#readme",
   "devDependencies": {
-    "@babel/cli": "^7.4.4",
-    "@babel/core": "^7.4.5",
-    "@babel/preset-env": "^7.4.5",
+    "@babel/cli": "7.4.4",
+    "@babel/core": "7.4.5",
+    "@babel/preset-env": "7.4.5",
     "chai": "4.2.0",
     "chai-as-promised": "7.1.1",
     "chai-things": "0.2.0",
@@ -52,8 +52,7 @@
     "webpack-cli": "^3.3.5"
   },
   "dependencies": {
-    "composer-concerto": "0.71.6",
-    "composer-concerto-tools": "0.61.1",
+    "@accordproject/ergo-compiler": "0.9.3",
     "uuid": "3.3.2",
     "yargs": "9.0.1"
   },
