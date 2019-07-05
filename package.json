@@ -1,21 +1,21 @@
 {
   "devDependencies": {
-    "colors": "1.1.2",
-    "concurrently": "3.5.1",
-    "coveralls": "3.0.1",
+    "colors": "1.3.3",
+    "concurrently": "4.1.1",
+    "coveralls": "3.0.4",
     "istanbul-combine": "0.3.0",
     "istanbul-merge": "1.1.1",
     "jsdoc": "3.6.2",
     "jsdoc-sphinx": "0.0.6",
-    "lerna": "2.11.0",
+    "lerna": "3.15.0",
     "license-check": "1.1.5",
     "moment-mini": "2.22.1",
-    "semver": "6.1.2",
-    "sleep-promise": "2.0.0",
-    "source-map-support": "0.5.3",
+    "semver": "6.2.0",
+    "sleep-promise": "8.0.1",
+    "source-map-support": "0.5.12",
     "licensecheck": "1.3.0",
-    "license-check-and-add": "2.3.1",
-    "event-stream": "3.3.2"
+    "license-check-and-add": "2.3.6",
+    "event-stream": "4.0.1"
   },
   "engines": {
     "node": ">=8",

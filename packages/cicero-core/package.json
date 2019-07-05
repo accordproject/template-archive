@@ -84,7 +84,7 @@
     "nunjucks": "3.2.0",
     "request": "2.88.0",
     "request-promise-native": "1.0.7",
-    "semver": "6.1.2",
+    "semver": "6.2.0",
     "uuid": "3.3.2",
     "winston": "^3.2.1",
     "xregexp": "4.2.4"
