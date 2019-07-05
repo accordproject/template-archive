@@ -43,11 +43,6 @@ NUMBER -> [0-9]
 DOUBLE_NUMBER -> NUMBER NUMBER
 {% (d) => {return '' + d[0] + d[1]}%}
 
-MONTH -> DOUBLE_NUMBER
-DAY -> DOUBLE_NUMBER
-YEAR -> DOUBLE_NUMBER DOUBLE_NUMBER
-{% (d) => {return '' + d[0] + d[1]}%}
-
 Word -> [\\S]:*
 {% (d) => {return d[0].join('');}%}
 

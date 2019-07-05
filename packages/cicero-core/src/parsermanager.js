@@ -133,7 +133,6 @@ class ParserManager {
         const combined = nunjucks.render('template.ne', parts);
         Logger.debug('Generated template grammar' + combined);
 
-        // console.log(combined);
         this.setGrammar(combined);
         this.templatizedGrammar = templatizedGrammar;
     }

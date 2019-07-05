@@ -14,7 +14,7 @@
 
 'use strict';
 
-const AbstractPlugin = require('composer-concerto-tools').CodeGen.AbstractPlugin;
+const AbstractPlugin = require('@accordproject/ergo-compiler').ComposerConcertoTools.CodeGen.AbstractPlugin;
 
 /**
  * Simple Corda plug-in class for code-generation.

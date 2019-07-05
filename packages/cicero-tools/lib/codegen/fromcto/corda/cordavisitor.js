@@ -15,7 +15,7 @@
 'use strict';
 
 const CordaPlugin = require('./cordaplugin.js');
-const JavaVisitor = require('composer-concerto-tools').CodeGen.JavaVisitor;
+const JavaVisitor = require('@accordproject/ergo-compiler').ComposerConcertoTools.CodeGen.JavaVisitor;
 
 /**
  * Convert the contents of a ModelManager to Java code for Corda.
