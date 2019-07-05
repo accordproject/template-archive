@@ -4,7 +4,7 @@
     "description": "Name of the person to greet: \"Dan\".\nThank you!",
     "accordproject": {
         "template": "contract",
-        "ergo": "0.9.0",
+        "ergo": "0.9.1",
         "cicero": "^<%= data.engineVersion %>"
       },
     "devDependencies": {
