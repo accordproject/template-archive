@@ -17,6 +17,7 @@
 const Logger = require('@accordproject/ergo-compiler').Logger;
 const ParseException = require('@accordproject/ergo-compiler').ComposerConcerto.ParseException;
 const crypto = require('crypto');
+const ErrorUtil = require('./errorutil');
 const Util = require('@accordproject/ergo-compiler').Util;
 const moment = require('moment-mini');
 // Make sure Moment serialization preserves utcOffset. See https://momentjs.com/docs/#/displaying/as-json/
@@ -94,37 +95,6 @@ class TemplateInstance {
     }
 
     /**
-     * Extract the file location from the parse error
-     * @param {object} error the parse error
-     * @return {object} - the file location information
-     */
-    static locationOfError(error) {
-        if (!error) { return null; }
-        const message = error.message;
-
-        const re = /invalid syntax at line (\d+) col (\d+)([^]*)/mi;
-        const found = message.match(re);
-        if (!found) { return message; }
-
-        let column = parseInt(found[2], 10);
-        let line = parseInt(found[1], 10);
-
-        let token = error.token && error.token.value ? error.token.value : ' ';
-        const endColumn = column + token.length;
-
-        return {
-            start: {
-                line,
-                column,
-            },
-            end: {
-                line,
-                endColumn,//XXX
-            },
-        };
-    }
-
-    /**
      * Set the data for the clause by parsing natural language text.
      * @param {string} text  - the data for the clause
      * @param {string} currentTime - the definition of 'now' (optional)
@@ -139,7 +109,7 @@ class TemplateInstance {
         try {
             parser.feed(text);
         } catch(err) {
-            const fileLocation = TemplateInstance.locationOfError(err);
+            const fileLocation = ErrorUtil.locationOfError(err);
             throw new ParseException(err.message, fileLocation, fileName, err.message, 'cicero-core');
         }
         if (parser.results.length !== 1) {
