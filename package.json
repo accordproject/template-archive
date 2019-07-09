@@ -68,6 +68,7 @@
       "CONTRIBUTING.md",
       "DEVELOPERS.md",
       "NOTICES.md",
+      "CHARTER.md",
       "LICENSE",
       "HEADER",
       "docs/",
@@ -120,7 +121,7 @@
         }
       },
       "md": {
-        "file": "markdown-license.txt"
+        "file": "HEADER"
       }
     }
   }
