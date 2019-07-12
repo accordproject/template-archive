@@ -183,46 +183,55 @@ class TemplateInstance {
             throw new Error('Data has not been set. Call setData or parse before calling this method.');
         }
 
-        let startVar = '';
-        let endVar = '';
-        if(options && options.wrapVariables) {
-            startVar = '{{';
-            endVar = '}}';
-        }
-
         const ast = this.getTemplate().getParserManager().getTemplateAst();
         // console.log('AST: ' + JSON.stringify(ast, null, 4));
 
         let result = '';
 
         for(let n=0; n < ast.data.length; n++) {
+            let textValue = '';
+            let format = '';
+            let property = null;
             const thing = ast.data[n];
 
             switch(thing.type) {
             case 'LastChunk':
             case 'Chunk':
-                result += thing.value;
+                textValue = thing.value;
                 break;
 
             case 'BooleanBinding': {
-                const property = this.getTemplate().getTemplateModel().getProperty(thing.fieldName.value);
+                property = this.getTemplate().getTemplateModel().getProperty(thing.fieldName.value);
                 if(this.composerData[property.getName()]) {
-                    result += startVar + thing.string.value.substring(1,thing.string.value.length-1) + endVar;
+                    textValue = thing.string.value.substring(1,thing.string.value.length-1);
                 }
             }
                 break;
 
             case 'FormattedBinding':
             case 'Binding': {
-                const property = this.getTemplate().getTemplateModel().getProperty(thing.fieldName.value);
+                property = this.getTemplate().getTemplateModel().getProperty(thing.fieldName.value);
                 const value = this.composerData[property.getName()];
-                result += startVar + this.convertPropertyToString(property, value, thing.format ? thing.format.value : null) + endVar;
+                if(thing.format) {
+                    format = thing.format.value;
+                }
+                textValue = this.convertPropertyToString(property, value, thing.format ? thing.format.value : null);
             }
                 break;
 
             default:
                 throw new Error('Unrecognized item: ' + thing.type);
             }
+
+            if(property && options && options.wrapVariables) {
+                textValue = `<variable id="${property.getName()}" value="${textValue}"`;
+                if(format) {
+                    textValue += ` format=${format}`;
+                }
+                textValue += '/>';
+            }
+
+            result += textValue;
         }
 
         return result;

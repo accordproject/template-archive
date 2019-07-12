@@ -285,7 +285,15 @@ describe('Clause', () => {
             const clause = new Clause(template);
             clause.parse(testLatePenaltyInput);
             const nl = clause.generateText({ wrapVariables: true });
-            nl.should.equal('Late Delivery and Penalty. In case of delayed delivery{{ except for Force Majeure cases,}} the Seller shall pay to the Buyer for every {{9 days}} of delay penalty amounting to {{7}}% of the total value of the Equipment whose delivery has been delayed. Any fractional part of a {{days}} is to be considered a full {{days}}. The total amount of penalty shall not however, exceed {{2}}% of the total value of the Equipment involved in late delivery. If the delay is more than {{2 weeks}}, the Buyer is entitled to terminate this Contract.');
+            nl.should.equal('Late Delivery and Penalty. In case of delayed delivery<variable id="forceMajeure" value=" except for Force Majeure cases,"/> the Seller shall pay to the Buyer for every <variable id="penaltyDuration" value="9 days"/> of delay penalty amounting to <variable id="penaltyPercentage" value="7"/>% of the total value of the Equipment whose delivery has been delayed. Any fractional part of a <variable id="fractionalPart" value="days"/> is to be considered a full <variable id="fractionalPart" value="days"/>. The total amount of penalty shall not however, exceed <variable id="capPercentage" value="2"/>% of the total value of the Equipment involved in late delivery. If the delay is more than <variable id="termination" value="2 weeks"/>, the Buyer is entitled to terminate this Contract.');
+        });
+
+        it('should be able to generate natural language text with wrapped variables and formatted dates', async function() {
+            const template = await Template.fromDirectory('./test/data/formatted-dates-DD_MM_YYYY', options);
+            const clause = new Clause(template);
+            clause.parse('dateTimeProperty: 01/12/2018');
+            const nl = clause.generateText({ wrapVariables: true });
+            nl.should.equal('dateTimeProperty: <variable id="dateTimeProperty" value="01/12/2018" format="DD/MM/YYYY"/>');
         });
 
         it('should be able to roundtrip latedelivery natural language text (with a Period)', async function() {
