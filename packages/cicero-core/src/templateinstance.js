@@ -171,21 +171,39 @@ class TemplateInstance {
     }
 
     /**
-     * Generates the natural language text for a clause; combining the text from the template
-     * and the clause data.
+     * Generates the natural language text for a contract or clause clause; combining the text from the template
+     * and the instance data.
      * @param {*} [options] text generation options. options.wrapVariables encloses variables
-     * and editable sections in '{{' and '}}'
-     * @returns {string} the natural language text for the clause; created by combining the structure of
+     * and editable sections in '<variable ...' and '/>'
+     * @returns {string} the natural language text for the contract or clause; created by combining the structure of
      * the template with the JSON data for the clause.
      */
     generateText(options) {
+        let data;
         if(!this.composerData) {
             throw new Error('Data has not been set. Call setData or parse before calling this method.');
+        } else {
+            data = this.composerData;
         }
 
-        const ast = this.getTemplate().getParserManager().getTemplateAst();
-        // console.log('AST: ' + JSON.stringify(ast, null, 4));
+        const model = this.getTemplate().getTemplateModel();
 
+        const ast = this.getTemplate().getParserManager().getTemplateAst();
+
+        return this.generateTextAux(ast,data,model,options);
+    }
+    /**
+     * Auxiliary function to generate the natural language text for a clause; combining the text from the template
+     * and the clause data.
+     * @param {*} ast current template ast
+     * @param {*} data current composer data used for text generation
+     * @param {*} model current composer model for that data
+     * @param {*} [options] text generation options. options.wrapVariables encloses variables
+     * and editable sections in '<variable ...' and '/>'
+     * @returns {string} the natural language text for the contract or clause; created by combining the structure of
+     * the template with the JSON data for the clause.
+     */
+    generateTextAux(ast,data,model,options) {
         let result = '';
 
         for(let n=0; n < ast.data.length; n++) {
@@ -200,9 +218,20 @@ class TemplateInstance {
                 textValue = thing.value;
                 break;
 
+            case 'ClauseBinding': {
+                // Get the property & class model for the Clause
+                property = model.getProperty(thing.fieldName.value);
+                const clauseModel = this.template.getIntrospector().getClassDeclaration(property.getFullyQualifiedTypeName());
+                // Get the data for the Clause
+                const clauseData = data[property.getName()];
+                // Generate text on the template AST
+                textValue = this.generateTextAux(thing.template,clauseData,clauseModel,options);
+            }
+                break;
+
             case 'BooleanBinding': {
-                property = this.getTemplate().getTemplateModel().getProperty(thing.fieldName.value);
-                if(this.composerData[property.getName()]) {
+                property = model.getProperty(thing.fieldName.value);
+                if(data[property.getName()]) {
                     textValue = thing.string.value.substring(1,thing.string.value.length-1);
                 }
             }
@@ -210,8 +239,8 @@ class TemplateInstance {
 
             case 'FormattedBinding':
             case 'Binding': {
-                property = this.getTemplate().getTemplateModel().getProperty(thing.fieldName.value);
-                const value = this.composerData[property.getName()];
+                property = model.getProperty(thing.fieldName.value);
+                const value = data[property.getName()];
                 if(thing.format) {
                     format = thing.format.value;
                 }

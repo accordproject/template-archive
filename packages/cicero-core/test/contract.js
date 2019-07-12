@@ -35,4 +35,15 @@ describe('Contract', () => {
             contract.parse(sampleText);
         });
     });
+
+    describe('#generateText', () => {
+
+        it('should be able to roundtrip copyright-license natural language text', async function() {
+            const template = await Template.fromDirectory('./test/data/copyright-license', { skipUpdateExternalModels: true });
+            const contract = new Contract(template);
+            contract.parse(sampleText);
+            const nl = contract.generateText();
+            nl.should.equal(sampleText);
+        });
+    });
 });
