@@ -285,7 +285,7 @@ describe('Clause', () => {
             const clause = new Clause(template);
             clause.parse(testLatePenaltyInput);
             const nl = clause.generateText({ wrapVariables: true });
-            nl.should.equal('Late Delivery and Penalty. In case of delayed delivery<variable id="forceMajeure" value=" except for Force Majeure cases,"/> the Seller shall pay to the Buyer for every <variable id="penaltyDuration" value="9 days"/> of delay penalty amounting to <variable id="penaltyPercentage" value="7"/>% of the total value of the Equipment whose delivery has been delayed. Any fractional part of a <variable id="fractionalPart" value="days"/> is to be considered a full <variable id="fractionalPart" value="days"/>. The total amount of penalty shall not however, exceed <variable id="capPercentage" value="2"/>% of the total value of the Equipment involved in late delivery. If the delay is more than <variable id="termination" value="2 weeks"/>, the Buyer is entitled to terminate this Contract.');
+            nl.should.equal('Late Delivery and Penalty. In case of delayed delivery<variable id="forceMajeure" value="%20except%20for%20Force%20Majeure%20cases,"/> the Seller shall pay to the Buyer for every <variable id="penaltyDuration" value="9%20days"/> of delay penalty amounting to <variable id="penaltyPercentage" value="7"/>% of the total value of the Equipment whose delivery has been delayed. Any fractional part of a <variable id="fractionalPart" value="days"/> is to be considered a full <variable id="fractionalPart" value="days"/>. The total amount of penalty shall not however, exceed <variable id="capPercentage" value="2"/>% of the total value of the Equipment involved in late delivery. If the delay is more than <variable id="termination" value="2%20weeks"/>, the Buyer is entitled to terminate this Contract.');
         });
 
         it('should be able to generate natural language text with wrapped variables and formatted dates', async function() {
@@ -293,7 +293,7 @@ describe('Clause', () => {
             const clause = new Clause(template);
             clause.parse('dateTimeProperty: 01/12/2018');
             const nl = clause.generateText({ wrapVariables: true });
-            nl.should.equal('dateTimeProperty: <variable id="dateTimeProperty" value="01/12/2018" format="DD/MM/YYYY"/>');
+            nl.should.equal('dateTimeProperty: <variable id="dateTimeProperty" value="01/12/2018" format=%22DD/MM/YYYY%22/>');
         });
 
         it('should be able to roundtrip latedelivery natural language text (with a Period)', async function() {
