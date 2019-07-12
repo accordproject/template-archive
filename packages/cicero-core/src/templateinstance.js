@@ -224,9 +224,9 @@ class TemplateInstance {
             }
 
             if(property && options && options.wrapVariables) {
-                textValue = `<variable id="${property.getName()}" value="${textValue}"`;
+                textValue = `<variable id="${property.getName()}" value="${encodeURI(textValue)}"`;
                 if(format) {
-                    textValue += ` format=${format}`;
+                    textValue += ` format=${encodeURI(format)}`;
                 }
                 textValue += '/>';
             }
