@@ -103,7 +103,6 @@ require('yargs')
         try {
             argv = Commands.validateGenerateTextArgs(argv);
             const options = {
-                markdown: argv.markdown,
                 wrapVariables: argv.wrapVariables,
                 warnings: argv.warnings,
             };

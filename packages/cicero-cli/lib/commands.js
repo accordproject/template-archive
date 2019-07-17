@@ -180,7 +180,7 @@ class Commands {
                 clause.setData(dataJson);
                 if (outPath) {
                     Logger.info('Creating file: ' + outPath);
-                    fs.writeFileSync(outPath, clause.generateText());
+                    fs.writeFileSync(outPath, clause.generateText(options));
                 }
                 return clause.generateText(options);
             })

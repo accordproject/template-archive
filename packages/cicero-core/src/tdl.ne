@@ -39,22 +39,36 @@ const escapeNearley = (x) => {
         .replace(/\r/g, '\\r');
 }
 
+const adjustList = (x) => {
+    if (x.data[0] && x.data[0].type === "Chunk") {
+        x.data[0].value = "\n- " + x.data[0].value;
+        return x;
+    } else {
+        return {
+            type: x.type,
+            data: [
+              { "type":"Chunk",
+                "value":"\n- ",
+                "text":"",
+                "offset":0,
+                "lineBreaks":0,
+                "line":0,
+                "col":0}
+            ].concat(x.data),
+        };
+    }
+}
+
 // we use lexer states to distinguish between the tokens
 // in the text and the tokens inside the variables
 const lexer = moo.states({
     main: {
-        // a chunk is everything up until '[{', even across newlines. We then trim off the '[{'
+        // a chunk is everything up until '{[', even across newlines. We then trim off the '{['
         // we also push the lexer into the 'var' state
         Chunk: {
-            match: /[^]*?\[{/,
-            lineBreaks: true,
-            push: 'var',
-            value: x => escapeNearley(x.slice(0, -2))
-        },
-        ExprChunk: {
             match: /[^]*?{{/,
             lineBreaks: true,
-            push: 'expr',
+            push: 'markup',
             value: x => escapeNearley(x.slice(0, -2))
         },
         // we now need to consume everything up until the end of the buffer.
@@ -65,9 +79,25 @@ const lexer = moo.states({
             value: x => escapeNearley(x)
         }
     },
-    var: {
-varend: {
-            match: '}]',
+    markup: { // This is a dispatch to the correct lexical state (using moo's "next")
+        markupstartblock: {
+            match: '#',
+            next: 'startblock',
+        },
+        markupstartref: {
+            match: '>',
+            next: 'startref',
+        },
+        markupendblock: {
+            match: '/',
+            next: 'endblock',
+        },
+        markupexpr: {
+            match: '%',
+            next: 'expr',
+        },
+        varend: {
+            match: '}}',
             pop: true
         }, // pop back to main state
         varid: {
@@ -75,24 +105,42 @@ varend: {
           type: moo.keywords({varas: 'as'})
         },
         varstring: /".*?"/,
-        varcond: ':?',
         varspace: ' ',
-        clauseidstart: {
-            match: /#[a-zA-Z_][_a-zA-Z0-9]*/,
-            value: x => x.slice(1)
-        },
-        clauseidend: {
-            match: /\/[a-zA-Z_][_a-zA-Z0-9]*/,
-            value: x => x.slice(1)
-        },
-        clauseclose: /\//
     },
     expr: {
-exprend: {
-            match: /[^]*?}}/,
+        exprend: {
+            match: /[^]*?[%]}}/,
             lineBreaks: true,
             pop: true
         },
+    },
+    startblock: {
+        startblockend: {
+            match: '}}',
+            pop: true,
+        }, // pop back to main state
+        startblockspace: / +/,
+        startclauseid: 'clause',
+        startlistid: 'ulist',
+        startifid: 'if',
+        startblockid: /[a-zA-Z_][_a-zA-Z0-9]*/,
+    },
+    startref: {
+        startrefend: {
+            match: '}}',
+            pop: true,
+        }, // pop back to main state
+        startrefspace: / +/,
+        startrefid: /[a-zA-Z_][_a-zA-Z0-9]*/,
+    },
+    endblock: {
+        endblockend: {
+            match: '}}',
+            pop: true
+        }, // pop back to main state
+        endclauseid: 'clause',
+        endlistid: 'ulist',
+        endifid: 'if',
     },
 });
 %}
@@ -114,7 +162,15 @@ CONTRACT_TEMPLATE -> CONTRACT_ITEM:* %LastChunk:?
     }
 %}
 
-# A Clause is one or more items, followed by an optional LastChunk
+CONTRACT_ITEM -> 
+      %Chunk {% id %}
+    | %markupstartblock LIST_VARIABLE_INLINE {% (data) => { return data[1]; } %}
+    | %markupstartblock IF_VARIABLE_INLINE {% (data) => { return data[1]; } %}
+    | %markupstartblock CLAUSE_VARIABLE_INLINE {% (data) => { return data[1]; } %}
+    | %markupstartref CLAUSE_VARIABLE_EXTERNAL {% (data) => { return data[1]; } %}
+    | %markupexpr CLAUSE_EXPR {% (data) => { return data[1]; } %}
+    | VARIABLE {% id %}
+
 CLAUSE_TEMPLATE -> CLAUSE_ITEM:* %LastChunk:?
 {% (data) => {
         return {
@@ -124,13 +180,12 @@ CLAUSE_TEMPLATE -> CLAUSE_ITEM:* %LastChunk:?
     }
 %}
 
-CONTRACT_ITEM -> 
+CLAUSE_ITEM -> 
       %Chunk {% id %} 
-    | %ExprChunk {% id %} 
+    | %markupstartblock LIST_VARIABLE_INLINE {% (data) => { return data[1]; } %}
+    | %markupstartblock IF_VARIABLE_INLINE {% (data) => { return data[1]; } %}
+    | %markupexpr CLAUSE_EXPR {% (data) => { return data[1]; } %}
     | VARIABLE {% id %}
-    | CLAUSE_VARIABLE_INLINE {% id %}
-    | CLAUSE_VARIABLE_EXTERNAL {% id %}
-    | CLAUSE_EXPR {% id %}
 
 # An expression
 CLAUSE_EXPR -> %exprend
@@ -141,60 +196,60 @@ CLAUSE_EXPR -> %exprend
     }
 %}
 
-# An item is either a chunk of text or an embedded variable
-CLAUSE_ITEM -> 
-      %Chunk {% id %} 
-    | %ExprChunk {% id %} 
-    | VARIABLE {% id %}
-    | CLAUSE_EXPR {% id %}
-
-CLAUSE_VARIABLE_INLINE -> %clauseidstart %varend CLAUSE_TEMPLATE %clauseidend %varend
+CLAUSE_VARIABLE_INLINE -> %startclauseid %startblockspace %startblockid %startblockend CLAUSE_TEMPLATE %markupendblock %endclauseid %endblockend
 {% (data,l,reject) => {
     // Check that opening and closing clause tags match
     // Note: this line makes the parser non-context-free
-    if(data[0].value !== data[3].value) {
-        return reject;
-    } else {
-        return {
-            type: 'ClauseBinding',
-            template: data[2],
-            fieldName: data[0]
-        }
+    return {
+        type: 'ClauseBinding',
+        template: data[4],
+        fieldName: data[2]
     }
 }
 %}
 
 # Binds the variable to a Clause in the template model. The type of the clause
 # in the grammar is inferred from the type of the model element
-CLAUSE_VARIABLE_EXTERNAL -> %clauseidstart %clauseclose %varend
+CLAUSE_VARIABLE_EXTERNAL -> %startrefspace:? %startrefid %startrefend
 {% (data) => {
     return {
         type: 'ClauseExternalBinding',
-        fieldName: data[0]
+        fieldName: data[1]
     }
 } 
+%}
+
+LIST_VARIABLE_INLINE -> %startlistid %startblockspace %startblockid %startblockend CLAUSE_TEMPLATE %markupendblock %endlistid %endblockend
+{% (data,l,reject) => {
+    // Check that opening and closing clause tags match
+    // Note: this line makes the parser non-context-free
+        return {
+            type: 'ListBinding',
+            template: adjustList(data[4]),
+            fieldName: data[2]
+        }
+}
+%}
+
+IF_VARIABLE_INLINE -> %startifid %startblockspace %startblockid %startblockend %Chunk %markupendblock %endifid %endblockend
+{% (data,l,reject) => {
+    // Check that opening and closing clause tags match
+    // Note: this line makes the parser non-context-free
+        return {
+            type: 'BooleanBinding',
+            string: data[4],
+            fieldName: data[2]
+        }
+}
 %}
 
 # A variable may be one of the sub-types below
 VARIABLE -> 
       FORMATTED_BINDING {% id %}
-    | BOOLEAN_BINDING  {% id %}
     | BINDING {% id %} 
 
-# A Boolean binding set a boolean to true if a given optional string literal is present
-# [{"optional text":? booleanFieldName}]
-BOOLEAN_BINDING -> %varstring %varcond %varspace %varid %varend
-{% (data) => {
-        return {
-            type: 'BooleanBinding',
-            string: data[0],
-            fieldName: data[3]
-        };
-    }
-%}
-
 # A Formatted binding specifies how a field is parsed inline. For example, for a DateTime field:
-# [{fieldName as "YYYY-MM-DD HH:mm Z"}]
+# {[fieldName as "YYYY-MM-DD HH:mm Z"]}
 FORMATTED_BINDING -> %varid %varspace %varas %varspace %varstring %varend
 {% (data) => {
         return {
@@ -207,7 +262,7 @@ FORMATTED_BINDING -> %varid %varspace %varas %varspace %varstring %varend
 
 # Binds the variable to a field in the template model. The type of the variable
 # in the grammar is inferred from the type of the model element
-# [{fieldName}]
+# {[fieldName]}
 BINDING -> %varid %varend
 {% (data) => {
         return {

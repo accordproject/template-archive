@@ -1,1 +1,1 @@
-[{"foo":? participant}] agrees to spend [{amount}] conga coins on [{swag}]. [{maybeThing}]
+{{#if participant}}foo{{/if}} agrees to spend {{amount}} conga coins on {{swag}}. {{maybeThing}}

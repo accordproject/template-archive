@@ -65,7 +65,7 @@ describe('Clause', () => {
             try {
                 await Template.fromDirectory('./test/data/bad-boolean-binding', options);
             } catch (err) {
-                err.message.should.equal('A boolean binding can only be used with a boolean property. Property participant has type Participant File grammar/template.tem line 1 column 11');
+                err.message.should.equal('A boolean binding can only be used with a boolean property. Property participant has type Participant File grammar/template.tem line 1 column 7');
             }
         });
 

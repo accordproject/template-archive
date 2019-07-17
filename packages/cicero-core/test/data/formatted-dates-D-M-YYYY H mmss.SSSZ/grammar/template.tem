@@ -1,1 +1,1 @@
-dateTimeProperty: [{dateTimeProperty as "D-M-YYYY H mm:ss.SSSZ"}]
+dateTimeProperty: {{dateTimeProperty as "D-M-YYYY H mm:ss.SSSZ"}}
