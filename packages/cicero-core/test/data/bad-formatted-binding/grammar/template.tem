@@ -1,1 +1,1 @@
-[{participant as "YYYY/MM/DD"}] agrees to spend [{amount}] conga coins on [{swag}]. [{maybeThing}]
+{{participant as "YYYY/MM/DD"}} agrees to spend {{amount}} conga coins on {{swag}}. {{maybeThing}}

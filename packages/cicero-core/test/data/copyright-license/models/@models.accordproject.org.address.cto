@@ -1,0 +1,13 @@
+namespace org.accordproject.address
+
+/**
+ * Based on http://schema.org/PostalAddress
+ */
+concept PostalAddress {
+  o String streetAddress optional
+  o String postalCode optional
+  o String postOfficeBoxNumber optional
+  o String addressRegion optional
+  o String addressLocality optional
+  o String addressCountry optional
+}

@@ -5,6 +5,7 @@
     "accordproject": {
         "template": "clause",
         "ergo": "0.9.1",
-        "cicero": "^0.13.0"
+        "cicero": "^0.13.0",
+        "runtime": "cicero"
     }
 }

@@ -1,1 +1,1 @@
-dateTimeProperty: 04-Jan-2019 2 59:01.001+01:01
+dateTimeProperty: 04-Jan-2019 2 59:01.001+01:02

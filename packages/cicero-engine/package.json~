@@ -1,7 +1,7 @@
 {
-  "name": "@accordproject/cicero-cli",
+  "name": "@accordproject/cicero-engine",
   "version": "0.13.5",
-  "description": "Cicero CLI",
+  "description": "Cicero Engine - Node.js VM based implementation of Accord Protcol Template Specification execution",
   "engines": {
     "node": ">=8",
     "npm": ">=3"
@@ -9,20 +9,16 @@
   "publishConfig": {
     "access": "public"
   },
-  "bin": {
-    "cicero": "./index.js"
-  },
   "main": "index.js",
   "scripts": {
     "pretest": "npm run lint",
     "lint": "eslint .",
     "postlint": "npm run licchk",
     "licchk": "license-check",
-    "test:cucumber": "cucumber-js test/features --require .cucumber.js --world-parameters \"{\\\"rootdir\\\":\\\"./test\\\"}\"",
     "test:mocha": "mocha",
-    "test:all": "npm run test:mocha && npm run test:cucumber",
     "test:windows": "npm run test:all",
-    "test:cov": "nyc npm run test",
+    "test:all": "npm run test:mocha",
+    "test:cov": "nyc npm run test:all",
     "test": "npm run test:all"
   },
   "repository": {
@@ -30,9 +26,11 @@
     "url": "git+https://github.com/accordproject/cicero.git"
   },
   "keywords": [
-    "clause",
+    "accord",
     "legal",
-    "tech"
+    "tech",
+    "smart",
+    "contract"
   ],
   "author": "clause.io",
   "license": "Apache-2.0",
@@ -42,23 +40,24 @@
   "homepage": "https://github.com/accordproject/cicero#readme",
   "devDependencies": {
     "chai": "4.2.0",
-    "chai-as-promised": "7.1.1",
     "chai-things": "0.2.0",
     "cucumber": "^5.1.0",
     "eslint": "4.19.1",
     "license-check": "1.1.5",
     "mocha": "6.1.4",
-    "nyc": "14.1.1",
-    "tmp-promise": "1.0.4"
+    "nyc": "14.1.1"
   },
   "dependencies": {
+<<<<<<< HEAD
     "@accordproject/cicero-core": "0.13.5",
-    "@accordproject/cicero-engine": "0.13.5",
-    "@accordproject/cicero-tools": "0.13.5",
-    "@accordproject/cicero-test": "0.13.5",
+    "@accordproject/ergo-compiler": "0.9.4",
+    "@accordproject/ergo-engine": "0.9.4",
+=======
+    "@accordproject/cicero-core": "0.13.4",
     "@accordproject/ergo-compiler": "0.9.5-20190731165645",
-    "uuid": "3.3.2",
-    "yargs": "9.0.1"
+    "@accordproject/ergo-engine": "0.9.5-20190731165645",
+>>>>>>> feature(templates) Revise Cicero (parser, tests) for new template syntax based on handlebars
+    "moment-mini": "2.22.1"
   },
   "license-check-config": {
     "src": [
@@ -66,8 +65,7 @@
       "!./test/data/**/*",
       "!./coverage/**/*",
       "!./node_modules/**/*",
-      "!./out/**/*",
-      "!index.js"
+      "!./out/**/*"
     ],
     "path": "header.txt",
     "blocking": true,
@@ -89,9 +87,9 @@
     "exclude": [],
     "all": true,
     "check-coverage": true,
-    "statements": 0,
-    "branches": 0,
-    "functions": 0,
-    "lines": 0
+    "statements": 93,
+    "branches": 70,
+    "functions": 92,
+    "lines": 93
   }
 }

@@ -1,4 +1,4 @@
 {
     "$class" : "org.accordproject.test.TemplateModel",
-    "dateTimeProperty" : "2019-12-31T02:59:01.001+01:01"
+    "dateTimeProperty" : "2019-12-31T02:59:01.001+01:02"
 }

@@ -180,10 +180,11 @@ class TemplateInstance {
      * and the instance data.
      * @param {*} [options] text generation options. options.wrapVariables encloses variables
      * and editable sections in '<variable ...' and '/>'
+     * @param {string} currentTime - the definition of 'now' (optional)
      * @returns {string} the natural language text for the contract or clause; created by combining the structure of
      * the template with the JSON data for the clause.
      */
-    async generateText(options) {
+    async generateText(options, currentTime) {
         if(!this.composerData) {
             throw new Error('Data has not been set. Call setData or parse before calling this method.');
         }
@@ -199,7 +200,7 @@ class TemplateInstance {
         const contract = this.getData();
 
         return logicManager.compileLogic(false).then(async () => {
-            const result = await this.ergoEngine.generateText(logicManager,clauseId,contract,params,null);
+            const result = await this.ergoEngine.generateText(logicManager,clauseId,contract,params,currentTime);
             return result.response;
         });
     }

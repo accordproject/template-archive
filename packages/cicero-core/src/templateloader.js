@@ -334,7 +334,6 @@ class TemplateLoader {
             if(!templatizedGrammar) {
                 throw new Error('A template must either contain a template.tem or template.md file.');
             }
-            template.getLogicManager().addTemplateFile(templatizedGrammar,'grammar/template.tem');
             template.parserManager.buildGrammar(templatizedGrammar, false);
             Logger.debug(method, 'Loaded template.tem', templatizedGrammar);
         }
@@ -342,7 +341,13 @@ class TemplateLoader {
         Logger.debug(method, 'Loaded template.tem', template_txt);
 
         // load and add the ergo files
-        if(template.getMetadata().getErgoVersion()) {
+        if(template.getMetadata().getErgoVersion() && template.getMetadata().getRuntime() === 'ergo') {
+            // If Ergo then also register the template
+            if(templatizedGrammarMd) {
+                template.getLogicManager().addTemplateFile(templatizedGrammarMd,'grammar/template.md');
+            } else {
+                template.getLogicManager().addTemplateFile(templatizedGrammar,'grammar/template.tem');
+            }
             const ergoFiles = await TemplateLoader.loadFilesContents(path, /lib[/\\].*\.ergo$/);
             ergoFiles.forEach((file) => {
                 const resolvedPath = slash(fsPath.resolve(path));
@@ -353,7 +358,7 @@ class TemplateLoader {
         }
 
         // load and add compiled JS files - we assume all runtimes are JS based (review!)
-        if(template.getMetadata().getRuntime()) {
+        if(template.getMetadata().getRuntime() !== 'ergo') {
             const jsFiles = await TemplateLoader.loadFilesContents(path, /lib[/\\].*\.js$/);
             jsFiles.forEach((file) => {
                 const resolvedPath = slash(fsPath.resolve(path));

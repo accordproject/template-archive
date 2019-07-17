@@ -99,11 +99,9 @@ class ParserManager {
     buildGrammar(templatizedGrammar, markdown) {
 
         if(markdown) {
-            templatizedGrammar = templatizedGrammar.replace('[{', '{{').replace('}]', '}}');
             const commonmarkParser = new CommonmarkParser();
             const concertoAst = commonmarkParser.parse(templatizedGrammar);
             templatizedGrammar = CommonmarkToString(concertoAst);
-            templatizedGrammar = templatizedGrammar.replace('{{', '[{').replace('}}', '}]');
             console.log(templatizedGrammar);
         }
 
@@ -117,7 +115,6 @@ class ParserManager {
         // parse the template grammar to generate a dynamic grammar
         const ast = parser.results[0];
         this.templateAst = ast;
-        Logger.debug('Template AST', ast);
         const parts = {
             textRules: [],
             modelRules: [],
@@ -217,13 +214,14 @@ class ParserManager {
                 }
                 parts.modelRules.push({
                     prefix: rule,
-                    symbols: [`${element.string.value}:? {% (d) => {return d[0] !== null;}%} # ${element.fieldName.value}`],
+                    symbols: [`"${element.string.value}":? {% (d) => {return d[0] !== null;}%} # ${element.fieldName.value}`],
                 });
             }
                 break;
             case 'FormattedBinding':
             case 'Binding':
             case 'ClauseBinding':
+            case 'ListBinding':
                 this.handleBinding(templateModel, parts, rule, element);
                 break;
             case 'Expr':
@@ -324,13 +322,12 @@ class ParserManager {
                         symbols: [`${formatRule.tokens} ${formatRule.action} # ${propertyName} as ${format}`],
                     });
                 }
-            } else if(element.type === 'ClauseBinding') {
-                const clauseTemplate = element.template;
-                const clauseTemplateModel = this.template.getIntrospector().getClassDeclaration(property.getFullyQualifiedTypeName());
-                this.buildGrammarRules(clauseTemplate, clauseTemplateModel, propertyName, parts);
+            } else if(element.type === 'ClauseBinding' || element.type === 'ListBinding') {
+                const nestedTemplate = element.template;
+                const nestedTemplateModel = this.template.getIntrospector().getClassDeclaration(property.getFullyQualifiedTypeName());
+                this.buildGrammarRules(nestedTemplate, nestedTemplateModel, propertyName, parts);
                 type = element.fieldName.value;
-            }
-            else {
+            } else {
                 // relationships need to be transformed into strings
                 if (property instanceof RelationshipDeclaration) {
                     type = 'String';
@@ -384,7 +381,7 @@ class ParserManager {
     findFirstBinding(propertyName, elements) {
         for(let n=0; n < elements.length; n++) {
             const element = elements[n];
-            if(element !== null && ['Binding','FormattedBinding', 'BooleanBinding','ClauseBinding'].includes(element.type)) {
+            if(element !== null && ['Binding','FormattedBinding', 'BooleanBinding','ListBinding','ClauseBinding'].includes(element.type)) {
                 if(element.fieldName.value === propertyName) {
                     return n;
                 }

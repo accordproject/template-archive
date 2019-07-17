@@ -1,0 +1,12 @@
+namespace org.accordproject.organization
+
+import org.accordproject.address.PostalAddress from https://models.accordproject.org/address.cto
+import org.accordproject.geo.Place from https://models.accordproject.org/geo.cto
+
+participant Organization identified by identifier {
+  o String identifier
+  o String name optional 
+  o String description optional
+  o String duns optional
+  o Place place optional
+}

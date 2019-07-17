@@ -28,7 +28,7 @@ chai.use(require('chai-as-promised'));
 const getTestTemplates = p => fs.readdirSync(p).filter(f => {return f.startsWith('formatted-dates-') && fs.statSync(path.join(p, f)).isDirectory();});
 const testTemplates = getTestTemplates(path.resolve(__dirname, 'data/'));
 
-describe.skip('FormattedDates', () => {
+describe('FormattedDates', () => {
 
     testTemplates.forEach(testTemplate => {
         describe(`#constructor - ${testTemplate}`, () => {
@@ -64,7 +64,7 @@ describe.skip('FormattedDates', () => {
                 const clause = new Clause(template);
                 const formattedDatesInput = fs.readFileSync(path.resolve(__dirname, 'data/', testTemplate + '/sample.txt'), 'utf8');
                 clause.parse(formattedDatesInput);
-                const nl = clause.generateText();
+                const nl = await clause.generateText(null, '2019-01-04T00:00:00+01:02');
                 nl.should.equal(formattedDatesInput);
             });
         });
