@@ -197,22 +197,6 @@ describe('Metadata', () => {
             metadata.getDisplayName().should.equal(displayName);
         });
 
-        it('should get the displayName from packageJson', () => {
-            const displayName = 'My Display Name 👍 名称';
-            const metadata = new Metadata({
-                name: 'template',
-                version: '1.0.0',
-                accordproject: {
-                    template: 'clause',
-                    cicero:ciceroVersion,
-                    ergo: '0.1.0',
-                    language: 'ergo'
-                },
-                displayName,
-            }, null, {});
-            metadata.getDisplayName().should.equal(displayName);
-        });
-
         it('should get the displayName by falling back to the name in packageJson', () => {
             const metadata = new Metadata({
                 name: 'my-display_name',
