@@ -109,6 +109,14 @@ class Template {
     }
 
     /**
+     * Returns the display name for this template.
+     * @return {string} the display name of the template
+     */
+    getDisplayName() {
+        return this.getMetadata().getDisplayName();
+    }
+
+    /**
      * Returns the version for this template
      * @return {String} the version of this template. Use semver module
      * to parse.

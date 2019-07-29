@@ -90,7 +90,7 @@ class Metadata {
         this.ciceroVersion = packageJson.accordproject.cicero;
 
         if (!this.satisfiesCiceroVersion(ciceroVersion)){
-            const msg = `The template targets Cicero (${this.ciceroVersion}) but the Cicero version is ${ciceroVersion}.`;
+            const msg = `The template targets Cicero version ${this.ciceroVersion} but the current Cicero version is ${ciceroVersion}.`;
             Logger.error(msg);
             throw new Error(msg);
         }
@@ -132,6 +132,10 @@ class Metadata {
 
         if(packageJson.keywords && !Array.isArray(packageJson.keywords)) {
             throw new Error('keywords property in package.json must be an array.');
+        }
+
+        if(packageJson.displayName && packageJson.displayName.length > 214){
+            throw new Error('The template displayName property is limited to a maximum of 214 characters.');
         }
 
         this.readme = readme;
@@ -274,6 +278,25 @@ class Metadata {
      */
     getName() {
         return this.packageJson.name;
+    }
+
+    /**
+     * Returns the display name for this template.
+     * @return {string} the display name of the template
+     */
+    getDisplayName() {
+        // Fallback for packages that don't have a displayName property.
+        if(!this.packageJson.displayName) {
+            // Convert `acceptance-Of-Delivery` or `acceptanceOfDelivery` into `Acceptance Of Delivery`
+            return String(this.packageJson.name)
+                .split('-').join(' ')
+                .replace(/([a-z])([A-Z])/g, '$1 $2')
+                .replace(/([A-Z])([a-z])/g, ' $1$2')
+                .replace(/ +/g, ' ')
+                .replace(/^./, str => str.toUpperCase())
+                .trim();
+        }
+        return this.packageJson.displayName;
     }
 
     /**
