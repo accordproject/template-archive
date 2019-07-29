@@ -287,13 +287,11 @@ class Metadata {
     getDisplayName() {
         // Fallback for packages that don't have a displayName property.
         if(!this.packageJson.displayName) {
-            // Convert `acceptance-Of-Delivery` or `acceptanceOfDelivery` into `Acceptance Of Delivery`
+            // Convert `acceptance-of-delivery` or `acceptance_of_delivery` into `Acceptance Of Delivery`
             return String(this.packageJson.name)
-                .split('-').join(' ')
-                .replace(/([a-z])([A-Z])/g, '$1 $2')
-                .replace(/([A-Z])([a-z])/g, ' $1$2')
-                .replace(/ +/g, ' ')
-                .replace(/^./, str => str.toUpperCase())
+                .split(/_|-/)
+                .map(word => word.replace(/^./, str => str.toUpperCase()))
+                .join(' ')
                 .trim();
         }
         return this.packageJson.displayName;
