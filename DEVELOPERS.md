@@ -65,11 +65,10 @@ It is good practice to always keep your `origin/master` in sync with `upstream/m
 
 ### <a name="unit-tests"></a> Running the Unit Test Suite
 
-We write unit and integration tests with Jasmine and execute them with Karma. To run all of the
-tests once on Chrome run:
+We write and execute unit tests with Mocha and integration tests with Cucumber. To run all of the tests at once, run:
 
 ```shell
-lerna run test
+npm run test
 ```
 
 ### <a name="e2e-tests"></a> Running the End-to-end Test Suite
