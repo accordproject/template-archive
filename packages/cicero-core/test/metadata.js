@@ -178,7 +178,51 @@ describe('Metadata', () => {
                     ergo: '0.1.0',
                     language: 'ergo'
                 },
-            }, null, {})).should.throw('The template targets Cicero (0.0.0) but the Cicero version is ');
+            }, null, {})).should.throw('The template targets Cicero version 0.0.0 but the current Cicero version is ');
+        });
+
+        it('should get the displayName from packageJson', () => {
+            const displayName = 'My Display Name 👍 名称';
+            const metadata = new Metadata({
+                name: 'template',
+                version: '1.0.0',
+                accordproject: {
+                    template: 'clause',
+                    cicero:ciceroVersion,
+                    ergo: '0.1.0',
+                    language: 'ergo'
+                },
+                displayName,
+            }, null, {});
+            metadata.getDisplayName().should.equal(displayName);
+        });
+
+        it('should get the displayName by falling back to the name in packageJson', () => {
+            const metadata = new Metadata({
+                name: 'my-display_name',
+                version: '1.0.0',
+                accordproject: {
+                    template: 'clause',
+                    cicero:ciceroVersion,
+                    ergo: '0.1.0',
+                    language: 'ergo'
+                },
+            }, null, {});
+            metadata.getDisplayName().should.equal('My Display Name');
+        });
+
+        it('should throw an error if the displayName is too long', () => {
+            return (() => new Metadata({
+                name: 'template',
+                version: '1.0.0',
+                accordproject: {
+                    template: 'clause',
+                    cicero:ciceroVersion,
+                    ergo: '0.1.0',
+                    language: 'ergo'
+                },
+                displayName: new Array(216).join('A'),
+            }, null, {})).should.throw('The template displayName property is limited to a maximum of 214 characters.');
         });
     });
 
