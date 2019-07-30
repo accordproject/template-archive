@@ -70,7 +70,7 @@
     "webpack-cli": "^3.3.5"
   },
   "dependencies": {
-    "@accordproject/ergo-compiler": "0.9.3",
+    "@accordproject/ergo-compiler": "0.9.4",
     "acorn": "5.7.3",
     "axios": "0.19.0",
     "debug": "4.1.0",
