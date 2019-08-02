@@ -44,7 +44,7 @@
     "chai": "4.2.0",
     "chai-as-promised": "7.1.1",
     "chai-things": "0.2.0",
-    "cucumber": "^5.1.0",
+    "cucumber": "5.1.0",
     "eslint": "4.19.1",
     "license-check": "1.1.5",
     "mocha": "6.1.4",
@@ -56,7 +56,7 @@
     "@accordproject/cicero-engine": "0.13.5",
     "@accordproject/cicero-tools": "0.13.5",
     "@accordproject/cicero-test": "0.13.5",
-    "@accordproject/ergo-compiler": "0.9.5-20190731165645",
+    "@accordproject/ergo-compiler": "0.9.5-20190826173445",
     "uuid": "3.3.2",
     "yargs": "9.0.1"
   },

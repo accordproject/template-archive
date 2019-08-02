@@ -189,18 +189,17 @@ class TemplateInstance {
             throw new Error('Data has not been set. Call setData or parse before calling this method.');
         }
 
-        const params = {
-            options: {
-                '$class': 'org.accordproject.markdown.MarkdownOptions',
-                'wrapVariables': options && options.wrapVariables ? options.wrapVariables : false,
-            }
+        const markdownOptions = {
+            '$class': 'org.accordproject.markdown.MarkdownOptions',
+            'wrapVariables': options && options.wrapVariables ? options.wrapVariables : false,
+            'template': true
         };
         const logicManager = this.getLogicManager();
         const clauseId = this.getIdentifier();
         const contract = this.getData();
 
         return logicManager.compileLogic(false).then(async () => {
-            const result = await this.ergoEngine.generateText(logicManager,clauseId,contract,params,currentTime);
+            const result = await this.ergoEngine.generateText(logicManager,clauseId,contract,{},currentTime,markdownOptions);
             return result.response;
         });
     }

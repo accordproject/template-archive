@@ -14,19 +14,19 @@
 
 namespace org.accordproject.saft
 
-import org.accordproject.money.MonetaryAmount
+import org.accordproject.money.*
 
 contract Saft over SaftContract {
   clause onLaunch(request : Launch) : Payout {
     return Payout{
-      tokenAmount: MonetaryAmount{ doubleValue: 100.0, currencyCode: "USD" },
+      tokenAmount: MonetaryAmount{ doubleValue: 100.0, currencyCode: USD },
       tokenAddress: contract.purchaser
     }
   }
 
   clause onTerminate(request : Terminate) : Payout {
     return Payout{
-      tokenAmount: MonetaryAmount{ doubleValue: 9.0, currencyCode: "USD" },
+      tokenAmount: MonetaryAmount{ doubleValue: 9.0, currencyCode: USD },
       tokenAddress: contract.purchaser
     }
   }

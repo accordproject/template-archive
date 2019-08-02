@@ -16,7 +16,7 @@ namespace org.accordproject.simplelatedeliveryandpenalty
 
 import org.accordproject.cicero.runtime.*
 import org.accordproject.time.*
-import org.accordproject.money.MonetaryAmount
+import org.accordproject.money.*
 
 contract SimpleLateDeliveryAndPenalty over SimpleLateDeliveryAndPenaltyContract {
   clause latedeliveryandpenalty(request : SimpleLateDeliveryAndPenaltyRequest) : SimpleLateDeliveryAndPenaltyResponse emits PaymentObligation {
@@ -26,7 +26,7 @@ contract SimpleLateDeliveryAndPenalty over SimpleLateDeliveryAndPenaltyContract 
     throw ErgoErrorResponse{ message : "Cannot exercise late delivery before delivery date" };
 
     // Calculate the period difference between current date and agreed upon date using the penalty unit
-    let diff = diffPeriodAs(now,agreed,contract.penaltyPeriod.unit).amount;
+    let diff = diffPeriodAs(now(),agreed,contract.penaltyPeriod.unit).amount;
     // Penalty formula
     let penalty =
       (integerToDouble(diff) / integerToDouble(contract.penaltyPeriod.amount))
@@ -40,12 +40,12 @@ contract SimpleLateDeliveryAndPenalty over SimpleLateDeliveryAndPenaltyContract 
 			promisor: some(contract.buyer),
 			promisee: some(contract.seller),
 			deadline: none,
-			amount: MonetaryAmount{ doubleValue: capped, currencyCode: "USD" },
+			amount: MonetaryAmount{ doubleValue: capped, currencyCode: USD },
 			description: contract.buyer.partyId ++ " should pay penalty amount to " ++ contract.seller.partyId
 		};
     return SimpleLateDeliveryAndPenaltyResponse{
       penalty: capped,
-      buyerMayTerminate: isAfter(now, addPeriod(agreed,contract.maximumDelay))
+      buyerMayTerminate: isAfter(now(), addPeriod(agreed,contract.maximumDelay))
     }
   }
 }

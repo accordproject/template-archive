@@ -25,7 +25,7 @@ contract LateDeliveryAndPenalty over TemplateModel {
     ;
 
     // Calculate the time difference between current date and agreed upon date
-    let diff = diffDurationAs(now,agreed,"days").amount;
+    let diff = diffDurationAs(now(),agreed,"days").amount;
     // Penalty formula
     let penalty =
       (integerToDouble(diff) / integerToDouble(contract.penaltyDuration.amount)) * contract.penaltyPercentage/100.0 * request.goodsValue;

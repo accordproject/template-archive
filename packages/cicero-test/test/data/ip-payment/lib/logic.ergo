@@ -32,7 +32,7 @@ contract IPPayment over IntellectualPropertyPaymentClause {
     else 
       return PayOut{
         totalAmount: totalAmount,
-        dueBy: addDuration(endOf(now(), "quarters"), contract.paymentPeriod)
+        dueBy: addDuration(endOf(now(), quarters), contract.paymentPeriod)
       }
   }
 }

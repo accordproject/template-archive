@@ -39,16 +39,17 @@ const escapeNearley = (x) => {
         .replace(/\r/g, '\\r');
 }
 
-const adjustList = (x) => {
+const adjustList = (x,kind) => {
+    const sep = kind === 'unordered' ? "\n- " : "\n1. ";
     if (x.data[0] && x.data[0].type === "Chunk") {
-        x.data[0].value = "\n- " + x.data[0].value;
+        x.data[0].value = sep + x.data[0].value;
         return x;
     } else {
         return {
             type: x.type,
             data: [
               { "type":"Chunk",
-                "value":"\n- ",
+                "value":sep,
                 "text":"",
                 "offset":0,
                 "lineBreaks":0,
@@ -121,7 +122,9 @@ const lexer = moo.states({
         }, // pop back to main state
         startblockspace: / +/,
         startclauseid: 'clause',
-        startlistid: 'ulist',
+        startwithid: 'with',
+        startulistid: 'ulist',
+        startolistid: 'olist',
         startifid: 'if',
         startblockid: /[a-zA-Z_][_a-zA-Z0-9]*/,
     },
@@ -139,7 +142,9 @@ const lexer = moo.states({
             pop: true
         }, // pop back to main state
         endclauseid: 'clause',
-        endlistid: 'ulist',
+        endwithid: 'with',
+        endulistid: 'ulist',
+        endolistid: 'olist',
         endifid: 'if',
     },
 });
@@ -164,9 +169,11 @@ CONTRACT_TEMPLATE -> CONTRACT_ITEM:* %LastChunk:?
 
 CONTRACT_ITEM -> 
       %Chunk {% id %}
-    | %markupstartblock LIST_VARIABLE_INLINE {% (data) => { return data[1]; } %}
+    | %markupstartblock ULIST_VARIABLE_INLINE {% (data) => { return data[1]; } %}
+    | %markupstartblock OLIST_VARIABLE_INLINE {% (data) => { return data[1]; } %}
     | %markupstartblock IF_VARIABLE_INLINE {% (data) => { return data[1]; } %}
     | %markupstartblock CLAUSE_VARIABLE_INLINE {% (data) => { return data[1]; } %}
+    | %markupstartblock WITH_VARIABLE_INLINE {% (data) => { return data[1]; } %}
     | %markupstartref CLAUSE_VARIABLE_EXTERNAL {% (data) => { return data[1]; } %}
     | %markupexpr CLAUSE_EXPR {% (data) => { return data[1]; } %}
     | VARIABLE {% id %}
@@ -182,8 +189,10 @@ CLAUSE_TEMPLATE -> CLAUSE_ITEM:* %LastChunk:?
 
 CLAUSE_ITEM -> 
       %Chunk {% id %} 
-    | %markupstartblock LIST_VARIABLE_INLINE {% (data) => { return data[1]; } %}
+    | %markupstartblock ULIST_VARIABLE_INLINE {% (data) => { return data[1]; } %}
+    | %markupstartblock OLIST_VARIABLE_INLINE {% (data) => { return data[1]; } %}
     | %markupstartblock IF_VARIABLE_INLINE {% (data) => { return data[1]; } %}
+    | %markupstartblock WITH_VARIABLE_INLINE {% (data) => { return data[1]; } %}
     | %markupexpr CLAUSE_EXPR {% (data) => { return data[1]; } %}
     | VARIABLE {% id %}
 
@@ -208,6 +217,18 @@ CLAUSE_VARIABLE_INLINE -> %startclauseid %startblockspace %startblockid %startbl
 }
 %}
 
+WITH_VARIABLE_INLINE -> %startwithid %startblockspace %startblockid %startblockend CLAUSE_TEMPLATE %markupendblock %endwithid %endblockend
+{% (data,l,reject) => {
+    // Check that opening and closing clause tags match
+    // Note: this line makes the parser non-context-free
+    return {
+        type: 'WithBinding',
+        template: data[4],
+        fieldName: data[2]
+    }
+}
+%}
+
 # Binds the variable to a Clause in the template model. The type of the clause
 # in the grammar is inferred from the type of the model element
 CLAUSE_VARIABLE_EXTERNAL -> %startrefspace:? %startrefid %startrefend
@@ -219,13 +240,27 @@ CLAUSE_VARIABLE_EXTERNAL -> %startrefspace:? %startrefid %startrefend
 } 
 %}
 
-LIST_VARIABLE_INLINE -> %startlistid %startblockspace %startblockid %startblockend CLAUSE_TEMPLATE %markupendblock %endlistid %endblockend
+ULIST_VARIABLE_INLINE -> %startulistid %startblockspace %startblockid %startblockend CLAUSE_TEMPLATE %markupendblock %endulistid %endblockend
 {% (data,l,reject) => {
     // Check that opening and closing clause tags match
     // Note: this line makes the parser non-context-free
         return {
             type: 'ListBinding',
-            template: adjustList(data[4]),
+            kind: 'unordered',
+            template: adjustList(data[4],'unordered'),
+            fieldName: data[2]
+        }
+}
+%}
+
+OLIST_VARIABLE_INLINE -> %startolistid %startblockspace %startblockid %startblockend CLAUSE_TEMPLATE %markupendblock %endolistid %endblockend
+{% (data,l,reject) => {
+    // Check that opening and closing clause tags match
+    // Note: this line makes the parser non-context-free
+        return {
+            type: 'ListBinding',
+            kind: 'ordered',
+            template: adjustList(data[4],'ordered'),
             fieldName: data[2]
         }
 }

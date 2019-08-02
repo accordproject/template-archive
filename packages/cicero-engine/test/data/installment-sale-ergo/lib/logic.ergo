@@ -20,7 +20,7 @@ contract InstallmentSale over InstallmentSaleContract state InstallmentSaleState
   clause init(request : Request) : Response {
     set state InstallmentSaleState{
       stateId: "#1",
-      status: "WaitingForFirstDayOfNextMonth",
+      status: WaitingForFirstDayOfNextMonth,
       balance_remaining: contract.INITIAL_DUE,
       total_paid: 0.0,
       next_payment_month: contract.FIRST_MONTH
@@ -34,7 +34,7 @@ contract InstallmentSale over InstallmentSaleContract state InstallmentSaleState
     let total_paid = state.total_paid + request.amount;
     set state InstallmentSaleState{
       stateId: "#1",
-      status: "WaitingForFirstDayOfNextMonth",
+      status: WaitingForFirstDayOfNextMonth,
       balance_remaining: balance,
       total_paid: total_paid,
       next_payment_month: state.next_payment_month + 1
@@ -54,7 +54,7 @@ contract InstallmentSale over InstallmentSaleContract state InstallmentSaleState
     let total_paid = state.total_paid + request.amount;
     set state InstallmentSaleState{
       stateId: "#1",
-      status: "Fulfilled",
+      status: Fulfilled,
       balance_remaining: balance,
       total_paid: total_paid,
       next_payment_month: state.next_payment_month + 1

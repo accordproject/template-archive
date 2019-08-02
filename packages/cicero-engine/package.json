@@ -41,7 +41,7 @@
   "devDependencies": {
     "chai": "4.2.0",
     "chai-things": "0.2.0",
-    "cucumber": "^5.1.0",
+    "cucumber": "5.1.0",
     "eslint": "4.19.1",
     "license-check": "1.1.5",
     "mocha": "6.1.4",
@@ -49,8 +49,8 @@
   },
   "dependencies": {
     "@accordproject/cicero-core": "0.13.5",
-    "@accordproject/ergo-compiler": "0.9.5-20190731165645",
-    "@accordproject/ergo-engine": "0.9.5-20190731165645",
+    "@accordproject/ergo-compiler": "0.9.5-20190826173445",
+    "@accordproject/ergo-engine": "0.9.5-20190826173445",
     "moment-mini": "2.22.1"
   },
   "license-check-config": {
