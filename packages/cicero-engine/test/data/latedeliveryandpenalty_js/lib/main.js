@@ -1,4 +1,4 @@
-/* Generated using ergoc version 0.8.0 */
+/* Generated using ergoc version 0.9.4 */
 'use strict';
 /*eslint-disable no-unused-vars*/
 /*eslint-disable no-undef*/
@@ -14,19 +14,20 @@
  * @param {org.accordproject.cicero.contract.AccordContractState} context.state - the state
  */
 function orgXaccordprojectXlatedeliveryandpenaltyXLateDeliveryAndPenalty_latedeliveryandpenalty(context) {
-  let pcontext = { 'request' : context.request, 'state': context.state, 'contract': context.contract, 'emit': context.emit, 'now': context.now};
+  let pcontext = { 'request' : context.request, '__state': context.__state, '__contract': context.__contract, '__emit': context.__emit, '__now': context.__now, '__options': context.__options};
   //logger.info('ergo context: '+JSON.stringify(pcontext))
   return new orgXaccordprojectXlatedeliveryandpenaltyXLateDeliveryAndPenalty().latedeliveryandpenalty(pcontext);
 }
 class orgXaccordprojectXlatedeliveryandpenaltyXLateDeliveryAndPenalty {
   main(context) {
-    var vcontract = deref(context, "contract");
-    var vnow = deref(context, "now");
+    var vX__now = deref(context, "__now");
+    var vX__5 = deref(context, "__contract");
     var vrequest = deref(context, "request");
-    var vemit = deref(context, "emit");
-    var vstate = deref(context, "state");
-    var vlstate_0 = vstate;
-    var vlemit_0 = vemit;
+    var vX__4 = deref(context, "__emit");
+    var vX__3 = deref(context, "__state");
+    var vX__2 = vX__3;
+    var vX__1 = vX__4;
+    var vX__0 = vX__5;
     var vX$match0_1 = vrequest;
     var res1 = null;
     if (either(cast(["org.accordproject.latedeliveryandpenalty.LateDeliveryAndPenaltyRequest"],vX$match0_1))) {
@@ -44,25 +45,25 @@ class orgXaccordprojectXlatedeliveryandpenaltyXLateDeliveryAndPenalty {
       vX$case0_4 = toLeft(res1);
       var vX$case0_3 = vX$case0_4;
       var vX$main = deref(vX$case0_3, "$main");
-      var vnow_0 = vnow;
-      var vcontract_0 = vcontract;
-      var vstate_0 = vlstate_0;
-      var vemit_0 = vlemit_0;
+      var vX__contract = vX__5;
+      var vX__state = vX__2;
+      var vX__emit = vX__1;
       var vrequest_0 = vX$main;
-      var vlstate = vstate;
-      var vlemit = vemit;
+      var vX__lstate = vX__3;
+      var vX__lemit = vX__4;
+      var vX__this = vX__5;
       var vagreed = deref(unbrand(vrequest), "agreedDelivery");
       var vp1 = vagreed;
-      var vp2 = vnow;
+      var vp2 = vX__now;
       var t62;
       if (!(dateTimeIsBefore(vp1, vp2))) {
         t62 = {"right" : brand(["org.accordproject.ergo.stdlib.ErgoErrorResponse"],{"message": "Cannot exercise late delivery before delivery date"})};
       } else {
         var t61;
-        if (!((!(deref(unbrand(vcontract), "forceMajeure")) || !(deref(unbrand(vrequest), "forceMajeure"))))) {
-          t61 = {"left" : concat(concat({"response": brand(["org.accordproject.latedeliveryandpenalty.LateDeliveryAndPenaltyResponse"],concat({"penalty": 0.0}, {"buyerMayTerminate": true}))}, {"state": vlstate}), {"emit": vlemit})};
+        if (!((!(deref(unbrand(vX__5), "forceMajeure")) || !(deref(unbrand(vrequest), "forceMajeure"))))) {
+          t61 = {"left" : concat(concat({"__response": brand(["org.accordproject.latedeliveryandpenalty.LateDeliveryAndPenaltyResponse"],concat({"penalty": 0.0}, {"buyerMayTerminate": true}))}, {"__state": vX__lstate}), {"__emit": vX__lemit})};
         } else {
-          var vx = vnow;
+          var vx = vX__now;
           var vy = vagreed;
           var vz = "days";
           var vp1$0 = vx;
@@ -99,7 +100,7 @@ class orgXaccordprojectXlatedeliveryandpenaltyXLateDeliveryAndPenalty {
                 var vX$case0_0 = null;
                 vX$case0_0 = toLeft(t3);
                 var vX$0 = vX$case0_0;
-                res10 = natMult(deref(unbrand(vdu$0), "amount"), 60.0);
+                res10 = natMult(deref(unbrand(vdu$0), "amount"), {"nat": 60.0});
               } else {
                 var vX$case1_2 = null;
                 vX$case1_2 = toRight(t3);
@@ -114,7 +115,7 @@ class orgXaccordprojectXlatedeliveryandpenaltyXLateDeliveryAndPenalty {
                   var vX$1 = null;
                   vX$1 = toLeft(t4);
                   var vX$2 = vX$1;
-                  res9 = natMult(natMult(deref(unbrand(vdu$0), "amount"), 60.0), 60.0);
+                  res9 = natMult(natMult(deref(unbrand(vdu$0), "amount"), {"nat": 60.0}), {"nat": 60.0});
                 } else {
                   var vX$case1_1 = null;
                   vX$case1_1 = toRight(t4);
@@ -129,7 +130,7 @@ class orgXaccordprojectXlatedeliveryandpenaltyXLateDeliveryAndPenalty {
                     var vX$3 = null;
                     vX$3 = toLeft(t5);
                     var vX$4 = vX$3;
-                    res8 = natMult(natMult(natMult(deref(unbrand(vdu$0), "amount"), 60.0), 60.0), 24.0);
+                    res8 = natMult(natMult(natMult(deref(unbrand(vdu$0), "amount"), {"nat": 60.0}), {"nat": 60.0}), {"nat": 24.0});
                   } else {
                     var vX$case1_0 = null;
                     vX$case1_0 = toRight(t5);
@@ -144,7 +145,7 @@ class orgXaccordprojectXlatedeliveryandpenaltyXLateDeliveryAndPenalty {
                       var vX$5 = null;
                       vX$5 = toLeft(t6);
                       var vX$6 = vX$5;
-                      res7 = natMult(natMult(natMult(natMult(deref(unbrand(vdu$0), "amount"), 60.0), 60.0), 24.0), 7.0);
+                      res7 = natMult(natMult(natMult(natMult(deref(unbrand(vdu$0), "amount"), {"nat": 60.0}), {"nat": 60.0}), {"nat": 24.0}), {"nat": 7.0});
                     } else {
                       var vX$7 = null;
                       vX$7 = toRight(t6);
@@ -183,7 +184,7 @@ class orgXaccordprojectXlatedeliveryandpenaltyXLateDeliveryAndPenalty {
                   var vX$B = null;
                   vX$B = toLeft(t12);
                   var vX$C = vX$B;
-                  res19 = natDiv(deref(unbrand(vdu$0), "amount"), 60.0);
+                  res19 = natDiv(deref(unbrand(vdu$0), "amount"), {"nat": 60.0});
                 } else {
                   var vX$D = null;
                   vX$D = toRight(t12);
@@ -198,7 +199,7 @@ class orgXaccordprojectXlatedeliveryandpenaltyXLateDeliveryAndPenalty {
                     var vX$E = null;
                     vX$E = toLeft(t13);
                     var vX$F = vX$E;
-                    res18 = natMult(deref(unbrand(vdu$0), "amount"), 60.0);
+                    res18 = natMult(deref(unbrand(vdu$0), "amount"), {"nat": 60.0});
                   } else {
                     var vX$10 = null;
                     vX$10 = toRight(t13);
@@ -213,7 +214,7 @@ class orgXaccordprojectXlatedeliveryandpenaltyXLateDeliveryAndPenalty {
                       var vX$11 = null;
                       vX$11 = toLeft(t14);
                       var vX$12 = vX$11;
-                      res17 = natMult(natMult(deref(unbrand(vdu$0), "amount"), 60.0), 24.0);
+                      res17 = natMult(natMult(deref(unbrand(vdu$0), "amount"), {"nat": 60.0}), {"nat": 24.0});
                     } else {
                       var vX$13 = null;
                       vX$13 = toRight(t14);
@@ -228,11 +229,11 @@ class orgXaccordprojectXlatedeliveryandpenaltyXLateDeliveryAndPenalty {
                         var vX$14 = null;
                         vX$14 = toLeft(t15);
                         var vX$15 = vX$14;
-                        res16 = natMult(natMult(natMult(deref(unbrand(vdu$0), "amount"), 60.0), 24.0), 7.0);
+                        res16 = natMult(natMult(natMult(deref(unbrand(vdu$0), "amount"), {"nat": 60.0}), {"nat": 24.0}), {"nat": 7.0});
                       } else {
                         var vX$16 = null;
                         vX$16 = toRight(t15);
-                        res16 = natMult(deref(unbrand(vdu$0), "amount"), 60.0);
+                        res16 = natMult(deref(unbrand(vdu$0), "amount"), {"nat": 60.0});
                       }
                       res17 = res16;
                     }
@@ -267,7 +268,7 @@ class orgXaccordprojectXlatedeliveryandpenaltyXLateDeliveryAndPenalty {
                     var vX$1A = null;
                     vX$1A = toLeft(t21);
                     var vX$1B = vX$1A;
-                    res28 = natDiv(natDiv(deref(unbrand(vdu$0), "amount"), 60.0), 60.0);
+                    res28 = natDiv(natDiv(deref(unbrand(vdu$0), "amount"), {"nat": 60.0}), {"nat": 60.0});
                   } else {
                     var vX$1C = null;
                     vX$1C = toRight(t21);
@@ -282,7 +283,7 @@ class orgXaccordprojectXlatedeliveryandpenaltyXLateDeliveryAndPenalty {
                       var vX$1D = null;
                       vX$1D = toLeft(t22);
                       var vX$1E = vX$1D;
-                      res27 = natMult(deref(unbrand(vdu$0), "amount"), 60.0);
+                      res27 = natMult(deref(unbrand(vdu$0), "amount"), {"nat": 60.0});
                     } else {
                       var vX$1F = null;
                       vX$1F = toRight(t22);
@@ -297,7 +298,7 @@ class orgXaccordprojectXlatedeliveryandpenaltyXLateDeliveryAndPenalty {
                         var vX$20 = null;
                         vX$20 = toLeft(t23);
                         var vX$21 = vX$20;
-                        res26 = natMult(deref(unbrand(vdu$0), "amount"), 24.0);
+                        res26 = natMult(deref(unbrand(vdu$0), "amount"), {"nat": 24.0});
                       } else {
                         var vX$22 = null;
                         vX$22 = toRight(t23);
@@ -312,11 +313,11 @@ class orgXaccordprojectXlatedeliveryandpenaltyXLateDeliveryAndPenalty {
                           var vX$23 = null;
                           vX$23 = toLeft(t24);
                           var vX$24 = vX$23;
-                          res25 = natMult(natMult(deref(unbrand(vdu$0), "amount"), 24.0), 7.0);
+                          res25 = natMult(natMult(deref(unbrand(vdu$0), "amount"), {"nat": 24.0}), {"nat": 7.0});
                         } else {
                           var vX$25 = null;
                           vX$25 = toRight(t24);
-                          res25 = natMult(natMult(deref(unbrand(vdu$0), "amount"), 60.0), 60.0);
+                          res25 = natMult(natMult(deref(unbrand(vdu$0), "amount"), {"nat": 60.0}), {"nat": 60.0});
                         }
                         res26 = res25;
                       }
@@ -351,7 +352,7 @@ class orgXaccordprojectXlatedeliveryandpenaltyXLateDeliveryAndPenalty {
                       var vX$29 = null;
                       vX$29 = toLeft(t30);
                       var vX$2A = vX$29;
-                      res37 = natDiv(natDiv(natDiv(deref(unbrand(vdu$0), "amount"), 60.0), 60.0), 24.0);
+                      res37 = natDiv(natDiv(natDiv(deref(unbrand(vdu$0), "amount"), {"nat": 60.0}), {"nat": 60.0}), {"nat": 24.0});
                     } else {
                       var vX$2B = null;
                       vX$2B = toRight(t30);
@@ -366,7 +367,7 @@ class orgXaccordprojectXlatedeliveryandpenaltyXLateDeliveryAndPenalty {
                         var vX$2C = null;
                         vX$2C = toLeft(t31);
                         var vX$2D = vX$2C;
-                        res36 = natDiv(natMult(deref(unbrand(vdu$0), "amount"), 60.0), 24.0);
+                        res36 = natDiv(natMult(deref(unbrand(vdu$0), "amount"), {"nat": 60.0}), {"nat": 24.0});
                       } else {
                         var vX$2E = null;
                         vX$2E = toRight(t31);
@@ -381,7 +382,7 @@ class orgXaccordprojectXlatedeliveryandpenaltyXLateDeliveryAndPenalty {
                           var vX$2F = null;
                           vX$2F = toLeft(t32);
                           var vX$30 = vX$2F;
-                          res35 = natDiv(deref(unbrand(vdu$0), "amount"), 24.0);
+                          res35 = natDiv(deref(unbrand(vdu$0), "amount"), {"nat": 24.0});
                         } else {
                           var vX$31 = null;
                           vX$31 = toRight(t32);
@@ -396,11 +397,11 @@ class orgXaccordprojectXlatedeliveryandpenaltyXLateDeliveryAndPenalty {
                             var vX$32 = null;
                             vX$32 = toLeft(t33);
                             var vX$33 = vX$32;
-                            res34 = natMult(deref(unbrand(vdu$0), "amount"), 7.0);
+                            res34 = natMult(deref(unbrand(vdu$0), "amount"), {"nat": 7.0});
                           } else {
                             var vX$34 = null;
                             vX$34 = toRight(t33);
-                            res34 = natDiv(natDiv(natDiv(deref(unbrand(vdu$0), "amount"), 60.0), 60.0), 24.0);
+                            res34 = natDiv(natDiv(natDiv(deref(unbrand(vdu$0), "amount"), {"nat": 60.0}), {"nat": 60.0}), {"nat": 24.0});
                           }
                           res35 = res34;
                         }
@@ -435,7 +436,7 @@ class orgXaccordprojectXlatedeliveryandpenaltyXLateDeliveryAndPenalty {
                         var vX$38 = null;
                         vX$38 = toLeft(t39);
                         var vX$39 = vX$38;
-                        res46 = natDiv(natDiv(natDiv(natDiv(deref(unbrand(vdu$0), "amount"), 60.0), 60.0), 24.0), 7.0);
+                        res46 = natDiv(natDiv(natDiv(natDiv(deref(unbrand(vdu$0), "amount"), {"nat": 60.0}), {"nat": 60.0}), {"nat": 24.0}), {"nat": 7.0});
                       } else {
                         var vX$3A = null;
                         vX$3A = toRight(t39);
@@ -450,7 +451,7 @@ class orgXaccordprojectXlatedeliveryandpenaltyXLateDeliveryAndPenalty {
                           var vX$3B = null;
                           vX$3B = toLeft(t40);
                           var vX$3C = vX$3B;
-                          res45 = natDiv(natDiv(natMult(deref(unbrand(vdu$0), "amount"), 60.0), 24.0), 7.0);
+                          res45 = natDiv(natDiv(natMult(deref(unbrand(vdu$0), "amount"), {"nat": 60.0}), {"nat": 24.0}), {"nat": 7.0});
                         } else {
                           var vX$3D = null;
                           vX$3D = toRight(t40);
@@ -465,7 +466,7 @@ class orgXaccordprojectXlatedeliveryandpenaltyXLateDeliveryAndPenalty {
                             var vX$3E = null;
                             vX$3E = toLeft(t41);
                             var vX$3F = vX$3E;
-                            res44 = natDiv(natDiv(deref(unbrand(vdu$0), "amount"), 24.0), 7.0);
+                            res44 = natDiv(natDiv(deref(unbrand(vdu$0), "amount"), {"nat": 24.0}), {"nat": 7.0});
                           } else {
                             var vX$40 = null;
                             vX$40 = toRight(t41);
@@ -480,11 +481,11 @@ class orgXaccordprojectXlatedeliveryandpenaltyXLateDeliveryAndPenalty {
                               var vX$41 = null;
                               vX$41 = toLeft(t42);
                               var vX$42 = vX$41;
-                              res43 = natDiv(deref(unbrand(vdu$0), "amount"), 7.0);
+                              res43 = natDiv(deref(unbrand(vdu$0), "amount"), {"nat": 7.0});
                             } else {
                               var vX$43 = null;
                               vX$43 = toRight(t42);
-                              res43 = natDiv(natDiv(natDiv(natDiv(deref(unbrand(vdu$0), "amount"), 60.0), 60.0), 24.0), 7.0);
+                              res43 = natDiv(natDiv(natDiv(natDiv(deref(unbrand(vdu$0), "amount"), {"nat": 60.0}), {"nat": 60.0}), {"nat": 24.0}), {"nat": 7.0});
                             }
                             res44 = res43;
                           }
@@ -508,7 +509,7 @@ class orgXaccordprojectXlatedeliveryandpenaltyXLateDeliveryAndPenalty {
                         var vX$45 = null;
                         vX$45 = toLeft(t47);
                         var vX$46 = vX$45;
-                        res54 = natMult(deref(unbrand(vdu$0), "amount"), 60.0);
+                        res54 = natMult(deref(unbrand(vdu$0), "amount"), {"nat": 60.0});
                       } else {
                         var vX$47 = null;
                         vX$47 = toRight(t47);
@@ -523,7 +524,7 @@ class orgXaccordprojectXlatedeliveryandpenaltyXLateDeliveryAndPenalty {
                           var vX$48 = null;
                           vX$48 = toLeft(t48);
                           var vX$49 = vX$48;
-                          res53 = natMult(natMult(deref(unbrand(vdu$0), "amount"), 60.0), 60.0);
+                          res53 = natMult(natMult(deref(unbrand(vdu$0), "amount"), {"nat": 60.0}), {"nat": 60.0});
                         } else {
                           var vX$4A = null;
                           vX$4A = toRight(t48);
@@ -538,7 +539,7 @@ class orgXaccordprojectXlatedeliveryandpenaltyXLateDeliveryAndPenalty {
                             var vX$4B = null;
                             vX$4B = toLeft(t49);
                             var vX$4C = vX$4B;
-                            res52 = natMult(natMult(natMult(deref(unbrand(vdu$0), "amount"), 60.0), 60.0), 24.0);
+                            res52 = natMult(natMult(natMult(deref(unbrand(vdu$0), "amount"), {"nat": 60.0}), {"nat": 60.0}), {"nat": 24.0});
                           } else {
                             var vX$4D = null;
                             vX$4D = toRight(t49);
@@ -553,7 +554,7 @@ class orgXaccordprojectXlatedeliveryandpenaltyXLateDeliveryAndPenalty {
                               var vX$4E = null;
                               vX$4E = toLeft(t50);
                               var vX$4F = vX$4E;
-                              res51 = natMult(natMult(natMult(natMult(deref(unbrand(vdu$0), "amount"), 60.0), 60.0), 24.0), 7.0);
+                              res51 = natMult(natMult(natMult(natMult(deref(unbrand(vdu$0), "amount"), {"nat": 60.0}), {"nat": 60.0}), {"nat": 24.0}), {"nat": 7.0});
                             } else {
                               var vX$50 = null;
                               vX$50 = toRight(t50);
@@ -580,11 +581,11 @@ class orgXaccordprojectXlatedeliveryandpenaltyXLateDeliveryAndPenalty {
           }
           var vdiff = deref(unbrand(t60), "amount");
           var vp0$0 = vdiff;
-          var vp0$1 = deref(unbrand(deref(unbrand(vcontract), "penaltyDuration")), "amount");
-          var vpenalty = ((((floatOfNat(vp0$0) / floatOfNat(vp0$1)) * deref(unbrand(vcontract), "penaltyPercentage")) / 100.0) * deref(unbrand(vrequest), "goodsValue"));
-          var vp0$2 = bunion([vpenalty], [((deref(unbrand(vcontract), "capPercentage") * deref(unbrand(vrequest), "goodsValue")) / 100.0)]);
+          var vp0$1 = deref(unbrand(deref(unbrand(vX__5), "penaltyDuration")), "amount");
+          var vpenalty = ((((floatOfNat(vp0$0) / floatOfNat(vp0$1)) * deref(unbrand(vX__5), "penaltyPercentage")) / 100.0) * deref(unbrand(vrequest), "goodsValue"));
+          var vp0$2 = bunion([vpenalty], [((deref(unbrand(vX__5), "capPercentage") * deref(unbrand(vrequest), "goodsValue")) / 100.0)]);
           var vcapped = Math.min.apply(Math,vp0$2);
-          t61 = {"left" : concat(concat({"response": brand(["org.accordproject.latedeliveryandpenalty.LateDeliveryAndPenaltyResponse"],concat({"penalty": vcapped}, {"buyerMayTerminate": !((compare(vdiff,deref(unbrand(deref(unbrand(vcontract), "termination")), "amount")) <= 0))}))}, {"state": vlstate}), {"emit": vlemit})};
+          t61 = {"left" : concat(concat({"__response": brand(["org.accordproject.latedeliveryandpenalty.LateDeliveryAndPenaltyResponse"],concat({"penalty": vcapped}, {"buyerMayTerminate": !((compare(vdiff,deref(unbrand(deref(unbrand(vX__5), "termination")), "amount")) <= 0))}))}, {"__state": vX__lstate}), {"__emit": vX__lemit})};
         }
         t62 = t61;
       }
@@ -597,33 +598,36 @@ class orgXaccordprojectXlatedeliveryandpenaltyXLateDeliveryAndPenalty {
     return res63;
   }
   init(context) {
-    var vemit = deref(context, "emit");
-    var vstate = deref(context, "state");
-    var vlstate_0 = vstate;
-    var vlemit = vemit;
-    var vlstate = brand(["org.accordproject.cicero.contract.AccordContractState"],{"stateId": "org.accordproject.cicero.contract.AccordContractState#1"});
-    return {"left" : concat(concat({"response": null}, {"state": vlstate}), {"emit": vlemit})};
+    var vX__contract = deref(context, "__contract");
+    var vX__emit = deref(context, "__emit");
+    var vX__state = deref(context, "__state");
+    var vX__0 = vX__state;
+    var vX__lemit = vX__emit;
+    var vX__this = vX__contract;
+    var vX__lstate = brand(["org.accordproject.cicero.contract.AccordContractState"],{"stateId": "org.accordproject.cicero.contract.AccordContractState#1"});
+    return {"left" : concat(concat({"__response": null}, {"__state": vX__lstate}), {"__emit": vX__lemit})};
   }
   latedeliveryandpenalty(context) {
-    var vcontract = deref(context, "contract");
+    var vX__contract = deref(context, "__contract");
     var vrequest = deref(context, "request");
-    var vnow = deref(context, "now");
-    var vemit = deref(context, "emit");
-    var vstate = deref(context, "state");
-    var vlstate = vstate;
-    var vlemit = vemit;
+    var vX__now = deref(context, "__now");
+    var vX__emit = deref(context, "__emit");
+    var vX__state = deref(context, "__state");
+    var vX__lstate = vX__state;
+    var vX__lemit = vX__emit;
+    var vX__this = vX__contract;
     var vagreed = deref(unbrand(vrequest), "agreedDelivery");
     var vp1 = vagreed;
-    var vp2 = vnow;
+    var vp2 = vX__now;
     var t61;
     if (!(dateTimeIsBefore(vp1, vp2))) {
       t61 = {"right" : brand(["org.accordproject.ergo.stdlib.ErgoErrorResponse"],{"message": "Cannot exercise late delivery before delivery date"})};
     } else {
       var t60;
-      if (!((!(deref(unbrand(vcontract), "forceMajeure")) || !(deref(unbrand(vrequest), "forceMajeure"))))) {
-        t60 = {"left" : concat(concat({"response": brand(["org.accordproject.latedeliveryandpenalty.LateDeliveryAndPenaltyResponse"],concat({"penalty": 0.0}, {"buyerMayTerminate": true}))}, {"state": vlstate}), {"emit": vlemit})};
+      if (!((!(deref(unbrand(vX__contract), "forceMajeure")) || !(deref(unbrand(vrequest), "forceMajeure"))))) {
+        t60 = {"left" : concat(concat({"__response": brand(["org.accordproject.latedeliveryandpenalty.LateDeliveryAndPenaltyResponse"],concat({"penalty": 0.0}, {"buyerMayTerminate": true}))}, {"__state": vX__lstate}), {"__emit": vX__lemit})};
       } else {
-        var vx = vnow;
+        var vx = vX__now;
         var vy = vagreed;
         var vz = "days";
         var vp1$0 = vx;
@@ -660,7 +664,7 @@ class orgXaccordprojectXlatedeliveryandpenaltyXLateDeliveryAndPenalty {
               var vX$case0_0 = null;
               vX$case0_0 = toLeft(t2);
               var vX$case0 = vX$case0_0;
-              res9 = natMult(deref(unbrand(vdu$0), "amount"), 60.0);
+              res9 = natMult(deref(unbrand(vdu$0), "amount"), {"nat": 60.0});
             } else {
               var vX$case1_2 = null;
               vX$case1_2 = toRight(t2);
@@ -675,7 +679,7 @@ class orgXaccordprojectXlatedeliveryandpenaltyXLateDeliveryAndPenalty {
                 var vX$0 = null;
                 vX$0 = toLeft(t3);
                 var vX$1 = vX$0;
-                res8 = natMult(natMult(deref(unbrand(vdu$0), "amount"), 60.0), 60.0);
+                res8 = natMult(natMult(deref(unbrand(vdu$0), "amount"), {"nat": 60.0}), {"nat": 60.0});
               } else {
                 var vX$case1_1 = null;
                 vX$case1_1 = toRight(t3);
@@ -690,7 +694,7 @@ class orgXaccordprojectXlatedeliveryandpenaltyXLateDeliveryAndPenalty {
                   var vX$2 = null;
                   vX$2 = toLeft(t4);
                   var vX$3 = vX$2;
-                  res7 = natMult(natMult(natMult(deref(unbrand(vdu$0), "amount"), 60.0), 60.0), 24.0);
+                  res7 = natMult(natMult(natMult(deref(unbrand(vdu$0), "amount"), {"nat": 60.0}), {"nat": 60.0}), {"nat": 24.0});
                 } else {
                   var vX$case1_0 = null;
                   vX$case1_0 = toRight(t4);
@@ -705,7 +709,7 @@ class orgXaccordprojectXlatedeliveryandpenaltyXLateDeliveryAndPenalty {
                     var vX$4 = null;
                     vX$4 = toLeft(t5);
                     var vX$5 = vX$4;
-                    res6 = natMult(natMult(natMult(natMult(deref(unbrand(vdu$0), "amount"), 60.0), 60.0), 24.0), 7.0);
+                    res6 = natMult(natMult(natMult(natMult(deref(unbrand(vdu$0), "amount"), {"nat": 60.0}), {"nat": 60.0}), {"nat": 24.0}), {"nat": 7.0});
                   } else {
                     var vX$case1 = null;
                     vX$case1 = toRight(t5);
@@ -744,7 +748,7 @@ class orgXaccordprojectXlatedeliveryandpenaltyXLateDeliveryAndPenalty {
                 var vX$9 = null;
                 vX$9 = toLeft(t11);
                 var vX$A = vX$9;
-                res18 = natDiv(deref(unbrand(vdu$0), "amount"), 60.0);
+                res18 = natDiv(deref(unbrand(vdu$0), "amount"), {"nat": 60.0});
               } else {
                 var vX$B = null;
                 vX$B = toRight(t11);
@@ -759,7 +763,7 @@ class orgXaccordprojectXlatedeliveryandpenaltyXLateDeliveryAndPenalty {
                   var vX$C = null;
                   vX$C = toLeft(t12);
                   var vX$D = vX$C;
-                  res17 = natMult(deref(unbrand(vdu$0), "amount"), 60.0);
+                  res17 = natMult(deref(unbrand(vdu$0), "amount"), {"nat": 60.0});
                 } else {
                   var vX$E = null;
                   vX$E = toRight(t12);
@@ -774,7 +778,7 @@ class orgXaccordprojectXlatedeliveryandpenaltyXLateDeliveryAndPenalty {
                     var vX$F = null;
                     vX$F = toLeft(t13);
                     var vX$10 = vX$F;
-                    res16 = natMult(natMult(deref(unbrand(vdu$0), "amount"), 60.0), 24.0);
+                    res16 = natMult(natMult(deref(unbrand(vdu$0), "amount"), {"nat": 60.0}), {"nat": 24.0});
                   } else {
                     var vX$11 = null;
                     vX$11 = toRight(t13);
@@ -789,11 +793,11 @@ class orgXaccordprojectXlatedeliveryandpenaltyXLateDeliveryAndPenalty {
                       var vX$12 = null;
                       vX$12 = toLeft(t14);
                       var vX$13 = vX$12;
-                      res15 = natMult(natMult(natMult(deref(unbrand(vdu$0), "amount"), 60.0), 24.0), 7.0);
+                      res15 = natMult(natMult(natMult(deref(unbrand(vdu$0), "amount"), {"nat": 60.0}), {"nat": 24.0}), {"nat": 7.0});
                     } else {
                       var vX$14 = null;
                       vX$14 = toRight(t14);
-                      res15 = natMult(deref(unbrand(vdu$0), "amount"), 60.0);
+                      res15 = natMult(deref(unbrand(vdu$0), "amount"), {"nat": 60.0});
                     }
                     res16 = res15;
                   }
@@ -828,7 +832,7 @@ class orgXaccordprojectXlatedeliveryandpenaltyXLateDeliveryAndPenalty {
                   var vX$18 = null;
                   vX$18 = toLeft(t20);
                   var vX$19 = vX$18;
-                  res27 = natDiv(natDiv(deref(unbrand(vdu$0), "amount"), 60.0), 60.0);
+                  res27 = natDiv(natDiv(deref(unbrand(vdu$0), "amount"), {"nat": 60.0}), {"nat": 60.0});
                 } else {
                   var vX$1A = null;
                   vX$1A = toRight(t20);
@@ -843,7 +847,7 @@ class orgXaccordprojectXlatedeliveryandpenaltyXLateDeliveryAndPenalty {
                     var vX$1B = null;
                     vX$1B = toLeft(t21);
                     var vX$1C = vX$1B;
-                    res26 = natMult(deref(unbrand(vdu$0), "amount"), 60.0);
+                    res26 = natMult(deref(unbrand(vdu$0), "amount"), {"nat": 60.0});
                   } else {
                     var vX$1D = null;
                     vX$1D = toRight(t21);
@@ -858,7 +862,7 @@ class orgXaccordprojectXlatedeliveryandpenaltyXLateDeliveryAndPenalty {
                       var vX$1E = null;
                       vX$1E = toLeft(t22);
                       var vX$1F = vX$1E;
-                      res25 = natMult(deref(unbrand(vdu$0), "amount"), 24.0);
+                      res25 = natMult(deref(unbrand(vdu$0), "amount"), {"nat": 24.0});
                     } else {
                       var vX$20 = null;
                       vX$20 = toRight(t22);
@@ -873,11 +877,11 @@ class orgXaccordprojectXlatedeliveryandpenaltyXLateDeliveryAndPenalty {
                         var vX$21 = null;
                         vX$21 = toLeft(t23);
                         var vX$22 = vX$21;
-                        res24 = natMult(natMult(deref(unbrand(vdu$0), "amount"), 24.0), 7.0);
+                        res24 = natMult(natMult(deref(unbrand(vdu$0), "amount"), {"nat": 24.0}), {"nat": 7.0});
                       } else {
                         var vX$23 = null;
                         vX$23 = toRight(t23);
-                        res24 = natMult(natMult(deref(unbrand(vdu$0), "amount"), 60.0), 60.0);
+                        res24 = natMult(natMult(deref(unbrand(vdu$0), "amount"), {"nat": 60.0}), {"nat": 60.0});
                       }
                       res25 = res24;
                     }
@@ -912,7 +916,7 @@ class orgXaccordprojectXlatedeliveryandpenaltyXLateDeliveryAndPenalty {
                     var vX$27 = null;
                     vX$27 = toLeft(t29);
                     var vX$28 = vX$27;
-                    res36 = natDiv(natDiv(natDiv(deref(unbrand(vdu$0), "amount"), 60.0), 60.0), 24.0);
+                    res36 = natDiv(natDiv(natDiv(deref(unbrand(vdu$0), "amount"), {"nat": 60.0}), {"nat": 60.0}), {"nat": 24.0});
                   } else {
                     var vX$29 = null;
                     vX$29 = toRight(t29);
@@ -927,7 +931,7 @@ class orgXaccordprojectXlatedeliveryandpenaltyXLateDeliveryAndPenalty {
                       var vX$2A = null;
                       vX$2A = toLeft(t30);
                       var vX$2B = vX$2A;
-                      res35 = natDiv(natMult(deref(unbrand(vdu$0), "amount"), 60.0), 24.0);
+                      res35 = natDiv(natMult(deref(unbrand(vdu$0), "amount"), {"nat": 60.0}), {"nat": 24.0});
                     } else {
                       var vX$2C = null;
                       vX$2C = toRight(t30);
@@ -942,7 +946,7 @@ class orgXaccordprojectXlatedeliveryandpenaltyXLateDeliveryAndPenalty {
                         var vX$2D = null;
                         vX$2D = toLeft(t31);
                         var vX$2E = vX$2D;
-                        res34 = natDiv(deref(unbrand(vdu$0), "amount"), 24.0);
+                        res34 = natDiv(deref(unbrand(vdu$0), "amount"), {"nat": 24.0});
                       } else {
                         var vX$2F = null;
                         vX$2F = toRight(t31);
@@ -957,11 +961,11 @@ class orgXaccordprojectXlatedeliveryandpenaltyXLateDeliveryAndPenalty {
                           var vX$30 = null;
                           vX$30 = toLeft(t32);
                           var vX$31 = vX$30;
-                          res33 = natMult(deref(unbrand(vdu$0), "amount"), 7.0);
+                          res33 = natMult(deref(unbrand(vdu$0), "amount"), {"nat": 7.0});
                         } else {
                           var vX$32 = null;
                           vX$32 = toRight(t32);
-                          res33 = natDiv(natDiv(natDiv(deref(unbrand(vdu$0), "amount"), 60.0), 60.0), 24.0);
+                          res33 = natDiv(natDiv(natDiv(deref(unbrand(vdu$0), "amount"), {"nat": 60.0}), {"nat": 60.0}), {"nat": 24.0});
                         }
                         res34 = res33;
                       }
@@ -996,7 +1000,7 @@ class orgXaccordprojectXlatedeliveryandpenaltyXLateDeliveryAndPenalty {
                       var vX$36 = null;
                       vX$36 = toLeft(t38);
                       var vX$37 = vX$36;
-                      res45 = natDiv(natDiv(natDiv(natDiv(deref(unbrand(vdu$0), "amount"), 60.0), 60.0), 24.0), 7.0);
+                      res45 = natDiv(natDiv(natDiv(natDiv(deref(unbrand(vdu$0), "amount"), {"nat": 60.0}), {"nat": 60.0}), {"nat": 24.0}), {"nat": 7.0});
                     } else {
                       var vX$38 = null;
                       vX$38 = toRight(t38);
@@ -1011,7 +1015,7 @@ class orgXaccordprojectXlatedeliveryandpenaltyXLateDeliveryAndPenalty {
                         var vX$39 = null;
                         vX$39 = toLeft(t39);
                         var vX$3A = vX$39;
-                        res44 = natDiv(natDiv(natMult(deref(unbrand(vdu$0), "amount"), 60.0), 24.0), 7.0);
+                        res44 = natDiv(natDiv(natMult(deref(unbrand(vdu$0), "amount"), {"nat": 60.0}), {"nat": 24.0}), {"nat": 7.0});
                       } else {
                         var vX$3B = null;
                         vX$3B = toRight(t39);
@@ -1026,7 +1030,7 @@ class orgXaccordprojectXlatedeliveryandpenaltyXLateDeliveryAndPenalty {
                           var vX$3C = null;
                           vX$3C = toLeft(t40);
                           var vX$3D = vX$3C;
-                          res43 = natDiv(natDiv(deref(unbrand(vdu$0), "amount"), 24.0), 7.0);
+                          res43 = natDiv(natDiv(deref(unbrand(vdu$0), "amount"), {"nat": 24.0}), {"nat": 7.0});
                         } else {
                           var vX$3E = null;
                           vX$3E = toRight(t40);
@@ -1041,11 +1045,11 @@ class orgXaccordprojectXlatedeliveryandpenaltyXLateDeliveryAndPenalty {
                             var vX$3F = null;
                             vX$3F = toLeft(t41);
                             var vX$40 = vX$3F;
-                            res42 = natDiv(deref(unbrand(vdu$0), "amount"), 7.0);
+                            res42 = natDiv(deref(unbrand(vdu$0), "amount"), {"nat": 7.0});
                           } else {
                             var vX$41 = null;
                             vX$41 = toRight(t41);
-                            res42 = natDiv(natDiv(natDiv(natDiv(deref(unbrand(vdu$0), "amount"), 60.0), 60.0), 24.0), 7.0);
+                            res42 = natDiv(natDiv(natDiv(natDiv(deref(unbrand(vdu$0), "amount"), {"nat": 60.0}), {"nat": 60.0}), {"nat": 24.0}), {"nat": 7.0});
                           }
                           res43 = res42;
                         }
@@ -1069,7 +1073,7 @@ class orgXaccordprojectXlatedeliveryandpenaltyXLateDeliveryAndPenalty {
                       var vX$43 = null;
                       vX$43 = toLeft(t46);
                       var vX$44 = vX$43;
-                      res53 = natMult(deref(unbrand(vdu$0), "amount"), 60.0);
+                      res53 = natMult(deref(unbrand(vdu$0), "amount"), {"nat": 60.0});
                     } else {
                       var vX$45 = null;
                       vX$45 = toRight(t46);
@@ -1084,7 +1088,7 @@ class orgXaccordprojectXlatedeliveryandpenaltyXLateDeliveryAndPenalty {
                         var vX$46 = null;
                         vX$46 = toLeft(t47);
                         var vX$47 = vX$46;
-                        res52 = natMult(natMult(deref(unbrand(vdu$0), "amount"), 60.0), 60.0);
+                        res52 = natMult(natMult(deref(unbrand(vdu$0), "amount"), {"nat": 60.0}), {"nat": 60.0});
                       } else {
                         var vX$48 = null;
                         vX$48 = toRight(t47);
@@ -1099,7 +1103,7 @@ class orgXaccordprojectXlatedeliveryandpenaltyXLateDeliveryAndPenalty {
                           var vX$49 = null;
                           vX$49 = toLeft(t48);
                           var vX$4A = vX$49;
-                          res51 = natMult(natMult(natMult(deref(unbrand(vdu$0), "amount"), 60.0), 60.0), 24.0);
+                          res51 = natMult(natMult(natMult(deref(unbrand(vdu$0), "amount"), {"nat": 60.0}), {"nat": 60.0}), {"nat": 24.0});
                         } else {
                           var vX$4B = null;
                           vX$4B = toRight(t48);
@@ -1114,7 +1118,7 @@ class orgXaccordprojectXlatedeliveryandpenaltyXLateDeliveryAndPenalty {
                             var vX$4C = null;
                             vX$4C = toLeft(t49);
                             var vX$4D = vX$4C;
-                            res50 = natMult(natMult(natMult(natMult(deref(unbrand(vdu$0), "amount"), 60.0), 60.0), 24.0), 7.0);
+                            res50 = natMult(natMult(natMult(natMult(deref(unbrand(vdu$0), "amount"), {"nat": 60.0}), {"nat": 60.0}), {"nat": 24.0}), {"nat": 7.0});
                           } else {
                             var vX$4E = null;
                             vX$4E = toRight(t49);
@@ -1141,11 +1145,11 @@ class orgXaccordprojectXlatedeliveryandpenaltyXLateDeliveryAndPenalty {
         }
         var vdiff = deref(unbrand(t59), "amount");
         var vp0$0 = vdiff;
-        var vp0$1 = deref(unbrand(deref(unbrand(vcontract), "penaltyDuration")), "amount");
-        var vpenalty = ((((floatOfNat(vp0$0) / floatOfNat(vp0$1)) * deref(unbrand(vcontract), "penaltyPercentage")) / 100.0) * deref(unbrand(vrequest), "goodsValue"));
-        var vp0$2 = bunion([vpenalty], [((deref(unbrand(vcontract), "capPercentage") * deref(unbrand(vrequest), "goodsValue")) / 100.0)]);
+        var vp0$1 = deref(unbrand(deref(unbrand(vX__contract), "penaltyDuration")), "amount");
+        var vpenalty = ((((floatOfNat(vp0$0) / floatOfNat(vp0$1)) * deref(unbrand(vX__contract), "penaltyPercentage")) / 100.0) * deref(unbrand(vrequest), "goodsValue"));
+        var vp0$2 = bunion([vpenalty], [((deref(unbrand(vX__contract), "capPercentage") * deref(unbrand(vrequest), "goodsValue")) / 100.0)]);
         var vcapped = Math.min.apply(Math,vp0$2);
-        t60 = {"left" : concat(concat({"response": brand(["org.accordproject.latedeliveryandpenalty.LateDeliveryAndPenaltyResponse"],concat({"penalty": vcapped}, {"buyerMayTerminate": !((compare(vdiff,deref(unbrand(deref(unbrand(vcontract), "termination")), "amount")) <= 0))}))}, {"state": vlstate}), {"emit": vlemit})};
+        t60 = {"left" : concat(concat({"__response": brand(["org.accordproject.latedeliveryandpenalty.LateDeliveryAndPenaltyResponse"],concat({"penalty": vcapped}, {"buyerMayTerminate": !((compare(vdiff,deref(unbrand(deref(unbrand(vX__contract), "termination")), "amount")) <= 0))}))}, {"__state": vX__lstate}), {"__emit": vX__lemit})};
       }
       t61 = t60;
     }
@@ -1154,19 +1158,18 @@ class orgXaccordprojectXlatedeliveryandpenaltyXLateDeliveryAndPenalty {
 }
 const contract = new orgXaccordprojectXlatedeliveryandpenaltyXLateDeliveryAndPenalty();
 function __dispatch(context) {
-  let pcontext = { 'request' : context.request, 'state': context.state, 'contract': context.contract, 'emit': context.emit, 'now': context.now};
+  let pcontext = { 'request' : context.request, '__state': context.__state, '__contract': context.__contract, '__emit': context.__emit, '__now': context.__now, '__options': context.__options};
   //logger.info('ergo context: '+JSON.stringify(pcontext))
   return new orgXaccordprojectXlatedeliveryandpenaltyXLateDeliveryAndPenalty().main(pcontext);
 }
 function __init(context) {
-  let pcontext = { 'state': { '$class': 'org.accordproject.cicero.contract.AccordContractState', 'stateId' : 'org.accordproject.cicero.contract.AccordContractState#1' }, 'contract': context.contract, 'emit': context.emit, 'now': context.now};
+  let pcontext = { 'state': { '$class': 'org.accordproject.cicero.contract.AccordContractState', 'stateId' : 'org.accordproject.cicero.contract.AccordContractState#1' }, '__contract': context.__contract, '__emit': context.__emit, '__now': context.__now, '__options': context.__options};
   //logger.info('ergo context: '+JSON.stringify(pcontext))
   return new orgXaccordprojectXlatedeliveryandpenaltyXLateDeliveryAndPenalty().init(pcontext);
 }
 
 /*eslint-enable no-unused-vars*/
 /*eslint-enable no-undef*/
-
 
 /*
  * Licensed under the Apache License, Version 2.0 (the "License");

@@ -1,7 +1,7 @@
 {
-  "name": "@accordproject/cicero-test",
+  "name": "@accordproject/cicero-cli",
   "version": "0.13.5",
-  "description": "Cicero Test - Testing support for Cicero based on cucumber",
+  "description": "Cicero CLI",
   "engines": {
     "node": ">=8",
     "npm": ">=3"
@@ -9,15 +9,19 @@
   "publishConfig": {
     "access": "public"
   },
+  "bin": {
+    "cicero": "./index.js"
+  },
   "main": "index.js",
   "scripts": {
     "pretest": "npm run lint",
     "lint": "eslint .",
     "postlint": "npm run licchk",
     "licchk": "license-check",
-    "test:cucumber": "cucumber-js test/features --require lib/steps.js --world-parameters \"{\\\"rootdir\\\":\\\"./test\\\"}\" && cucumber-js test/data/helloemit/test --require lib/steps.js --world-parameters \"{\\\"rootdir\\\":\\\"./test/data/helloemit\\\"}\"",
+    "test:cucumber": "cucumber-js test/features --require .cucumber.js --world-parameters \"{\\\"rootdir\\\":\\\"./test\\\"}\"",
+    "test:mocha": "mocha",
+    "test:all": "npm run test:mocha && npm run test:cucumber",
     "test:windows": "npm run test:all",
-    "test:all": "npm run test:cucumber",
     "test:cov": "nyc npm run test",
     "test": "npm run test:all"
   },
@@ -26,11 +30,9 @@
     "url": "git+https://github.com/accordproject/cicero.git"
   },
   "keywords": [
-    "accord",
+    "clause",
     "legal",
-    "tech",
-    "smart",
-    "contract"
+    "tech"
   ],
   "author": "clause.io",
   "license": "Apache-2.0",
@@ -39,24 +41,32 @@
   },
   "homepage": "https://github.com/accordproject/cicero#readme",
   "devDependencies": {
+    "chai": "4.2.0",
+    "chai-as-promised": "7.1.1",
+    "chai-things": "0.2.0",
+    "cucumber": "5.1.0",
     "eslint": "4.19.1",
     "license-check": "1.1.5",
     "mocha": "6.1.4",
-    "nyc": "14.1.1"
+    "nyc": "14.1.1",
+    "tmp-promise": "1.0.4"
   },
   "dependencies": {
 <<<<<<< HEAD
     "@accordproject/cicero-core": "0.13.5",
     "@accordproject/cicero-engine": "0.13.5",
-    "@accordproject/ergo-test": "0.9.5-20190731165645",
+    "@accordproject/cicero-tools": "0.13.5",
+    "@accordproject/cicero-test": "0.13.5",
+    "@accordproject/ergo-compiler": "0.9.5-20190731165645",
 =======
     "@accordproject/cicero-core": "0.13.4",
     "@accordproject/cicero-engine": "0.13.4",
-    "@accordproject/ergo-test": "0.9.5-20190826173445",
+    "@accordproject/cicero-tools": "0.13.4",
+    "@accordproject/cicero-test": "0.13.4",
+    "@accordproject/ergo-compiler": "0.9.5-20190826173445",
 >>>>>>> fix(engine) Revision for latest Ergo engine
-    "chai": "4.2.0",
-    "chai-things": "0.2.0",
-    "cucumber": "5.1.0"
+    "uuid": "3.3.2",
+    "yargs": "9.0.1"
   },
   "license-check-config": {
     "src": [
@@ -64,7 +74,8 @@
       "!./test/data/**/*",
       "!./coverage/**/*",
       "!./node_modules/**/*",
-      "!./out/**/*"
+      "!./out/**/*",
+      "!index.js"
     ],
     "path": "header.txt",
     "blocking": true,
@@ -86,9 +97,9 @@
     "exclude": [],
     "all": true,
     "check-coverage": true,
-    "statements": 93,
-    "branches": 70,
-    "functions": 92,
-    "lines": 93
+    "statements": 0,
+    "branches": 0,
+    "functions": 0,
+    "lines": 0
   }
 }

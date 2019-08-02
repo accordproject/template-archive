@@ -221,6 +221,7 @@ class ParserManager {
             case 'FormattedBinding':
             case 'Binding':
             case 'ClauseBinding':
+            case 'WithBinding':
             case 'ListBinding':
                 this.handleBinding(templateModel, parts, rule, element);
                 break;
@@ -322,7 +323,7 @@ class ParserManager {
                         symbols: [`${formatRule.tokens} ${formatRule.action} # ${propertyName} as ${format}`],
                     });
                 }
-            } else if(element.type === 'ClauseBinding' || element.type === 'ListBinding') {
+            } else if(element.type === 'ClauseBinding' || element.type === 'WithBinding' || element.type === 'ListBinding') {
                 const nestedTemplate = element.template;
                 const nestedTemplateModel = this.template.getIntrospector().getClassDeclaration(property.getFullyQualifiedTypeName());
                 this.buildGrammarRules(nestedTemplate, nestedTemplateModel, propertyName, parts);
@@ -381,7 +382,7 @@ class ParserManager {
     findFirstBinding(propertyName, elements) {
         for(let n=0; n < elements.length; n++) {
             const element = elements[n];
-            if(element !== null && ['Binding','FormattedBinding', 'BooleanBinding','ListBinding','ClauseBinding'].includes(element.type)) {
+            if(element !== null && ['Binding','FormattedBinding', 'BooleanBinding','ListBinding','ClauseBinding','WithBinding'].includes(element.type)) {
                 if(element.fieldName.value === propertyName) {
                     return n;
                 }

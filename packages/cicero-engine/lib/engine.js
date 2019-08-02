@@ -48,7 +48,7 @@ class Engine {
         const clauseId = clause.getIdentifier();
         const contract = clause.getData();
 
-        return this.ergoEngine.execute(logicManager,clauseId,contract,request,state,currentTime);
+        return this.ergoEngine.execute(logicManager,clauseId,contract,request,state,currentTime,null);
     }
 
     /**
@@ -62,27 +62,22 @@ class Engine {
         const clauseId = clause.getIdentifier();
         const contract = clause.getData();
 
-        return this.ergoEngine.init(logicManager,clauseId,contract,{},currentTime);
+        return this.ergoEngine.init(logicManager,clauseId,contract,{},currentTime,null);
     }
 
     /**
      * Generate Text for a clause
      * @param {Clause} clause  - the clause to execute
+     * @param {*} [options] text generation options. options.wrapVariables encloses variables
+     * and editable sections in '<variable ...' and '/>'
      * @param {string} currentTime - the definition of 'now'
      * @return {Promise} a promise that resolves to a result for the clause initialization
      */
-    async generateText(clause, currentTime) {
+    async generateText(clause, options, currentTime) {
         const logicManager = clause.getLogicManager();
         const clauseId = clause.getIdentifier();
         const contract = clause.getData();
-
-        const params = {
-            options: {
-                '$class': 'org.accordproject.markdown.MarkdownOptions',
-                'wrapVariables': false,
-            }
-        };
-        return this.ergoEngine.generateText(logicManager,clauseId,contract,params,currentTime);
+        return this.ergoEngine.generateText(logicManager,clauseId,contract,{},currentTime, options);
     }
 
     /**

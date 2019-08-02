@@ -3,6 +3,37 @@
 namespace org.accordproject.time
 
 /**
+ * Months of the year
+ */
+enum Month {
+  o January
+  o February
+  o March
+  o April
+  o May
+  o June
+  o July
+  o August
+  o September
+  o October
+  o November
+  o December
+}
+
+/**
+ * Days of the week
+ */
+enum Day {
+  o Monday
+  o Tuesday
+  o Wednesday
+  o Thursday
+  o Friday
+  o Saturday
+  o Sunday
+}
+
+/**
  * Units for a duration.
  */
 enum TemporalUnit {
@@ -11,7 +42,6 @@ enum TemporalUnit {
   o hours
   o days
   o weeks
-  o years
 }
 
 /**
@@ -20,4 +50,23 @@ enum TemporalUnit {
 concept Duration {
   o Long amount
   o TemporalUnit unit
+}
+
+/**
+ * Units for a time period.
+ */
+enum PeriodUnit {
+  o days
+  o weeks
+  o months
+  o quarters
+  o years
+}
+
+/**
+ * A time period. For example, 2 months.
+ */
+concept Period {
+  o Long amount
+  o PeriodUnit unit
 }

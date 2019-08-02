@@ -76,7 +76,7 @@ async function loadClause(templateDir) {
 }
 
 Before(function () {
-    setDefaultTimeout(20 * 1000);
+    setDefaultTimeout(40 * 1000);
 
     this.engine = new Engine();
     this.currentTime = '1970-01-01T00:00:00Z';

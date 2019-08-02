@@ -54,7 +54,7 @@
     "webpack-cli": "^3.3.5"
   },
   "dependencies": {
-    "@accordproject/ergo-compiler": "0.9.5-20190731165645",
+    "@accordproject/ergo-compiler": "0.9.5-20190826173445",
     "uuid": "3.3.2",
     "yargs": "9.0.1"
   },
