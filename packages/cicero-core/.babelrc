@@ -10,5 +10,12 @@
             }
         ]
     ],
-    "plugins": ["istanbul","@babel/plugin-proposal-object-rest-spread"]
+    "env": {
+        "production": {
+            "plugins": ["@babel/plugin-proposal-object-rest-spread"]
+        },
+        "development": {
+            "plugins": ["istanbul","@babel/plugin-proposal-object-rest-spread"]
+        }
+      }
 }
