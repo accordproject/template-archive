@@ -17,8 +17,9 @@
   "scripts": {
     "webpack": "webpack --config webpack.config.js --mode production",
     "build": "babel src -d lib --copy-files && nearleyc ./src/tdl.ne -o ./lib/tdl.js && node scripts/nunjucks-precompile.js",
+    "build:dist": "NODE_ENV=production babel src -d lib --copy-files && nearleyc ./src/tdl.ne -o ./lib/tdl.js && node scripts/nunjucks-precompile.js",
     "build:watch": "babel src -d lib --copy-files --watch",
-    "prepublishOnly": "npm run build && npm run webpack",
+    "prepublishOnly": "npm run build:dist && npm run webpack",
     "prepare": "npm run build",
     "pretest": "npm run lint && npm run build",
     "lint": "eslint .",
@@ -71,10 +72,8 @@
   },
   "dependencies": {
     "@accordproject/ergo-compiler": "0.9.4",
-    "acorn": "5.7.3",
     "axios": "0.19.0",
     "debug": "4.1.0",
-    "fast-safe-stringify": "2.0.5",
     "ietf-language-tag-regex": "0.0.5",
     "json-stable-stringify": "1.0.1",
     "jszip": "3.2.1",
@@ -87,7 +86,6 @@
     "request-promise-native": "1.0.7",
     "semver": "6.2.0",
     "uuid": "3.3.2",
-    "winston": "3.2.1",
     "xregexp": "4.2.4"
   },
   "license-check-config": {
