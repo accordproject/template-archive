@@ -95,6 +95,9 @@ YYYY ->[0-9] [0-9] [0-9] [0-9]
 # Timezone Offset
 Z -> ("+"|"-") [0-9] [0-9] ":" [0-9] [0-9]
 {% (d) => {return d[0] + d[1] + d[2] + ":" + d[4] + d[5]}%}
+
+DateTime -> MM  "/" DD  "/" YYYY
+{% (d) => {return {"$class" : "ParsedDateTime",   "months": d[0],   "days": d[2],   "years": d[4]};}%}
 `;
 
 module.exports = DATE_TIME_GRAMMAR;

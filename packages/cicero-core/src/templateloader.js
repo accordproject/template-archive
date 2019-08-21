@@ -192,7 +192,8 @@ class TemplateLoader {
 
         const requestContents = await TemplateLoader.loadZipFileContents(zip, 'request.json', true);
         const packageJsonObject = await TemplateLoader.loadZipFileContents(zip, 'package.json', true, true);
-        const templatizedGrammar = await TemplateLoader.loadZipFileContents(zip, 'grammar/template.tem', false, true);
+        const templatizedGrammar = await TemplateLoader.loadZipFileContents(zip, 'grammar/template.tem', false, false);
+        const templatizedGrammarMd = await TemplateLoader.loadZipFileContents(zip, 'grammar/template.md', false, false);
 
         Logger.debug(method, 'Looking for model files');
         let ctoFiles =  await TemplateLoader.loadZipFilesContents(zip, /models\/.*\.cto$/);
@@ -230,7 +231,15 @@ class TemplateLoader {
         template.validate();
 
         Logger.debug(method, 'Setting grammar');
-        template.parserManager.buildGrammar(templatizedGrammar);
+        if(templatizedGrammarMd) {
+            template.parserManager.buildGrammar(templatizedGrammarMd, true);
+        }
+        else {
+            if(!templatizedGrammar) {
+                throw new Error('A template must either contain a template.tem or template.md file.');
+            }
+            template.parserManager.buildGrammar(templatizedGrammar, false);
+        }
 
         return template; // Returns template
     }
@@ -336,9 +345,21 @@ class TemplateLoader {
         // check the template
         template.validate();
 
-        let template_txt = await TemplateLoader.loadFileContents(path, 'grammar/template.tem', false, true);
-        template.parserManager.buildGrammar(template_txt);
-        Logger.debug(method, 'Loaded template.tem', template_txt);
+        let templatizedGrammar = await TemplateLoader.loadFileContents(path, 'grammar/template.tem', false, false);
+        let templatizedGrammarMd = await TemplateLoader.loadFileContents(path, 'grammar/template.md', false, false);
+
+        if(templatizedGrammarMd) {
+            template.parserManager.buildGrammar(templatizedGrammarMd, true);
+            Logger.debug(method, 'Loaded template.md', templatizedGrammarMd);
+        }
+        else {
+            if(!templatizedGrammar) {
+                throw new Error('A template must either contain a template.tem or template.md file.');
+            }
+            template.parserManager.buildGrammar(templatizedGrammar, false);
+            Logger.debug(method, 'Loaded template.tem', templatizedGrammar);
+        }
+
         return template;
     }
 }

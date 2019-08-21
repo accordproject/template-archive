@@ -28,6 +28,8 @@ const GrammarVisitor = require('./grammarvisitor');
 const uuid = require('uuid');
 const nunjucks = require('nunjucks');
 const DateTimeFormatParser = require('./datetimeformatparser');
+const CommonMarkParser = require('@accordproject/markdown-transform').CommonMarkParser;
+const commonMarkToString = require('@accordproject/markdown-transform').commonMarkToString;
 
 // This required because only compiled nunjucks templates are supported browser-side
 // https://mozilla.github.io/nunjucks/api.html#browser-usage
@@ -91,8 +93,19 @@ class ParserManager {
     /**
      * Build a grammar from a template
      * @param {String} templatizedGrammar  - the annotated template
+     * @param {boolean} [markdown] - if true the templatizedGrammar is pre-processed
+     * using the markdown parser
      */
-    buildGrammar(templatizedGrammar) {
+    buildGrammar(templatizedGrammar, markdown) {
+
+        if(markdown) {
+            templatizedGrammar = templatizedGrammar.replace('[{', '{{').replace('}]', '}}');
+            const commonMarkParser = new CommonMarkParser();
+            const concertoAst = commonMarkParser.parse(templatizedGrammar);
+            templatizedGrammar = commonMarkToString(concertoAst);
+            templatizedGrammar = templatizedGrammar.replace('{{', '[{').replace('}}', '}]');
+            // console.log(templatizedGrammar);
+        }
 
         Logger.debug('buildGrammar', templatizedGrammar);
         const parser = new nearley.Parser(nearley.Grammar.fromCompiled(templateGrammar));
@@ -133,6 +146,7 @@ class ParserManager {
         const combined = nunjucks.render('template.ne', parts);
         Logger.debug('Generated template grammar' + combined);
 
+        // console.log(combined);
         this.setGrammar(combined);
         this.templatizedGrammar = templatizedGrammar;
     }

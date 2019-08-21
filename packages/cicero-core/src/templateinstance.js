@@ -97,8 +97,8 @@ class TemplateInstance {
     /**
      * Set the data for the clause by parsing natural language text.
      * @param {string} text  - the data for the clause
-     * @param {string} currentTime - the definition of 'now' (optional)
-     * @param {string} fileName - the fileName for the text (optional)
+     * @param {string} [currentTime] - the definition of 'now' (optional)
+     * @param {string} [fileName] - the fileName for the text (optional)
      */
     parse(text, currentTime, fileName) {
         // Set the current time and UTC Offset
