@@ -566,10 +566,10 @@ describe('Template', () => {
             delete result.contractId;
             delete result.clauseId;
             delete result.paymentClause.clauseId;
+            delete result.effectiveDate;
 
             const expected = {
                 '$class': 'org.accordproject.copyrightlicense.CopyrightLicenseContract',
-                'effectiveDate': '2018-01-01T00:00:00.000+02:00',
                 'licenseeName': 'Me',
                 'licenseeState': 'NY',
                 'licenseeEntityType': 'Company',
