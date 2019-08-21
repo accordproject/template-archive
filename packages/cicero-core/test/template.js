@@ -15,6 +15,8 @@
 'use strict';
 
 const Template = require('../lib/template');
+const Clause = require('../lib/clause');
+
 const fs = require('fs');
 const archiver = require('archiver');
 
@@ -518,6 +520,79 @@ describe('Template', () => {
             };
             const template = await Template.fromDirectory('./test/data/latedeliveryandpenalty', options);
             return (() => template.accept(visitor,{})).should.not.throw();
+        });
+    });
+
+    describe('#markdown', () => {
+
+        it('should load latedeliveryandpenalty markdown template and parse', async () => {
+            const template = await Template.fromDirectory('./test/data/latedeliveryandpenalty-md', options);
+            template.getParserManager().getParser().should.not.be.null;
+
+            const sampleText = fs.readFileSync('./test/data/latedeliveryandpenalty-md/sample.md', 'utf8');
+            const clause = new Clause(template);
+            clause.parse(sampleText);
+            const result = clause.getData();
+            delete result.clauseId;
+
+            const expected = {
+                '$class': 'io.clause.latedeliveryandpenalty.TemplateModel',
+                'forceMajeure': true,
+                'penaltyDuration': {
+                    '$class': 'org.accordproject.time.Duration',
+                    'amount': 9,
+                    'unit': 'days'
+                },
+                'penaltyPercentage': 7,
+                'capPercentage': 2,
+                'termination': {
+                    '$class': 'org.accordproject.time.Duration',
+                    'amount': 2,
+                    'unit': 'weeks'
+                },
+                'fractionalPart': 'days'
+            };
+            result.should.deep.equal(expected);
+        });
+
+        it('should load copyright-license markdown template and parse', async () => {
+            const template = await Template.fromDirectory('./test/data/copyright-license-md', options);
+            template.getParserManager().getParser().should.not.be.null;
+
+            const sampleText = fs.readFileSync('./test/data/copyright-license-md/sample.md', 'utf8');
+            const clause = new Clause(template);
+            clause.parse(sampleText);
+            const result = clause.getData();
+            delete result.contractId;
+            delete result.clauseId;
+            delete result.paymentClause.clauseId;
+
+            const expected = {
+                '$class': 'org.accordproject.copyrightlicense.CopyrightLicenseContract',
+                'effectiveDate': '2018-01-01T00:00:00.000+02:00',
+                'licenseeName': 'Me',
+                'licenseeState': 'NY',
+                'licenseeEntityType': 'Company',
+                'licenseeAddress': '1 Broadway',
+                'licensorName': 'Myself',
+                'licensorState': 'NY',
+                'licensorEntityType': 'Company',
+                'licensorAddress': '2 Broadway',
+                'territory': 'United States',
+                'purposeDescription': 'stuff',
+                'workDescription': 'other stuff',
+                'paymentClause': {
+                    '$class': 'org.accordproject.copyrightlicense.PaymentClause',
+                    'amountText': 'one hundred US Dollars',
+                    'amount': {
+                        '$class': 'org.accordproject.money.MonetaryAmount',
+                        'doubleValue': 100,
+                        'currencyCode': 'USD'
+                    },
+                    'paymentProcedure': 'bank transfer'
+                }
+            };
+            result.should.deep.equal(expected);
         });
     });
 });
