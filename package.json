@@ -124,5 +124,6 @@
         "file": "HEADER"
       }
     }
-  }
+  },
+  "dependencies": {}
 }
