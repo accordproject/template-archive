@@ -64,8 +64,10 @@ varend: {
             match: '}]',
             pop: true
         }, // pop back to main state
-        varas: 'as',
-        varid: /[a-zA-Z_][_a-zA-Z0-9]*/,
+        varid: {
+          match: /[a-zA-Z_][_a-zA-Z0-9]*/,
+          type: moo.keywords({varas: 'as'})
+        },
         varstring: /".*?"/,
         varcond: ':?',
         varspace: ' ',

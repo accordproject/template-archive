@@ -28,8 +28,8 @@ const GrammarVisitor = require('./grammarvisitor');
 const uuid = require('uuid');
 const nunjucks = require('nunjucks');
 const DateTimeFormatParser = require('./datetimeformatparser');
-const CommonMarkParser = require('@accordproject/markdown-transform').CommonMarkParser;
-const commonMarkToString = require('@accordproject/markdown-transform').commonMarkToString;
+const CommonmarkParser = require('@accordproject/markdown-transform').CommonmarkParser;
+const CommonmarkToString = require('@accordproject/markdown-transform').CommonmarkToString;
 
 // This required because only compiled nunjucks templates are supported browser-side
 // https://mozilla.github.io/nunjucks/api.html#browser-usage
@@ -100,11 +100,11 @@ class ParserManager {
 
         if(markdown) {
             templatizedGrammar = templatizedGrammar.replace('[{', '{{').replace('}]', '}}');
-            const commonMarkParser = new CommonMarkParser();
-            const concertoAst = commonMarkParser.parse(templatizedGrammar);
-            templatizedGrammar = commonMarkToString(concertoAst);
+            const commonmarkParser = new CommonmarkParser();
+            const concertoAst = commonmarkParser.parse(templatizedGrammar);
+            templatizedGrammar = CommonmarkToString(concertoAst);
             templatizedGrammar = templatizedGrammar.replace('{{', '[{').replace('}}', '}]');
-            // console.log(templatizedGrammar);
+            console.log(templatizedGrammar);
         }
 
         Logger.debug('buildGrammar', templatizedGrammar);
