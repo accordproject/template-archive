@@ -102,7 +102,7 @@ class ParserManager {
             const commonmarkParser = new CommonmarkParser();
             const concertoAst = commonmarkParser.parse(templatizedGrammar);
             templatizedGrammar = CommonmarkToString(concertoAst);
-            console.log(templatizedGrammar);
+            // console.log(templatizedGrammar);
         }
 
         Logger.debug('buildGrammar', templatizedGrammar);

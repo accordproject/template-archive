@@ -338,13 +338,13 @@ class TemplateLoader {
             Logger.debug(method, 'Loaded template.tem', templatizedGrammar);
         }
 
-        Logger.debug(method, 'Loaded template.tem', template_txt);
+        Logger.debug(method, 'Loaded template.tem');
 
         // load and add the ergo files
         if(template.getMetadata().getErgoVersion() && template.getMetadata().getRuntime() === 'ergo') {
             // If Ergo then also register the template
             if(templatizedGrammarMd) {
-                template.getLogicManager().addTemplateFile(templatizedGrammarMd,'grammar/template.md');
+                template.getLogicManager().addTemplateFile(templatizedGrammarMd,'grammar/template.tem');
             } else {
                 template.getLogicManager().addTemplateFile(templatizedGrammar,'grammar/template.tem');
             }
