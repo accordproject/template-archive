@@ -50,13 +50,13 @@
   "dependencies": {
 <<<<<<< HEAD
     "@accordproject/cicero-core": "0.13.5",
-    "@accordproject/ergo-compiler": "0.9.5-20190731165645",
-    "@accordproject/ergo-engine": "0.9.5-20190731165645",
-=======
-    "@accordproject/cicero-core": "0.13.4",
     "@accordproject/ergo-compiler": "0.9.5-20190826173445",
     "@accordproject/ergo-engine": "0.9.5-20190826173445",
->>>>>>> fix(engine) Revision for latest Ergo engine
+=======
+    "@accordproject/cicero-core": "0.13.4",
+    "@accordproject/ergo-compiler": "0.9.5-20190905172418",
+    "@accordproject/ergo-engine": "0.9.5-20190905172418",
+>>>>>>> merge(templates) Refactor and merge Markdown support with new template syntax
     "moment-mini": "2.22.1"
   },
   "license-check-config": {

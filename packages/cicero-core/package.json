@@ -73,8 +73,8 @@
     "webpack-cli": "^3.3.5"
   },
   "dependencies": {
-    "@accordproject/ergo-compiler": "0.9.5-20190826173445",
-    "@accordproject/ergo-engine": "0.9.5-20190826173445",
+    "@accordproject/ergo-compiler": "0.9.5-20190905172418",
+    "@accordproject/ergo-engine": "0.9.5-20190905172418",
     "@accordproject/markdown-transform": "^0.1.11",
     "axios": "0.19.0",
     "debug": "4.1.0",
