@@ -1,0 +1,33 @@
+{
+  "$class": "org.accordproject.copyrightlicense.CopyrightLicenseContract",
+  "contractId": "125569fa-8cf0-4a35-b9ec-eeb9724dbd05",
+  "effectiveDate": "2018-01-01T00:00:00.000-04:00",
+  "licensee": {
+    "$class": "org.accordproject.cicero.contract.AccordParty",
+    "partyId": "Me"
+  },
+  "licenseeState": "NY",
+  "licenseeEntityType": "Company",
+  "licenseeAddress": "1 Broadway",
+  "licensor": {
+    "$class": "org.accordproject.cicero.contract.AccordParty",
+    "partyId": "Myself"
+  },
+  "licensorState": "NY",
+  "licensorEntityType": "Company",
+  "licensorAddress": "2 Broadway",
+  "territory": "United States",
+  "purposeDescription": "stuff",
+  "workDescription": "other stuff",
+  "paymentClause": {
+    "$class": "org.accordproject.copyrightlicense.PaymentClause",
+    "clauseId": "ee168b46-9f61-42b8-9536-04abbadc2e6c",
+    "amountText": "one hundred US Dollars",
+    "amount": {
+      "$class": "org.accordproject.money.MonetaryAmount",
+      "doubleValue": 100,
+      "currencyCode": "USD"
+    },
+    "paymentProcedure": "bank transfer"
+  }
+}

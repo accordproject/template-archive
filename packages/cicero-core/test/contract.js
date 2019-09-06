@@ -26,8 +26,8 @@ chai.should();
 chai.use(require('chai-things'));
 chai.use(require('chai-as-promised'));
 
-describe.skip('Contract', () => {
-    const sampleText = fs.readFileSync(path.resolve(__dirname, 'data/copyright-license', 'sample.txt'), 'utf8');
+describe('Contract', () => {
+    const sampleText = fs.readFileSync(path.resolve(__dirname, 'data/copyright-license', 'sample.md'), 'utf8');
 
     describe('#parse', () => {
         it('should be able to set the data from copyright-license natural language text', async function() {
@@ -37,14 +37,14 @@ describe.skip('Contract', () => {
         });
     });
 
-    describe('#generateText', () => {
+    describe.skip('#generateText', () => {
 
         it('should be able to roundtrip copyright-license natural language text', async function() {
             const template = await Template.fromDirectory('./test/data/copyright-license');
             const contract = new Contract(template);
             contract.parse(sampleText);
-            const nl = contract.generateText();
-            nl.should.equal(TemplateLoader.normalizeText(sampleText));
+            const nl = await contract.generateText();
+            nl.should.equal(sampleText);
         });
     });
 });

@@ -93,17 +93,12 @@ class ParserManager {
     /**
      * Build a grammar from a template
      * @param {String} templatizedGrammar  - the annotated template
-     * @param {boolean} [markdown] - if true the templatizedGrammar is pre-processed
      * using the markdown parser
      */
-    buildGrammar(templatizedGrammar, markdown) {
-
-        if(markdown) {
-            const commonmarkParser = new CommonmarkParser();
-            const concertoAst = commonmarkParser.parse(templatizedGrammar);
-            templatizedGrammar = CommonmarkToString(concertoAst);
-            // console.log(templatizedGrammar);
-        }
+    buildGrammar(templatizedGrammar) {
+        // Roundtrip the grammar through the Commonmark parser
+        templatizedGrammar = this.roundtripMarkdown(templatizedGrammar);
+        // console.log(templatizedGrammar);
 
         Logger.debug('buildGrammar', templatizedGrammar);
         const parser = new nearley.Parser(nearley.Grammar.fromCompiled(templateGrammar));
@@ -436,6 +431,19 @@ class ParserManager {
             throw err;
         }
     }
+
+    /**
+     * Round-trip markdown
+     * @param {string} text - the markdown text
+     * @return {string} the result of parsing and printing back the text
+     */
+    roundtripMarkdown(text) {
+        // Roundtrip the grammar through the Commonmark parser
+        const commonmarkParser = new CommonmarkParser();
+        const concertoAst = commonmarkParser.parse(text);
+        return CommonmarkToString(concertoAst);
+    }
+
 }
 
 module.exports = ParserManager;

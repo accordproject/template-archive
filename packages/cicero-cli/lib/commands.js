@@ -197,7 +197,7 @@ class Commands {
      */
     static validateParseArgs(argv) {
         argv = Commands.validateCommonArgs(argv);
-        argv = Commands.setDefaultFileArg(argv, 'sample', 'sample.txt', ((argv, argDefaultName) => { return path.resolve(argv.template,argDefaultName); }));
+        argv = Commands.setDefaultFileArg(argv, 'sample', 'sample.md', ((argv, argDefaultName) => { return path.resolve(argv.template,argDefaultName); }));
 
         if(argv.verbose) {
             Logger.info(`parse sample ${argv.sample} using a template ${argv.template}`);
@@ -311,7 +311,7 @@ class Commands {
      */
     static validateExecuteArgs(argv) {
         argv = Commands.validateCommonArgs(argv);
-        argv = Commands.setDefaultFileArg(argv, 'sample', 'sample.txt', ((argv, argDefaultName) => { return path.resolve(argv.template,argDefaultName); }));
+        argv = Commands.setDefaultFileArg(argv, 'sample', 'sample.md', ((argv, argDefaultName) => { return path.resolve(argv.template,argDefaultName); }));
         argv = Commands.setDefaultFileArg(argv, 'request', 'request.json', ((argv, argDefaultName) => { return [path.resolve(argv.template,argDefaultName)]; }));
         //argv = Commands.setDefaultFileArg(argv, 'state', 'state.json', ((argv, argDefaultName) => { return path.resolve(argv.template,argDefaultName); }));
 
@@ -330,7 +330,7 @@ class Commands {
      */
     static validateInitArgs(argv) {
         argv = Commands.validateCommonArgs(argv);
-        argv = Commands.setDefaultFileArg(argv, 'sample', 'sample.txt', ((argv, argDefaultName) => { return path.resolve(argv.template,argDefaultName); }));
+        argv = Commands.setDefaultFileArg(argv, 'sample', 'sample.md', ((argv, argDefaultName) => { return path.resolve(argv.template,argDefaultName); }));
 
         if(argv.verbose) {
             Logger.info(`initialize sample ${argv.sample} using a template ${argv.template}`);

@@ -27,9 +27,9 @@ const readdir = fs.readdir ? promisify(fs.readdir) : undefined;
 const stat = fs.stat ? promisify(fs.stat) : undefined;
 
 const ENCODING = 'utf8';
-// Matches 'sample.txt' or 'sample_TAG.txt' where TAG is an IETF language tag (BCP 47)
+// Matches 'sample.md' or 'sample_TAG.md' where TAG is an IETF language tag (BCP 47)
 const IETF_REGEXP = languageTagRegex({ exact: false }).toString().slice(1,-2);
-const SAMPLE_FILE_REGEXP = xregexp('sample(_(' + IETF_REGEXP + '))?.txt$');
+const SAMPLE_FILE_REGEXP = xregexp('sample(_(' + IETF_REGEXP + '))?.md$');
 
 /**
  * A utility class to create templates from data sources.
@@ -194,7 +194,6 @@ class TemplateLoader {
         const requestContents = await TemplateLoader.loadZipFileContents(zip, 'request.json', true);
         const packageJsonObject = await TemplateLoader.loadZipFileContents(zip, 'package.json', true, true);
         const templatizedGrammar = await TemplateLoader.loadZipFileContents(zip, 'grammar/template.tem', false, false);
-        const templatizedGrammarMd = await TemplateLoader.loadZipFileContents(zip, 'grammar/template.md', false, false);
 
         Logger.debug(method, 'Looking for model files');
         let ctoFiles =  await TemplateLoader.loadZipFilesContents(zip, /models[/\\].*\.cto$/);
@@ -232,14 +231,10 @@ class TemplateLoader {
         template.validate();
 
         Logger.debug(method, 'Setting grammar');
-        if(templatizedGrammarMd) {
-            template.parserManager.buildGrammar(templatizedGrammarMd, true);
-        }
-        else {
-            if(!templatizedGrammar) {
-                throw new Error('A template must either contain a template.tem or template.md file.');
-            }
-            template.parserManager.buildGrammar(templatizedGrammar, false);
+        if(!templatizedGrammar) {
+            throw new Error('A template must contain a template.tem file.');
+        } else {
+            template.parserManager.buildGrammar(templatizedGrammar);
         }
 
         return template; // Returns template
@@ -324,17 +319,11 @@ class TemplateLoader {
 
         // load and add the template
         let templatizedGrammar = await TemplateLoader.loadFileContents(path, 'grammar/template.tem', false, false);
-        let templatizedGrammarMd = await TemplateLoader.loadFileContents(path, 'grammar/template.md', false, false);
 
-        if(templatizedGrammarMd) {
-            template.parserManager.buildGrammar(templatizedGrammarMd, true);
-            Logger.debug(method, 'Loaded template.md', templatizedGrammarMd);
-        }
-        else {
-            if(!templatizedGrammar) {
-                throw new Error('A template must either contain a template.tem or template.md file.');
-            }
-            template.parserManager.buildGrammar(templatizedGrammar, false);
+        if(!templatizedGrammar) {
+            throw new Error('A template must either contain a template.tem file.');
+        } else {
+            template.parserManager.buildGrammar(templatizedGrammar);
             Logger.debug(method, 'Loaded template.tem', templatizedGrammar);
         }
 
@@ -343,11 +332,7 @@ class TemplateLoader {
         // load and add the ergo files
         if(template.getMetadata().getErgoVersion() && template.getMetadata().getRuntime() === 'ergo') {
             // If Ergo then also register the template
-            if(templatizedGrammarMd) {
-                template.getLogicManager().addTemplateFile(templatizedGrammarMd,'grammar/template.tem');
-            } else {
-                template.getLogicManager().addTemplateFile(templatizedGrammar,'grammar/template.tem');
-            }
+            template.getLogicManager().addTemplateFile(templatizedGrammar,'grammar/template.tem');
             const ergoFiles = await TemplateLoader.loadFilesContents(path, /lib[/\\].*\.ergo$/);
             ergoFiles.forEach((file) => {
                 const resolvedPath = slash(fsPath.resolve(path));

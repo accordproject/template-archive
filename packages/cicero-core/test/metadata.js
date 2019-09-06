@@ -71,14 +71,14 @@ describe('Metadata', () => {
                 name: 'template',
                 version: '1.0.0',
                 accordproject: {template: 'contract',cicero:caretRange(ciceroVersion)}
-            }, null)).should.throw('sample.txt is required');
+            }, null)).should.throw('sample.md is required');
         });
         it('should throw an error if samples is not an object', () => {
             (() => new Metadata({
                 name: 'template',
                 version: '1.0.0',
                 accordproject: {template: 'contract',cicero:caretRange(ciceroVersion),ergo:'^0.1.0-0'}
-            }, null, 'sample')).should.throw('sample.txt is required');
+            }, null, 'sample')).should.throw('sample.md is required');
         });
 
         it('should throw an error if accordproject metadata is missing', () => {

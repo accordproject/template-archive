@@ -25,6 +25,7 @@ moment.fn.toJSON = Util.momentToJson;
 const TemplateLoader = require('./templateloader');
 const ErgoEngine = require('@accordproject/ergo-engine/index.browser.js').EvalEngine;
 
+const ErgoEngine = require('@accordproject/ergo-engine/index.browser.js').EvalEngine;
 const RelationshipDeclaration = require('@accordproject/ergo-compiler').ComposerConcerto.RelationshipDeclaration;
 
 /**
@@ -105,6 +106,8 @@ class TemplateInstance {
      */
     parse(input, currentTime, fileName) {
         let text = TemplateLoader.normalizeText(input);
+        // Roundtrip the sample through the Commonmark parser
+        text = this.getTemplate().getParserManager().roundtripMarkdown(text);
 
         // Set the current time and UTC Offset
         const now = Util.setCurrentTime(currentTime);
@@ -200,7 +203,8 @@ class TemplateInstance {
 
         return logicManager.compileLogic(false).then(async () => {
             const result = await this.ergoEngine.generateText(logicManager,clauseId,contract,{},currentTime,markdownOptions);
-            return result.response;
+            // Roundtrip the response through the Commonmark parser
+            return this.getTemplate().getParserManager().roundtripMarkdown(result.response);
         });
     }
 
