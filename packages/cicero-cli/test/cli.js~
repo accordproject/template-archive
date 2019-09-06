@@ -145,8 +145,13 @@ describe('cicero-cli', () => {
             const args  = Commands.validateParseArgs({
                 _: ['parse'],
             });
+<<<<<<< HEAD
             args.template.should.match(/cicero-cli[/\\]test[/\\]data[/\\]latedeliveryandpenalty$/);
+            args.sample.should.match(/sample.txt$/);
+=======
+            args.template.should.match(/cicero-cli\/test\/data\/latedeliveryandpenalty$/);
             args.sample.should.match(/sample.md$/);
+>>>>>>> feature(markdown) All templates are markdown based
         });
         it('all args specified', () => {
             process.chdir(path.resolve(__dirname, 'data/latedeliveryandpenalty/'));
@@ -155,8 +160,13 @@ describe('cicero-cli', () => {
                 template: './',
                 sample: 'sample.md'
             });
+<<<<<<< HEAD
             args.template.should.match(/cicero-cli[/\\]test[/\\]data[/\\]latedeliveryandpenalty$/);
+            args.sample.should.match(/sample.txt$/);
+=======
+            args.template.should.match(/cicero-cli\/test\/data\/latedeliveryandpenalty$/);
             args.sample.should.match(/sample.md$/);
+>>>>>>> feature(markdown) All templates are markdown based
         });
         it('all args specified, parent folder', () => {
             process.chdir(path.resolve(__dirname, 'data/'));
@@ -165,8 +175,13 @@ describe('cicero-cli', () => {
                 template: 'latedeliveryandpenalty',
                 sample: 'latedeliveryandpenalty/sample.md'
             });
+<<<<<<< HEAD
             args.template.should.match(/cicero-cli[/\\]test[/\\]data[/\\]latedeliveryandpenalty$/);
+            args.sample.should.match(/sample.txt$/);
+=======
+            args.template.should.match(/cicero-cli\/test\/data\/latedeliveryandpenalty$/);
             args.sample.should.match(/sample.md$/);
+>>>>>>> feature(markdown) All templates are markdown based
         });
         it('all args specified, archive', () => {
             process.chdir(path.resolve(__dirname, 'data/'));
@@ -175,8 +190,13 @@ describe('cicero-cli', () => {
                 template: 'latedeliveryandpenalty.cta',
                 sample: 'latedeliveryandpenalty/sample.md'
             });
+<<<<<<< HEAD
             args.template.should.match(/cicero-cli[/\\]test[/\\]data[/\\]latedeliveryandpenalty.cta$/);
+            args.sample.should.match(/sample.txt$/);
+=======
+            args.template.should.match(/cicero-cli\/test\/data\/latedeliveryandpenalty.cta$/);
             args.sample.should.match(/sample.md$/);
+>>>>>>> feature(markdown) All templates are markdown based
         });
         it('all args specified, parent folder, no sample', () => {
             process.chdir(path.resolve(__dirname, 'data/'));
@@ -184,8 +204,13 @@ describe('cicero-cli', () => {
                 _: ['parse'],
                 template: 'latedeliveryandpenalty',
             });
+<<<<<<< HEAD
             args.template.should.match(/cicero-cli[/\\]test[/\\]data[/\\]latedeliveryandpenalty$/);
+            args.sample.should.match(/sample.txt$/);
+=======
+            args.template.should.match(/cicero-cli\/test\/data\/latedeliveryandpenalty$/);
             args.sample.should.match(/sample.md$/);
+>>>>>>> feature(markdown) All templates are markdown based
         });
         it('all args specified, child folder, no sample', () => {
             process.chdir(path.resolve(__dirname, 'data/latedeliveryandpenalty/grammar'));
@@ -193,15 +218,25 @@ describe('cicero-cli', () => {
                 _: ['parse'],
                 template: '../',
             });
+<<<<<<< HEAD
             args.template.should.match(/cicero-cli[/\\]test[/\\]data[/\\]latedeliveryandpenalty$/);
+            args.sample.should.match(/sample.txt$/);
+=======
+            args.template.should.match(/cicero-cli\/test\/data\/latedeliveryandpenalty$/);
             args.sample.should.match(/sample.md$/);
+>>>>>>> feature(markdown) All templates are markdown based
         });
         it('no flags specified', () => {
             const args  = Commands.validateParseArgs({
                 _: ['parse', path.resolve(__dirname, 'data/latedeliveryandpenalty/')],
             });
+<<<<<<< HEAD
             args.template.should.match(/cicero-cli[/\\]test[/\\]data[/\\]latedeliveryandpenalty$/);
+            args.sample.should.match(/sample.txt$/);
+=======
+            args.template.should.match(/cicero-cli\/test\/data\/latedeliveryandpenalty$/);
             args.sample.should.match(/sample.md$/);
+>>>>>>> feature(markdown) All templates are markdown based
         });
         it('verbose flag specified', () => {
             process.chdir(path.resolve(__dirname, 'data/latedeliveryandpenalty/'));
@@ -396,8 +431,13 @@ describe('cicero-cli', () => {
             const args  = Commands.validateInitArgs({
                 _: ['init'],
             });
+<<<<<<< HEAD
             args.template.should.match(/cicero-cli[/\\]test[/\\]data[/\\]latedeliveryandpenalty$/);
+            args.sample.should.match(/sample.txt$/);
+=======
+            args.template.should.match(/cicero-cli\/test\/data\/latedeliveryandpenalty$/);
             args.sample.should.match(/sample.md$/);
+>>>>>>> feature(markdown) All templates are markdown based
         });
         it('all args specified', () => {
             process.chdir(path.resolve(__dirname, 'data/latedeliveryandpenalty/'));
@@ -406,8 +446,13 @@ describe('cicero-cli', () => {
                 template: './',
                 sample: 'sample.md'
             });
+<<<<<<< HEAD
             args.template.should.match(/cicero-cli[/\\]test[/\\]data[/\\]latedeliveryandpenalty$/);
+            args.sample.should.match(/sample.txt$/);
+=======
+            args.template.should.match(/cicero-cli\/test\/data\/latedeliveryandpenalty$/);
             args.sample.should.match(/sample.md$/);
+>>>>>>> feature(markdown) All templates are markdown based
         });
         it('all args specified, parent folder', () => {
             process.chdir(path.resolve(__dirname, 'data/'));
@@ -416,8 +461,13 @@ describe('cicero-cli', () => {
                 template: 'latedeliveryandpenalty',
                 sample: 'latedeliveryandpenalty/sample.md'
             });
+<<<<<<< HEAD
             args.template.should.match(/cicero-cli[/\\]test[/\\]data[/\\]latedeliveryandpenalty$/);
+            args.sample.should.match(/sample.txt$/);
+=======
+            args.template.should.match(/cicero-cli\/test\/data\/latedeliveryandpenalty$/);
             args.sample.should.match(/sample.md$/);
+>>>>>>> feature(markdown) All templates are markdown based
         });
         it('all args specified, parent folder, no sample, no state', () => {
             process.chdir(path.resolve(__dirname, 'data/'));
@@ -425,8 +475,13 @@ describe('cicero-cli', () => {
                 _: ['init'],
                 template: 'latedeliveryandpenalty',
             });
+<<<<<<< HEAD
             args.template.should.match(/cicero-cli[/\\]test[/\\]data[/\\]latedeliveryandpenalty$/);
+            args.sample.should.match(/sample.txt$/);
+=======
+            args.template.should.match(/cicero-cli\/test\/data\/latedeliveryandpenalty$/);
             args.sample.should.match(/sample.md$/);
+>>>>>>> feature(markdown) All templates are markdown based
         });
         it('all args specified, child folder, no sample', () => {
             process.chdir(path.resolve(__dirname, 'data/latedeliveryandpenalty/grammar'));
@@ -434,15 +489,25 @@ describe('cicero-cli', () => {
                 _: ['init'],
                 template: '../',
             });
+<<<<<<< HEAD
             args.template.should.match(/cicero-cli[/\\]test[/\\]data[/\\]latedeliveryandpenalty$/);
+            args.sample.should.match(/sample.txt$/);
+=======
+            args.template.should.match(/cicero-cli\/test\/data\/latedeliveryandpenalty$/);
             args.sample.should.match(/sample.md$/);
+>>>>>>> feature(markdown) All templates are markdown based
         });
         it('no flags specified', () => {
             const args  = Commands.validateInitArgs({
                 _: ['init', path.resolve(__dirname, 'data/latedeliveryandpenalty/')],
             });
+<<<<<<< HEAD
             args.template.should.match(/cicero-cli[/\\]test[/\\]data[/\\]latedeliveryandpenalty$/);
+            args.sample.should.match(/sample.txt$/);
+=======
+            args.template.should.match(/cicero-cli\/test\/data\/latedeliveryandpenalty$/);
             args.sample.should.match(/sample.md$/);
+>>>>>>> feature(markdown) All templates are markdown based
         });
         it('verbose flag specified', () => {
             process.chdir(path.resolve(__dirname, 'data/latedeliveryandpenalty/'));
@@ -472,8 +537,13 @@ describe('cicero-cli', () => {
             const args  = Commands.validateExecuteArgs({
                 _: ['execute'],
             });
+<<<<<<< HEAD
             args.template.should.match(/cicero-cli[/\\]test[/\\]data[/\\]latedeliveryandpenalty$/);
+            args.sample.should.match(/sample.txt$/);
+=======
+            args.template.should.match(/cicero-cli\/test\/data\/latedeliveryandpenalty$/);
             args.sample.should.match(/sample.md$/);
+>>>>>>> feature(markdown) All templates are markdown based
         });
         it('all args specified', () => {
             process.chdir(path.resolve(__dirname, 'data/latedeliveryandpenalty/'));
@@ -483,8 +553,13 @@ describe('cicero-cli', () => {
                 sample: 'sample.md',
                 state: 'state.json'
             });
+<<<<<<< HEAD
             args.template.should.match(/cicero-cli[/\\]test[/\\]data[/\\]latedeliveryandpenalty$/);
+            args.sample.should.match(/sample.txt$/);
+=======
+            args.template.should.match(/cicero-cli\/test\/data\/latedeliveryandpenalty$/);
             args.sample.should.match(/sample.md$/);
+>>>>>>> feature(markdown) All templates are markdown based
         });
         it('all args specified, parent folder', () => {
             process.chdir(path.resolve(__dirname, 'data/'));
@@ -494,8 +569,13 @@ describe('cicero-cli', () => {
                 sample: 'latedeliveryandpenalty/sample.md',
                 state: 'latedeliveryandpenalty/state.json'
             });
+<<<<<<< HEAD
             args.template.should.match(/cicero-cli[/\\]test[/\\]data[/\\]latedeliveryandpenalty$/);
+            args.sample.should.match(/sample.txt$/);
+=======
+            args.template.should.match(/cicero-cli\/test\/data\/latedeliveryandpenalty$/);
             args.sample.should.match(/sample.md$/);
+>>>>>>> feature(markdown) All templates are markdown based
         });
         it('all args specified, parent folder, no sample, no state', () => {
             process.chdir(path.resolve(__dirname, 'data/'));
@@ -503,8 +583,13 @@ describe('cicero-cli', () => {
                 _: ['execute'],
                 template: 'latedeliveryandpenalty',
             });
+<<<<<<< HEAD
             args.template.should.match(/cicero-cli[/\\]test[/\\]data[/\\]latedeliveryandpenalty$/);
+            args.sample.should.match(/sample.txt$/);
+=======
+            args.template.should.match(/cicero-cli\/test\/data\/latedeliveryandpenalty$/);
             args.sample.should.match(/sample.md$/);
+>>>>>>> feature(markdown) All templates are markdown based
         });
         it('all args specified, child folder, no sample', () => {
             process.chdir(path.resolve(__dirname, 'data/latedeliveryandpenalty/grammar'));
@@ -512,15 +597,25 @@ describe('cicero-cli', () => {
                 _: ['execute'],
                 template: '../',
             });
+<<<<<<< HEAD
             args.template.should.match(/cicero-cli[/\\]test[/\\]data[/\\]latedeliveryandpenalty$/);
+            args.sample.should.match(/sample.txt$/);
+=======
+            args.template.should.match(/cicero-cli\/test\/data\/latedeliveryandpenalty$/);
             args.sample.should.match(/sample.md$/);
+>>>>>>> feature(markdown) All templates are markdown based
         });
         it('no flags specified', () => {
             const args  = Commands.validateExecuteArgs({
                 _: ['execute', path.resolve(__dirname, 'data/latedeliveryandpenalty/')],
             });
+<<<<<<< HEAD
             args.template.should.match(/cicero-cli[/\\]test[/\\]data[/\\]latedeliveryandpenalty$/);
+            args.sample.should.match(/sample.txt$/);
+=======
+            args.template.should.match(/cicero-cli\/test\/data\/latedeliveryandpenalty$/);
             args.sample.should.match(/sample.md$/);
+>>>>>>> feature(markdown) All templates are markdown based
         });
         it('verbose flag specified', () => {
             process.chdir(path.resolve(__dirname, 'data/latedeliveryandpenalty/'));

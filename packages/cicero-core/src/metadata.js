@@ -39,17 +39,17 @@ class Metadata {
      * </p>
      * @param {object} packageJson  - the JS object for package.json (required)
      * @param {String} readme  - the README.md for the template (may be null)
-     * @param {object} samples - the sample text for the template in different locales,
+     * @param {object} samples - the sample markdown for the template in different locales,
      * @param {object} request - the JS object for the sample request
-     * represented as an object whose keys are the locales and whose values are the sample text.
+     * represented as an object whose keys are the locales and whose values are the sample markdown.
      * For example:
      *  {
-     *      default: 'default sample text',
+     *      default: 'default sample markdown',
      *      en: 'sample text in english',
      *      fr: 'exemple de texte français'
      *  }
      * Locale keys (with the exception of default) conform to the IETF Language Tag specification (BCP 47).
-     * THe `default` key represents sample template text in a non-specified language, stored in a file called `sample.txt`.
+     * THe `default` key represents sample template text in a non-specified language, stored in a file called `sample.md`.
      */
     constructor(packageJson, readme, samples, request) {
         // name of the runtime that this template targets (if the template contains compiled code)
@@ -109,7 +109,7 @@ class Metadata {
         }
 
         if(!samples || typeof(samples) !== 'object') {
-            throw new Error('sample.txt is required');
+            throw new Error('sample.md is required');
         }
 
         if(request && typeof(request) !== 'object') {

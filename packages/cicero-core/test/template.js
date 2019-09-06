@@ -117,10 +117,16 @@ describe('Template', () => {
             template.getMetadata().getKeywords().should.not.be.null;
             template.getName().should.equal('latedeliveryandpenalty', options);
             template.getDisplayName().should.equal('Latedeliveryandpenalty');
-            template.getDescription().should.equal('Late Delivery and Penalty. In case of delayed delivery except for Force Majeure cases, the Seller shall pay to the Buyer for every 9 DAY of delay penalty amounting to 7% of the total value of the Equipment whose delivery has been delayed. Any fractional part of a DAY is to be considered a full DAY. The total amount of penalty shall not however, exceed 2% of the total value of the Equipment involved in late delivery. If the delay is more than 2 WEEK, the Buyer is entitled to terminate this Contract.');
+            template.getDescription().should.equal('Late Delivery and Penalty. In case of delayed delivery except for Force Majeure cases, the Seller shall pay to the Buyer for every 9 DAY of delay penalty amounting to 7.0% of the total value of the Equipment whose delivery has been delayed. Any fractional part of a DAY is to be considered a full DAY. The total amount of penalty shall not however, exceed 2.0% of the total value of the Equipment involved in late delivery. If the delay is more than 2 WEEK, the Buyer is entitled to terminate this Contract.');
             template.getVersion().should.equal('0.0.1');
-            template.getMetadata().getSample().should.equal('Late Delivery and Penalty. In case of delayed delivery except for Force Majeure cases, the Seller shall pay to the Buyer for every 9 days of delay penalty amounting to 7.0% of the total value of the Equipment whose delivery has been delayed. Any fractional part of a days is to be considered a full days. The total amount of penalty shall not however, exceed 2.0% of the total value of the Equipment involved in late delivery. If the delay is more than 2 weeks, the Buyer is entitled to terminate this Contract.');
-            template.getHash().should.equal('52a9cbc21564e5c16b210970440b7010ef009b7f0708a9bcfb8272b2728a2afb');
+            template.getMetadata().getSample().should.equal(`Late Delivery and Penalty
+----
+
+In case of delayed delivery except for Force Majeure cases, the Seller shall pay to the Buyer for every 9 days of delay penalty amounting to 7.0% of the total value of the Equipment whose delivery has been delayed.
+1. Any fractional part of a days is to be considered a full days.
+2. The total amount of penalty shall not however, exceed 2.0% of the total value of the Equipment involved in late delivery.
+3. If the delay is more than 2 weeks, the Buyer is entitled to terminate this Contract.`);
+            template.getHash().should.equal('1726841d5ea759dd16da31a0b5c4fd1cc6c7841fc5c1f6bc1cd67577ecba22ac');
             const buffer = await template.toArchive('ergo');
             buffer.should.not.be.null;
             const template2 = await Template.fromArchive(buffer);
@@ -224,10 +230,10 @@ describe('Template', () => {
             return Template.fromDirectory('./test/data/locales-conga', options).should.be.fulfilled;
         });
 
-        it('should throw an error if a sample.txt file does not exist', async () => {
+        it('should throw an error if a sample.md file does not exist', async () => {
             try {
                 await Template.fromDirectory('./test/data/no-sample', options);
-                assert.isOk(false,'should throw an error if a sample.txt file does not exist');
+                assert.isOk(false,'should throw an error if a sample.md file does not exist');
             }
             catch(err) {
                 // ignore
@@ -349,7 +355,7 @@ describe('Template', () => {
 
         it('should throw for null samples object', async () => {
             const template = await Template.fromDirectory('./test/data/latedeliveryandpenalty', options);
-            return (() => template.setSamples(null)).should.throw('sample.txt is required');
+            return (() => template.setSamples(null)).should.throw('sample.md is required');
         });
     });
 
@@ -474,7 +480,7 @@ describe('Template', () => {
     describe('#getHash', () => {
         it('should return a SHA-256 hash', async () => {
             const template = await Template.fromDirectory('./test/data/latedeliveryandpenalty', options);
-            template.getHash().should.equal('52a9cbc21564e5c16b210970440b7010ef009b7f0708a9bcfb8272b2728a2afb');
+            template.getHash().should.equal('1726841d5ea759dd16da31a0b5c4fd1cc6c7841fc5c1f6bc1cd67577ecba22ac');
         });
     });
 
@@ -560,10 +566,10 @@ describe('Template', () => {
     describe('#markdown', () => {
 
         it('should load latedeliveryandpenalty markdown template and parse', async () => {
-            const template = await Template.fromDirectory('./test/data/latedeliveryandpenalty-md', options);
+            const template = await Template.fromDirectory('./test/data/latedeliveryandpenalty', options);
             template.getParserManager().getParser().should.not.be.null;
 
-            const sampleText = fs.readFileSync('./test/data/latedeliveryandpenalty-md/sample.md', 'utf8');
+            const sampleText = fs.readFileSync('./test/data/latedeliveryandpenalty/sample.md', 'utf8');
             const clause = new Clause(template);
             clause.parse(sampleText);
             const result = clause.getData();
@@ -590,10 +596,10 @@ describe('Template', () => {
         });
 
         it('should load copyright-license markdown template and parse', async () => {
-            const template = await Template.fromDirectory('./test/data/copyright-license-md', options);
+            const template = await Template.fromDirectory('./test/data/copyright-license', options);
             template.getParserManager().getParser().should.not.be.null;
 
-            const sampleText = fs.readFileSync('./test/data/copyright-license-md/sample.md', 'utf8');
+            const sampleText = fs.readFileSync('./test/data/copyright-license/sample.md', 'utf8');
             const clause = new Clause(template);
             clause.parse(sampleText);
             const result = clause.getData();
@@ -604,11 +610,17 @@ describe('Template', () => {
 
             const expected = {
                 '$class': 'org.accordproject.copyrightlicense.CopyrightLicenseContract',
-                'licenseeName': 'Me',
+                'licensee': {
+                    '$class': 'org.accordproject.cicero.contract.AccordParty',
+                    'partyId': 'Me'
+                },
                 'licenseeState': 'NY',
                 'licenseeEntityType': 'Company',
                 'licenseeAddress': '1 Broadway',
-                'licensorName': 'Myself',
+                'licensor': {
+                    '$class': 'org.accordproject.cicero.contract.AccordParty',
+                    'partyId': 'Myself'
+                },
                 'licensorState': 'NY',
                 'licensorEntityType': 'Company',
                 'licensorAddress': '2 Broadway',

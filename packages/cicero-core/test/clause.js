@@ -30,13 +30,13 @@ const options = { skipUpdateExternalModels: true };
 
 describe('Clause', () => {
 
-    const testLatePenaltyInput = fs.readFileSync(path.resolve(__dirname, 'data/latedeliveryandpenalty', 'sample.txt'), 'utf8');
-    const testLatePenaltyPeriodInput = fs.readFileSync(path.resolve(__dirname, 'data/latedeliveryandpenalty-period', 'sample.txt'), 'utf8');
-    const testLatePenaltyCrInput = fs.readFileSync(path.resolve(__dirname, 'data/latedeliveryandpenalty-cr', 'sample.txt'), 'utf8');
-    const testCongaInput = fs.readFileSync(path.resolve(__dirname, 'data/conga', 'sample.txt'), 'utf8');
-    const testCongaErr = fs.readFileSync(path.resolve(__dirname, 'data/conga', 'sampleErr.txt'), 'utf8');
-    const testAllTypesInput = fs.readFileSync(path.resolve(__dirname, 'data/alltypes', 'sample.txt'), 'utf8');
-    const testTextOnlyInput = fs.readFileSync(path.resolve(__dirname, 'data/text-only', 'sample.txt'), 'utf8');
+    const testLatePenaltyInput = fs.readFileSync(path.resolve(__dirname, 'data/latedeliveryandpenalty', 'sample.md'), 'utf8');
+    const testLatePenaltyPeriodInput = fs.readFileSync(path.resolve(__dirname, 'data/latedeliveryandpenalty-period', 'sample.md'), 'utf8');
+    const testLatePenaltyCrInput = fs.readFileSync(path.resolve(__dirname, 'data/latedeliveryandpenalty-cr', 'sample.md'), 'utf8');
+    const testCongaInput = fs.readFileSync(path.resolve(__dirname, 'data/conga', 'sample.md'), 'utf8');
+    const testCongaErr = fs.readFileSync(path.resolve(__dirname, 'data/conga', 'sampleErr.md'), 'utf8');
+    const testAllTypesInput = fs.readFileSync(path.resolve(__dirname, 'data/alltypes', 'sample.md'), 'utf8');
+    const testTextOnlyInput = fs.readFileSync(path.resolve(__dirname, 'data/text-only', 'sample.md'), 'utf8');
 
     describe('#constructor', () => {
 
@@ -314,7 +314,13 @@ describe('Clause', () => {
             const clause = new Clause(template);
             clause.parse(testLatePenaltyInput);
             const nl = await clause.generateText({ wrapVariables: true });
-            nl.should.equal('Late Delivery and Penalty. In case of delayed delivery<variable id="forceMajeure" value="%20except%20for%20Force%20Majeure%20cases,"/> the Seller shall pay to the Buyer for every <variable id="penaltyDuration" value="9%20days"/> of delay penalty amounting to <variable id="penaltyPercentage" value="7.0"/>% of the total value of the Equipment whose delivery has been delayed. Any fractional part of a <variable id="fractionalPart" value="days"/> is to be considered a full <variable id="fractionalPart" value="days"/>. The total amount of penalty shall not however, exceed <variable id="capPercentage" value="2.0"/>% of the total value of the Equipment involved in late delivery. If the delay is more than <variable id="termination" value="2%20weeks"/>, the Buyer is entitled to terminate this Contract.');
+            nl.should.equal(`Late Delivery and Penalty
+----
+
+In case of delayed delivery<variable id="forceMajeure" value="%20except%20for%20Force%20Majeure%20cases,"/> the Seller shall pay to the Buyer for every <variable id="penaltyDuration" value="9%20days"/> of delay penalty amounting to <variable id="penaltyPercentage" value="7.0"/>% of the total value of the Equipment whose delivery has been delayed.
+1. Any fractional part of a <variable id="fractionalPart" value="days"/> is to be considered a full <variable id="fractionalPart" value="days"/>.
+2. The total amount of penalty shall not however, exceed <variable id="capPercentage" value="2.0"/>% of the total value of the Equipment involved in late delivery.
+3. If the delay is more than <variable id="termination" value="2%20weeks"/>, the Buyer is entitled to terminate this Contract.`);
         });
 
         it.skip('should be able to generate natural language text with wrapped variables and formatted dates', async function() {

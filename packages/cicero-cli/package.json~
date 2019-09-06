@@ -57,14 +57,14 @@
     "@accordproject/cicero-engine": "0.13.5",
     "@accordproject/cicero-tools": "0.13.5",
     "@accordproject/cicero-test": "0.13.5",
-    "@accordproject/ergo-compiler": "0.9.5-20190826173445",
+    "@accordproject/ergo-compiler": "0.9.5-20190905172418",
 =======
     "@accordproject/cicero-core": "0.13.4",
     "@accordproject/cicero-engine": "0.13.4",
     "@accordproject/cicero-tools": "0.13.4",
     "@accordproject/cicero-test": "0.13.4",
-    "@accordproject/ergo-compiler": "0.9.5-20190905172418",
->>>>>>> merge(templates) Refactor and merge Markdown support with new template syntax
+    "@accordproject/ergo-compiler": "0.9.5-20190906172043",
+>>>>>>> feature(markdown) All templates are markdown based
     "uuid": "3.3.2",
     "yargs": "9.0.1"
   },

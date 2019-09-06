@@ -64,9 +64,9 @@ class TemplateSaver {
             Object.keys(sampleFiles).forEach(function (locale) {
                 let fileName;
                 if(locale === 'default'){
-                    fileName = 'sample.txt';
+                    fileName = 'sample.md';
                 } else {
-                    fileName = `sample_${locale}.txt`;
+                    fileName = `sample_${locale}.md`;
                 }
                 zip.file(fileName, sampleFiles[locale], options);
             });
