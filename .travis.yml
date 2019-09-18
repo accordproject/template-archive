@@ -14,7 +14,7 @@ before_install: |
 install: |
   set -e
   date
-  npm install -g lerna@^3.16.4
+  npm install -g lerna@^3.15.0
   lerna bootstrap 2>&1
   date
 script: bash ./.travis/test.sh
