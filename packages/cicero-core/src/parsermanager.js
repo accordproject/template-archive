@@ -438,7 +438,7 @@ class ParserManager {
      */
     roundtripMarkdown(text) {
         // Roundtrip the grammar through the Commonmark parser
-        const commonMark = new CommonMark();
+        const commonMark = new CommonMark({ noIndex: true });
         const concertoAst = commonMark.fromMarkdownString(text);
         return commonMark.toMarkdownString(concertoAst);
     }
