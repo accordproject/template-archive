@@ -48,12 +48,12 @@
 <<<<<<< HEAD
     "@accordproject/cicero-core": "0.13.5",
     "@accordproject/cicero-engine": "0.13.5",
-    "@accordproject/ergo-test": "0.9.5-20190905172418",
+    "@accordproject/ergo-test": "0.9.5-20190906172043",
 =======
     "@accordproject/cicero-core": "0.13.4",
     "@accordproject/cicero-engine": "0.13.4",
-    "@accordproject/ergo-test": "0.9.5-20190906172043",
->>>>>>> feature(markdown) All templates are markdown based
+    "@accordproject/ergo-test": "0.9.5-20190918111829",
+>>>>>>> chore(dep) Upgrade to Markdown Transform 0.3.0 and Concerto 0.80.0
     "chai": "4.2.0",
     "chai-things": "0.2.0",
     "cucumber": "5.1.0"

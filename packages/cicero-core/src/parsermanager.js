@@ -28,8 +28,7 @@ const GrammarVisitor = require('./grammarvisitor');
 const uuid = require('uuid');
 const nunjucks = require('nunjucks');
 const DateTimeFormatParser = require('./datetimeformatparser');
-const CommonmarkParser = require('@accordproject/markdown-transform').CommonmarkParser;
-const CommonmarkToString = require('@accordproject/markdown-transform').CommonmarkToString;
+const CommonMark = require('@accordproject/markdown-common').CommonMark;
 
 // This required because only compiled nunjucks templates are supported browser-side
 // https://mozilla.github.io/nunjucks/api.html#browser-usage
@@ -439,9 +438,9 @@ class ParserManager {
      */
     roundtripMarkdown(text) {
         // Roundtrip the grammar through the Commonmark parser
-        const commonmarkParser = new CommonmarkParser();
-        const concertoAst = commonmarkParser.parse(text);
-        return CommonmarkToString(concertoAst);
+        const commonMark = new CommonMark();
+        const concertoAst = commonMark.fromMarkdownString(text);
+        return commonMark.toMarkdownString(concertoAst);
     }
 
 }

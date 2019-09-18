@@ -50,13 +50,13 @@
   "dependencies": {
 <<<<<<< HEAD
     "@accordproject/cicero-core": "0.13.5",
-    "@accordproject/ergo-compiler": "0.9.5-20190905172418",
-    "@accordproject/ergo-engine": "0.9.5-20190905172418",
-=======
-    "@accordproject/cicero-core": "0.13.4",
     "@accordproject/ergo-compiler": "0.9.5-20190906172043",
     "@accordproject/ergo-engine": "0.9.5-20190906172043",
->>>>>>> feature(markdown) All templates are markdown based
+=======
+    "@accordproject/cicero-core": "0.13.4",
+    "@accordproject/ergo-compiler": "0.9.5-20190918111829",
+    "@accordproject/ergo-engine": "0.9.5-20190918111829",
+>>>>>>> chore(dep) Upgrade to Markdown Transform 0.3.0 and Concerto 0.80.0
     "moment-mini": "2.22.1"
   },
   "license-check-config": {

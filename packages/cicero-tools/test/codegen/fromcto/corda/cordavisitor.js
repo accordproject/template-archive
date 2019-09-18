@@ -20,14 +20,14 @@ const sinon = require('sinon');
 
 const CordaVisitor = require('../../../../lib/codegen/fromcto/corda/cordavisitor.js');
 
-const ClassDeclaration = require('composer-concerto').ClassDeclaration;
-const EnumDeclaration = require('composer-concerto').EnumDeclaration;
-const EnumValueDeclaration = require('composer-concerto').EnumValueDeclaration;
-const Field = require('composer-concerto').Field;
-const ModelFile = require('composer-concerto').ModelFile;
-const ModelManager = require('composer-concerto').ModelManager;
-const RelationshipDeclaration = require('composer-concerto').RelationshipDeclaration;
-const fileWriter = require('composer-concerto').FileWriter;
+const ClassDeclaration = require('@accordproject/ergo-compiler').ComposerConcerto.ClassDeclaration;
+const EnumDeclaration = require('@accordproject/ergo-compiler').ComposerConcerto.EnumDeclaration;
+const EnumValueDeclaration = require('@accordproject/ergo-compiler').ComposerConcerto.EnumValueDeclaration;
+const Field = require('@accordproject/ergo-compiler').ComposerConcerto.Field;
+const ModelFile = require('@accordproject/ergo-compiler').ComposerConcerto.ModelFile;
+const ModelManager = require('@accordproject/ergo-compiler').ComposerConcerto.ModelManager;
+const RelationshipDeclaration = require('@accordproject/ergo-compiler').ComposerConcerto.RelationshipDeclaration;
+const fileWriter = require('@accordproject/ergo-compiler').ComposerConcerto.FileWriter;
 
 describe('CordaVisitor', function () {
     let cordaVisit;
@@ -47,6 +47,7 @@ describe('CordaVisitor', function () {
 
         it('should call visitModelManager for a ModelManager', () => {
             let thing = sinon.createStubInstance(ModelManager);
+            thing._isModelManager = true;
             let mockSpecialVisit = sinon.stub(cordaVisit, 'visitModelManager');
             mockSpecialVisit.returns('Duck');
 
@@ -57,6 +58,7 @@ describe('CordaVisitor', function () {
 
         it('should default to callint visitModelManager with no options', () => {
             let thing = sinon.createStubInstance(ModelManager);
+            thing._isModelManager = true;
             let mockSpecialVisit = sinon.stub(cordaVisit, 'visitModelManager');
             mockSpecialVisit.returns('Duck');
 
@@ -67,6 +69,7 @@ describe('CordaVisitor', function () {
 
         it('should call visitModelFile for a ModelFile', () => {
             let thing = sinon.createStubInstance(ModelFile);
+            thing._isModelFile = true;
             let mockSpecialVisit = sinon.stub(cordaVisit, 'visitModelFile');
             mockSpecialVisit.returns('Duck');
 
@@ -77,6 +80,7 @@ describe('CordaVisitor', function () {
 
         it('should call visitEnumDeclaration for a EnumDeclaration', () => {
             let thing = sinon.createStubInstance(EnumDeclaration);
+            thing._isEnumDeclaration = true;
             let mockSpecialVisit = sinon.stub(cordaVisit, 'visitEnumDeclaration');
             mockSpecialVisit.returns('Duck');
 
@@ -87,6 +91,7 @@ describe('CordaVisitor', function () {
 
         it('should call visitClassDeclaration for a ClassDeclaration', () => {
             let thing = sinon.createStubInstance(ClassDeclaration);
+            thing._isClassDeclaration = true;
             let mockSpecialVisit = sinon.stub(cordaVisit, 'visitClassDeclaration');
             mockSpecialVisit.returns('Duck');
 
@@ -97,6 +102,7 @@ describe('CordaVisitor', function () {
 
         it('should call visitField for a Field', () => {
             let thing = sinon.createStubInstance(Field);
+            thing._isField = true;
             let mockSpecialVisit = sinon.stub(cordaVisit, 'visitField');
             mockSpecialVisit.returns('Duck');
 
@@ -107,6 +113,7 @@ describe('CordaVisitor', function () {
 
         it('should call visitRelationship for a RelationshipDeclaration', () => {
             let thing = sinon.createStubInstance(RelationshipDeclaration);
+            thing._isRelationshipDeclaration = true;
             let mockSpecialVisit = sinon.stub(cordaVisit, 'visitRelationship');
             mockSpecialVisit.returns('Duck');
 
@@ -117,6 +124,7 @@ describe('CordaVisitor', function () {
 
         it('should call visitEnumValueDeclaration for a EnumValueDeclaration', () => {
             let thing = sinon.createStubInstance(EnumValueDeclaration);
+            thing._isEnumValueDeclaration = true;
             let mockSpecialVisit = sinon.stub(cordaVisit, 'visitEnumValueDeclaration');
             mockSpecialVisit.returns('Duck');
 
@@ -142,6 +150,7 @@ describe('CordaVisitor', function () {
 
             let acceptSpy = sinon.spy();
             let mockModelManagerDefinition = sinon.createStubInstance(ModelManager);
+            mockModelManagerDefinition._isModelManager = true;
             mockModelManagerDefinition.getModelFiles.returns([{
                 accept: acceptSpy
             },
@@ -165,6 +174,7 @@ describe('CordaVisitor', function () {
 
             let acceptSpy = sinon.spy();
             let mockModelFile = sinon.createStubInstance(ModelFile);
+            mockModelFile._isModelFile = true;
             mockModelFile.getAllDeclarations.returns([{
                 accept: acceptSpy
             },
@@ -185,6 +195,7 @@ describe('CordaVisitor', function () {
             };
 
             let mockClass = sinon.createStubInstance(ClassDeclaration);
+            mockClass._isClassDeclaration = true;
             mockClass.getModelFile.returns({
                 getNamespace: () => {
                     return 'org.acme.people';
@@ -213,6 +224,7 @@ describe('CordaVisitor', function () {
             };
 
             let mockClass = sinon.createStubInstance(ClassDeclaration);
+            mockClass._isClassDeclaration = true;
 
             cordaVisit.endClassFile(mockClass, param);
 
@@ -229,6 +241,7 @@ describe('CordaVisitor', function () {
             };
 
             let mockEnumDeclaration = sinon.createStubInstance(EnumDeclaration);
+            mockEnumDeclaration._isEnumDeclaration = true;
             mockEnumDeclaration.getName.returns('Bob');
             mockEnumDeclaration.getOwnProperties.returns([{
                 accept: acceptSpy
@@ -267,6 +280,7 @@ describe('CordaVisitor', function () {
             };
 
             mockClassDeclaration = sinon.createStubInstance(ClassDeclaration);
+            mockClassDeclaration._isClassDeclaration = true;
             mockClassDeclaration.getName.returns('Bob');
             mockClassDeclaration.getModelFile.returns({
                 getImports: () => {
@@ -417,6 +431,7 @@ describe('CordaVisitor', function () {
 
         it('should default to write a line defining a field', () => {
             let mockField = sinon.createStubInstance(Field);
+            mockField._isField = true;
             mockField.isArray.returns(false);
             mockField.getName.returns('Bob');
             mockField.getType.returns('SpecialType');
@@ -429,6 +444,7 @@ describe('CordaVisitor', function () {
 
         it('should default to write a line defining a field and add [] if an array', () => {
             let mockField = sinon.createStubInstance(Field);
+            mockField._isField = true;
             mockField.isArray.returns(true);
             mockField.getName.returns('Bob');
             mockField.getType.returns('SpecialType');
@@ -441,6 +457,7 @@ describe('CordaVisitor', function () {
 
         it('should write a line defining a field', () => {
             let mockField = sinon.createStubInstance(Field);
+            mockField._isField = true;
             mockField.isArray.returns(false);
             mockField.getName.returns('Bob');
             mockField.getType.returns('SpecialType');
@@ -453,6 +470,7 @@ describe('CordaVisitor', function () {
 
         it('should write a line defining a field and add [] if an array', () => {
             let mockField = sinon.createStubInstance(Field);
+            mockField._isField = true;
             mockField.isArray.returns(true);
             mockField.getName.returns('Bob');
             mockField.getType.returns('SpecialType');
@@ -465,6 +483,7 @@ describe('CordaVisitor', function () {
 
         it('should write a line setting a field', () => {
             let mockField = sinon.createStubInstance(Field);
+            mockField._isField = true;
             mockField.isArray.returns(false);
             mockField.getName.returns('Bob');
             mockField.getType.returns('SpecialType');
@@ -480,6 +499,7 @@ describe('CordaVisitor', function () {
 
         it('should write a line setting a field and add [] if an array', () => {
             let mockField = sinon.createStubInstance(Field);
+            mockField._isField = true;
             mockField.isArray.returns(true);
             mockField.getName.returns('Bob');
             mockField.getType.returns('SpecialType');
@@ -495,6 +515,7 @@ describe('CordaVisitor', function () {
 
         it('should write a line getting a field', () => {
             let mockField = sinon.createStubInstance(Field);
+            mockField._isField = true;
             mockField.isArray.returns(false);
             mockField.getName.returns('Bob');
             mockField.getType.returns('SpecialType');
@@ -510,6 +531,7 @@ describe('CordaVisitor', function () {
 
         it('should write a line getting a field and add [] if an array', () => {
             let mockField = sinon.createStubInstance(Field);
+            mockField._isField = true;
             mockField.isArray.returns(true);
             mockField.getName.returns('Bob');
             mockField.getType.returns('SpecialType');
@@ -531,6 +553,7 @@ describe('CordaVisitor', function () {
             };
 
             let mockEnumValueDeclaration = sinon.createStubInstance(EnumValueDeclaration);
+            mockEnumValueDeclaration._isEnumValueDeclaration = true;
             mockEnumValueDeclaration.getName.returns('Bob');
 
             cordaVisit.visitEnumValueDeclaration(mockEnumValueDeclaration, param);
@@ -549,6 +572,7 @@ describe('CordaVisitor', function () {
 
         it('should default to write a line defining a field', () => {
             let mockRelationship = sinon.createStubInstance(RelationshipDeclaration);
+            mockRelationship._isRelationshipDeclaration = true;
             mockRelationship.isArray.returns(false);
             mockRelationship.getName.returns('Bob');
             mockRelationship.getType.returns('SpecialType');
@@ -561,6 +585,7 @@ describe('CordaVisitor', function () {
 
         it('should default to write a line defining a field and add [] if an array', () => {
             let mockRelationship = sinon.createStubInstance(RelationshipDeclaration);
+            mockRelationship._isRelationshipDeclaration = true;
             mockRelationship.isArray.returns(true);
             mockRelationship.getName.returns('Bob');
             mockRelationship.getType.returns('SpecialType');
@@ -572,6 +597,7 @@ describe('CordaVisitor', function () {
         });
         it('should write a line defining a field', () => {
             let mockRelationship = sinon.createStubInstance(RelationshipDeclaration);
+            mockRelationship._isRelationshipDeclaration = true;
             mockRelationship.isArray.returns(false);
             mockRelationship.getName.returns('Bob');
             mockRelationship.getType.returns('SpecialType');
@@ -584,6 +610,7 @@ describe('CordaVisitor', function () {
 
         it('should write a line defining a field and add [] if an array', () => {
             let mockRelationship = sinon.createStubInstance(RelationshipDeclaration);
+            mockRelationship._isRelationshipDeclaration = true;
             mockRelationship.isArray.returns(true);
             mockRelationship.getName.returns('Bob');
             mockRelationship.getType.returns('SpecialType');
@@ -596,6 +623,7 @@ describe('CordaVisitor', function () {
 
         it('should write a line setting a field', () => {
             let mockRelationship = sinon.createStubInstance(RelationshipDeclaration);
+            mockRelationship._isRelationshipDeclaration = true;
             mockRelationship.isArray.returns(false);
             mockRelationship.getName.returns('Bob');
             mockRelationship.getType.returns('SpecialType');
@@ -611,6 +639,7 @@ describe('CordaVisitor', function () {
 
         it('should write a line setting a field and add [] if an array', () => {
             let mockRelationship = sinon.createStubInstance(RelationshipDeclaration);
+            mockRelationship._isRelationshipDeclaration = true;
             mockRelationship.isArray.returns(true);
             mockRelationship.getName.returns('Bob');
             mockRelationship.getType.returns('SpecialType');
@@ -626,6 +655,7 @@ describe('CordaVisitor', function () {
 
         it('should write a line getting a field', () => {
             let mockRelationship = sinon.createStubInstance(RelationshipDeclaration);
+            mockRelationship._isRelationshipDeclaration = true;
             mockRelationship.isArray.returns(false);
             mockRelationship.getName.returns('Bob');
             mockRelationship.getType.returns('SpecialType');
@@ -641,6 +671,7 @@ describe('CordaVisitor', function () {
 
         it('should write a line getting a field and add [] if an array', () => {
             let mockRelationship = sinon.createStubInstance(RelationshipDeclaration);
+            mockRelationship._isRelationshipDeclaration = true;
             mockRelationship.isArray.returns(true);
             mockRelationship.getName.returns('Bob');
             mockRelationship.getType.returns('SpecialType');

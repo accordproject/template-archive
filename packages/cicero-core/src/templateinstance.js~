@@ -24,6 +24,8 @@ const moment = require('moment-mini');
 moment.fn.toJSON = Util.momentToJson;
 const TemplateLoader = require('./templateloader');
 const ErgoEngine = require('@accordproject/ergo-engine/index.browser.js').EvalEngine;
+
+const ErgoEngine = require('@accordproject/ergo-engine/index.browser.js').EvalEngine;
 const RelationshipDeclaration = require('@accordproject/ergo-compiler').ComposerConcerto.RelationshipDeclaration;
 
 /**

@@ -56,7 +56,7 @@
     "@accordproject/cicero-engine": "0.13.5",
     "@accordproject/cicero-tools": "0.13.5",
     "@accordproject/cicero-test": "0.13.5",
-    "@accordproject/ergo-compiler": "0.9.5-20190906172043",
+    "@accordproject/ergo-compiler": "0.9.5-20190918111829",
     "uuid": "3.3.2",
     "yargs": "9.0.1"
   },
