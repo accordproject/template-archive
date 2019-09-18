@@ -57,14 +57,14 @@
     "@accordproject/cicero-engine": "0.13.5",
     "@accordproject/cicero-tools": "0.13.5",
     "@accordproject/cicero-test": "0.13.5",
-    "@accordproject/ergo-compiler": "0.9.5-20190906172043",
+    "@accordproject/ergo-compiler": "0.9.5-20190918111829",
 =======
     "@accordproject/cicero-core": "0.13.4",
     "@accordproject/cicero-engine": "0.13.4",
     "@accordproject/cicero-tools": "0.13.4",
     "@accordproject/cicero-test": "0.13.4",
-    "@accordproject/ergo-compiler": "0.9.5-20190918111829",
->>>>>>> chore(dep) Upgrade to Markdown Transform 0.3.0 and Concerto 0.80.0
+    "@accordproject/ergo-compiler": "0.9.5-20190918140608",
+>>>>>>> chore(dep) Upgrade to Markdown Transform 0.3.1
     "uuid": "3.3.2",
     "yargs": "9.0.1"
   },
