@@ -26,7 +26,7 @@ deploy:
       all_branches: true
       repo: accordproject/cicero
 after_failure: tail -n +1 -- /home/travis/.npm/_logs/*-debug.log
-after_success: if [ $TRAVIS_REPO_SLUG = 'accordproject/cicero' ]; then npm run coverage; fi
+after_success: if [ $TRAVIS_OS_NAME = 'linux' ] && [ $TRAVIS_REPO_SLUG = 'accordproject/cicero' ]; then npm run coverage; fi
 cache:
   directories:
   - node_modules
