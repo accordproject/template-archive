@@ -20,6 +20,17 @@
 set -ev
 set -o pipefail
 
+
+# Bring in the standard set of script utilities
+DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )/.." && pwd )"
+source ${DIR}/.travis/base.sh
+
 # ----
 
-npm run test 2>&1
+if [ $TRAVIS_OS_NAME = 'windows' ]; then 
+    npm run test:cli 2>&1; 
+else 
+    npm run test 2>&1;
+fi 
+
+_exit "All complete" 0
