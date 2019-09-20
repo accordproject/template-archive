@@ -20,7 +20,7 @@ install: |
 script: if [ $TRAVIS_OS_NAME = 'windows' ]; then npm run test:cli 2>&1; else npm run test 2>&1; fi 
 deploy:
     provider: script
-    script: if [ $TRAVIS_OS_NAME = 'windows' ] && [ $TRAVIS_PULL_REQUEST = 'false' ]; then bash ./.travis/deploy.sh; fi
+    script: if [ $TRAVIS_OS_NAME = 'linux' ] && [ $TRAVIS_PULL_REQUEST = 'false' ]; then bash ./.travis/deploy.sh; fi
     skip_cleanup: true
     on:
       all_branches: true
