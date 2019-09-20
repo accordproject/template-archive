@@ -61,6 +61,7 @@
     "exact_paths": [
       ".git",
       ".github",
+      ".gitattributes",
       "node_modules",
       "packages",
       "softhsm",
