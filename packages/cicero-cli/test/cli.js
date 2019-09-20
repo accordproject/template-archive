@@ -145,7 +145,7 @@ describe('cicero-cli', () => {
             const args  = Commands.validateParseArgs({
                 _: ['parse'],
             });
-            args.template.should.match(/cicero-cli\/test\/data\/latedeliveryandpenalty$/);
+            args.template.should.match(/cicero-cli[/\\]test[/\\]data[/\\]latedeliveryandpenalty$/);
             args.sample.should.match(/sample.txt$/);
         });
         it('all args specified', () => {
@@ -155,7 +155,7 @@ describe('cicero-cli', () => {
                 template: './',
                 sample: 'sample.txt'
             });
-            args.template.should.match(/cicero-cli\/test\/data\/latedeliveryandpenalty$/);
+            args.template.should.match(/cicero-cli[/\\]test[/\\]data[/\\]latedeliveryandpenalty$/);
             args.sample.should.match(/sample.txt$/);
         });
         it('all args specified, parent folder', () => {
@@ -165,7 +165,7 @@ describe('cicero-cli', () => {
                 template: 'latedeliveryandpenalty',
                 sample: 'latedeliveryandpenalty/sample.txt'
             });
-            args.template.should.match(/cicero-cli\/test\/data\/latedeliveryandpenalty$/);
+            args.template.should.match(/cicero-cli[/\\]test[/\\]data[/\\]latedeliveryandpenalty$/);
             args.sample.should.match(/sample.txt$/);
         });
         it('all args specified, archive', () => {
@@ -175,7 +175,7 @@ describe('cicero-cli', () => {
                 template: 'latedeliveryandpenalty.cta',
                 sample: 'latedeliveryandpenalty/sample.txt'
             });
-            args.template.should.match(/cicero-cli\/test\/data\/latedeliveryandpenalty.cta$/);
+            args.template.should.match(/cicero-cli[/\\]test[/\\]data[/\\]latedeliveryandpenalty.cta$/);
             args.sample.should.match(/sample.txt$/);
         });
         it('all args specified, parent folder, no sample', () => {
@@ -184,7 +184,7 @@ describe('cicero-cli', () => {
                 _: ['parse'],
                 template: 'latedeliveryandpenalty',
             });
-            args.template.should.match(/cicero-cli\/test\/data\/latedeliveryandpenalty$/);
+            args.template.should.match(/cicero-cli[/\\]test[/\\]data[/\\]latedeliveryandpenalty$/);
             args.sample.should.match(/sample.txt$/);
         });
         it('all args specified, child folder, no sample', () => {
@@ -193,14 +193,14 @@ describe('cicero-cli', () => {
                 _: ['parse'],
                 template: '../',
             });
-            args.template.should.match(/cicero-cli\/test\/data\/latedeliveryandpenalty$/);
+            args.template.should.match(/cicero-cli[/\\]test[/\\]data[/\\]latedeliveryandpenalty$/);
             args.sample.should.match(/sample.txt$/);
         });
         it('no flags specified', () => {
             const args  = Commands.validateParseArgs({
                 _: ['parse', path.resolve(__dirname, 'data/latedeliveryandpenalty/')],
             });
-            args.template.should.match(/cicero-cli\/test\/data\/latedeliveryandpenalty$/);
+            args.template.should.match(/cicero-cli[/\\]test[/\\]data[/\\]latedeliveryandpenalty$/);
             args.sample.should.match(/sample.txt$/);
         });
         it('verbose flag specified', () => {
@@ -231,7 +231,7 @@ describe('cicero-cli', () => {
             const args  = Commands.validateGenerateTextArgs({
                 _: ['generateText'],
             });
-            args.template.should.match(/cicero-cli\/test\/data\/latedeliveryandpenalty$/);
+            args.template.should.match(/cicero-cli[/\\]test[/\\]data[/\\]latedeliveryandpenalty$/);
             args.data.should.match(/data.json$/);
         });
         it('all args specified', () => {
@@ -241,7 +241,7 @@ describe('cicero-cli', () => {
                 template: './',
                 data: 'data.json'
             });
-            args.template.should.match(/cicero-cli\/test\/data\/latedeliveryandpenalty$/);
+            args.template.should.match(/cicero-cli[/\\]test[/\\]data[/\\]latedeliveryandpenalty$/);
             args.data.should.match(/data.json$/);
         });
         it('all args specified, parent folder', () => {
@@ -251,7 +251,7 @@ describe('cicero-cli', () => {
                 template: 'latedeliveryandpenalty',
                 data: 'latedeliveryandpenalty/data.json'
             });
-            args.template.should.match(/cicero-cli\/test\/data\/latedeliveryandpenalty$/);
+            args.template.should.match(/cicero-cli[/\\]test[/\\]data[/\\]latedeliveryandpenalty$/);
             args.data.should.match(/data.json$/);
         });
         it('all args specified, archive', () => {
@@ -261,7 +261,7 @@ describe('cicero-cli', () => {
                 template: 'latedeliveryandpenalty.cta',
                 data: 'latedeliveryandpenalty/data.json'
             });
-            args.template.should.match(/cicero-cli\/test\/data\/latedeliveryandpenalty.cta$/);
+            args.template.should.match(/cicero-cli[/\\]test[/\\]data[/\\]latedeliveryandpenalty.cta$/);
             args.data.should.match(/data.json$/);
         });
         it('all args specified, parent folder, no sample', () => {
@@ -270,7 +270,7 @@ describe('cicero-cli', () => {
                 _: ['generateText'],
                 template: 'latedeliveryandpenalty',
             });
-            args.template.should.match(/cicero-cli\/test\/data\/latedeliveryandpenalty$/);
+            args.template.should.match(/cicero-cli[/\\]test[/\\]data[/\\]latedeliveryandpenalty$/);
             args.data.should.match(/data.json$/);
         });
         it('all args specified, child folder, no sample', () => {
@@ -279,14 +279,14 @@ describe('cicero-cli', () => {
                 _: ['generateText'],
                 template: '../',
             });
-            args.template.should.match(/cicero-cli\/test\/data\/latedeliveryandpenalty$/);
+            args.template.should.match(/cicero-cli[/\\]test[/\\]data[/\\]latedeliveryandpenalty$/);
             args.data.should.match(/data.json$/);
         });
         it('no flags specified', () => {
             const args  = Commands.validateGenerateTextArgs({
                 _: ['generateText', path.resolve(__dirname, 'data/latedeliveryandpenalty/')],
             });
-            args.template.should.match(/cicero-cli\/test\/data\/latedeliveryandpenalty$/);
+            args.template.should.match(/cicero-cli[/\\]test[/\\]data[/\\]latedeliveryandpenalty$/);
             args.data.should.match(/data.json$/);
         });
         it('verbose flag specified', () => {
@@ -396,7 +396,7 @@ describe('cicero-cli', () => {
             const args  = Commands.validateInitArgs({
                 _: ['init'],
             });
-            args.template.should.match(/cicero-cli\/test\/data\/latedeliveryandpenalty$/);
+            args.template.should.match(/cicero-cli[/\\]test[/\\]data[/\\]latedeliveryandpenalty$/);
             args.sample.should.match(/sample.txt$/);
         });
         it('all args specified', () => {
@@ -406,7 +406,7 @@ describe('cicero-cli', () => {
                 template: './',
                 sample: 'sample.txt'
             });
-            args.template.should.match(/cicero-cli\/test\/data\/latedeliveryandpenalty$/);
+            args.template.should.match(/cicero-cli[/\\]test[/\\]data[/\\]latedeliveryandpenalty$/);
             args.sample.should.match(/sample.txt$/);
         });
         it('all args specified, parent folder', () => {
@@ -416,7 +416,7 @@ describe('cicero-cli', () => {
                 template: 'latedeliveryandpenalty',
                 sample: 'latedeliveryandpenalty/sample.txt'
             });
-            args.template.should.match(/cicero-cli\/test\/data\/latedeliveryandpenalty$/);
+            args.template.should.match(/cicero-cli[/\\]test[/\\]data[/\\]latedeliveryandpenalty$/);
             args.sample.should.match(/sample.txt$/);
         });
         it('all args specified, parent folder, no sample, no state', () => {
@@ -425,7 +425,7 @@ describe('cicero-cli', () => {
                 _: ['init'],
                 template: 'latedeliveryandpenalty',
             });
-            args.template.should.match(/cicero-cli\/test\/data\/latedeliveryandpenalty$/);
+            args.template.should.match(/cicero-cli[/\\]test[/\\]data[/\\]latedeliveryandpenalty$/);
             args.sample.should.match(/sample.txt$/);
         });
         it('all args specified, child folder, no sample', () => {
@@ -434,14 +434,14 @@ describe('cicero-cli', () => {
                 _: ['init'],
                 template: '../',
             });
-            args.template.should.match(/cicero-cli\/test\/data\/latedeliveryandpenalty$/);
+            args.template.should.match(/cicero-cli[/\\]test[/\\]data[/\\]latedeliveryandpenalty$/);
             args.sample.should.match(/sample.txt$/);
         });
         it('no flags specified', () => {
             const args  = Commands.validateInitArgs({
                 _: ['init', path.resolve(__dirname, 'data/latedeliveryandpenalty/')],
             });
-            args.template.should.match(/cicero-cli\/test\/data\/latedeliveryandpenalty$/);
+            args.template.should.match(/cicero-cli[/\\]test[/\\]data[/\\]latedeliveryandpenalty$/);
             args.sample.should.match(/sample.txt$/);
         });
         it('verbose flag specified', () => {
@@ -472,7 +472,7 @@ describe('cicero-cli', () => {
             const args  = Commands.validateExecuteArgs({
                 _: ['execute'],
             });
-            args.template.should.match(/cicero-cli\/test\/data\/latedeliveryandpenalty$/);
+            args.template.should.match(/cicero-cli[/\\]test[/\\]data[/\\]latedeliveryandpenalty$/);
             args.sample.should.match(/sample.txt$/);
         });
         it('all args specified', () => {
@@ -483,7 +483,7 @@ describe('cicero-cli', () => {
                 sample: 'sample.txt',
                 state: 'state.json'
             });
-            args.template.should.match(/cicero-cli\/test\/data\/latedeliveryandpenalty$/);
+            args.template.should.match(/cicero-cli[/\\]test[/\\]data[/\\]latedeliveryandpenalty$/);
             args.sample.should.match(/sample.txt$/);
         });
         it('all args specified, parent folder', () => {
@@ -494,7 +494,7 @@ describe('cicero-cli', () => {
                 sample: 'latedeliveryandpenalty/sample.txt',
                 state: 'latedeliveryandpenalty/state.json'
             });
-            args.template.should.match(/cicero-cli\/test\/data\/latedeliveryandpenalty$/);
+            args.template.should.match(/cicero-cli[/\\]test[/\\]data[/\\]latedeliveryandpenalty$/);
             args.sample.should.match(/sample.txt$/);
         });
         it('all args specified, parent folder, no sample, no state', () => {
@@ -503,7 +503,7 @@ describe('cicero-cli', () => {
                 _: ['execute'],
                 template: 'latedeliveryandpenalty',
             });
-            args.template.should.match(/cicero-cli\/test\/data\/latedeliveryandpenalty$/);
+            args.template.should.match(/cicero-cli[/\\]test[/\\]data[/\\]latedeliveryandpenalty$/);
             args.sample.should.match(/sample.txt$/);
         });
         it('all args specified, child folder, no sample', () => {
@@ -512,14 +512,14 @@ describe('cicero-cli', () => {
                 _: ['execute'],
                 template: '../',
             });
-            args.template.should.match(/cicero-cli\/test\/data\/latedeliveryandpenalty$/);
+            args.template.should.match(/cicero-cli[/\\]test[/\\]data[/\\]latedeliveryandpenalty$/);
             args.sample.should.match(/sample.txt$/);
         });
         it('no flags specified', () => {
             const args  = Commands.validateExecuteArgs({
                 _: ['execute', path.resolve(__dirname, 'data/latedeliveryandpenalty/')],
             });
-            args.template.should.match(/cicero-cli\/test\/data\/latedeliveryandpenalty$/);
+            args.template.should.match(/cicero-cli[/\\]test[/\\]data[/\\]latedeliveryandpenalty$/);
             args.sample.should.match(/sample.txt$/);
         });
         it('verbose flag specified', () => {
@@ -624,7 +624,7 @@ describe('cicero-cli', () => {
             const args  = Commands.validateArchiveArgs({
                 _: ['archive']
             });
-            args.template.should.match(/cicero-cli\/test\/data\/latedeliveryandpenalty$/);
+            args.template.should.match(/cicero-cli[/\\]test[/\\]data[/\\]latedeliveryandpenalty$/);
             args.target.should.match(/ergo/);
         });
         it('only target arg specified', () => {
@@ -633,7 +633,7 @@ describe('cicero-cli', () => {
                 _: ['archive'],
                 target: 'ergo'
             });
-            args.template.should.match(/cicero-cli\/test\/data\/latedeliveryandpenalty$/);
+            args.template.should.match(/cicero-cli[/\\]test[/\\]data[/\\]latedeliveryandpenalty$/);
             args.target.should.match(/ergo/);
         });
         it('template arg specified', () => {
@@ -641,7 +641,7 @@ describe('cicero-cli', () => {
             const args  = Commands.validateArchiveArgs({
                 _: ['archive', 'data/latedeliveryandpenalty/']
             });
-            args.template.should.match(/cicero-cli\/test\/data\/latedeliveryandpenalty$/);
+            args.template.should.match(/cicero-cli[/\\]test[/\\]data[/\\]latedeliveryandpenalty$/);
             args.target.should.match(/ergo/);
         });
         it('verbose flag specified', () => {

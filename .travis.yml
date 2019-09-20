@@ -1,7 +1,11 @@
 language: node_js
 node_js:
   - '8'
-dist: trusty
+matrix:
+  include:
+    - os: linux
+      dist: trusty
+    - os: windows
 before_install: |
   set -e
   export PATH="./$HOME/node_modules/.bin:$PATH"
@@ -10,21 +14,19 @@ before_install: |
 install: |
   set -e
   date
-  npm install -g lerna@^2.11.0
+  npm install -g lerna@^3.16.4
   lerna bootstrap 2>&1
   date
-script: npm run test 2>&1
+script: bash ./.travis/test.sh
 deploy:
     provider: script
-    script: 
-      - 'if [ "$TRAVIS_PULL_REQUEST" = "false" ]; then bash ./.travis/deploy.sh; fi'
+    script: if [ $TRAVIS_OS_NAME = 'linux' ] && [ $TRAVIS_PULL_REQUEST = 'false' ]; then bash ./.travis/deploy.sh; fi
     skip_cleanup: true
     on:
       all_branches: true
       repo: accordproject/cicero
 after_failure: tail -n +1 -- /home/travis/.npm/_logs/*-debug.log
-after_success:
-  - 'if [ "$TRAVIS_REPO_SLUG" = "accordproject/cicero" ]; then npm run coverage; fi'
+after_success: if [ $TRAVIS_OS_NAME = 'linux' ] && [ $TRAVIS_REPO_SLUG = 'accordproject/cicero' ]; then npm run coverage; fi
 cache:
   directories:
   - node_modules
