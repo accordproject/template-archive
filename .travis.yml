@@ -17,7 +17,7 @@ install: |
   npm install -g lerna@^2.11.0
   lerna bootstrap 2>&1
   date
-script: if [ $TRAVIS_OS_NAME = 'windows' ]; then npm run test:cli 2>&1; else npm run test 2>&1; fi 
+script: bash ./.travis/test.sh
 deploy:
     provider: script
     script: if [ $TRAVIS_OS_NAME = 'linux' ] && [ $TRAVIS_PULL_REQUEST = 'false' ]; then bash ./.travis/deploy.sh; fi
