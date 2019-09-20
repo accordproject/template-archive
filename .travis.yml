@@ -20,7 +20,7 @@ install: |
 script: bash ./.travis/test.sh
 deploy:
     provider: script
-    script: if [ $TRAVIS_OS_NAME = 'linux' ] && [ $TRAVIS_PULL_REQUEST = 'false' ]; then bash ./.travis/deploy.sh; fi
+    script: 'if  [ "$TRAVIS_OS_NAME" = "linux" ] && [ "$TRAVIS_PULL_REQUEST" = "false" ]; then bash ./.travis/deploy.sh; fi'
     skip_cleanup: true
     on:
       all_branches: true
