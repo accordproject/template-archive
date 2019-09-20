@@ -1,7 +1,11 @@
 language: node_js
 node_js:
   - '8'
-dist: trusty
+matrix:
+  include:
+    - os: linux
+      dist: trusty
+    - os: windows
 before_install: |
   set -e
   export PATH="./$HOME/node_modules/.bin:$PATH"
@@ -13,11 +17,10 @@ install: |
   npm install -g lerna@^2.11.0
   lerna bootstrap 2>&1
   date
-script: npm run test 2>&1
+script: if [ $TRAVIS_OS_NAME = 'windows' ]; then lerna run test --scope @accordproject/cicero-cli; else lerna run test; fi
 deploy:
     provider: script
-    script: 
-      - 'if [ "$TRAVIS_PULL_REQUEST" = "false" ]; then bash ./.travis/deploy.sh; fi'
+    script: if [ $TRAVIS_OS_NAME = 'windows' ] && [ $TRAVIS_PULL_REQUEST = 'false' ]; then bash ./.travis/deploy.sh; fi
     skip_cleanup: true
     on:
       all_branches: true
