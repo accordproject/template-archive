@@ -17,7 +17,7 @@ install: |
   npm install -g lerna@^2.11.0
   lerna bootstrap 2>&1
   date
-script: if [ $TRAVIS_OS_NAME = 'windows' ]; then lerna run test --scope @accordproject/cicero-cli; else lerna run test; fi
+script: if [ $TRAVIS_OS_NAME = 'windows' ]; then npm run test:cli 2>&1; else npm run test 2>&1; fi 
 deploy:
     provider: script
     script: if [ $TRAVIS_OS_NAME = 'windows' ] && [ $TRAVIS_PULL_REQUEST = 'false' ]; then bash ./.travis/deploy.sh; fi
@@ -26,8 +26,7 @@ deploy:
       all_branches: true
       repo: accordproject/cicero
 after_failure: tail -n +1 -- /home/travis/.npm/_logs/*-debug.log
-after_success:
-  - 'if [ "$TRAVIS_REPO_SLUG" = "accordproject/cicero" ]; then npm run coverage; fi'
+after_success: if [ $TRAVIS_REPO_SLUG = 'accordproject/cicero' ]; then npm run coverage; fi
 cache:
   directories:
   - node_modules
