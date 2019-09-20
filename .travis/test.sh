@@ -27,7 +27,7 @@ source ${DIR}/.travis/base.sh
 
 # ----
 
-if [[ "${TRAVIS_OS_NAME}" == "windows" ]]; then 
+if [ $TRAVIS_OS_NAME = 'windows' ]; then 
     npm run test:cli; 
 else 
     npm run test;
