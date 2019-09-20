@@ -33,7 +33,7 @@
     "bootstrap": "lerna bootstrap",
     "pretest": "npm run doc && npm run licchk",
     "test": "lerna exec -- npm run test:cov",
-    "test:cli": "lerna exec --scope @accordproject/cicero-cli -- npm run test:mocha",
+    "test:windows": "lerna exec --scope @accordproject/cicero-cli -- npm run test:all && lerna exec --scope @accordproject/cicero-core -- npm run test:mocha",
     "publish": "./scripts/manualrelease.sh",
     "repoclean": "lerna clean",
     "licchk": "license-check-and-add",
