@@ -15,6 +15,7 @@
 'use strict';
 
 const Template = require('../lib/template');
+const TemplateLoader = require('../lib/templateloader');
 const Clause = require('../lib/clause');
 
 const chai = require('chai');
@@ -31,6 +32,7 @@ describe('Clause', () => {
 
     const testLatePenaltyInput = fs.readFileSync(path.resolve(__dirname, 'data/latedeliveryandpenalty', 'sample.txt'), 'utf8');
     const testLatePenaltyPeriodInput = fs.readFileSync(path.resolve(__dirname, 'data/latedeliveryandpenalty-period', 'sample.txt'), 'utf8');
+    const testLatePenaltyCrInput = fs.readFileSync(path.resolve(__dirname, 'data/latedeliveryandpenalty-cr', 'sample.txt'), 'utf8');
     const testCongaInput = fs.readFileSync(path.resolve(__dirname, 'data/conga', 'sample.txt'), 'utf8');
     const testCongaErr = fs.readFileSync(path.resolve(__dirname, 'data/conga', 'sampleErr.txt'), 'utf8');
     const testAllTypesInput = fs.readFileSync(path.resolve(__dirname, 'data/alltypes', 'sample.txt'), 'utf8');
@@ -154,6 +156,33 @@ describe('Clause', () => {
             const template = await Template.fromDirectory('./test/data/latedeliveryandpenalty', options);
             const clause = new Clause(template);
             clause.parse(testLatePenaltyInput);
+            const data = {
+                $class: 'io.clause.latedeliveryandpenalty.TemplateModel',
+                capPercentage: 2,
+                forceMajeure: true,
+                fractionalPart : 'days',
+                penaltyDuration: {
+                    $class: 'org.accordproject.time.Duration',
+                    amount: 9,
+                    unit: 'days'
+                },
+                penaltyPercentage: 7,
+                termination: {
+                    $class: 'org.accordproject.time.Duration',
+                    amount: 2,
+                    unit: 'weeks',
+                }
+            };
+            // remove the generated clause id
+            delete clause.getData().clauseId;
+            clause.getData().should.eql(data);
+            clause.getIdentifier().should.equal('latedeliveryandpenalty@0.0.1-0ee76aefdd19d6863f2f1642182f506b1ac8e5c4be2a005c00dd13bbf36fe63c');
+        });
+
+        it('should be able to set the data from latedeliveryandpenalty natural language text (with CR)', async function() {
+            const template = await Template.fromDirectory('./test/data/latedeliveryandpenalty-cr', options);
+            const clause = new Clause(template);
+            clause.parse(testLatePenaltyCrInput);
             const data = {
                 $class: 'io.clause.latedeliveryandpenalty.TemplateModel',
                 capPercentage: 2,
@@ -301,7 +330,7 @@ describe('Clause', () => {
             const clause = new Clause(template);
             clause.parse(testLatePenaltyPeriodInput);
             const nl = clause.generateText();
-            nl.should.equal(testLatePenaltyPeriodInput);
+            nl.should.equal(TemplateLoader.normalizeText(testLatePenaltyPeriodInput));
         });
 
         it('should be able to roundtrip conga natural language text', async function() {
@@ -309,7 +338,7 @@ describe('Clause', () => {
             const clause = new Clause(template);
             clause.parse(testCongaInput);
             const nl = clause.generateText();
-            nl.should.equal(testCongaInput);
+            nl.should.equal(TemplateLoader.normalizeText(testCongaInput));
         });
 
         it('should be able to roundtrip alltypes natural language text', async function() {
@@ -317,7 +346,7 @@ describe('Clause', () => {
             const clause = new Clause(template);
             clause.parse(testAllTypesInput);
             const nl = clause.generateText();
-            nl.should.equal(testAllTypesInput);
+            nl.should.equal(TemplateLoader.normalizeText(testAllTypesInput));
         });
     });
 });

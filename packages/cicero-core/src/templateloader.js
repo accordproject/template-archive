@@ -16,6 +16,7 @@
 
 const fs = require('fs');
 const fsPath = require('path');
+const slash = require('slash');
 const JSZip = require('jszip');
 const xregexp = require('xregexp');
 const languageTagRegex = require('ietf-language-tag-regex');
@@ -62,7 +63,7 @@ class TemplateLoader {
                 return JSON.parse(content);
             }
             else {
-                return content;
+                return TemplateLoader.normalizeText(content);
             }
         }
 
@@ -112,7 +113,7 @@ class TemplateLoader {
                 return JSON.parse(contents);
             }
             else {
-                return contents;
+                return TemplateLoader.normalizeText(contents);
             }
         }
         else {
@@ -305,7 +306,7 @@ class TemplateLoader {
         const modelFileNames = [];
         const ctoFiles = await TemplateLoader.loadFilesContents(path, /models[/\\].*\.cto$/);
         ctoFiles.forEach((file) => {
-            modelFileNames.push(file.name);
+            modelFileNames.push(slash(file.name));
             modelFiles.push(file.contents);
         });
 
@@ -324,8 +325,8 @@ class TemplateLoader {
         if(template.getMetadata().getErgoVersion()) {
             const ergoFiles = await TemplateLoader.loadFilesContents(path, /lib[/\\].*\.ergo$/);
             ergoFiles.forEach((file) => {
-                const resolvedPath = fsPath.resolve(path);
-                const resolvedFilePath = fsPath.resolve(file.name);
+                const resolvedPath = slash(fsPath.resolve(path));
+                const resolvedFilePath = slash(fsPath.resolve(file.name));
                 const truncatedPath = resolvedFilePath.replace(resolvedPath+'/', '');
                 template.getLogicManager().addLogicFile(file.contents, truncatedPath);
             });
@@ -335,8 +336,8 @@ class TemplateLoader {
         if(template.getMetadata().getRuntime()) {
             const jsFiles = await TemplateLoader.loadFilesContents(path, /lib[/\\].*\.js$/);
             jsFiles.forEach((file) => {
-                const resolvedPath = fsPath.resolve(path);
-                const resolvedFilePath = fsPath.resolve(file.name);
+                const resolvedPath = slash(fsPath.resolve(path));
+                const resolvedFilePath = slash(fsPath.resolve(file.name));
                 const truncatedPath = resolvedFilePath.replace(resolvedPath+'/', '');
                 template.getLogicManager().addLogicFile(file.contents, truncatedPath);
             });
@@ -362,6 +363,18 @@ class TemplateLoader {
 
         return template;
     }
+
+    /**
+     * Prepare the text for parsing (normalizes new lines, etc)
+     * @param {string} input - the text for the clause
+     * @return {string} - the normalized text for the clause
+     */
+    static normalizeText(input) {
+        // we replace all \r and \n with \n
+        let text =  input.replace(/\r/gm,'');
+        return text;
+    }
+
 }
 
 module.exports = TemplateLoader;

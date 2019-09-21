@@ -22,6 +22,7 @@ const Util = require('@accordproject/ergo-compiler').Util;
 const moment = require('moment-mini');
 // Make sure Moment serialization preserves utcOffset. See https://momentjs.com/docs/#/displaying/as-json/
 moment.fn.toJSON = Util.momentToJson;
+const TemplateLoader = require('./templateloader');
 
 const RelationshipDeclaration = require('@accordproject/ergo-compiler').ComposerConcerto.RelationshipDeclaration;
 
@@ -96,11 +97,13 @@ class TemplateInstance {
 
     /**
      * Set the data for the clause by parsing natural language text.
-     * @param {string} text  - the data for the clause
+     * @param {string} input - the text for the clause
      * @param {string} [currentTime] - the definition of 'now' (optional)
      * @param {string} [fileName] - the fileName for the text (optional)
      */
-    parse(text, currentTime, fileName) {
+    parse(input, currentTime, fileName) {
+        let text = TemplateLoader.normalizeText(input);
+
         // Set the current time and UTC Offset
         const now = Util.setCurrentTime(currentTime);
         const utcOffset = now.utcOffset();

@@ -138,6 +138,40 @@ describe('Template', () => {
             buffer2.should.not.be.null;
         });
 
+        it('should roundtrip a source template (CR)', async function() {
+            const template = await Template.fromDirectory('./test/data/latedeliveryandpenalty-cr', options);
+            template.hasLogic().should.equal(true);
+            template.getIdentifier().should.equal('latedeliveryandpenalty@0.0.1');
+            template.getModelManager().getModelFile('io.clause.latedeliveryandpenalty').should.not.be.null;
+            template.getParserManager().getGrammar().should.not.be.null;
+            template.getScriptManager().getScripts().length.should.equal(1);
+            template.getScriptManager().getLogic().length.should.equal(1);
+            template.getMetadata().getREADME().should.not.be.null;
+            template.getMetadata().getRequest().should.not.be.null;
+            template.getMetadata().getKeywords().should.not.be.null;
+            template.getName().should.equal('latedeliveryandpenalty', options);
+            template.getDisplayName().should.equal('Latedeliveryandpenalty');
+            template.getDescription().should.equal('Late Delivery and Penalty. In case of delayed delivery except for Force Majeure cases, the Seller shall pay to the Buyer for every 9 DAY of delay penalty amounting to 7% of the total value of the Equipment whose delivery has been delayed. Any fractional part of a DAY is to be considered a full DAY. The total amount of penalty shall not however, exceed 2% of the total value of the Equipment involved in late delivery. If the delay is more than 2 WEEK, the Buyer is entitled to terminate this Contract.');
+            template.getVersion().should.equal('0.0.1');
+            template.getMetadata().getSample().should.equal('Late Delivery and Penalty.\n\nIn case of delayed delivery except for Force Majeure cases, the Seller shall pay to the Buyer for every 9 days of delay penalty amounting to 7% of the total value of the Equipment whose delivery has been delayed. Any fractional part of a days is to be considered a full days. The total amount of penalty shall not however, exceed 2% of the total value of the Equipment involved in late delivery. If the delay is more than 2 weeks, the Buyer is entitled to terminate this Contract.\n');
+            template.getHash().should.equal('617b6c531124f3ea681bbe4adb437b91c0a179cded0cbd0b2d16f2ea2020368f');
+            const buffer = await template.toArchive('ergo');
+            buffer.should.not.be.null;
+            const template2 = await Template.fromArchive(buffer);
+            template2.getIdentifier().should.equal(template.getIdentifier());
+            template2.getModelManager().getModelFile('io.clause.latedeliveryandpenalty').should.not.be.null;
+            template2.getParserManager().getGrammar().should.not.be.null;
+            template2.getParserManager().getTemplatizedGrammar().should.equal(template.getParserManager().getTemplatizedGrammar());
+            template2.getScriptManager().getScripts().length.should.equal(template.getScriptManager().getScripts().length);
+            template2.getMetadata().getREADME().should.equal(template.getMetadata().getREADME());
+            template2.getMetadata().getKeywords().should.eql(template.getMetadata().getKeywords());
+            template2.getMetadata().getSamples().should.eql(template.getMetadata().getSamples());
+            template2.getHash().should.equal(template.getHash());
+            template.getDisplayName().should.equal('Latedeliveryandpenalty');
+            const buffer2 = await template2.toArchive('ergo');
+            buffer2.should.not.be.null;
+        });
+
         it('should roundtrip a compiled template (JavaScript)', async function() {
             const template = await Template.fromDirectory('./test/data/latedeliveryandpenalty_js', options);
             template.getIdentifier().should.equal('latedeliveryandpenalty@0.0.1');

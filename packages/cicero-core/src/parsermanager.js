@@ -369,10 +369,9 @@ class ParserManager {
      * @return {string} cleaned text
      */
     cleanChunk(input) {
-        // we replace all \r and \n with \n
-        let text = input.replace(/\r?\n|\r/gm,'\\n');
-
-        // replace all " with \", even across newlines
+        // we replace all \n with \\n
+        let text =  input.replace(/\n/gm,'\\n');
+        // replace all " with \"
         text = text.replace(/"/gm, '\\"');
 
         return `"${text}"`;

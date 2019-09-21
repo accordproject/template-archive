@@ -15,6 +15,7 @@
 'use strict';
 
 const Template = require('../lib/template');
+const TemplateLoader = require('../lib/templateloader');
 const Contract = require('../lib/contract');
 
 const chai = require('chai');
@@ -43,7 +44,7 @@ describe('Contract', () => {
             const contract = new Contract(template);
             contract.parse(sampleText);
             const nl = contract.generateText();
-            nl.should.equal(sampleText);
+            nl.should.equal(TemplateLoader.normalizeText(sampleText));
         });
     });
 });
