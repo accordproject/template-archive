@@ -16,6 +16,7 @@
     "postlint": "npm run licchk",
     "licchk": "license-check",
     "test:mocha": "mocha",
+    "test:windows": "npm run test:all",
     "test:all": "npm run test:mocha",
     "test:cov": "nyc npm run test:all",
     "test": "npm run test:all"
