@@ -21,6 +21,7 @@
     "test:cucumber": "cucumber-js test/features --require .cucumber.js --world-parameters \"{\\\"rootdir\\\":\\\"./test\\\"}\"",
     "test:mocha": "mocha",
     "test:all": "npm run test:mocha && npm run test:cucumber",
+    "test:windows": "npm run test:all",
     "test:cov": "nyc npm run test",
     "test": "npm run test:all"
   },

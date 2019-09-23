@@ -16,7 +16,9 @@
     "lint": "eslint .",
     "postlint": "npm run licchk",
     "licchk": "license-check",
-    "test": "mocha --recursive",
+    "test:mocha": "mocha --recursive",
+    "test:windows": "npm run test:mocha",
+    "test": "npm run test:mocha",
     "test:cov": "nyc npm run test"
   },
   "repository": {
