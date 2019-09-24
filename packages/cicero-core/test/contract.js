@@ -15,7 +15,6 @@
 'use strict';
 
 const Template = require('../lib/template');
-const TemplateLoader = require('../lib/templateloader');
 const Contract = require('../lib/contract');
 
 const chai = require('chai');
