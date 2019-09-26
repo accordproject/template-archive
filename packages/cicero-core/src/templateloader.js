@@ -209,8 +209,16 @@ class TemplateLoader {
         Logger.debug(method, 'Adding model files to model manager');
         template.getModelManager().addModelFiles(ctoModelFiles, ctoModelFileNames, true); // validation is disabled
 
+        Logger.debug(method, 'Setting grammar');
+        if(!templatizedGrammar) {
+            throw new Error('A template must contain a template.tem file.');
+        } else {
+            template.parserManager.buildGrammar(templatizedGrammar);
+        }
+
         // load and add the ergo files
         if(template.getMetadata().getErgoVersion()) {
+            template.getLogicManager().addTemplateFile(templatizedGrammar,'grammar/template.tem');
             Logger.debug(method, 'Adding Ergo files to script manager');
             const scriptFiles = await TemplateLoader.loadZipFilesContents(zip, /lib[/\\].*\.ergo$/);
             scriptFiles.forEach(function (obj) {
@@ -229,13 +237,6 @@ class TemplateLoader {
 
         // check the integrity of the model and logic of the template
         template.validate();
-
-        Logger.debug(method, 'Setting grammar');
-        if(!templatizedGrammar) {
-            throw new Error('A template must contain a template.tem file.');
-        } else {
-            template.parserManager.buildGrammar(templatizedGrammar);
-        }
 
         return template; // Returns template
     }

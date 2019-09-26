@@ -15,6 +15,7 @@
 'use strict';
 
 const Template = require('../lib/template');
+const TemplateLoader = require('../lib/templateloader');
 const Contract = require('../lib/contract');
 
 const chai = require('chai');
@@ -36,14 +37,14 @@ describe('Contract', () => {
         });
     });
 
-    describe.skip('#generateText', () => {
+    describe('#generateText', () => {
 
         it('should be able to roundtrip copyright-license natural language text', async function() {
             const template = await Template.fromDirectory('./test/data/copyright-license');
             const contract = new Contract(template);
             contract.parse(sampleText);
             const nl = await contract.generateText();
-            nl.should.equal(sampleText);
+            nl.should.equal(TemplateLoader.normalizeText(sampleText));
         });
     });
 });

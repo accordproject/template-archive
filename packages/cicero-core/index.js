@@ -22,5 +22,6 @@
 module.exports.ErrorUtil = require('./lib/errorutil');
 module.exports.Clause = require('./lib/clause');
 module.exports.Template = require('./lib/template');
+module.exports.TemplateLoader = require('./lib/templateloader');
 module.exports.TemplateLibrary = require('./lib/templatelibrary');
 module.exports.version = require('./package.json');

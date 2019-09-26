@@ -15,6 +15,7 @@
 'use strict';
 
 const Template = require('@accordproject/cicero-core').Template;
+const TemplateLoader = require('@accordproject/cicero-core').TemplateLoader;
 const Clause = require('@accordproject/cicero-core').Clause;
 const Engine = require('../lib/engine');
 
@@ -250,14 +251,14 @@ describe('EngineHelloWorld', () => {
         it('should generate text for a smart clause', async function () {
             const result = await engine.generateText(clause, null, null);
             result.should.not.be.null;
-            result.response.should.equal(`Name of the person to greet: Fred Blogs.
+            result.response.should.equal(`Name of the person to greet: "Fred Blogs".
 Thank you!`);
         });
 
         it('should generate text for a smart clause, with wrapped variables', async function () {
             const result = await engine.generateText(clause, {wrapVariables:true},null);
             result.should.not.be.null;
-            result.response.should.equal(`Name of the person to greet: <variable id="name" value="Fred%20Blogs"/>.
+            result.response.should.equal(`Name of the person to greet: <variable id="name" value="%22Fred%20Blogs%22"/>.
 Thank you!`);
         });
     });
@@ -384,7 +385,7 @@ describe('EngineSaft', () => {
         });
     });
 
-    describe.skip('#generateText', function () {
+    describe('#generateText', function () {
 
         it('should generate text for a smart clause', async function () {
             const request = {};
@@ -396,7 +397,7 @@ describe('EngineSaft', () => {
             state.stateId = '1';
             const result = await engine.generateText(clause);
             result.should.not.be.null;
-            result.response.should.equal(saftInput);
+            result.response.should.equal(TemplateLoader.normalizeText(saftInput));
         });
     });
 
