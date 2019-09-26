@@ -21,7 +21,7 @@ THIS DOCUMENT HAS NOT BEEN APPROVED BY AN AUTHORISED PERSON. ANY INVESTMENT TO W
 SAFT
 (Simple Agreement for Future Tokens)
 
-THIS CERTIFIES THAT in exchange for the payment by the undersigned purchaser (the “Purchaser”) of 25 USD (the “Purchase Amount”) on or about 10/04/2017, "Clause", a NY corporation (the “Company”), hereby issues to the Purchaser the right (the “Right”) to certain units of "Clause Token" (the “Token”), subject to the terms set forth below.
+THIS CERTIFIES THAT in exchange for the payment by the undersigned purchaser (the “Purchaser”) of 25.0 USD (the “Purchase Amount”) on or about 10/04/2017, "Clause", a NY corporation (the “Company”), hereby issues to the Purchaser the right (the “Right”) to certain units of "Clause Token" (the “Token”), subject to the terms set forth below.
 
 1.   Events
  
@@ -31,13 +31,13 @@ In connection with and prior to the issuance of Tokens by the Company to the Pur
 (ii) The Purchaser will provide to the Company a network address for which to allocate Purchaser's Tokens upon the Network Launch.
 (b) Dissolution Event. If there is a Dissolution Event before this instrument expires or terminates, the Company will pay an amount equal to the Purchase Amount multiplied by the Discount Rate (the “Discounted Purchase Amount”), due and payable to the Purchaser immediately prior to, or concurrent with, the consummation of the Dissolution Event, subject to the rights and preferences of the holders of the Company’s preferred stock, as set forth in the Company’s Certificate of Incorporation, as it may be amended from time to time. If immediately prior to the consummation of the Dissolution Event, the assets of the Company that remain legally available for distribution to the Purchaser and all holders of all other SAFTs (the “Dissolving Purchasers”), as determined in good faith by the Company’s board of directors, are insufficient to permit the payment to the Dissolving Purchasers of their respective Discounted Purchase Amounts, then the remaining assets of the Company legally available for distribution, following all distributions to the holders of the Company’s preferred stock, will be distributed with equal priority and pro rata among the Dissolving Purchasers in proportion to the Discounted Purchase Amounts they would otherwise be entitled to receive pursuant to this Section 1(b).  Any distributed amounts shall be in U.S. Dollars.
 
-(c) Termination.  This instrument will expire and terminate upon the earlier of (i) the issuance of Tokens to the Purchaser pursuant to Section 1(a); (ii) the payment, or setting aside for payment, of amounts due the Purchaser pursuant to Section 1(b); (iii) 04/20/2018 (the “Deadline Date”), if the Network Launch has not occurred as of such date; provided that, the Company shall have the right to extend the Deadline Date by sixty (60) days, in its sole discretion; and (iv) the failure to obtain net proceeds of more than 3000000 USD from the sale of all rights pursuant to the SAFTs; provided, that in the case of (iv), the Company shall have the obligation to repay to the Purchasers the aggregate amount of all Purchase Amounts.
+(c) Termination.  This instrument will expire and terminate upon the earlier of (i) the issuance of Tokens to the Purchaser pursuant to Section 1(a); (ii) the payment, or setting aside for payment, of amounts due the Purchaser pursuant to Section 1(b); (iii) 04/20/2018 (the “Deadline Date”), if the Network Launch has not occurred as of such date; provided that, the Company shall have the right to extend the Deadline Date by sixty (60) days, in its sole discretion; and (iv) the failure to obtain net proceeds of more than 3000000.0 USD from the sale of all rights pursuant to the SAFTs; provided, that in the case of (iv), the Company shall have the obligation to repay to the Purchasers the aggregate amount of all Purchase Amounts.
 
 2.   Definitions
  
 “Discount Price” means the maximum price per Token sold by the Company to the public during the Network Launch multiplied by the Discount Rate. 
 
-“Discount Rate” is 38%.
+“Discount Rate” is 38.0%.
 
 “Dissolution Event” means (i) a voluntary termination of operations of the Company, (ii) a general assignment for the benefit of the Company’s creditors or (iii) any other liquidation, dissolution or winding up of the Company, whether voluntary or involuntary.  
 	

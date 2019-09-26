@@ -15,6 +15,7 @@
 'use strict';
 
 const Template = require('../lib/template');
+const TemplateLoader = require('../lib/templateloader');
 const Clause = require('../lib/clause');
 
 const chai = require('chai');
@@ -305,7 +306,7 @@ describe('Clause', () => {
             const clause = new Clause(template);
             clause.parse(testLatePenaltyInput);
             const nl = await clause.generateText();
-            nl.should.equal(testLatePenaltyInput);
+            nl.should.equal(TemplateLoader.normalizeText(testLatePenaltyInput));
         });
 
         it('should be able to generate natural language text with wrapped variables', async function() {
@@ -323,36 +324,36 @@ In case of delayed delivery<variable id="forceMajeure" value="%20except%20for%20
 1. If the delay is more than <variable id="termination" value="2%20weeks"/>, the Buyer is entitled to terminate this Contract.`);
         });
 
-        it.skip('should be able to generate natural language text with wrapped variables and formatted dates', async function() {
+        it('should be able to generate natural language text with wrapped variables and formatted dates', async function() {
             const template = await Template.fromDirectory('./test/data/formatted-dates-DD_MM_YYYY', options);
             const clause = new Clause(template);
             clause.parse('dateTimeProperty: 01/12/2018');
             const nl = await clause.generateText({ wrapVariables: true });
-            nl.should.equal('dateTimeProperty: <variable id="dateTimeProperty" value="01/12/2018" format=%22DD/MM/YYYY%22/>');
+            nl.should.equal('dateTimeProperty: <variable id="dateTimeProperty" value="01/12/2018" format="DD/MM/YYYY"/>');
         });
 
-        it.skip('should be able to roundtrip latedelivery natural language text (with a Period)', async function() {
+        it('should be able to roundtrip latedelivery natural language text (with a Period)', async function() {
             const template = await Template.fromDirectory('./test/data/latedeliveryandpenalty-period', options);
             const clause = new Clause(template);
             clause.parse(testLatePenaltyPeriodInput);
             const nl = await clause.generateText();
-            nl.should.equal(testLatePenaltyPeriodInput);
+            nl.should.equal(TemplateLoader.normalizeText(testLatePenaltyPeriodInput));
         });
 
-        it.skip('should be able to roundtrip conga natural language text', async function() {
+        it('should be able to roundtrip conga natural language text', async function() {
             const template = await Template.fromDirectory('./test/data/conga', options);
             const clause = new Clause(template);
             clause.parse(testCongaInput);
             const nl = await clause.generateText();
-            nl.should.equal(testCongaInput);
+            nl.should.equal(TemplateLoader.normalizeText(testCongaInput));
         });
 
-        it.skip('should be able to roundtrip alltypes natural language text', async function() {
+        it('should be able to roundtrip alltypes natural language text', async function() {
             const template = await Template.fromDirectory('./test/data/alltypes', options);
             const clause = new Clause(template);
             clause.parse(testAllTypesInput);
             const nl = await clause.generateText();
-            nl.should.equal(testAllTypesInput);
+            nl.should.equal(TemplateLoader.normalizeText(testAllTypesInput));
         });
     });
 });

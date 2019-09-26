@@ -1,1 +1,1 @@
-"Dan Selman" agrees to spend 100 conga coins on "penguins". "thing"
+"Dan Selman" agrees to spend 100.0 conga coins on "penguins". "thing"
