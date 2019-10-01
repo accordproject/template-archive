@@ -1,6 +1,6 @@
 {
   "name": "@accordproject/cicero-test",
-  "version": "0.13.5",
+  "version": "0.20.0-alpha.1",
   "description": "Cicero Test - Testing support for Cicero based on cucumber",
   "engines": {
     "node": ">=8",
@@ -45,9 +45,9 @@
     "nyc": "14.1.1"
   },
   "dependencies": {
-    "@accordproject/cicero-core": "0.13.5",
-    "@accordproject/cicero-engine": "0.13.5",
-    "@accordproject/ergo-test": "0.9.5-20190930143253",
+    "@accordproject/cicero-core": "0.20.0-alpha.1",
+    "@accordproject/cicero-engine": "0.20.0-alpha.1",
+    "@accordproject/ergo-test": "0.20.0-alpha.2",
     "chai": "4.2.0",
     "chai-things": "0.2.0",
     "cucumber": "5.1.0"

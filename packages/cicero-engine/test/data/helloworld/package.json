@@ -4,7 +4,7 @@
     "description": "This is the Hello World of Accord Protocol Templates. Executing the clause will simply echo back the text that occurs after the string `Hello` prepended to text that is passed in the request.",
     "accordproject": {
         "template": "clause",
-        "ergo": "0.9.1",
-        "cicero": "^0.13.0"
+        "ergo": "0.20.0-alpha.2",
+        "cicero": "^0.20.0-alpha.1"
     }
 }

@@ -1,6 +1,6 @@
 {
   "name": "@accordproject/cicero-tools",
-  "version": "0.13.5",
+  "version": "0.20.0-alpha.1",
   "description": "Cicero Tools",
   "engines": {
     "node": ">=8",
@@ -54,7 +54,7 @@
     "webpack-cli": "^3.3.5"
   },
   "dependencies": {
-    "@accordproject/ergo-compiler": "0.9.5-20190930143253",
+    "@accordproject/ergo-compiler": "0.20.0-alpha.2",
     "uuid": "3.3.2",
     "yargs": "9.0.1"
   },

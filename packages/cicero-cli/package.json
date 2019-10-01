@@ -1,6 +1,6 @@
 {
   "name": "@accordproject/cicero-cli",
-  "version": "0.13.5",
+  "version": "0.20.0-alpha.1",
   "description": "Cicero CLI",
   "engines": {
     "node": ">=8",
@@ -52,11 +52,11 @@
     "tmp-promise": "1.0.4"
   },
   "dependencies": {
-    "@accordproject/cicero-core": "0.13.5",
-    "@accordproject/cicero-engine": "0.13.5",
-    "@accordproject/cicero-tools": "0.13.5",
-    "@accordproject/cicero-test": "0.13.5",
-    "@accordproject/ergo-compiler": "0.9.5-20190930143253",
+    "@accordproject/cicero-core": "0.20.0-alpha.1",
+    "@accordproject/cicero-engine": "0.20.0-alpha.1",
+    "@accordproject/cicero-tools": "0.20.0-alpha.1",
+    "@accordproject/cicero-test": "0.20.0-alpha.1",
+    "@accordproject/ergo-compiler": "0.20.0-alpha.2",
     "uuid": "3.3.2",
     "yargs": "9.0.1"
   },
