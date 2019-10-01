@@ -1,9 +1,17 @@
-![Cicero](./cicero.png)
+<p align="center">
+  <a href="./cicero.png">
+    <img src="./cicero.png" alt="Cicero logo">
+  </a>
+</p>
+
 
 [![Build Status](https://travis-ci.org/accordproject/cicero.svg?branch=master)](https://travis-ci.org/accordproject/cicero)
 [![Coverage Status](https://coveralls.io/repos/github/accordproject/cicero/badge.svg?branch=master)](https://coveralls.io/github/accordproject/cicero?branch=master)
+[![GitHub license](https://img.shields.io/github/license/accordproject/ergo?color=bright-green)](./LICENSE)
 [![lerna](https://img.shields.io/badge/maintained%20with-lerna-cc00ff.svg)](https://lernajs.io/)
 [![npm version](https://badge.fury.io/js/%40accordproject%2Fcicero-cli.svg)](https://badge.fury.io/js/%40accordproject%2Fcicero-cli)
+[![join slack](https://img.shields.io/badge/Slack-Join%20Slack-blue)](https://accord-project-slack-signup.herokuapp.com/)
+
 
 ## Introduction
 
@@ -38,9 +46,11 @@ Top level repository (cicero), with sub packages. Each sub-package is published 
 
 ---
 
-<a href="https://www.accordproject.org/">
-  <img src="assets/APLogo.png" alt="Accord Project Logo" width="400" />
-</a>
+<p align="center">
+  <a href="https://www.accordproject.org/">
+    <img src="assets/APLogo.png" alt="Accord Project Logo" width="400" />
+  </a>
+</p>
 
 Accord Project is an open source, non-profit, initiative working to transform contract management and contract automation by digitizing contracts. Accord Project operates under the umbrella of the [Linux Foundation][linuxfound]. The technical charter for the Accord Project can be found [here][charter].
 
