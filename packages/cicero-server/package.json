@@ -1,6 +1,6 @@
 {
   "name": "@accordproject/cicero-server",
-  "version": "0.13.5",
+  "version": "0.20.0-alpha.1",
   "description": "Cicero Server - wraps the Cicero Engine and exposes it as a RESTful service",
   "engines": {
     "node": ">=8",
@@ -55,8 +55,8 @@
     "supertest": "3.0.0"
   },
   "dependencies": {
-    "@accordproject/cicero-core": "0.13.5",
-    "@accordproject/cicero-engine": "0.13.5",
+    "@accordproject/cicero-core": "0.20.0-alpha.1",
+    "@accordproject/cicero-engine": "0.20.0-alpha.1",
     "express": "4.16.2"
   },
   "license-check-config": {
