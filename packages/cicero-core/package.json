@@ -1,6 +1,6 @@
 {
   "name": "@accordproject/cicero-core",
-  "version": "0.20.0-alpha.1",
+  "version": "0.20.0-alpha.2",
   "description": "Cicero Core - implementation of Accord Protocol Template Specification",
   "engines": {
     "node": ">=8",
@@ -88,8 +88,8 @@
     "nunjucks": "3.2.0",
     "request": "2.88.0",
     "request-promise-native": "1.0.7",
-    "slash": "3.0.0",
     "semver": "6.2.0",
+    "slash": "3.0.0",
     "uuid": "3.3.2",
     "xregexp": "4.2.4"
   },
@@ -132,5 +132,6 @@
     "branches": 76,
     "functions": 84,
     "lines": 88
-  }
+  },
+  "gitHead": "514fd02f46752e018aedb77e1716a212ef4a59e5"
 }

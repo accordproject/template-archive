@@ -1,6 +1,6 @@
 {
   "name": "@accordproject/generator-cicero-template",
-  "version": "0.20.0-alpha.1",
+  "version": "0.20.0-alpha.2",
   "description": "Code generator for a Cicero Template",
   "engines": {
     "node": ">=8",
@@ -94,5 +94,6 @@
     "branches": 64,
     "functions": 88,
     "lines": 85
-  }
+  },
+  "gitHead": "514fd02f46752e018aedb77e1716a212ef4a59e5"
 }
