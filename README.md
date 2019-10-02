@@ -5,12 +5,15 @@
 </p>
 
 
-[![Build Status](https://travis-ci.org/accordproject/cicero.svg?branch=master)](https://travis-ci.org/accordproject/cicero)
-[![Coverage Status](https://coveralls.io/repos/github/accordproject/cicero/badge.svg?branch=master)](https://coveralls.io/github/accordproject/cicero?branch=master)
-[![GitHub license](https://img.shields.io/github/license/accordproject/ergo?color=bright-green)](./LICENSE)
-[![lerna](https://img.shields.io/badge/maintained%20with-lerna-cc00ff.svg)](https://lernajs.io/)
-[![npm version](https://badge.fury.io/js/%40accordproject%2Fcicero-cli.svg)](https://badge.fury.io/js/%40accordproject%2Fcicero-cli)
-[![join slack](https://img.shields.io/badge/Slack-Join%20Slack-blue)](https://accord-project-slack-signup.herokuapp.com/)
+<p align="center">
+  <a href="https://travis-ci.org/accordproject/cicero"><img src="https://travis-ci.org/accordproject/cicero.svg?branch=master" alt="Build Status"></a>
+  <a href="https://coveralls.io/github/accordproject/cicero?branch=master"><img src="https://coveralls.io/repos/github/accordproject/cicero/badge.svg?branch=master" alt="Coverage Status"></a>
+  <a href="./LICENSE"><img src="https://img.shields.io/github/license/accordproject/cicero?color=bright-green" alt="GitHub license"></a>
+  <a href="https://lernajs.io/"><img src="https://img.shields.io/badge/maintained%20with-lerna-cc00ff.svg" alt="lerna"></a>
+  <a href="https://badge.fury.io/js/%40accordproject%2Fcicero-cli"><img src="https://badge.fury.io/js/%40accordproject%2Fcicero-cli.svg" alt="npm version"></a>
+  <a href="https://accord-project-slack-signup.herokuapp.com/"><img src="https://img.shields.io/badge/Slack-Join%20Slack-blue" alt="join slack"></a>
+</p>
+
 
 
 ## Introduction
