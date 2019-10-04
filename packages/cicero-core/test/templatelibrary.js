@@ -35,6 +35,12 @@ describe('TemplateLibrary', () => {
             const templateLibrary = new TemplateLibrary('https://foo.org');
             templateLibrary.url.should.equal('https://foo.org');
         });
+        it('should create with http auth', async function() {
+            const templateLibrary = new TemplateLibrary('https://foo.org', {type: 'Basic', credential: 'someBasicCredential'});
+            templateLibrary.url.should.equal('https://foo.org');
+            templateLibrary.auth.type.should.equal('Basic');
+            templateLibrary.auth.credential.should.equal('someBasicCredential');
+        });
     });
 
     describe('#getTemplateIndex', () => {

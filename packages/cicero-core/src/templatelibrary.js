@@ -40,10 +40,20 @@ class TemplateLibrary {
      * Create the Template Library
      * @param {string} url - the url to connect to. Defaults to
      * https://templates.accordproject.org
+     * @param {object} auth - authentication object
+     * @param {object} auth.type - HTTP Auth type
+     * @param {object} auth.credential - HTTP Auth credential base64 encoded
      */
-    constructor(url=null) {
+    constructor(url=null, auth=null) {
         this.url = url || 'https://templates.accordproject.org';
+        this.auth = auth;
+        // Logging
         Logger.info('Creating TemplateLibrary for ' + this.url);
+        if (this.auth && this.auth.type && this.auth.credential){
+            Logger.info('TemplateLibrary with authentication');
+        } else {
+            Logger.info('TemplateLibrary without authentication');
+        }
     }
 
     /**
@@ -134,7 +144,12 @@ class TemplateLibrary {
             },
             json: true, // Automatically parses the JSON string in the response
         };
-
+        // Set HTTP auth if available
+        // https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Authorization
+        if (this.auth && this.auth.type && this.auth.credential){
+            // httpOptions.headers.Authorization = this.auth.type + ' ' + this.auth.credential;
+            httpOptions.headers.Authorization = this.auth.type + ' ' + this.auth.credential;
+        }
         Logger.info('Loading template library from', httpOptions.uri);
         return rp(httpOptions)
             .then((templateIndex) => {
