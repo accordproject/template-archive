@@ -1,7 +1,7 @@
 {
   "name": "@accordproject/cicero-core",
   "version": "0.20.0-alpha.2",
-  "description": "Cicero Core - implementation of Accord Protocol Template Specification",
+  "description": "Cicero Core - Implementation of Accord Protocol Template Specification",
   "engines": {
     "node": ">=8",
     "npm": ">=3"
@@ -47,7 +47,7 @@
   "bugs": {
     "url": "https://github.com/accordproject/cicero/issues"
   },
-  "homepage": "https://github.com/accordproject/cicero#readme",
+  "homepage": "https://github.com/accordproject/cicero",
   "devDependencies": {
     "@babel/cli": "7.4.4",
     "@babel/core": "7.4.5",

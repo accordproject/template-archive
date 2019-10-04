@@ -19,6 +19,8 @@ const Logger = require('@accordproject/ergo-compiler').Logger;
 const Commands = require('./lib/commands');
 
 require('yargs')
+    .scriptName('cicero')
+    .usage('$0 <cmd> [args]')
     .demandCommand(1, '# Please specify a command')
     .recommendCommands()
     .strict()
@@ -286,4 +288,5 @@ require('yargs')
         alias: 'v',
         default: false
     })
+    .help()
     .argv;
