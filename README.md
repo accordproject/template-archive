@@ -38,13 +38,13 @@ We are an open community and welcome both lawyers and technologists to work on t
 ## Structure of the Code Repository
 
 Top level repository (cicero), with sub packages. Each sub-package is published as an independent npm module using `lerna`:
-* cicero-cli : Command line interface (for parsing, execution, creating archives) for Accord Project legal templates
-* cicero-core : Core classes to manage the grammar, models and logic of Accord Project legal templates
-* cicero-engine : A Node.js VM based execution engine for Accord Project legal templates
-* cicero-server: Exposes the Cicero Engine as a RESTful service
-* cicero-test : Cucumber based testing for Accord Project legal templates
-* cicero-tools : Tools for generating code (UML, Java, etc.) from Accord Project legal templates
-* generator-cicero-template: Utility to create a self-contained directory for a new Accord Project legal template
+* [cicero-cli](https://github.com/accordproject/cicero/tree/master/packages/cicero-cli) : Command line interface (for parsing, execution, creating archives) for Accord Project legal templates
+* [cicero-core](https://github.com/accordproject/cicero/tree/master/packages/cicero-core) : Core classes to manage the grammar, models and logic of Accord Project legal templates
+* [cicero-engine](https://github.com/accordproject/cicero/tree/master/packages/cicero-engine) : A Node.js VM based execution engine for Accord Project legal templates
+* [cicero-server](https://github.com/accordproject/cicero/tree/master/packages/cicero-server): Exposes the Cicero Engine as a RESTful service
+* [cicero-test](https://github.com/accordproject/cicero/tree/master/packages/cicero-test) : Cucumber based testing for Accord Project legal templates
+* [cicero-tools](https://github.com/accordproject/cicero/tree/master/packages/cicero-tools) : Tools for generating code (UML, Java, etc.) from Accord Project legal templates
+* [generator-cicero-template](https://github.com/accordproject/cicero/tree/master/packages/generator-cicero-template): Utility to create a self-contained directory for a new Accord Project legal template
 
 ---
 
