@@ -15,7 +15,7 @@
 
 'use strict';
 
-const Logger = require('@accordproject/ergo-compiler').Logger;
+const Logger = require('@accordproject/composer-core').Logger;
 const Commands = require('./lib/commands');
 
 require('yargs')

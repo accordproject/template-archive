@@ -54,7 +54,8 @@
     "webpack-cli": "^3.3.5"
   },
   "dependencies": {
-    "@accordproject/ergo-compiler": "0.20.0-20191002164641"
+    "@accordproject/concerto-core": "0.81.0",
+    "@accordproject/concerto-tools": "0.81.0"
   },
   "license-check-config": {
     "src": [

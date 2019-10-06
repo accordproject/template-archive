@@ -15,8 +15,8 @@
 'use strict';
 
 const APModelManager = require('@accordproject/ergo-compiler').APModelManager;
-const Logger = require('@accordproject/ergo-compiler').Logger;
-const Writer = require('@accordproject/ergo-compiler').ComposerConcerto.Writer;
+const Logger = require('@accordproject/concerto-core').Logger;
+const Writer = require('@accordproject/concerto-core').Writer;
 const GrammarVisitor = require('../lib/grammarvisitor');
 const ParserManager = require('../lib/parsermanager');
 const nunjucks = require('nunjucks');

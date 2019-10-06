@@ -14,7 +14,7 @@
 
 'use strict';
 
-const ParseException = require('@accordproject/ergo-compiler').ComposerConcerto.ParseException;
+const ParseException = require('@accordproject/concerto-core').ParseException;
 
 /**
  * Exception throws when ergo compilation fails

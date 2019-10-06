@@ -20,14 +20,14 @@ const sinon = require('sinon');
 
 const CordaVisitor = require('../../../../lib/codegen/fromcto/corda/cordavisitor.js');
 
-const ClassDeclaration = require('@accordproject/ergo-compiler').ComposerConcerto.ClassDeclaration;
-const EnumDeclaration = require('@accordproject/ergo-compiler').ComposerConcerto.EnumDeclaration;
-const EnumValueDeclaration = require('@accordproject/ergo-compiler').ComposerConcerto.EnumValueDeclaration;
-const Field = require('@accordproject/ergo-compiler').ComposerConcerto.Field;
-const ModelFile = require('@accordproject/ergo-compiler').ComposerConcerto.ModelFile;
-const ModelManager = require('@accordproject/ergo-compiler').ComposerConcerto.ModelManager;
-const RelationshipDeclaration = require('@accordproject/ergo-compiler').ComposerConcerto.RelationshipDeclaration;
-const fileWriter = require('@accordproject/ergo-compiler').ComposerConcerto.FileWriter;
+const ClassDeclaration = require('@accordproject/concerto-core').ClassDeclaration;
+const EnumDeclaration = require('@accordproject/concerto-core').EnumDeclaration;
+const EnumValueDeclaration = require('@accordproject/concerto-core').EnumValueDeclaration;
+const Field = require('@accordproject/concerto-core').Field;
+const ModelFile = require('@accordproject/concerto-core').ModelFile;
+const ModelManager = require('@accordproject/concerto-core').ModelManager;
+const RelationshipDeclaration = require('@accordproject/concerto-core').RelationshipDeclaration;
+const fileWriter = require('@accordproject/concerto-core').FileWriter;
 
 describe('CordaVisitor', function () {
     let cordaVisit;
