@@ -15,7 +15,7 @@
 'use strict';
 
 const Metadata = require('./metadata');
-const Logger = require('@accordproject/ergo-compiler').Logger;
+const Logger = require('@accordproject/concerto-core').Logger;
 const ParserManager = require('./parsermanager');
 const crypto = require('crypto');
 const stringify = require('json-stable-stringify');

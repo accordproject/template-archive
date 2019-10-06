@@ -495,7 +495,7 @@ In case of delayed delivery except for Force Majeure cases, the Seller shall pay
 
     describe('#getFactory', () => {
         it('should return a Factory', async () => {
-            const Factory = require('@accordproject/ergo-compiler').ComposerConcerto.Factory;
+            const Factory = require('@accordproject/concerto-core').Factory;
             const template = await Template.fromDirectory('./test/data/latedeliveryandpenalty', options);
             template.getFactory().should.be.an.instanceof(Factory);
         });
@@ -503,7 +503,7 @@ In case of delayed delivery except for Force Majeure cases, the Seller shall pay
 
     describe('#getSerializer', () => {
         it('should return a Serializer', async () => {
-            const Serializer = require('@accordproject/ergo-compiler').ComposerConcerto.Serializer;
+            const Serializer = require('@accordproject/concerto-core').Serializer;
             const template = await Template.fromDirectory('./test/data/latedeliveryandpenalty', options);
             template.getSerializer().should.be.an.instanceof(Serializer);
         });

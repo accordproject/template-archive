@@ -16,7 +16,7 @@
 
 const fs = require('fs');
 
-const ModelManager = require('@accordproject/ergo-compiler').ComposerConcerto.ModelManager;
+const ModelManager = require('@accordproject/concerto-core').ModelManager;
 const CodeGen = require('./codegen/codegen');
 
 const FileWriter = CodeGen.FileWriter;

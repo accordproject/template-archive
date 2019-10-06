@@ -20,5 +20,5 @@
  */
 
 module.exports.CodeGen = require('./lib/codegen/codegen.js');
-module.exports.Writer = require('@accordproject/ergo-compiler').ComposerConcertoTools.Writer;
-module.exports.FileWriter = require('@accordproject/ergo-compiler').ComposerConcertoTools.FileWriter;
+module.exports.Writer = require('@accordproject/concerto-tools').Writer;
+module.exports.FileWriter = require('@accordproject/concerto-tools').FileWriter;

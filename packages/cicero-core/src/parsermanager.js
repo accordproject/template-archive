@@ -16,9 +16,9 @@
 
 const fsPath = require('path');
 const TemplateException = require('./templateexception');
-const RelationshipDeclaration = require('@accordproject/ergo-compiler').ComposerConcerto.RelationshipDeclaration;
-const Writer = require('@accordproject/ergo-compiler').ComposerConcerto.Writer;
-const Logger = require('@accordproject/ergo-compiler').Logger;
+const RelationshipDeclaration = require('@accordproject/concerto-core').RelationshipDeclaration;
+const Writer = require('@accordproject/concerto-core').Writer;
+const Logger = require('@accordproject/concerto-core').Logger;
 const nearley = require('nearley');
 const compile = require('nearley/lib/compile');
 const generate = require('nearley/lib/generate');

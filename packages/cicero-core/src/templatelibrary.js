@@ -16,7 +16,7 @@
 
 const NodeCache = require('node-cache');
 const Template = require('./template');
-const Logger = require('@accordproject/ergo-compiler').Logger;
+const Logger = require('@accordproject/concerto-core').Logger;
 const rp = require('request-promise-native');
 const crypto = require('crypto');
 const stringify = require('json-stable-stringify');

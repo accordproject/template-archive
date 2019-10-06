@@ -14,7 +14,7 @@
 
 'use strict';
 
-const Logger = require('@accordproject/ergo-compiler').Logger;
+const Logger = require('@accordproject/concerto-core').Logger;
 const ErgoCompiler = require('@accordproject/ergo-compiler').Compiler;
 const ciceroVersion = require('../package.json').version;
 const semver = require('semver');

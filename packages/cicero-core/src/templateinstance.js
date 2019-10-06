@@ -14,8 +14,8 @@
 
 'use strict';
 
-const Logger = require('@accordproject/ergo-compiler').Logger;
-const ParseException = require('@accordproject/ergo-compiler').ComposerConcerto.ParseException;
+const Logger = require('@accordproject/concerto-core').Logger;
+const ParseException = require('@accordproject/concerto-core').ParseException;
 const crypto = require('crypto');
 const ErrorUtil = require('./errorutil');
 const Util = require('@accordproject/ergo-compiler').Util;
@@ -24,7 +24,7 @@ const moment = require('moment-mini');
 moment.fn.toJSON = Util.momentToJson;
 const TemplateLoader = require('./templateloader');
 const ErgoEngine = require('@accordproject/ergo-engine/index.browser.js').EvalEngine;
-const RelationshipDeclaration = require('@accordproject/ergo-compiler').ComposerConcerto.RelationshipDeclaration;
+const RelationshipDeclaration = require('@accordproject/concerto-core').RelationshipDeclaration;
 
 /**
  * A TemplateInstance is an instance of a Clause or Contract template. It is executable business logic, linked to
