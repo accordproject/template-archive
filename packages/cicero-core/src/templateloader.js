@@ -21,12 +21,9 @@ const JSZip = require('jszip');
 const xregexp = require('xregexp');
 const languageTagRegex = require('ietf-language-tag-regex');
 const DefaultArchiveLoader = require('./loaders/defaultarchiveloader');
+const FileLoader = require('@accordproject/ergo-compiler').FileLoader;
 const Logger = require('@accordproject/concerto-core').Logger;
-const promisify = require('util').promisify;
-const readdir = fs.readdir ? promisify(fs.readdir) : undefined;
-const stat = fs.stat ? promisify(fs.stat) : undefined;
 
-const ENCODING = 'utf8';
 // Matches 'sample.md' or 'sample_TAG.md' where TAG is an IETF language tag (BCP 47)
 const IETF_REGEXP = languageTagRegex({ exact: false }).toString().slice(1,-2);
 const SAMPLE_FILE_REGEXP = xregexp('sample(_(' + IETF_REGEXP + '))?.md$');
@@ -37,132 +34,7 @@ const SAMPLE_FILE_REGEXP = xregexp('sample(_(' + IETF_REGEXP + '))?.md$');
  * @private
  * @abstract
  */
-class TemplateLoader {
-
-    /**
-     * Loads a required file from the zip, displaying an error if missing
-     * @internal
-     * @param {*} zip the JSZip instance
-     * @param {string} path the file path within the zip
-     * @param {boolean} json if true the file is converted to a JS Object using JSON.parse
-     * @param {boolean} required whether the file is required
-     * @return {Promise<string>} a promise to the contents of the zip file or null if it does not exist and
-     * required is false
-     */
-    static async loadZipFileContents(zip, path, json=false, required=false) {
-        Logger.debug('loadZipFileContents', 'Loading ' + path);
-        let zipFile = zip.file(path);
-        if(!zipFile && required) {
-            throw new Error(`Failed to find ${path} in archive file.`);
-        }
-
-        if(zipFile) {
-            const content = await zipFile.async('string');
-
-            if(json && content) {
-                return JSON.parse(content);
-            }
-            else {
-                return TemplateLoader.normalizeText(content);
-            }
-        }
-
-        return null;
-    }
-
-    /**
-     * Loads the contents of all files in the zip that match a regex
-     * @internal
-     * @param {*} zip the JSZip instance
-     * @param {RegExp} regex the regex to use to match files
-     * @return {Promise<object[]>} a promise to an array of objects with the name and contents of the zip files
-     */
-    static async loadZipFilesContents(zip, regex) {
-        const results = [];
-        let matchedFiles = zip.file(regex);
-
-        // do not use forEach, because we need to call an async function!
-        for(let n=0; n < matchedFiles.length; n++) {
-            const file = matchedFiles[n];
-            const result = {name: file.name};
-            result.contents = await TemplateLoader.loadZipFileContents(zip, file.name, false, true);
-            results.push(result);
-        }
-
-        return results;
-    }
-
-    /**
-     * Loads a required file from a directory, displaying an error if missing
-     * @internal
-     * @param {*} path the root path
-     * @param {string} fileName the relative file name
-     * @param {boolean} json if true the file is converted to a JS Object using JSON.parse
-     * @param {boolean} required whether the file is required
-     * @return {Promise<string>} a promise to the contents of the file or null if it does not exist and
-     * required is false
-     */
-    static async loadFileContents(path, fileName, json=false, required=false) {
-
-        Logger.debug('loadFileContents', 'Loading ' + fileName);
-        const filePath = fsPath.resolve(path, fileName);
-
-        if (fs.existsSync(filePath)) {
-            const contents = fs.readFileSync(filePath, ENCODING);
-            if(json && contents) {
-                return JSON.parse(contents);
-            }
-            else {
-                return TemplateLoader.normalizeText(contents);
-            }
-        }
-        else {
-            if(required) {
-                throw new Error(`Failed to find ${fileName} in directory.`);
-            }
-        }
-
-        return null;
-    }
-
-    /**
-     * Loads the contents of all files under a path that match a regex
-     * Note that any directories called node_modules are ignored.
-     * @internal
-     * @param {*} path the file path
-     * @param {RegExp} regex the regex to match files
-     * @return {Promise<object[]>} a promise to an array of objects with the name and contents of the files
-     */
-    static async loadFilesContents(path, regex) {
-
-        Logger.debug('loadFilesContents', 'Loading ' + path);
-        const subdirs = await readdir(path);
-        const result = await Promise.all(subdirs.map(async (subdir) => {
-            const res = fsPath.resolve(path, subdir);
-
-            if((await stat(res)).isDirectory()) {
-                if( /.*node_modules$/.test(res) === false) {
-                    return TemplateLoader.loadFilesContents(res, regex);
-                }
-                else {
-                    return null;
-                }
-            }
-            else {
-                if(regex.test(res)) {
-                    return {
-                        name: res,
-                        contents: await TemplateLoader.loadFileContents(path, res, false, true)
-                    };
-                }
-                else {
-                    return null;
-                }
-            }
-        }));
-        return result.reduce((a, f) => a.concat(f), []).filter((f) => f !== null);
-    }
-
+class TemplateLoader extends FileLoader {
     /**
      * Create a template from an archive.
      * @param {*} Template - the type to construct

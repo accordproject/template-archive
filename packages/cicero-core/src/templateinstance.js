@@ -48,7 +48,7 @@ class TemplateInstance {
         }
         this.template = template;
         this.data = null;
-        this.composerData = null;
+        this.concertoData = null;
         this.ergoEngine = new ErgoEngine();
     }
 
@@ -56,7 +56,7 @@ class TemplateInstance {
      * Set the data for the clause
      * @param {object} data  - the data for the clause, must be an instance of the
      * template model for the clause's template. This should be a plain JS object
-     * and will be deserialized and validated into the Composer object before assignment.
+     * and will be deserialized and validated into the Concerto object before assignment.
      */
     setData(data) {
         // verify that data is an instance of the template model
@@ -74,13 +74,13 @@ class TemplateInstance {
         // save the data
         this.data = data;
 
-        // save the composer data
-        this.composerData = resource;
+        // save the concerto data
+        this.concertoData = resource;
     }
 
     /**
-     * Get the data for the clause. This is a plain JS object. To retrieve the Composer
-     * object call getComposerData().
+     * Get the data for the clause. This is a plain JS object. To retrieve the Concerto
+     * object call getConcertoData().
      * @return {object} - the data for the clause, or null if it has not been set
      */
     getData() {
@@ -88,12 +88,12 @@ class TemplateInstance {
     }
 
     /**
-     * Get the data for the clause. This is a Composer object. To retrieve the
+     * Get the data for the clause. This is a Concerto object. To retrieve the
      * plain JS object suitable for serialization call toJSON() and retrieve the `data` property.
      * @return {object} - the data for the clause, or null if it has not been set
      */
-    getDataAsComposerObject() {
-        return this.composerData;
+    getDataAsConcertoObject() {
+        return this.concertoData;
     }
 
     /**
@@ -186,7 +186,7 @@ class TemplateInstance {
      * the template with the JSON data for the clause.
      */
     async generateText(options, currentTime) {
-        if(!this.composerData) {
+        if(!this.concertoData) {
             throw new Error('Data has not been set. Call setData or parse before calling this method.');
         }
 
@@ -207,8 +207,8 @@ class TemplateInstance {
     }
 
     /**
-     * Converts a composer object to a string
-     * @param {ClassDeclaration} clazz - the composer classdeclaration
+     * Converts a concerto object to a string
+     * @param {ClassDeclaration} clazz - the concerto classdeclaration
      * @param {object} obj - the instance to convert
      * @returns {string} the parseable string representation of the object
      * @private
@@ -246,8 +246,8 @@ class TemplateInstance {
 
 
     /**
-     * Converts a composer object to a string
-     * @param {Property} property - the composer property
+     * Converts a concerto object to a string
+     * @param {Property} property - the concerto property
      * @param {object} obj - the instance to convert
      * @param {string} format - the optional format string to use
      * @returns {string} the parseable string representation of the object
