@@ -106,8 +106,8 @@ describe('Clause', () => {
             clause.setData(data);
             clause.getData().should.eql(data);
 
-            // check that the composer data is really a Composer object
-            clause.getDataAsComposerObject().getFullyQualifiedType().should.be.equal('io.clause.latedeliveryandpenalty.TemplateModel');
+            // check that the concerto data is really a Concerto object
+            clause.getDataAsConcertoObject().getFullyQualifiedType().should.be.equal('io.clause.latedeliveryandpenalty.TemplateModel');
         });
         it('should throw error for bad $class', async function() {
             const template = await Template.fromDirectory('./test/data/latedeliveryandpenalty', options);

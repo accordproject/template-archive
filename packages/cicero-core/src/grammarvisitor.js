@@ -25,7 +25,7 @@ const util = require('util');
 const debug = require('debug')('cicero-core:grammarvisitor');
 
 /**
- * Converts composer models and types to Nearley rules
+ * Converts concerto models and types to Nearley rules
  *
  * @private
  * @class
@@ -227,8 +227,8 @@ class GrammarVisitor {
     }
 
     /**
-     * Converts a Composer type to a Nearley grammar type.
-     * @param {string} type  - the composer type
+     * Converts a Concerto type to a Nearley grammar type.
+     * @param {string} type  - the concerto type
      * @return {string} the corresponding type to use for Nearley
      * @private
      */

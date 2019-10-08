@@ -52,7 +52,7 @@
     "tmp-promise": "1.0.4"
   },
   "dependencies": {
-    "@accordproject/concerto-core": "0.81.0",
+    "@accordproject/concerto-core": "0.81.1",
     "@accordproject/cicero-core": "0.20.0-alpha.2",
     "@accordproject/cicero-engine": "0.20.0-alpha.2",
     "@accordproject/cicero-test": "0.20.0-alpha.2",
