@@ -45,7 +45,7 @@ git clone https://github.com/<github username>/cicero.git
 cd cicero
 
 # Add the main Cicero repository as an upstream remote to your repository:
-git remote add upstream "https://github.com/acccordproject/cicero.git"
+git remote add upstream "https://github.com/accordproject/cicero.git"
 
 # Install node.js dependencies:
 npm install -g lerna
