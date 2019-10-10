@@ -20,7 +20,7 @@ const Logger = require('@accordproject/ergo-compiler').Logger;
 const Commands = require('./lib/commands');
 
 if (!process.argv.slice(2).length) {
-	argParser.showHelp()
+    argParser.showHelp();
 }
 
 argParser
