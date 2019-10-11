@@ -15,15 +15,10 @@
 
 'use strict';
 
-const argParser = require('yargs');
 const Logger = require('@accordproject/ergo-compiler').Logger;
 const Commands = require('./lib/commands');
 
-if (!process.argv.slice(2).length) {
-    argParser.showHelp();
-}
-
-argParser
+require('yargs')
     .command('parse', 'parse sample text using a template', (yargs) => {
         yargs.option('template', {
             describe: 'path to the directory with the template',
@@ -260,4 +255,7 @@ argParser
         alias: 'v',
         default: false
     })
+    .demandCommand()
+    .recommendCommands()
+    .strict()
     .argv;
