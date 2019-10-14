@@ -20,6 +20,7 @@ const Commands = require('./lib/commands');
 
 require('yargs')
     .demandCommand(1, '# Please specify a command')
+    .recommendCommands()
     .strict()
     .command('parse', 'parse sample text using a template', (yargs) => {
         yargs.option('template', {
