@@ -18,7 +18,7 @@ npm install -g @accordproject/generator-cicero-template
 Then generate your new project:
 
 ```bash
-yo cicero-template
+yo @accordproject/cicero-template
 ```
 
 ## Getting To Know Yeoman
