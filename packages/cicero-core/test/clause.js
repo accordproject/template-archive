@@ -36,6 +36,7 @@ describe('Clause', () => {
     const testCongaInput = fs.readFileSync(path.resolve(__dirname, 'data/conga', 'sample.md'), 'utf8');
     const testCongaErr = fs.readFileSync(path.resolve(__dirname, 'data/conga', 'sampleErr.md'), 'utf8');
     const testAllTypesInput = fs.readFileSync(path.resolve(__dirname, 'data/alltypes', 'sample.md'), 'utf8');
+    const testAllBlocksInput = fs.readFileSync(path.resolve(__dirname, 'data/allblocks', 'sample.md'), 'utf8');
     const testTextOnlyInput = fs.readFileSync(path.resolve(__dirname, 'data/text-only', 'sample.md'), 'utf8');
 
     describe('#constructor', () => {
@@ -354,6 +355,14 @@ In case of delayed delivery<variable id="forceMajeure" value="%20except%20for%20
             clause.parse(testAllTypesInput);
             const nl = await clause.generateText();
             nl.should.equal(TemplateLoader.normalizeText(testAllTypesInput));
+        });
+
+        it('should be able to roundtrip allblocks natural language text', async function() {
+            const template = await Template.fromDirectory('./test/data/allblocks', options);
+            const clause = new Clause(template);
+            clause.parse(testAllBlocksInput);
+            const nl = await clause.generateText();
+            nl.should.equal(TemplateLoader.normalizeText(testAllBlocksInput));
         });
     });
 });
