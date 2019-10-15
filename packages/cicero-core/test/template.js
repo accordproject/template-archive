@@ -91,7 +91,7 @@ describe('Template', () => {
         });
 
         it('should throw error when Ergo logic does not parse', async () => {
-            return Template.fromDirectory('./test/data/bad-logic', options).should.be.rejectedWith('Parse error (at file lib/logic.ergo line 14 col 4). \n    define agreed = request.agreedDelivery;\n    ^^^^^^                                 ');
+            return Template.fromDirectory('./test/data/bad-logic', options).should.be.rejectedWith('Parse error (at file logic/logic.ergo line 14 col 4). \n    define agreed = request.agreedDelivery;\n    ^^^^^^                                 ');
         });
 
         it('should throw an error if archive language is not a valid target', async () => {
@@ -127,7 +127,7 @@ In case of delayed delivery except for Force Majeure cases, the Seller shall pay
 1. Any fractional part of a days is to be considered a full days.
 1. The total amount of penalty shall not however, exceed 2.0% of the total value of the Equipment involved in late delivery.
 1. If the delay is more than 2 weeks, the Buyer is entitled to terminate this Contract.`);
-            template.getHash().should.equal('cf7e30fecdd0ab2a59309974cca67b842a1f4b19b09d205634ea113014ad0d90');
+            template.getHash().should.equal('e01601b4be757dc8fa7c4dee2adf3807e7a124f7b214688e761dde1a35aff702');
             const buffer = await template.toArchive('ergo');
             buffer.should.not.be.null;
             const template2 = await Template.fromArchive(buffer);
@@ -161,7 +161,7 @@ In case of delayed delivery except for Force Majeure cases, the Seller shall pay
             template.getDescription().should.equal('Late Delivery and Penalty. In case of delayed delivery except for Force Majeure cases, the Seller shall pay to the Buyer for every 9 DAY of delay penalty amounting to 7.0% of the total value of the Equipment whose delivery has been delayed. Any fractional part of a DAY is to be considered a full DAY. The total amount of penalty shall not however, exceed 2.0% of the total value of the Equipment involved in late delivery. If the delay is more than 2 WEEK, the Buyer is entitled to terminate this Contract.');
             template.getVersion().should.equal('0.0.1');
             template.getMetadata().getSample().should.equal('Late Delivery and Penalty.\n\nIn case of delayed delivery except for Force Majeure cases, the Seller shall pay to the Buyer for every 9 days of delay penalty amounting to 7.0% of the total value of the Equipment whose delivery has been delayed. Any fractional part of a days is to be considered a full days. The total amount of penalty shall not however, exceed 2.0% of the total value of the Equipment involved in late delivery. If the delay is more than 2 weeks, the Buyer is entitled to terminate this Contract.\n');
-            template.getHash().should.equal('fbf52b0af619be496b95e751152720b7fb05b43180a5d1c0e217f76e9b126766');
+            template.getHash().should.equal('657aba45f1dabfd5b305729779ebd6f634f44c077ea9b0c1fa99b7757129c845');
             const buffer = await template.toArchive('ergo');
             buffer.should.not.be.null;
             const template2 = await Template.fromArchive(buffer);
@@ -192,7 +192,7 @@ In case of delayed delivery except for Force Majeure cases, the Seller shall pay
             template.getDescription().should.equal('Late Delivery and Penalty. In case of delayed delivery except for Force Majeure cases, the Seller shall pay to the Buyer for every 9 DAY of delay penalty amounting to 7% of the total value of the Equipment whose delivery has been delayed. Any fractional part of a DAY is to be considered a full DAY. The total amount of penalty shall not however, exceed 2% of the total value of the Equipment involved in late delivery. If the delay is more than 2 WEEK, the Buyer is entitled to terminate this Contract.');
             template.getVersion().should.equal('0.0.1');
             template.getMetadata().getSample().should.equal('Late Delivery and Penalty. In case of delayed delivery except for Force Majeure cases, the Seller shall pay to the Buyer for every 9 days of delay penalty amounting to 7% of the total value of the Equipment whose delivery has been delayed. Any fractional part of a days is to be considered a full days. The total amount of penalty shall not however, exceed 2% of the total value of the Equipment involved in late delivery. If the delay is more than 2 weeks, the Buyer is entitled to terminate this Contract.');
-            template.getHash().should.equal('44972a3a416d0807769219bbda21d8d1d6c86aa3fed234a12ac5b6e7f427928d');
+            template.getHash().should.equal('39ed5227fce6c5cd3e541e8919fec4906c458b1f30d0c1e488266475499eab1d');
             const buffer = await template.toArchive('cicero');
             buffer.should.not.be.null;
             const template2 = await Template.fromArchive(buffer);
@@ -269,7 +269,7 @@ In case of delayed delivery except for Force Majeure cases, the Seller shall pay
         });
 
         it('should fail creating an archive for a template for a wrong Ergo module call', async () => {
-            return Template.fromDirectory('./test/data/hellomodule-bug', options).should.be.rejectedWith('Type error (at file lib/logic.ergo line 23 col 11). This operator received unexpected arguments');
+            return Template.fromDirectory('./test/data/hellomodule-bug', options).should.be.rejectedWith('Type error (at file logic/logic.ergo line 23 col 11). This operator received unexpected arguments');
         });
     });
 
@@ -481,7 +481,7 @@ In case of delayed delivery except for Force Majeure cases, the Seller shall pay
     describe('#getHash', () => {
         it('should return a SHA-256 hash', async () => {
             const template = await Template.fromDirectory('./test/data/latedeliveryandpenalty', options);
-            template.getHash().should.equal('cf7e30fecdd0ab2a59309974cca67b842a1f4b19b09d205634ea113014ad0d90');
+            template.getHash().should.equal('e01601b4be757dc8fa7c4dee2adf3807e7a124f7b214688e761dde1a35aff702');
         });
     });
 

@@ -65,10 +65,10 @@ class TemplateLoader extends FileLoader {
 
         const requestContents = await TemplateLoader.loadZipFileContents(zip, 'request.json', true);
         const packageJsonObject = await TemplateLoader.loadZipFileContents(zip, 'package.json', true, true);
-        const templatizedGrammar = await TemplateLoader.loadZipFileContents(zip, 'grammar/template.tem', false, false);
+        const templatizedGrammar = await TemplateLoader.loadZipFileContents(zip, 'grammar/template.tem.md', false, false);
 
         Logger.debug(method, 'Looking for model files');
-        let ctoFiles =  await TemplateLoader.loadZipFilesContents(zip, /models[/\\].*\.cto$/);
+        let ctoFiles =  await TemplateLoader.loadZipFilesContents(zip, /model[/\\].*\.cto$/);
         ctoFiles.forEach(async (file) => {
             ctoModelFileNames.push(file.name);
             ctoModelFiles.push(file.contents);
@@ -83,16 +83,16 @@ class TemplateLoader extends FileLoader {
 
         Logger.debug(method, 'Setting grammar');
         if(!templatizedGrammar) {
-            throw new Error('A template must contain a template.tem file.');
+            throw new Error('A template must contain a template.tem.md file.');
         } else {
             template.parserManager.buildGrammar(templatizedGrammar);
         }
 
         // load and add the ergo files
         if(template.getMetadata().getErgoVersion()) {
-            template.getLogicManager().addTemplateFile(templatizedGrammar,'grammar/template.tem');
+            template.getLogicManager().addTemplateFile(templatizedGrammar,'grammar/template.tem.md');
             Logger.debug(method, 'Adding Ergo files to script manager');
-            const scriptFiles = await TemplateLoader.loadZipFilesContents(zip, /lib[/\\].*\.ergo$/);
+            const scriptFiles = await TemplateLoader.loadZipFilesContents(zip, /logic[/\\].*\.ergo$/);
             scriptFiles.forEach(function (obj) {
                 template.getLogicManager().addLogicFile(obj.contents, obj.name);
             });
@@ -101,7 +101,7 @@ class TemplateLoader extends FileLoader {
         // load and add compiled JS files - we assume all runtimes are JS based (review!)
         if(template.getMetadata().getRuntime()) {
             Logger.debug(method, 'Adding JS files to script manager');
-            const scriptFiles = await TemplateLoader.loadZipFilesContents(zip, /lib[/\\].*\.js$/);
+            const scriptFiles = await TemplateLoader.loadZipFilesContents(zip, /logic[/\\].*\.js$/);
             scriptFiles.forEach(function (obj) {
                 template.getLogicManager().addLogicFile(obj.contents, obj.name);
             });
@@ -172,7 +172,7 @@ class TemplateLoader extends FileLoader {
         const template = new (Function.prototype.bind.call(Template, null, packageJsonObject, readmeContents, sampleTextFiles, requestJsonObject, options));
         const modelFiles = [];
         const modelFileNames = [];
-        const ctoFiles = await TemplateLoader.loadFilesContents(path, /models[/\\].*\.cto$/);
+        const ctoFiles = await TemplateLoader.loadFilesContents(path, /model[/\\].*\.cto$/);
         ctoFiles.forEach((file) => {
             modelFileNames.push(slash(file.name));
             modelFiles.push(file.contents);
@@ -185,28 +185,28 @@ class TemplateLoader extends FileLoader {
 
             const externalModelFiles = template.getModelManager().getModels();
             externalModelFiles.forEach(function (file) {
-                fs.writeFileSync(path + '/models/' + file.name, file.content);
+                fs.writeFileSync(path + '/model/' + file.name, file.content);
             });
         }
 
 
         // load and add the template
-        let templatizedGrammar = await TemplateLoader.loadFileContents(path, 'grammar/template.tem', false, false);
+        let templatizedGrammar = await TemplateLoader.loadFileContents(path, 'grammar/template.tem.md', false, false);
 
         if(!templatizedGrammar) {
-            throw new Error('A template must either contain a template.tem file.');
+            throw new Error('A template must either contain a template.tem.md file.');
         } else {
             template.parserManager.buildGrammar(templatizedGrammar);
-            Logger.debug(method, 'Loaded template.tem', templatizedGrammar);
+            Logger.debug(method, 'Loaded template.tem.md', templatizedGrammar);
         }
 
-        Logger.debug(method, 'Loaded template.tem');
+        Logger.debug(method, 'Loaded template.tem.md');
 
         // load and add the ergo files
         if(template.getMetadata().getErgoVersion() && template.getMetadata().getRuntime() === 'ergo') {
             // If Ergo then also register the template
-            template.getLogicManager().addTemplateFile(templatizedGrammar,'grammar/template.tem');
-            const ergoFiles = await TemplateLoader.loadFilesContents(path, /lib[/\\].*\.ergo$/);
+            template.getLogicManager().addTemplateFile(templatizedGrammar,'grammar/template.tem.md');
+            const ergoFiles = await TemplateLoader.loadFilesContents(path, /logic[/\\].*\.ergo$/);
             ergoFiles.forEach((file) => {
                 const resolvedPath = slash(fsPath.resolve(path));
                 const resolvedFilePath = slash(fsPath.resolve(file.name));
@@ -217,7 +217,7 @@ class TemplateLoader extends FileLoader {
 
         // load and add compiled JS files - we assume all runtimes are JS based (review!)
         if(template.getMetadata().getRuntime() !== 'ergo') {
-            const jsFiles = await TemplateLoader.loadFilesContents(path, /lib[/\\].*\.js$/);
+            const jsFiles = await TemplateLoader.loadFilesContents(path, /logic[/\\].*\.js$/);
             jsFiles.forEach((file) => {
                 const resolvedPath = slash(fsPath.resolve(path));
                 const resolvedFilePath = slash(fsPath.resolve(file.name));

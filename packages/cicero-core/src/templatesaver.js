@@ -50,7 +50,7 @@ class TemplateSaver {
         }));
 
         if (template.getParserManager().getTemplatizedGrammar()) {
-            zip.file('grammar/template.tem', template.getParserManager().getTemplatizedGrammar(), options);
+            zip.file('grammar/template.tem.md', template.getParserManager().getTemplatizedGrammar(), options);
         }
 
         // save the README.md if present
@@ -79,21 +79,21 @@ class TemplateSaver {
         }
 
         let modelFiles = template.getModelManager().getModels();
-        zip.file('models/', null, Object.assign({}, options, {
+        zip.file('model/', null, Object.assign({}, options, {
             dir: true
         }));
         modelFiles.forEach(function (file) {
-            zip.file('models/' + file.name, file.content, options);
+            zip.file('model/' + file.name, file.content, options);
         });
 
-        zip.file('lib/', null, Object.assign({}, options, {
+        zip.file('logic/', null, Object.assign({}, options, {
             dir: true
         }));
         const scriptFiles = template.getScriptManager().getScriptsForTarget(language);
         scriptFiles.forEach(function (file) {
             let fileIdentifier = file.getIdentifier();
             let fileName = fsPath.basename(fileIdentifier);
-            zip.file('lib/' + fileName, file.contents, options);
+            zip.file('logic/' + fileName, file.contents, options);
         });
 
         return zip.generateAsync({
