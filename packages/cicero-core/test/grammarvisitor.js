@@ -135,7 +135,7 @@ describe('GrammarVisitor', () => {
                 mm.addModelFile(model, 'common.cto');
             }
 
-            const test = fs.readFileSync(path.resolve(__dirname, 'data/conga/models', 'model.cto'), 'utf8');
+            const test = fs.readFileSync(path.resolve(__dirname, 'data/conga/model', 'model.cto'), 'utf8');
             mm.addModelFile(test, 'model.cto', true);
 
             await mm.updateExternalModels();
