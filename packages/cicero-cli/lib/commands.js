@@ -37,7 +37,7 @@ const TypescriptVisitor = CodeGen.TypescriptVisitor;
 class Commands {
     /**
      * Whether the template path is to a file (template archive)
-     * @param {string} templatePath to the template path directory or file
+     * @param {string} templatePath - path to the template directory or archive
      * @return {boolean} true if the path is to a file, false otherwise
      */
     static isTemplateArchive(templatePath) {
@@ -46,7 +46,7 @@ class Commands {
 
     /**
      * Return a promise to a template from either a directory or an archive file
-     * @param {string} templatePath to the template path directory or file
+     * @param {string} templatePath - path to the template directory or archive
      * @param {Object} [options] - an optional set of options
      * @return {Promise<Template>} a Promise to the instantiated template
      */
@@ -62,7 +62,7 @@ class Commands {
     /**
      * Common default params before we create an archive using a template
      *
-     * @param {object} argv the inbound argument values object
+     * @param {object} argv - the inbound argument values object
      * @returns {object} a modfied argument object
      */
     static validateCommonArgs(argv) {
@@ -97,11 +97,11 @@ class Commands {
     /**
      * Set a default for a file argument
      *
-     * @param {object} argv the inbound argument values object
-     * @param {string} argName the argument name
-     * @param {string} argDefaultName the argument default name
-     * @param {Function} argDefaultFun how to compute the argument default
-     * @param {object} argDefaultValue an optional default value if all else fails
+     * @param {object} argv - the inbound argument values object
+     * @param {string} argName - the argument name
+     * @param {string} argDefaultName - the argument default name
+     * @param {Function} argDefaultFun - how to compute the argument default
+     * @param {object} argDefaultValue - an optional default value if all else fails
      * @returns {object} a modified argument object
      */
     static setDefaultFileArg(argv, argName, argDefaultName, argDefaultFun) {
@@ -133,67 +133,9 @@ class Commands {
     }
 
     /**
-     * Parse a sample text using a template
-     *
-     * @param {string} templatePath to the template path directory or file
-     * @param {string} samplePath to the sample file
-     * @param {string} outPath to the contract file
-     * @param {string} currentTime - the definition of 'now'
-     * @param {Object} [options] - an optional set of options
-     * @returns {object} Promise to the result of parsing
-     */
-    static parse(templatePath, samplePath, outPath, currentTime, options) {
-        let clause;
-        const sampleText = fs.readFileSync(samplePath, 'utf8');
-
-        return Commands.loadTemplate(templatePath, options)
-            .then((template) => {
-                clause = new Clause(template);
-                clause.parse(sampleText, currentTime, samplePath);
-                if (outPath) {
-                    Logger.info('Creating file: ' + outPath);
-                    fs.writeFileSync(outPath, JSON.stringify(clause.getData(),null,2));
-                }
-                return clause.getData();
-            })
-            .catch((err) => {
-                Logger.error(err.message);
-            });
-    }
-
-    /**
-     * Generate a sample text from JSON data using a template
-     *
-     * @param {string} templatePath to the template path directory or file
-     * @param {string} dataPath to the data file
-     * @param {string} outPath to the contract file
-     * @param {Object} [options] - an optional set of options
-     * @returns {object} Promise to the result of parsing
-     */
-    static generateText(templatePath, dataPath, outPath, options) {
-        let clause;
-        const dataJson = JSON.parse(fs.readFileSync(dataPath, 'utf8'));
-
-        return Commands.loadTemplate(templatePath, options)
-            .then(async function (template) {
-                clause = new Clause(template);
-                clause.setData(dataJson);
-                const text = await clause.generateText(options);
-                if (outPath) {
-                    Logger.info('Creating file: ' + outPath);
-                    fs.writeFileSync(outPath, text);
-                }
-                return text;
-            })
-            .catch((err) => {
-                Logger.error(err.message);
-            });
-    }
-
-    /**
      * Set default params before we parse a sample text using a template
      *
-     * @param {object} argv the inbound argument values object
+     * @param {object} argv - the inbound argument values object
      * @returns {object} a modfied argument object
      */
     static validateParseArgs(argv) {
@@ -208,12 +150,41 @@ class Commands {
     }
 
     /**
+     * Parse a sample text using a template
+     *
+     * @param {string} templatePath - path to the template directory or archive
+     * @param {string} samplePath - path to the contract text
+     * @param {string} outputPath - to an output file
+     * @param {string} currentTime - the definition of 'now'
+     * @param {Object} [options] - an optional set of options
+     * @returns {object} Promise to the result of parsing
+     */
+    static parse(templatePath, samplePath, outputPath, currentTime, options) {
+        let clause;
+        const sampleText = fs.readFileSync(samplePath, 'utf8');
+
+        return Commands.loadTemplate(templatePath, options)
+            .then((template) => {
+                clause = new Clause(template);
+                clause.parse(sampleText, currentTime, samplePath);
+                if (outputPath) {
+                    Logger.info('Creating file: ' + outputPath);
+                    fs.writeFileSync(outputPath, JSON.stringify(clause.getData(),null,2));
+                }
+                return clause.getData();
+            })
+            .catch((err) => {
+                Logger.error(err.message);
+            });
+    }
+
+    /**
      * Set default params before we generatet a sample text using a template
      *
-     * @param {object} argv the inbound argument values object
+     * @param {object} argv - the inbound argument values object
      * @returns {object} a modfied argument object
      */
-    static validateGenerateTextArgs(argv) {
+    static validateDraftArgs(argv) {
         argv = Commands.validateCommonArgs(argv);
         argv = Commands.setDefaultFileArg(argv, 'data', 'data.json', ((argv, argDefaultName) => { return path.resolve(argv.template,argDefaultName); }));
 
@@ -225,15 +196,98 @@ class Commands {
     }
 
     /**
+     * Generate a contract text from JSON data
+     *
+     * @param {string} templatePath - path to the template directory or archive
+     * @param {string} dataPath - path to the JSON data
+     * @param {string} outputPath - to the contract file
+     * @param {string} currentTime - the definition of 'now'
+     * @param {Object} [options] - an optional set of options
+     * @returns {object} Promise to the result of parsing
+     */
+    static draft(templatePath, dataPath, outputPath, currentTime, options) {
+        let clause;
+        const dataJson = JSON.parse(fs.readFileSync(dataPath, 'utf8'));
+
+        return Commands.loadTemplate(templatePath, options)
+            .then(async function (template) {
+                clause = new Clause(template);
+                clause.setData(dataJson);
+                const text = await clause.generateText(options, currentTime);
+                if (outputPath) {
+                    Logger.info('Creating file: ' + outputPath);
+                    fs.writeFileSync(outputPath, text);
+                }
+                return text;
+            })
+            .catch((err) => {
+                Logger.error(err.message);
+            });
+    }
+
+    /**
+     * Set default params before we parse a sample text using a template
+     *
+     * @param {object} argv - the inbound argument values object
+     * @returns {object} a modfied argument object
+     */
+    static validateRedraftArgs(argv) {
+        argv = Commands.validateParseArgs(argv);
+        if (argv.overwrite) {
+            if (argv.output) {
+                throw new Error('Cannot use both --overwrite and --output');
+            } else {
+                argv.output = argv.sample;
+            }
+        }
+        return argv;
+    }
+
+    /**
+     * Parse and re-create a sample contract
+     *
+     * @param {string} templatePath - path to the template directory or archive
+     * @param {string} samplePath - to the sample file
+     * @param {boolean} overwrite - true if overwriting the sample
+     * @param {string} outputPath - to the contract file
+     * @param {string} currentTime - the definition of 'now'
+     * @param {Object} [options] - an optional set of options
+     * @returns {object} Promise to the result of parsing
+     */
+    static redraft(templatePath, samplePath, overwrite, outputPath, currentTime, options) {
+        let clause;
+        const sampleText = fs.readFileSync(samplePath, 'utf8');
+
+        return Commands.loadTemplate(templatePath, options)
+            .then(async function (template) {
+                clause = new Clause(template);
+                clause.parse(sampleText, currentTime, samplePath);
+                if (outputPath) {
+                    Logger.info('Creating file: ' + outputPath);
+                    fs.writeFileSync(outputPath, JSON.stringify(clause.getData(),null,2));
+                }
+                const text = await clause.generateText(options, currentTime);
+                if (outputPath) {
+                    Logger.info('Creating file: ' + outputPath);
+                    fs.writeFileSync(outputPath, text);
+                }
+                return text;
+            })
+            .catch((err) => {
+                Logger.error(err.message);
+            });
+    }
+
+    /**
      * Initializes a sample text using a template
      *
-     * @param {string} templatePath to the template path directory or file
-     * @param {string} samplePath to the sample file
+     * @param {string} templatePath - path to the template directory or archive
+     * @param {string} samplePath - to the sample file
      * @param {string} currentTime - the definition of 'now'
      * @param {Object} [options] - an optional set of options
      * @returns {object} Promise to the result of execution
      */
-    static init(templatePath, samplePath, currentTime, options) {
+    static initialize(templatePath, samplePath, currentTime, options) {
         let clause;
         const sampleText = fs.readFileSync(samplePath, 'utf8');
 
@@ -251,14 +305,32 @@ class Commands {
             });
     }
 
+    /**
+     * Set default params before we execute a template
+     *
+     * @param {object} argv the inbound argument values object
+     * @returns {object} a modfied argument object
+     */
+    static validateExecuteArgs(argv) {
+        argv = Commands.validateCommonArgs(argv);
+        argv = Commands.setDefaultFileArg(argv, 'sample', 'sample.md', ((argv, argDefaultName) => { return path.resolve(argv.template,argDefaultName); }));
+        argv = Commands.setDefaultFileArg(argv, 'request', 'request.json', ((argv, argDefaultName) => { return [path.resolve(argv.template,argDefaultName)]; }));
+        //argv = Commands.setDefaultFileArg(argv, 'state', 'state.json', ((argv, argDefaultName) => { return path.resolve(argv.template,argDefaultName); }));
+
+        if(argv.verbose) {
+            Logger.info(`execute sample ${argv.sample} using a template ${argv.template} with request ${argv.request} with state ${argv.state}`);
+        }
+
+        return argv;
+    }
 
     /**
      * Execute a sample text using a template
      *
-     * @param {string} templatePath to the template path directory or file
-     * @param {string} samplePath to the sample file
-     * @param {string[]} requestsPath to the array of request files
-     * @param {string} statePath to the state file
+     * @param {string} templatePath - path to the template directory or archive
+     * @param {string} samplePath - to the sample file
+     * @param {string[]} requestsPath - to the array of request files
+     * @param {string} statePath - to the state file
      * @param {string} currentTime - the definition of 'now'
      * @param {Object} [options] - an optional set of options
      * @returns {object} Promise to the result of execution
@@ -305,31 +377,12 @@ class Commands {
     }
 
     /**
-     * Set default params before we execute a template
-     *
-     * @param {object} argv the inbound argument values object
-     * @returns {object} a modfied argument object
-     */
-    static validateExecuteArgs(argv) {
-        argv = Commands.validateCommonArgs(argv);
-        argv = Commands.setDefaultFileArg(argv, 'sample', 'sample.md', ((argv, argDefaultName) => { return path.resolve(argv.template,argDefaultName); }));
-        argv = Commands.setDefaultFileArg(argv, 'request', 'request.json', ((argv, argDefaultName) => { return [path.resolve(argv.template,argDefaultName)]; }));
-        //argv = Commands.setDefaultFileArg(argv, 'state', 'state.json', ((argv, argDefaultName) => { return path.resolve(argv.template,argDefaultName); }));
-
-        if(argv.verbose) {
-            Logger.info(`execute sample ${argv.sample} using a template ${argv.template} with request ${argv.request} with state ${argv.state}`);
-        }
-
-        return argv;
-    }
-
-    /**
      * Set default params before we initialize a template
      *
      * @param {object} argv the inbound argument values object
      * @returns {object} a modfied argument object
      */
-    static validateInitArgs(argv) {
+    static validateInitializeArgs(argv) {
         argv = Commands.validateCommonArgs(argv);
         argv = Commands.setDefaultFileArg(argv, 'sample', 'sample.md', ((argv, argDefaultName) => { return path.resolve(argv.template,argDefaultName); }));
 
@@ -338,54 +391,6 @@ class Commands {
         }
 
         return argv;
-    }
-
-    /**
-     * Converts the model for a template into code
-     *
-     * @param {string} format the format to generate
-     * @param {string} templatePath to the template path directory or file
-     * @param {string} outputDirectory the output directory
-     * @param {Object} [options] - an optional set of options
-     * @returns {object} Promise to the result of code generation
-     */
-    static generate(format, templatePath, outputDirectory, options) {
-
-        return Commands.loadTemplate(templatePath, options)
-            .then((template) => {
-
-                let visitor = null;
-
-                switch(format) {
-                case 'Go':
-                    visitor = new GoLangVisitor();
-                    break;
-                case 'PlantUML':
-                    visitor = new PlantUMLVisitor();
-                    break;
-                case 'Typescript':
-                    visitor = new TypescriptVisitor();
-                    break;
-                case 'Java':
-                    visitor = new JavaVisitor();
-                    break;
-                case 'Corda':
-                    visitor = new CordaVisitor();
-                    break;
-                case 'JSONSchema':
-                    visitor = new JSONSchemaVisitor();
-                    break;
-                default:
-                    throw new Error ('Unrecognized code generator: ' + format );
-                }
-
-                let parameters = {};
-                parameters.fileWriter = new FileWriter(outputDirectory);
-                template.getModelManager().accept(visitor, parameters);
-            })
-            .catch((err) => {
-                Logger.error(err);
-            });
     }
 
     /**
@@ -408,19 +413,19 @@ class Commands {
     /**
      * Create an archive using a template
      *
+     * @param {string} templatePath - path to the template directory or archive
      * @param {string} target - target language for the archive (should be either 'ergo' or 'cicero')
-     * @param {string} templatePath to the template path directory or file
-     * @param {string} archiveFile to the archive file
+     * @param {string} outputPath - to the archive file
      * @param {Object} [options] - an optional set of options
      * @returns {object} Promise to the code creating an archive
      */
-    static archive(target, templatePath, archiveFile, options) {
+    static archive(templatePath, target, outputPath, options) {
         return Commands.loadTemplate(templatePath, options)
             .then(async (template) => {
                 const archive = await template.toArchive(target);
                 let file;
-                if (archiveFile) {
-                    file = archiveFile;
+                if (outputPath) {
+                    file = outputPath;
                 }
                 else {
                     const templateName = template.getMetadata().getName();
@@ -432,6 +437,54 @@ class Commands {
                 return true;
             });
     }
+    /**
+     * Converts the model for a template into code
+     *
+     * @param {string} templatePath - path to the template directory or archive
+     * @param {string} target - the target format to generate
+     * @param {string} outputPath - the output directory
+     * @param {Object} [options] - an optional set of options
+     * @returns {object} Promise to the result of code generation
+     */
+    static compile(templatePath, target, outputPath, options) {
+
+        return Commands.loadTemplate(templatePath, options)
+            .then((template) => {
+
+                let visitor = null;
+
+                switch(target) {
+                case 'Go':
+                    visitor = new GoLangVisitor();
+                    break;
+                case 'PlantUML':
+                    visitor = new PlantUMLVisitor();
+                    break;
+                case 'Typescript':
+                    visitor = new TypescriptVisitor();
+                    break;
+                case 'Java':
+                    visitor = new JavaVisitor();
+                    break;
+                case 'Corda':
+                    visitor = new CordaVisitor();
+                    break;
+                case 'JSONSchema':
+                    visitor = new JSONSchemaVisitor();
+                    break;
+                default:
+                    throw new Error ('Unrecognized code generator: ' + target);
+                }
+
+                let parameters = {};
+                parameters.fileWriter = new FileWriter(outputPath);
+                template.getModelManager().accept(visitor, parameters);
+            })
+            .catch((err) => {
+                Logger.error(err);
+            });
+    }
+
 }
 
 module.exports = Commands;

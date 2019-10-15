@@ -24,16 +24,16 @@ require('yargs')
     .demandCommand(1, '# Please specify a command')
     .recommendCommands()
     .strict()
-    .command('parse', 'parse sample text using a template', (yargs) => {
+    .command('parse', 'parse a contract text', (yargs) => {
         yargs.option('template', {
-            describe: 'path to the directory with the template',
+            describe: 'path to the template',
             type: 'string'
         });
         yargs.option('sample', {
-            describe: 'path to the clause text',
+            describe: 'path to the contract text',
             type: 'string'
         });
-        yargs.option('out', {
+        yargs.option('output', {
             describe: 'path to the output file',
             type: 'string'
         });
@@ -49,7 +49,7 @@ require('yargs')
         });
     }, (argv) => {
         if (argv.verbose) {
-            Logger.info(`parse sample ${argv.sample} using a template ${argv.template}`);
+            Logger.info(`parse sample ${argv.sample} for template ${argv.template}`);
         }
 
         try {
@@ -57,7 +57,7 @@ require('yargs')
             const options = {
                 warnings: argv.warnings,
             };
-            return Commands.parse(argv.template, argv.sample, argv.out, argv.currentTime, options)
+            return Commands.parse(argv.template, argv.sample, argv.output, argv.currentTime, options)
                 .then((result) => {
                     if(result) {Logger.info(JSON.stringify(result));}
                 })
@@ -69,46 +69,46 @@ require('yargs')
             return;
         }
     })
-    .command('generateText', 'generate sample text from template data', (yargs) => {
+    .command('draft', 'create contract text from data', (yargs) => {
         yargs.option('template', {
-            describe: 'path to the directory with the template',
+            describe: 'path to the template',
             type: 'string'
         });
         yargs.option('data', {
-            describe: 'path to the template data text',
+            describe: 'path to the contract data',
             type: 'string'
         });
-        yargs.option('out', {
+        yargs.option('output', {
             describe: 'path to the output file',
             type: 'string'
+        });
+        yargs.option('currentTime', {
+            describe: 'execute with this current time',
+            type: 'string',
+            default: null
+        });
+        yargs.option('wrapVariables', {
+            describe: 'wrap variables as XML tags',
+            type: 'boolean',
+            default: false
         });
         yargs.option('warnings', {
             describe: 'print warnings',
             type: 'boolean',
             default: false
         });
-        yargs.option('wrapVariables', {
-            describe: 'wrap variables in curly braces',
-            type: 'boolean',
-            default: false
-        });
-        yargs.option('template', {
-            describe: 'path to the template (.tem) file',
-            type: 'string',
-            default: null
-        });
     }, (argv) => {
         if (argv.verbose) {
-            Logger.info(`generate text from data ${argv.data} using a template ${argv.template}`);
+            Logger.info(`create contract from data ${argv.data} for template ${argv.template}`);
         }
 
         try {
-            argv = Commands.validateGenerateTextArgs(argv);
+            argv = Commands.validateDraftArgs(argv);
             const options = {
                 wrapVariables: argv.wrapVariables,
                 warnings: argv.warnings,
             };
-            return Commands.generateText(argv.template, argv.data, argv.out, options)
+            return Commands.draft(argv.template, argv.data, argv.output, argv.currentTime, options)
                 .then((result) => {
                     if(result) {Logger.info(result);}
                 })
@@ -120,18 +120,26 @@ require('yargs')
             return;
         }
     })
-    .command('archive', 'archive a template directory', (yargs) => {
-        yargs.option('target', {
-            describe: 'the target language of the archive',
-            type: 'string',
-            default: 'ergo'
-        });
+    .command('redraft', 'parse a contract text and re-create it', (yargs) => {
         yargs.option('template', {
-            describe: 'path to the directory with the template',
+            describe: 'path to the template',
             type: 'string'
         });
-        yargs.option('archiveFile', {
-            describe: 'file name for the archive',
+        yargs.option('sample', {
+            describe: 'path to the contract text',
+            type: 'string'
+        });
+        yargs.option('overwrite', {
+            describe: 'overwrite the contrct text',
+            type: 'boolean',
+            default: false
+        });
+        yargs.option('output', {
+            describe: 'path to the output file',
+            type: 'string'
+        });
+        yargs.option('currentTime', {
+            describe: 'execute with this current time',
             type: 'string',
             default: null
         });
@@ -140,17 +148,25 @@ require('yargs')
             type: 'boolean',
             default: false
         });
+        yargs.option('wrapVariables', {
+            describe: 'wrap variables as XML tags',
+            type: 'boolean',
+            default: false
+        });
     }, (argv) => {
         if (argv.verbose) {
-            Logger.info(`archive the template in the directory ${argv.template}`);
+            Logger.info(`parse sample and re-create sample ${argv.sample} for template ${argv.template}`);
         }
 
         try {
-            argv = Commands.validateArchiveArgs(argv);
+            argv = Commands.validateRedraftArgs(argv);
             const options = {
                 warnings: argv.warnings,
             };
-            return Commands.archive(argv.target, argv.template, argv.archiveFile, options)
+            return Commands.redraft(argv.template, argv.sample, argv.overwrite, argv.output, argv.currentTime, options)
+                .then((result) => {
+                    if(result) {Logger.info(result);}
+                })
                 .catch((err) => {
                     Logger.error(err.message);
                 });
@@ -159,13 +175,13 @@ require('yargs')
             return;
         }
     })
-    .command('execute', 'execute a clause with JSON request', (yargs) => {
+    .command('execute', 'send a request to the contract', (yargs) => {
         yargs.option('template', {
-            describe: 'path to the directory with the template',
+            describe: 'path to the template',
             type: 'string'
         });
         yargs.option('sample', {
-            describe: 'path to the clause text',
+            describe: 'path to the contract text',
             type: 'string'
         });
         yargs.option('request', {
@@ -204,13 +220,13 @@ require('yargs')
             Logger.error(err.message);
         }
     })
-    .command('init', 'initialize a clause', (yargs) => {
+    .command('initialize', 'initialize a clause', (yargs) => {
         yargs.option('template', {
-            describe: 'path to the directory with the template',
+            describe: 'path to the template',
             type: 'string'
         });
         yargs.option('sample', {
-            describe: 'path to the clause text',
+            describe: 'path to the contract text',
             type: 'string'
         });
         yargs.option('currentTime', {
@@ -226,11 +242,11 @@ require('yargs')
     }, (argv) => {
 
         try {
-            argv = Commands.validateInitArgs(argv);
+            argv = Commands.validateInitializeArgs(argv);
             const options = {
                 warnings: argv.warnings,
             };
-            return Commands.init(argv.template, argv.sample, argv.currentTime, options)
+            return Commands.initialize(argv.template, argv.sample, argv.currentTime, options)
                 .then((result) => {
                     if(result) {Logger.info(JSON.stringify(result));}
                 })
@@ -241,19 +257,57 @@ require('yargs')
             Logger.error(err.message);
         }
     })
-    .command('generate', 'generate code from the template model', (yargs) => {
+    .command('archive', 'create a template archive', (yargs) => {
         yargs.option('template', {
-            describe: 'path to the directory with the template',
-            type: 'string',
-            default: '.'
+            describe: 'path to the template',
+            type: 'string'
         });
-        yargs.option('format', {
-            describe: 'format of the code to generate',
+        yargs.option('target', {
+            describe: 'the target language of the archive',
+            type: 'string',
+            default: 'ergo'
+        });
+        yargs.option('output', {
+            describe: 'file name for new archive',
+            type: 'string',
+            default: null
+        });
+        yargs.option('warnings', {
+            describe: 'print warnings',
+            type: 'boolean',
+            default: false
+        });
+    }, (argv) => {
+        if (argv.verbose) {
+            Logger.info(`create an archive for ${argv.template}`);
+        }
+
+        try {
+            argv = Commands.validateArchiveArgs(argv);
+            const options = {
+                warnings: argv.warnings,
+            };
+            return Commands.archive(argv.template, argv.target, argv.output, options)
+                .catch((err) => {
+                    Logger.error(err.message);
+                });
+        } catch (err){
+            Logger.error(err.message);
+            return;
+        }
+    })
+    .command('compile', 'generate code for a target platform', (yargs) => {
+        yargs.option('template', {
+            describe: 'path to the template',
+            type: 'string'
+        });
+        yargs.option('target', {
+            describe: 'target of the code generation',
             type: 'string',
             default: 'JSONSchema'
         });
-        yargs.option('outputDirectory', {
-            describe: 'output directory path',
+        yargs.option('output', {
+            describe: 'path to the output directory',
             type: 'string',
             default: './output/'
         });
@@ -264,7 +318,7 @@ require('yargs')
         });
     }, (argv) => {
         if (argv.verbose) {
-            Logger.info(`generate code in format ${argv.format} from the model for template ${argv.template} into directory ${argv.outputDirectory}`);
+            Logger.info(`compile template ${argv.template} for target ${argv.target}`);
         }
 
         try {
@@ -272,7 +326,7 @@ require('yargs')
             const options = {
                 warnings: argv.warnings,
             };
-            return Commands.generate(argv.format, argv.template, argv.outputDirectory, options)
+            return Commands.compile(argv.template, argv.target, argv.output, options)
                 .then((result) => {
                     Logger.info('Completed.');
                 })
