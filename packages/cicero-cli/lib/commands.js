@@ -175,14 +175,15 @@ class Commands {
         const dataJson = JSON.parse(fs.readFileSync(dataPath, 'utf8'));
 
         return Commands.loadTemplate(templatePath, options)
-            .then((template) => {
+            .then(async function (template) {
                 clause = new Clause(template);
                 clause.setData(dataJson);
+                const text = await clause.generateText(options);
                 if (outPath) {
                     Logger.info('Creating file: ' + outPath);
-                    fs.writeFileSync(outPath, clause.generateText(options));
+                    fs.writeFileSync(outPath, text);
                 }
-                return clause.generateText(options);
+                return text;
             })
             .catch((err) => {
                 Logger.error(err.message);
