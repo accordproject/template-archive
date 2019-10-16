@@ -386,6 +386,34 @@ require('yargs')
             return;
         }
     })
+    .command('get', 'save local copies of external dependencies', (yargs) => {
+        yargs.option('template', {
+            describe: 'path to the template',
+            type: 'string'
+        });
+        yargs.option('output', {
+            describe: 'output directory path',
+            type: 'string'
+        });
+    }, (argv) => {
+        if (argv.verbose) {
+            Logger.info(`saving external models into directory: ${argv.output}`);
+        }
+
+        try {
+            argv = Commands.validateGetArgs(argv);
+            return Commands.get(argv.template, argv.output)
+                .then((result) => {
+                    Logger.info(result);
+                })
+                .catch((err) => {
+                    Logger.error(err.message);
+                });
+        } catch (err){
+            Logger.error(err.message);
+            return;
+        }
+    })
     .option('verbose', {
         alias: 'v',
         default: false

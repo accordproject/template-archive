@@ -58,6 +58,7 @@
     "@accordproject/cicero-test": "0.20.0-alpha.2",
     "@accordproject/cicero-tools": "0.20.0-alpha.2",
     "uuid": "3.3.2",
+    "mkdirp": "0.5.1",
     "yargs": "13.2.4"
   },
   "license-check-config": {

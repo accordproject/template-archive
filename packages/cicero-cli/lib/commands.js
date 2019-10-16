@@ -22,6 +22,7 @@ const CodeGen = require('@accordproject/cicero-tools').CodeGen;
 const FileWriter = CodeGen.FileWriter;
 const fs = require('fs');
 const path = require('path');
+const mkdirp = require('mkdirp');
 const GoLangVisitor = CodeGen.GoLangVisitor;
 const JavaVisitor = CodeGen.JavaVisitor;
 const CordaVisitor = CodeGen.CordaVisitor;
@@ -543,6 +544,42 @@ class Commands {
             });
     }
 
+    /**
+     * Set default params before we download external dependencies
+     *
+     * @param {object} argv the inbound argument values object
+     * @returns {object} a modfied argument object
+     */
+    static validateGetArgs(argv) {
+        argv = Commands.validateCommonArgs(argv);
+        if (!argv.output) {
+            if (Commands.isTemplateArchive(argv.template)) {
+                argv.output = './model';
+            } else {
+                argv.output = path.resolve(argv.template,'model');
+            }
+        }
+        return argv;
+    }
+
+
+    /**
+     * Fetches all external for a set of models dependencies and
+     * saves all the models to a target directory
+     *
+     * @param {string} templatePath the system model
+     * @param {string} output the output directory
+     * @return {string} message
+     */
+    static async get(templatePath, output) {
+        return Commands.loadTemplate(templatePath, {})
+            .then((template) => {
+                const modelManager = template.getModelManager();
+                mkdirp.sync(output);
+                modelManager.writeModelsToFileSystem(output);
+                return `Loaded external models in '${output}'.`;
+            });
+    }
 }
 
 module.exports = Commands;

@@ -793,43 +793,43 @@ describe('#initialize', () => {
 describe('#compile', () => {
 
     it('should compile to a Go model', async () => {
-        const dir = await tmp.dir({ unsafeCleanup: true});
+        const dir = await tmp.dir({ unsafeCleanup: true });
         await Commands.compile(template, 'Go', dir.path, true);
         fs.readdirSync(dir.path).length.should.be.above(0);
         dir.cleanup();
     });
     it('should compile to a PlantUML model', async () => {
-        const dir = await tmp.dir({ unsafeCleanup: true});
+        const dir = await tmp.dir({ unsafeCleanup: true });
         await Commands.compile(template, 'PlantUML', dir.path, true);
         fs.readdirSync(dir.path).length.should.be.above(0);
         dir.cleanup();
     });
     it('should compile to a Typescript model', async () => {
-        const dir = await tmp.dir({ unsafeCleanup: true});
+        const dir = await tmp.dir({ unsafeCleanup: true });
         await Commands.compile(template, 'Typescript', dir.path, true);
         fs.readdirSync(dir.path).length.should.be.above(0);
         dir.cleanup();
     });
     it('should compile to a Java model', async () => {
-        const dir = await tmp.dir({ unsafeCleanup: true});
+        const dir = await tmp.dir({ unsafeCleanup: true });
         await Commands.compile(template, 'Java', dir.path, true);
         fs.readdirSync(dir.path).length.should.be.above(0);
         dir.cleanup();
     });
     it('should compile to a Corda model', async () => {
-        const dir = await tmp.dir({ unsafeCleanup: true});
+        const dir = await tmp.dir({ unsafeCleanup: true });
         await Commands.compile(template, 'Corda', dir.path, true);
         fs.readdirSync(dir.path).length.should.be.above(0);
         dir.cleanup();
     });
     it('should compile to a JSONSchema model', async () => {
-        const dir = await tmp.dir({ unsafeCleanup: true});
+        const dir = await tmp.dir({ unsafeCleanup: true });
         await Commands.compile(template, 'JSONSchema', dir.path, true);
         fs.readdirSync(dir.path).length.should.be.above(0);
         dir.cleanup();
     });
     it('should not compile to an unknown model', async () => {
-        const dir = await tmp.dir({ unsafeCleanup: true});
+        const dir = await tmp.dir({ unsafeCleanup: true });
         await Commands.compile(template, 'BLAH', dir.path, true);
         fs.readdirSync(dir.path).length.should.be.equal(0);
         dir.cleanup();
@@ -917,6 +917,65 @@ describe('#archive', async () => {
         const tmpArchive = tmpFile.path + '.cta';
         return Commands.archive(template, 'foo', tmpArchive, false)
             .should.be.rejectedWith('Unknown target: foo (available: es5,es6,cicero,java)');
+    });
+
+});
+
+describe('#validateGetArgs', () => {
+    it('no args specified', () => {
+        process.chdir(path.resolve(__dirname, 'data/latedeliveryandpenalty/'));
+        const args  = Commands.validateGetArgs({
+            _: ['get']
+        });
+        args.template.should.match(/cicero-cli[/\\]test[/\\]data[/\\]latedeliveryandpenalty$/);
+        args.output.should.match(/cicero-cli[/\\]test[/\\]data[/\\]latedeliveryandpenalty[/\\]model$/);
+    });
+    it('only output arg specified', () => {
+        process.chdir(path.resolve(__dirname, 'data/latedeliveryandpenalty/'));
+        const args  = Commands.validateGetArgs({
+            _: ['get'],
+            output: 'foo'
+        });
+        args.template.should.match(/cicero-cli[/\\]test[/\\]data[/\\]latedeliveryandpenalty$/);
+        args.output.should.match(/foo/);
+    });
+    it('template directory specified', () => {
+        process.chdir(path.resolve(__dirname));
+        const args  = Commands.validateGetArgs({
+            _: ['get', 'data/latedeliveryandpenalty/']
+        });
+        args.template.should.match(/cicero-cli[/\\]test[/\\]data[/\\]latedeliveryandpenalty$/);
+        args.output.should.match(/cicero-cli[/\\]test[/\\]data[/\\]latedeliveryandpenalty[/\\]model$/);
+    });
+    it('template archive specified', () => {
+        process.chdir(path.resolve(__dirname));
+        const args  = Commands.validateGetArgs({
+            _: ['get', templateArchive]
+        });
+        args.template.should.eql(templateArchive);
+        args.output.should.match(/model$/);
+    });
+    it('verbose flag specified', () => {
+        process.chdir(path.resolve(__dirname, 'data/latedeliveryandpenalty/'));
+        Commands.validateGetArgs({
+            _: ['get'],
+            verbose: true
+        });
+    });
+    it('bad package.json', () => {
+        process.chdir(path.resolve(__dirname, 'data/'));
+        (() => Commands.validateGetArgs({
+            _: ['get']
+        })).should.throw(' not a valid cicero template. Make sure that package.json exists and that it has a cicero entry.');
+    });
+});
+
+describe('#get', async () => {
+    it('should get dependencies for a template', async () => {
+        const dir = await tmp.dir({ unsafeCleanup: true });
+        await Commands.get(template, dir.path);
+        fs.readdirSync(dir.path).length.should.be.above(0);
+        dir.cleanup();
     });
 });
 
