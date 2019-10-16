@@ -130,7 +130,7 @@ require('yargs')
             type: 'string'
         });
         yargs.option('overwrite', {
-            describe: 'overwrite the contrct text',
+            describe: 'overwrite the contract text',
             type: 'boolean',
             default: false
         });
@@ -210,6 +210,54 @@ require('yargs')
                 warnings: argv.warnings,
             };
             return Commands.execute(argv.template, argv.sample, argv.request, argv.state, argv.currentTime, options)
+                .then((result) => {
+                    if(result) {Logger.info(JSON.stringify(result));}
+                })
+                .catch((err) => {
+                    Logger.error(err.message);
+                });
+        } catch (err){
+            Logger.error(err.message);
+        }
+    })
+    .command('invoke', 'invoke a clause of the contract', (yargs) => {
+        yargs.option('template', {
+            describe: 'path to the template',
+            type: 'string'
+        });
+        yargs.option('sample', {
+            describe: 'path to the contract text',
+            type: 'string'
+        });
+        yargs.option('clauseName', {
+            describe: 'the name of the clause to invoke',
+            type: 'string'
+        });
+        yargs.option('params', {
+            describe: 'path to the parameters',
+            type: 'string'
+        });
+        yargs.option('state', {
+            describe: 'path to the JSON state',
+            type: 'string'
+        });
+        yargs.option('currentTime', {
+            describe: 'execute with this current time',
+            type: 'string',
+            default: null
+        });
+        yargs.option('warnings', {
+            describe: 'print warnings',
+            type: 'boolean',
+            default: false
+        });
+    }, (argv) => {
+        try {
+            argv = Commands.validateInvokeArgs(argv);
+            const options = {
+                warnings: argv.warnings,
+            };
+            return Commands.invoke(argv.template, argv.sample, argv.clauseName, argv.params, argv.state, argv.currentTime, options)
                 .then((result) => {
                     if(result) {Logger.info(JSON.stringify(result));}
                 })
