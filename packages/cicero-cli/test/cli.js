@@ -34,6 +34,7 @@ const templateArchive = path.resolve(__dirname, 'data/latedeliveryandpenalty.cta
 const sample = path.resolve(__dirname, 'data/latedeliveryandpenalty/', 'sample.md');
 const data = path.resolve(__dirname, 'data/latedeliveryandpenalty/', 'data.json');
 const request = path.resolve(__dirname, 'data/latedeliveryandpenalty/', 'request.json');
+const params = path.resolve(__dirname, 'data/latedeliveryandpenalty/', 'params.json');
 const state = path.resolve(__dirname, 'data/latedeliveryandpenalty/', 'state.json');
 const dataOut = path.resolve(__dirname, 'data/latedeliveryandpenalty/', 'data_out.json');
 const sampleOut = path.resolve(__dirname, 'data/latedeliveryandpenalty/', 'sample_out.md');
@@ -60,6 +61,7 @@ const sampleErr = path.resolve(__dirname, 'data/latedeliveryandpenalty/', 'sampl
 const dataErr = path.resolve(__dirname, 'data/latedeliveryandpenalty/', 'data_err.json');
 const stateErr = path.resolve(__dirname, 'data/latedeliveryandpenalty/', 'state_err.json');
 const requestErr = path.resolve(__dirname, 'data/latedeliveryandpenalty/', 'request_err.json');
+const paramsErr = path.resolve(__dirname, 'data/latedeliveryandpenalty/', 'params_err.json');
 
 describe('#validateParseArgs', () => {
     it('no args specified', () => {
@@ -572,6 +574,127 @@ describe('#execute-javascript', () => {
     });
 });
 
+describe('#validateInvokeArgs', () => {
+    it('no args specified', () => {
+        process.chdir(path.resolve(__dirname, 'data/latedeliveryandpenalty/'));
+        const args  = Commands.validateInvokeArgs({
+            _: ['invoke'],
+        });
+        args.template.should.match(/cicero-cli[/\\]test[/\\]data[/\\]latedeliveryandpenalty$/);
+        args.sample.should.match(/sample.md$/);
+        args.params.should.match(/params.json$/);
+    });
+    it('all args specified', () => {
+        process.chdir(path.resolve(__dirname, 'data/latedeliveryandpenalty/'));
+        const args  = Commands.validateInvokeArgs({
+            _: ['invoke'],
+            template: './',
+            sample: 'sample.md',
+            state: 'state.json'
+        });
+        args.template.should.match(/cicero-cli[/\\]test[/\\]data[/\\]latedeliveryandpenalty$/);
+        args.sample.should.match(/sample.md$/);
+    });
+    it('all args specified, parent folder', () => {
+        process.chdir(path.resolve(__dirname, 'data/'));
+        const args  = Commands.validateInvokeArgs({
+            _: ['invoke'],
+            template: 'latedeliveryandpenalty',
+            sample: 'latedeliveryandpenalty/sample.md',
+            state: 'latedeliveryandpenalty/state.json'
+        });
+        args.template.should.match(/cicero-cli[/\\]test[/\\]data[/\\]latedeliveryandpenalty$/);
+        args.sample.should.match(/sample.md$/);
+    });
+    it('all args specified, parent folder, no sample, no state', () => {
+        process.chdir(path.resolve(__dirname, 'data/'));
+        const args  = Commands.validateInvokeArgs({
+            _: ['invoke'],
+            template: 'latedeliveryandpenalty',
+        });
+        args.template.should.match(/cicero-cli[/\\]test[/\\]data[/\\]latedeliveryandpenalty$/);
+        args.sample.should.match(/sample.md$/);
+    });
+    it('all args specified, child folder, no sample', () => {
+        process.chdir(path.resolve(__dirname, 'data/latedeliveryandpenalty/grammar'));
+        const args  = Commands.validateInvokeArgs({
+            _: ['invoke'],
+            template: '../',
+        });
+        args.template.should.match(/cicero-cli[/\\]test[/\\]data[/\\]latedeliveryandpenalty$/);
+        args.sample.should.match(/sample.md$/);
+    });
+    it('no flags specified', () => {
+        const args  = Commands.validateInvokeArgs({
+            _: ['invoke', path.resolve(__dirname, 'data/latedeliveryandpenalty/')],
+        });
+        args.template.should.match(/cicero-cli[/\\]test[/\\]data[/\\]latedeliveryandpenalty$/);
+        args.sample.should.match(/sample.md$/);
+    });
+    it('verbose flag specified', () => {
+        process.chdir(path.resolve(__dirname, 'data/latedeliveryandpenalty/'));
+        Commands.validateInvokeArgs({
+            _: ['invoke'],
+            verbose: true
+        });
+    });
+    it('bad package.json', () => {
+        process.chdir(path.resolve(__dirname, 'data/'));
+        (() => Commands.validateInvokeArgs({
+            _: ['invoke'],
+        })).should.throw(' not a valid cicero template. Make sure that package.json exists and that it has a cicero entry.');
+    });
+    it('bad sample.md', () => {
+        process.chdir(path.resolve(__dirname, 'data/latedeliveryandpenalty/'));
+        (() => Commands.validateInvokeArgs({
+            _: ['invoke'],
+            sample: 'sample_en.md'
+        })).should.throw('A sample.md file is required. Try the --sample flag or create a sample.md in the root folder of your template.');
+    });
+    it('bad requestjson', () => {
+        process.chdir(path.resolve(__dirname, 'data/latedeliveryandpenalty/'));
+        (() => Commands.validateInvokeArgs({
+            _: ['invoke'],
+            params: 'params1.json'
+        })).should.throw('A params.json file is required. Try the --params flag or create a params.json in the root folder of your template.');
+    });
+});
+
+describe('#invoke', () => {
+    it('should invoke a clause using a template', async () => {
+        const response = await Commands.invoke(template, sample, 'latedeliveryandpenalty', params, state);
+        response.response.$class.should.be.equal('org.accordproject.latedeliveryandpenalty.LateDeliveryAndPenaltyResponse');
+        response.response.penalty.should.be.equal(4);
+        response.response.buyerMayTerminate.should.be.equal(true);
+    });
+
+    it('should invoke a clause using a template archive', async () => {
+        const response = await Commands.invoke(templateArchive, sample, 'latedeliveryandpenalty', params, state);
+        response.response.$class.should.be.equal('org.accordproject.latedeliveryandpenalty.LateDeliveryAndPenaltyResponse');
+        response.response.penalty.should.be.equal(4);
+        response.response.buyerMayTerminate.should.be.equal(true);
+    });
+
+    it('should invoke with default state when state is not found', async () => {
+        const response = await Commands.invoke(template, sample, 'latedeliveryandpenalty', params, stateErr);
+        response.response.$class.should.be.equal('org.accordproject.latedeliveryandpenalty.LateDeliveryAndPenaltyResponse');
+        response.response.penalty.should.be.equal(4);
+        response.response.buyerMayTerminate.should.be.equal(true);
+    });
+
+    it('should fail invoke on a bogus request', async () => {
+        const response = await Commands.invoke(template, sample, paramsErr, state);
+        should.equal(response,undefined);
+    });
+
+    it('should invoke a clause using a template (with currentTime set)', async () => {
+        const response = await Commands.invoke(template, sample, 'latedeliveryandpenalty', params, state, '2017-12-19T17:38:01Z');
+        response.response.$class.should.be.equal('org.accordproject.latedeliveryandpenalty.LateDeliveryAndPenaltyResponse');
+        response.response.penalty.should.be.equal(3.1111111111111107);
+        response.response.buyerMayTerminate.should.be.equal(false);
+    });
+});
+
 describe('#validateInitializeArgs', () => {
     it('no args specified', () => {
         process.chdir(path.resolve(__dirname, 'data/latedeliveryandpenalty/'));
@@ -749,7 +872,7 @@ describe('#validateArchiveArgs', () => {
     it('bad package.json', () => {
         process.chdir(path.resolve(__dirname, 'data/'));
         (() => Commands.validateArchiveArgs({
-            _: ['execute']
+            _: ['archive']
         })).should.throw(' not a valid cicero template. Make sure that package.json exists and that it has a cicero entry.');
     });
 });

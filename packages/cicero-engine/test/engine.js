@@ -117,6 +117,69 @@ describe('EngineLatePenalty', () => {
             result.response.buyerMayTerminate.should.equal(true);
         });
     });
+
+    describe('#invokeergo', function () {
+
+        it('should invoke a late delivery and penalty smart clause', async function () {
+            const params = { 'request' : {} };
+            params.request.$class = 'org.accordproject.latedeliveryandpenalty.LateDeliveryAndPenaltyRequest';
+            params.request.forceMajeure = false;
+            params.request.agreedDelivery = '2017-10-07T16:38:01Z';
+            params.request.goodsValue = 200.00;
+            params.request.transactionId = '402c8f50-9e61-433e-a7c1-afe61c06ef00';
+            const state = {};
+            state.$class = 'org.accordproject.cicero.contract.AccordContractState';
+            state.stateId = '1';
+            const result = await engine.invoke(clause, 'latedeliveryandpenalty', params, state, '2017-11-12T17:38:01Z');
+            result.should.not.be.null;
+            result.response.penalty.should.equal(110);
+            result.response.buyerMayTerminate.should.equal(true);
+        });
+
+        it('should invoke a late delivery and penalty smart clause in the ET timezone', async function () {
+            const params = { 'request' : {} };
+            params.request.$class = 'org.accordproject.latedeliveryandpenalty.LateDeliveryAndPenaltyRequest';
+            params.request.forceMajeure = false;
+            params.request.agreedDelivery = '2017-11-10T16:38:01-05:00';
+            params.request.goodsValue = 200.00;
+            params.request.transactionId = '402c8f50-9e61-433e-a7c1-afe61c06ef00';
+            const state = {};
+            state.$class = 'org.accordproject.cicero.contract.AccordContractState';
+            state.stateId = '1';
+            const result = await engine.invoke(clause, 'latedeliveryandpenalty', params, state, '2017-11-12T17:38:01-05:00');
+            result.should.not.be.null;
+            result.response.penalty.should.equal(21);
+            result.response.buyerMayTerminate.should.equal(false);
+        });
+
+        it('should fail to invoke if the current time is not in the right format', async function () {
+            const params = { 'request' : {} };
+            params.request.$class = 'org.accordproject.latedeliveryandpenalty.LateDeliveryAndPenaltyRequest';
+            params.request.forceMajeure = false;
+            params.request.agreedDelivery = '2017-11-10T16:38:01-05:00';
+            params.request.goodsValue = 200.00;
+            params.request.transactionId = '402c8f50-9e61-433e-a7c1-afe61c06ef00';
+            const state = {};
+            state.$class = 'org.accordproject.cicero.contract.AccordContractState';
+            state.stateId = '1';
+            return engine.invoke(clause, 'latedeliveryandpenalty', params, state, '2017-11-12').should.be.rejectedWith('2017-11-12 is not a valid moment with the format \'YYYY-MM-DDTHH:mm:ssZ\'');
+        });
+
+        it('should invoke a late delivery and penalty smart clause with a time period', async function () {
+            const params = { 'request' : {} };
+            params.request.$class = 'org.accordproject.simplelatedeliveryandpenalty.SimpleLateDeliveryAndPenaltyRequest';
+            params.request.agreedDelivery = '2017-10-07T16:38:01Z';
+            params.request.goodsValue = 200.00;
+            params.request.transactionId = '402c8f50-9e61-433e-a7c1-afe61c06ef00';
+            const state = {};
+            state.$class = 'org.accordproject.cicero.contract.AccordContractState';
+            state.stateId = '1';
+            const result = await engine.invoke(clause2, 'latedeliveryandpenalty', params, state, '2019-11-12T17:38:01Z');
+            result.should.not.be.null;
+            result.response.penalty.should.equal(87.5);
+            result.response.buyerMayTerminate.should.equal(true);
+        });
+    });
 });
 
 describe('EngineLatePenalty (JavaScript)', () => {
@@ -263,6 +326,7 @@ Thank you!`);
         });
     });
 });
+
 describe('EngineHelloModule', () => {
 
     let engine;
@@ -294,6 +358,7 @@ describe('EngineHelloModule', () => {
         });
     });
 });
+
 describe('EngineHelloEmit', () => {
 
     let engine;
@@ -327,6 +392,7 @@ describe('EngineHelloEmit', () => {
         });
     });
 });
+
 describe('EngineHelloEmitInit', () => {
 
     let engine;
@@ -353,6 +419,7 @@ describe('EngineHelloEmitInit', () => {
         });
     });
 });
+
 describe('EngineSaft', () => {
 
     let engine;
@@ -402,6 +469,7 @@ describe('EngineSaft', () => {
     });
 
 });
+
 describe('BogusClauses', () => {
     let engine;
     let clause;

@@ -279,33 +279,6 @@ class Commands {
     }
 
     /**
-     * Initializes a sample text using a template
-     *
-     * @param {string} templatePath - path to the template directory or archive
-     * @param {string} samplePath - to the sample file
-     * @param {string} currentTime - the definition of 'now'
-     * @param {Object} [options] - an optional set of options
-     * @returns {object} Promise to the result of execution
-     */
-    static initialize(templatePath, samplePath, currentTime, options) {
-        let clause;
-        const sampleText = fs.readFileSync(samplePath, 'utf8');
-
-        const engine = new Engine();
-        return Commands.loadTemplate(templatePath, options)
-            .then((template) => {
-                // Initialize clause
-                clause = new Clause(template);
-                clause.parse(sampleText, currentTime);
-
-                return engine.init(clause, currentTime);
-            })
-            .catch((err) => {
-                Logger.error(err.message);
-            });
-    }
-
-    /**
      * Set default params before we execute a template
      *
      * @param {object} argv the inbound argument values object
@@ -377,6 +350,64 @@ class Commands {
     }
 
     /**
+     * Set default params before we invoke a clause
+     *
+     * @param {object} argv the inbound argument values object
+     * @returns {object} a modfied argument object
+     */
+    static validateInvokeArgs(argv) {
+        argv = Commands.validateCommonArgs(argv);
+        argv = Commands.setDefaultFileArg(argv, 'sample', 'sample.md', ((argv, argDefaultName) => { return path.resolve(argv.template,argDefaultName); }));
+        argv = Commands.setDefaultFileArg(argv, 'params', 'params.json', ((argv, argDefaultName) => { return [path.resolve(argv.template,argDefaultName)]; }));
+
+        if(argv.verbose) {
+            Logger.info(`initialize sample ${argv.sample} using a template ${argv.template}`);
+        }
+
+        return argv;
+    }
+
+    /**
+     * Invoke a sample text using a template
+     *
+     * @param {string} templatePath - path to the template directory or archive
+     * @param {string} samplePath - to the sample file
+     * @param {string} clauseName the name of the clause to invoke
+     * @param {object} paramsPath the parameters for the clause
+     * @param {string} statePath - to the state file
+     * @param {string} currentTime - the definition of 'now'
+     * @param {Object} [options] - an optional set of options
+     * @returns {object} Promise to the result of execution
+     */
+    static invoke(templatePath, samplePath, clauseName, paramsPath, statePath, currentTime, options) {
+        let clause;
+        const sampleText = fs.readFileSync(samplePath, 'utf8');
+        const paramsJson = JSON.parse(fs.readFileSync(paramsPath, 'utf8'));
+
+        const engine = new Engine();
+        return Commands.loadTemplate(templatePath, options)
+            .then(async (template) => {
+                // Initialize clause
+                clause = new Clause(template);
+                clause.parse(sampleText, currentTime);
+
+                let stateJson;
+                if(!fs.existsSync(statePath)) {
+                    Logger.warn('A state file was not provided, initializing state. Try the --state flag or create a state.json in the root folder of your template.');
+                    const initResult = await engine.init(clause, currentTime);
+                    stateJson = initResult.state;
+                } else {
+                    stateJson = JSON.parse(fs.readFileSync(statePath, 'utf8'));
+                }
+
+                return engine.invoke(clause, clauseName, paramsJson, stateJson, currentTime);
+            })
+            .catch((err) => {
+                Logger.error(err.message);
+            });
+    }
+
+    /**
      * Set default params before we initialize a template
      *
      * @param {object} argv the inbound argument values object
@@ -391,6 +422,33 @@ class Commands {
         }
 
         return argv;
+    }
+
+    /**
+     * Initializes a sample text using a template
+     *
+     * @param {string} templatePath - path to the template directory or archive
+     * @param {string} samplePath - to the sample file
+     * @param {string} currentTime - the definition of 'now'
+     * @param {Object} [options] - an optional set of options
+     * @returns {object} Promise to the result of execution
+     */
+    static initialize(templatePath, samplePath, currentTime, options) {
+        let clause;
+        const sampleText = fs.readFileSync(samplePath, 'utf8');
+
+        const engine = new Engine();
+        return Commands.loadTemplate(templatePath, options)
+            .then((template) => {
+                // Initialize clause
+                clause = new Clause(template);
+                clause.parse(sampleText, currentTime);
+
+                return engine.init(clause, currentTime);
+            })
+            .catch((err) => {
+                Logger.error(err.message);
+            });
     }
 
     /**
@@ -438,7 +496,7 @@ class Commands {
             });
     }
     /**
-     * Converts the model for a template into code
+     * Compile the template to a given target
      *
      * @param {string} templatePath - path to the template directory or archive
      * @param {string} target - the target format to generate
