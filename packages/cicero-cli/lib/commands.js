@@ -562,7 +562,6 @@ class Commands {
         return argv;
     }
 
-
     /**
      * Fetches all external for a set of models dependencies and
      * saves all the models to a target directory
