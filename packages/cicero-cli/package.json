@@ -46,13 +46,14 @@
     "chai-things": "0.2.0",
     "cucumber": "5.1.0",
     "eslint": "6.0.1",
+    "jsdoc": "3.6.3",
     "license-check": "1.1.5",
     "mocha": "6.1.4",
     "nyc": "14.1.1",
     "tmp-promise": "2.0.2"
   },
   "dependencies": {
-    "@accordproject/concerto-core": "0.81.1",
+    "@accordproject/concerto-core": "0.82.1-20191017153557",
     "@accordproject/cicero-core": "0.20.0-alpha.2",
     "@accordproject/cicero-engine": "0.20.0-alpha.2",
     "@accordproject/cicero-test": "0.20.0-alpha.2",

@@ -73,8 +73,8 @@ app.post('/execute/:template/:data', async function (req, httpResponse, next) {
         const engine = new Engine();
         let result;
         if(Object.keys(req.body).length === 2 &&
-        req.body.hasOwnProperty('request') &&
-        req.body.hasOwnProperty('state')) {
+           Object.prototype.hasOwnProperty.call(req.body,'request') &&
+           Object.prototype.hasOwnProperty.call(req.body,'state')) {
             result = await engine.execute(clause, req.body.request, req.body.state);
         } else {
             // Add empty state in input, remove it on output

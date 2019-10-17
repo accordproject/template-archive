@@ -42,14 +42,15 @@
     "chai": "4.2.0",
     "chai-things": "0.2.0",
     "cucumber": "5.1.0",
-    "eslint": "4.19.1",
+    "eslint": "6.0.1",
+    "jsdoc": "3.6.3",
     "license-check": "1.1.5",
     "mocha": "6.1.4",
     "nyc": "14.1.1"
   },
   "dependencies": {
     "@accordproject/cicero-core": "0.20.0-alpha.2",
-    "@accordproject/ergo-engine": "0.20.0-20191014193310",
+    "@accordproject/ergo-engine": "0.20.0-20191017180116",
     "moment-mini": "2.22.1"
   },
   "license-check-config": {
