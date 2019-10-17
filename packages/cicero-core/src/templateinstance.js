@@ -24,7 +24,6 @@ const moment = require('moment-mini');
 moment.fn.toJSON = Util.momentToJson;
 const TemplateLoader = require('./templateloader');
 const ErgoEngine = require('@accordproject/ergo-engine/index.browser.js').EvalEngine;
-const RelationshipDeclaration = require('@accordproject/concerto-core').RelationshipDeclaration;
 
 /**
  * A TemplateInstance is an instance of a Clause or Contract template. It is executable business logic, linked to
@@ -205,109 +204,6 @@ class TemplateInstance {
             return this.getTemplate().getParserManager().roundtripMarkdown(result.response);
         });
     }
-
-    /**
-     * Converts a concerto object to a string
-     * @param {ClassDeclaration} clazz - the concerto classdeclaration
-     * @param {object} obj - the instance to convert
-     * @returns {string} the parseable string representation of the object
-     * @private
-     */
-    convertClassToString(clazz, obj) {
-        const properties = clazz.getProperties();
-        let result = '';
-        for(let n=0; n < properties.length; n++) {
-            const child = properties[n];
-            result += this.convertPropertyToString(child, obj[child.getName()]);
-
-            if(n < properties.length-1) {
-                result += ' ';
-            }
-        }
-
-        return result;
-    }
-
-    /**
-     * Returns moment Date object parsed using a format string
-     * @param {Date} date - date/time string to parse
-     * @param {string} format - the optional format string. If not specified
-     * this defaults to 'MM/DD/YYYY'
-     * @returns {string} ISO-8601 formatted date as a string
-     * @private
-     */
-    static formatDateTime(date, format) {
-        if(!format) {
-            format = 'MM/DD/YYYY';
-        }
-        const instance = moment.parseZone(date);
-        return instance.format(format);
-    }
-
-
-    /**
-     * Converts a concerto object to a string
-     * @param {Property} property - the concerto property
-     * @param {object} obj - the instance to convert
-     * @param {string} format - the optional format string to use
-     * @returns {string} the parseable string representation of the object
-     * @private
-     */
-    convertPropertyToString(property, obj, format) {
-
-        if(property.isOptional() === false && !obj) {
-            throw new Error(`Required property ${property.getFullyQualifiedName()} is null.`);
-        }
-
-        if(property instanceof RelationshipDeclaration) {
-            return `"${obj.getIdentifier()}"`;
-        }
-
-        if(property.isTypeEnum()) {
-            return obj;
-        }
-
-        if(format) {
-            // strip quotes
-            format = format.substr(1, format.length-2);
-        }
-
-        // uncomment this code when the templates support arrays
-        // if(property.isArray()) {
-        //     let result = '';
-        //     for(let n=0; n < obj.length; n++) {
-        //         result += this.convertPropertyToString(this.getTemplate().getTemplateModel().
-        //             getModelFile().getModelManager().getType(property.getFullyQualifiedTypeName()), obj[n] );
-
-        //         if(n < obj.length-1) {
-        //             result += ' ';
-        //         }
-        //     }
-        //     return result;
-        // }
-
-        switch(property.getFullyQualifiedTypeName()) {
-        case 'String':
-            return `"${obj}"`;
-        case 'Integer':
-        case 'Long':
-        case 'Double':
-            return obj.toString();
-        case 'DateTime':
-            return TemplateInstance.formatDateTime(obj, format);
-        case 'Boolean':
-            if(obj) {
-                return 'true';
-            }
-            else {
-                return 'false';
-            }
-        default:
-            return this.convertClassToString(this.getTemplate().getTemplateModel().
-                getModelFile().getModelManager().getType(property.getFullyQualifiedTypeName()), obj);
-        }
-    }
-
 
     /**
      * Returns the identifier for this clause. The identifier is the identifier of
