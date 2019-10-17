@@ -19,7 +19,7 @@
 
 ## Introduction
 
-Cicero allows you to define natural language contract and clause templates that can be executed by a computer. These could be relatively simple things like `if the goods are more than [{DAYS}] late, then notify the supplier of the goods, with the message [{MESSAGE}].` or more elaborate natural language and logic such as computing interest on a loan, or calculating penalties based on IoT sensor readings.
+Cicero allows you to define natural language contract and clause templates that can be executed by a computer. These could be relatively simple things like `if the goods are more than {{DAYS}} late, then notify the supplier of the goods, with the message {{MESSAGE}}.` or more elaborate natural language and logic such as computing interest on a loan, or calculating penalties based on IoT sensor readings.
 
 You can browse the library of Open Source Cicero contract and clause templates at: https://templates.accordproject.org.
 
