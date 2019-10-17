@@ -22,7 +22,7 @@ module.exports.XmlSchemaVisitor = require('@accordproject/concerto-tools').CodeG
 module.exports.PlantUMLVisitor = require('@accordproject/concerto-tools').CodeGen.PlantUMLVisitor;
 module.exports.TypescriptVisitor = require('@accordproject/concerto-tools').CodeGen.TypescriptVisitor;
 module.exports.JavaVisitor = require('@accordproject/concerto-tools').CodeGen.JavaVisitor;
-module.exports.FileWriter = require('@accordproject/concerto-core').FileWriter;
+module.exports.FileWriter = require('@accordproject/concerto-tools').FileWriter;
 
 module.exports.CordaVisitor = require('./fromcto/corda/cordavisitor');
 
