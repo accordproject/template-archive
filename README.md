@@ -19,9 +19,9 @@
 
 ## Introduction
 
-Cicero allows you to define natural language contract and clause templates that can be executed by a computer. These could be relatively simple things like `if the goods are more than {{DAYS}} late, then notify the supplier of the goods, with the message {{MESSAGE}}.` or more elaborate natural language and logic such as computing interest on a loan, or calculating penalties based on IoT sensor readings.
+Cicero allows you to define natural language contract and clause templates that can be executed by a computer. These could be relatively simple things like `If the goods are more than {{DAYS}} late, then notify the supplier of the goods, with the message {{MESSAGE}}.` or more elaborate natural language and logic such as computing interest on a loan, or calculating penalties based on IoT sensor readings.
 
-You can browse the library of Open Source Cicero contract and clause templates at: https://templates.accordproject.org.
+You can browse the library of Open Source Cicero contract and clause templates at https://templates.accordproject.org.
 
 Cicero is an Open Source implementation of the [Accord Project Template Specification][apspec]. It defines the structure of natural language templates, bound to a data model, that can be executed using request/response JSON messages.
 
@@ -29,7 +29,7 @@ You can read the latest user documentation here: http://docs.accordproject.org.
 
 ## Smart Clause
 
-Using Cicero you can take any existing natural language text (typically a clause or a contract) and declaratively bind it to a data model. Cicero generates a parser (using the Earley parser algorithm) to parse and validate source text, extracting machine readable/computable data. The Cicero engine can then be used to execute a Smart Clause (an instance of a template) against a JSON payload. Smart Clause software can be used to add computable functionality to any document. Clauses are typically stateless (idempotent) functions. They receive an incoming request and the template data, and they produce a response.
+Using Cicero you can take any existing natural language text (typically a clause or a contract) and declaratively bind it to a data model. Cicero generates a parser (using the Earley parser algorithm) to parse and validate source text, extracting machine-readable/computable data. The Cicero engine can then be used to execute a Smart Clause (an instance of a template) against a JSON payload. Smart Clause software can be used to add computable functionality to any document. Clauses are typically stateless (idempotent) functions. They receive an incoming request and the template data, and they produce a response.
 
 ## Get Involved!
 
@@ -56,7 +56,7 @@ Top level repository (cicero), with sub packages. Each sub-package is published 
   </a>
 </p>
 
-Accord Project is an open source, non-profit, initiative working to transform contract management and contract automation by digitizing contracts. Accord Project operates under the umbrella of the [Linux Foundation][linuxfound]. The technical charter for the Accord Project can be found [here][charter].
+Accord Project is an open-source, non-profit, initiative working to transform contract management and contract automation by digitizing contracts. Accord Project operates under the umbrella of the [Linux Foundation][linuxfound]. The technical charter for the Accord Project can be found [here][charter].
 
 ## Learn More About Accord Project
 
@@ -288,7 +288,7 @@ Accord Project is an open source, non-profit, initiative working to transform co
 
 ## Contributing
 
-The Accord Project technology is being developed as open source. All the software packages are being actively maintained on GitHub and we encourage organizations and individuals to contribute requirements, documentation, issues, new templates, and code.
+The Accord Project technology is being developed as open-source. All the software packages are being actively maintained on GitHub and we encourage organizations and individuals to contribute requirements, documentation, issues, new templates, and code.
 
 Find out what’s coming on our [blog][apblog].
 
