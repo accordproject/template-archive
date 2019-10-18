@@ -27,7 +27,6 @@ function _exit(){
 function _abortBuild(){
     echo "ABORT_BUILD=true" > ${DIR}/build.cfg
     echo "ABORT_CODE=$1" >> ${DIR}/build.cfg
-    echo "BUILD_FOCUS=${BUILD_FOCUS}" >> ${DIR}/build.cfg
     echo "BUILD_RELEASE=${BUILD_RELEASE}" >> ${DIR}/build.cfg
 }
 
@@ -37,21 +36,19 @@ if [ ! -f ${DIR}/build.cfg ]; then
     echo "ABORT_BUILD=false" > ${DIR}/build.cfg
     echo "ABORT_CODE=0" >> ${DIR}/build.cfg
     ## determine the build type here
-    if [ -z "${TRAVIS_TAG}" ]; then
+    if [[ -z "${TRAVIS_TAG}" ]]; then
         BUILD_RELEASE="unstable"
-        BUILD_FOCUS="latest"
+    elif [[ "${TRAVIS_TAG}" == *"-alpha"* ]] || [[ "${TRAVIS_TAG}" == *"-beta"* ]]; then
+        BUILD_RELEASE="alpha"
     else
         BUILD_RELEASE="stable"
-        BUILD_FOCUS="latest"
     fi
 
-    echo "BUILD_FOCUS=${BUILD_FOCUS}" >> ${DIR}/build.cfg
     echo "BUILD_RELEASE=${BUILD_RELEASE}" >> ${DIR}/build.cfg
 fi
 
 source ${DIR}/build.cfg
 
-echo "--I-- Build focus is ${BUILD_FOCUS}"
 echo "--I-- Build release is ${BUILD_RELEASE}"
 
 if [ "${ABORT_BUILD}" == "true" ]; then

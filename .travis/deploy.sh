@@ -55,14 +55,16 @@ if [[ "${BUILD_RELEASE}" == "unstable" ]]; then
     npm run pkgstamp
    
     TAG="unstable"
-elif  [[ "${BUILD_RELEASE}" == "stable" ]]; then
+elif [[ "${BUILD_RELEASE}" == "alpha" ]]; then
+    TAG="unstable"
+elif [[ "${BUILD_RELEASE}" == "stable" ]]; then
     TAG="latest"
-else 
-    _exit "Unknown build focus" 1 
+else
+    _exit "Unknown build release" 1 
 fi
 
-## Stable releases only; both latest and next then clean up git, and bump version number
-if [[ "${BUILD_RELEASE}" = "stable" ]]; then
+## Stable or alpha/beta releases only; both latest and next then clean up git, and bump version number
+if [[ "${BUILD_RELEASE}" = "stable" ]] || [[ "${BUILD_RELEASE}" = "alpha" ]]; then
 
     # Configure the Git repository and clean any untracked and unignored build files.
     git config user.name "${GH_USER_NAME}"
