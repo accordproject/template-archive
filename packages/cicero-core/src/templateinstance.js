@@ -87,6 +87,14 @@ class TemplateInstance {
     }
 
     /**
+     * Get the current Ergo engine
+     * @return {object} - the data for the clause, or null if it has not been set
+     */
+    getEngine() {
+        return this.ergoEngine;
+    }
+
+    /**
      * Get the data for the clause. This is a Concerto object. To retrieve the
      * plain JS object suitable for serialization call toJSON() and retrieve the `data` property.
      * @return {object} - the data for the clause, or null if it has not been set
@@ -199,7 +207,7 @@ class TemplateInstance {
         const contract = this.getData();
 
         return logicManager.compileLogic(false).then(async () => {
-            const result = await this.ergoEngine.generateText(logicManager,clauseId,contract,{},currentTime,markdownOptions);
+            const result = await this.getEngine().generateText(logicManager,clauseId,contract,{},currentTime,markdownOptions);
             // Roundtrip the response through the Commonmark parser
             return this.getTemplate().getParserManager().roundtripMarkdown(result.response);
         });
