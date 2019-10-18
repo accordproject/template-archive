@@ -1,6 +1,6 @@
 {
   "name": "@accordproject/cicero-core",
-  "version": "0.20.0-alpha.2",
+  "version": "0.20.0-beta.1",
   "description": "Cicero Core - Implementation of Accord Protocol Template Specification",
   "engines": {
     "node": ">=8",
