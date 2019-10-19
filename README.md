@@ -1,5 +1,5 @@
 <p align="center">
-  <a href="./cicero.png">
+  <a href="https://www.accordproject.org/projects/cicero">
     <img src="./cicero.png" alt="Cicero logo">
   </a>
 </p>
