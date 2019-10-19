@@ -75,3 +75,6 @@ typings/
 
 # User Data
 userdata.json
+
+# Windows directory cache
+thumbs.db
