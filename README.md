@@ -216,7 +216,8 @@ Accord Project is an open source, non-profit, initiative working to transform co
     <tr>
       <td headers>Markdown Editor</td>
       <td headers><a href="https://github.com/accordproject/markdown-editor">markdown-editor</a></td>
-      <td headers><img src="https://badge.fury.io/js/%40accordproject%2Fmarkdown-editor.svg" alt="npm version"></a></td>
+      <td headers> <a href="https://badge.fury.io/js/%40accordproject%2Fmarkdown-editor">
+      <img src="https://badge.fury.io/js/%40accordproject%2Fmarkdown-editor.svg" alt="npm version"></a></td>
       <td headers>Text editor based on Slate.js.</td>
     </tr>
      <tr>
@@ -225,6 +226,12 @@ Accord Project is an open source, non-profit, initiative working to transform co
       <td headers="co3 c1"> <a href="https://badge.fury.io/js/%40accordproject%2Fcicero-ui"><img src="https://badge.fury.io/js/%40accordproject%2Fcicero-ui.svg" alt="npm version"></a></td>
        <td headers="co4 c1">Cicero-ui React component</td>
      </tr>
+      <tr>
+     <td headers="co1 c1">Concerto UI</td>
+     <td headers="co2 c1"><a href="https://github.com/accordproject/concerto-ui">concerto-ui</a></td>
+     <td headers="co3 c1"> <a href="https://badge.fury.io/js/%40accordproject%2Fconcerto-ui-react"><img src="https://badge.fury.io/js/%40accordproject%2Fconcerto-ui-react.svg" alt="npm version"></a></td>
+     <td headers="co4 c1">Dynamic web forms generated from Concerto models</td>
+    </tr>  
  </table>
 
 #### Template Editors:
