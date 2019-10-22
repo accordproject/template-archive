@@ -4,7 +4,6 @@
   </a>
 </p>
 
-
 <p align="center">
   <a href="https://travis-ci.org/accordproject/cicero"><img src="https://travis-ci.org/accordproject/cicero.svg?branch=master" alt="Build Status"></a>
   <a href="https://coveralls.io/github/accordproject/cicero?branch=master"><img src="https://coveralls.io/repos/github/accordproject/cicero/badge.svg?branch=master" alt="Coverage Status"></a>
@@ -12,9 +11,8 @@
   <a href="https://www.npmjs.com/package/@accordproject/cicero-cli"><img src="https://img.shields.io/npm/dm/@accordproject/cicero-cli" alt="downloads"></a>
   <a href="https://badge.fury.io/js/%40accordproject%2Fcicero-cli"><img src="https://badge.fury.io/js/%40accordproject%2Fcicero-cli.svg" alt="npm version"></a>
   <a href="https://accord-project-slack-signup.herokuapp.com/">
-    <img src="https://img.shields.io/badge/Accord%20Project-Join%20Slack-blue" alt="Join the Accord Project Slack" />
+    <img src="https://img.shields.io/badge/Accord%20Project-Join%20Slack-blue" alt="Join the Accord Project Slack"/>
   </a>
-  <a href="https://lerna.js.org/"><img src="https://img.shields.io/badge/maintained%20with-lerna-cc00ff.svg" alt="lerna"></a>
 </p>
 
 ## Introduction
@@ -31,12 +29,6 @@ You can read the latest user documentation here: http://docs.accordproject.org.
 
 Using Cicero you can take any existing natural language text (typically a clause or a contract) and declaratively bind it to a data model. Cicero generates a parser (using the Earley parser algorithm) to parse and validate source text, extracting machine readable/computable data. The Cicero engine can then be used to execute a Smart Clause (an instance of a template) against a JSON payload. Smart Clause software can be used to add computable functionality to any document. Clauses are typically stateless (idempotent) functions. They receive an incoming request and the template data, and they produce a response.
 
-## Get Involved!
-
-We are an open community and welcome both lawyers and technologists to work on the specifications and code. If you would like to get involved please join the Accord #technology-wg Slack channel by signing up here: https://www.accordproject.org.
-
-[Accord Technology Working Group weekly meeting][apworkgroup]
-
 ## Structure of the Code Repository
 
 Top level repository (cicero), with sub packages. Each sub-package is published as an independent npm module using `lerna`:
@@ -47,6 +39,14 @@ Top level repository (cicero), with sub packages. Each sub-package is published 
 * [cicero-test](https://github.com/accordproject/cicero/tree/master/packages/cicero-test) : Cucumber based testing for Accord Project legal templates
 * [cicero-tools](https://github.com/accordproject/cicero/tree/master/packages/cicero-tools) : Tools for generating code (UML, Java, etc.) from Accord Project legal templates
 * [generator-cicero-template](https://github.com/accordproject/cicero/tree/master/packages/generator-cicero-template): Utility to create a self-contained directory for a new Accord Project legal template
+
+## Installation
+
+To install the command-line interface:
+
+```
+npm install -g @accordproject/cicero-cli
+```
 
 ---
 
@@ -77,7 +77,6 @@ Accord Project is an open source, non-profit, initiative working to transform co
 * [Ergo Language Guide][docergo]
 
 ### Ecosystem
-
 
 #### Core libraries:
 <table>
@@ -181,7 +180,7 @@ Accord Project is an open source, non-profit, initiative working to transform co
      <th id="blank"></th>
      <td headers><a href="https://github.com/accordproject/markdown-transform/tree/master/packages/markdown-slate">markdown-slate</a></td>
      <td headers><a href="https://badge.fury.io/js/%40accordproject%2Fmarkdown-slate"><img src="https://badge.fury.io/js/%40accordproject%2Fmarkdown-slate.svg" alt="npm version"></a></td>
-     <td headers>Transform markdown to/from CommonMark AST</td>
+     <td headers>Transform markdown to/from CommonMark DOM</td>
      </tr>
      <tr>
      <td headers></td>
@@ -193,7 +192,7 @@ Accord Project is an open source, non-profit, initiative working to transform co
       <th id="blank"></th>
       <td headers><a href="https://github.com/accordproject/markdown-transform/tree/master/packages/markdown-cicero">markdown-cicero</a></td>
       <td headers><a href="https://badge.fury.io/js/%40accordproject%2Fmarkdown-cicero"><img src="https://badge.fury.io/js/%40accordproject%2Fmarkdown-cicero.svg" alt="npm version"></a></td>
-      <td headers>A framework for transforming markdown</td>
+      <td headers>Markdown extensions for contracts, clauses, variables etc.</td>
       </tr>
        <tr>
       <th id="blank"></th>
@@ -216,23 +215,22 @@ Accord Project is an open source, non-profit, initiative working to transform co
     <tr>
       <td headers>Markdown Editor</td>
       <td headers><a href="https://github.com/accordproject/markdown-editor">markdown-editor</a></td>
-      <td headers> <a href="https://badge.fury.io/js/%40accordproject%2Fmarkdown-editor">
-      <img src="https://badge.fury.io/js/%40accordproject%2Fmarkdown-editor.svg" alt="npm version"></a></td>
-      <td headers>Text editor based on Slate.js.</td>
+      <td headers><a href="https://badge.fury.io/js/%40accordproject%2Fmarkdown-editor"><img src="https://badge.fury.io/js/%40accordproject%2Fmarkdown-editor.svg" alt="npm version"></a></td>
+      <td headers>WYSIWYG rich text web editor for markdown based on Slate.js</td>
     </tr>
      <tr>
      <td headers="co1 c1">Cicero UI</td>
       <td headers="co2 c1"><a href="https://github.com/accordproject/cicero-ui">cicero-ui</a></td>
       <td headers="co3 c1"> <a href="https://badge.fury.io/js/%40accordproject%2Fcicero-ui"><img src="https://badge.fury.io/js/%40accordproject%2Fcicero-ui.svg" alt="npm version"></a></td>
-       <td headers="co4 c1">Cicero-ui React component</td>
+       <td headers="co4 c1">React UI components for Cicero</td>
      </tr>
-      <tr>
+     <tr>
      <td headers="co1 c1">Concerto UI</td>
-     <td headers="co2 c1"><a href="https://github.com/accordproject/concerto-ui">concerto-ui</a></td>
-     <td headers="co3 c1"> <a href="https://badge.fury.io/js/%40accordproject%2Fconcerto-ui-react"><img src="https://badge.fury.io/js/%40accordproject%2Fconcerto-ui-react.svg" alt="npm version"></a></td>
-     <td headers="co4 c1">Dynamic web forms generated from Concerto models</td>
-    </tr>  
- </table>
+      <td headers="co2 c1"><a href="https://github.com/accordproject/concerto-ui">concerto-ui</a></td>
+      <td headers="co3 c1"> <a href="https://badge.fury.io/js/%40accordproject%2Fconcerto-ui-react"><img src="https://badge.fury.io/js/%40accordproject%2Fconcerto-ui-react.svg" alt="npm version"></a></td>
+       <td headers="co4 c1">Dynamic web forms generated from Concerto models</td>
+     </tr>
+</table>
 
 #### Template Editors:
 
@@ -291,7 +289,6 @@ Accord Project is an open source, non-profit, initiative working to transform co
     <td headers><a href="https://github.com/accordproject/techdocs">techdocs</a></td>
   </tr>
  </table>
-
 
 ## Contributing
 
