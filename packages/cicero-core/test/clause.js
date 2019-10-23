@@ -30,14 +30,14 @@ const options = { skipUpdateExternalModels: true };
 
 describe('Clause', () => {
 
-    const testLatePenaltyInput = fs.readFileSync(path.resolve(__dirname, 'data/latedeliveryandpenalty', 'sample.md'), 'utf8');
-    const testLatePenaltyPeriodInput = fs.readFileSync(path.resolve(__dirname, 'data/latedeliveryandpenalty-period', 'sample.md'), 'utf8');
-    const testLatePenaltyCrInput = fs.readFileSync(path.resolve(__dirname, 'data/latedeliveryandpenalty-cr', 'sample.md'), 'utf8');
-    const testCongaInput = fs.readFileSync(path.resolve(__dirname, 'data/conga', 'sample.md'), 'utf8');
-    const testCongaErr = fs.readFileSync(path.resolve(__dirname, 'data/conga', 'sampleErr.md'), 'utf8');
-    const testAllTypesInput = fs.readFileSync(path.resolve(__dirname, 'data/alltypes', 'sample.md'), 'utf8');
-    const testAllBlocksInput = fs.readFileSync(path.resolve(__dirname, 'data/allblocks', 'sample.md'), 'utf8');
-    const testTextOnlyInput = fs.readFileSync(path.resolve(__dirname, 'data/text-only', 'sample.md'), 'utf8');
+    const testLatePenaltyInput = fs.readFileSync(path.resolve(__dirname, 'data/latedeliveryandpenalty', 'text/sample.md'), 'utf8');
+    const testLatePenaltyPeriodInput = fs.readFileSync(path.resolve(__dirname, 'data/latedeliveryandpenalty-period', 'text/sample.md'), 'utf8');
+    const testLatePenaltyCrInput = fs.readFileSync(path.resolve(__dirname, 'data/latedeliveryandpenalty-cr', 'text/sample.md'), 'utf8');
+    const testCongaInput = fs.readFileSync(path.resolve(__dirname, 'data/conga', 'text/sample.md'), 'utf8');
+    const testCongaErr = fs.readFileSync(path.resolve(__dirname, 'data/conga', 'text/sampleErr.md'), 'utf8');
+    const testAllTypesInput = fs.readFileSync(path.resolve(__dirname, 'data/alltypes', 'text/sample.md'), 'utf8');
+    const testAllBlocksInput = fs.readFileSync(path.resolve(__dirname, 'data/allblocks', 'text/sample.md'), 'utf8');
+    const testTextOnlyInput = fs.readFileSync(path.resolve(__dirname, 'data/text-only', 'text/sample.md'), 'utf8');
 
     describe('#constructor', () => {
 
@@ -58,7 +58,7 @@ describe('Clause', () => {
             try {
                 await Template.fromDirectory('./test/data/bad-binding', options);
             } catch (err) {
-                err.message.should.equal('Template references a property \'articipant\' that is not declared in the template model \'org.accordproject.conga.TemplateModel\' File grammar/template.tem line 1 column 3');
+                err.message.should.equal('Template references a property \'articipant\' that is not declared in the template model \'org.accordproject.conga.TemplateModel\' File text/grammar.tem.md line 1 column 3');
             }
         });
 
@@ -66,7 +66,7 @@ describe('Clause', () => {
             try {
                 await Template.fromDirectory('./test/data/bad-boolean-binding', options);
             } catch (err) {
-                err.message.should.equal('A boolean binding can only be used with a boolean property. Property participant has type Participant File grammar/template.tem line 1 column 7');
+                err.message.should.equal('A boolean binding can only be used with a boolean property. Property participant has type Participant File text/grammar.tem.md line 1 column 7');
             }
         });
 
@@ -74,7 +74,7 @@ describe('Clause', () => {
             try {
                 await Template.fromDirectory('./test/data/bad-formatted-binding', options);
             } catch (err) {
-                err.message.should.equal('Formatted types are currently only supported for DateTime properties. File grammar/template.tem line 1 column 3');
+                err.message.should.equal('Formatted types are currently only supported for DateTime properties. File text/grammar.tem.md line 1 column 3');
             }
         });
     });

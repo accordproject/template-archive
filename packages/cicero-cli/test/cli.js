@@ -31,13 +31,13 @@ const Commands = require('../lib/commands');
 const template = path.resolve(__dirname, 'data/latedeliveryandpenalty/');
 const templateJs = path.resolve(__dirname, 'data/latedeliveryandpenalty_js/');
 const templateArchive = path.resolve(__dirname, 'data/latedeliveryandpenalty.cta');
-const sample = path.resolve(__dirname, 'data/latedeliveryandpenalty/', 'sample.md');
+const sample = path.resolve(__dirname, 'data/latedeliveryandpenalty/', 'text/sample.md');
 const data = path.resolve(__dirname, 'data/latedeliveryandpenalty/', 'data.json');
 const request = path.resolve(__dirname, 'data/latedeliveryandpenalty/', 'request.json');
 const params = path.resolve(__dirname, 'data/latedeliveryandpenalty/', 'params.json');
 const state = path.resolve(__dirname, 'data/latedeliveryandpenalty/', 'state.json');
 const dataOut = path.resolve(__dirname, 'data/latedeliveryandpenalty/', 'data_out.json');
-const sampleOut = path.resolve(__dirname, 'data/latedeliveryandpenalty/', 'sample_out.md');
+const sampleOut = path.resolve(__dirname, 'data/latedeliveryandpenalty/', 'text/sample_out.md');
 const parseReponse = {
     '$class':'org.accordproject.latedeliveryandpenalty.TemplateModel',
     'forceMajeure':true,
@@ -57,7 +57,7 @@ const parseReponse = {
 };
 const draftResponse = 'Late Delivery and Penalty. In case of delayed delivery except for Force Majeure cases, the Seller shall pay to the Buyer for every 9 days of delay penalty amounting to 7.0% of the total value of the Equipment whose delivery has been delayed. Any fractional part of a days is to be considered a full days. The total amount of penalty shall not however, exceed 2.0% of the total value of the Equipment involved in late delivery. If the delay is more than 2 weeks, the Buyer is entitled to terminate this Contract.';
 
-const sampleErr = path.resolve(__dirname, 'data/latedeliveryandpenalty/', 'sample_err.md');
+const sampleErr = path.resolve(__dirname, 'data/latedeliveryandpenalty/', 'text/sample_err.md');
 const dataErr = path.resolve(__dirname, 'data/latedeliveryandpenalty/', 'data_err.json');
 const stateErr = path.resolve(__dirname, 'data/latedeliveryandpenalty/', 'state_err.json');
 const requestErr = path.resolve(__dirname, 'data/latedeliveryandpenalty/', 'request_err.json');
@@ -70,37 +70,37 @@ describe('#validateParseArgs', () => {
             _: ['parse'],
         });
         args.template.should.match(/cicero-cli[/\\]test[/\\]data[/\\]latedeliveryandpenalty$/);
-        args.sample.should.match(/sample.md$/);
+        args.sample.should.match(/text[/\\]sample.md$/);
     });
     it('all args specified', () => {
         process.chdir(path.resolve(__dirname, 'data/latedeliveryandpenalty/'));
         const args  = Commands.validateParseArgs({
             _: ['parse'],
             template: './',
-            sample: 'sample.md'
+            sample: 'text/sample.md'
         });
         args.template.should.match(/cicero-cli[/\\]test[/\\]data[/\\]latedeliveryandpenalty$/);
-        args.sample.should.match(/sample.md$/);
+        args.sample.should.match(/text[/\\]sample.md$/);
     });
     it('all args specified, parent folder', () => {
         process.chdir(path.resolve(__dirname, 'data/'));
         const args  = Commands.validateParseArgs({
             _: ['parse'],
             template: 'latedeliveryandpenalty',
-            sample: 'latedeliveryandpenalty/sample.md'
+            sample: 'latedeliveryandpenalty/text/sample.md'
         });
         args.template.should.match(/cicero-cli[/\\]test[/\\]data[/\\]latedeliveryandpenalty$/);
-        args.sample.should.match(/sample.md$/);
+        args.sample.should.match(/text[/\\]sample.md$/);
     });
     it('all args specified, archive', () => {
         process.chdir(path.resolve(__dirname, 'data/'));
         const args  = Commands.validateParseArgs({
             _: ['parse'],
             template: 'latedeliveryandpenalty.cta',
-            sample: 'latedeliveryandpenalty/sample.md'
+            sample: 'latedeliveryandpenalty/text/sample.md'
         });
         args.template.should.match(/cicero-cli[/\\]test[/\\]data[/\\]latedeliveryandpenalty.cta$/);
-        args.sample.should.match(/sample.md$/);
+        args.sample.should.match(/text[/\\]sample.md$/);
     });
     it('all args specified, parent folder, no sample', () => {
         process.chdir(path.resolve(__dirname, 'data/'));
@@ -109,23 +109,23 @@ describe('#validateParseArgs', () => {
             template: 'latedeliveryandpenalty',
         });
         args.template.should.match(/cicero-cli[/\\]test[/\\]data[/\\]latedeliveryandpenalty$/);
-        args.sample.should.match(/sample.md$/);
+        args.sample.should.match(/text[/\\]sample.md$/);
     });
     it('all args specified, child folder, no sample', () => {
-        process.chdir(path.resolve(__dirname, 'data/latedeliveryandpenalty/grammar'));
+        process.chdir(path.resolve(__dirname, 'data/latedeliveryandpenalty/text'));
         const args  = Commands.validateParseArgs({
             _: ['parse'],
             template: '../',
         });
         args.template.should.match(/cicero-cli[/\\]test[/\\]data[/\\]latedeliveryandpenalty$/);
-        args.sample.should.match(/sample.md$/);
+        args.sample.should.match(/text[/\\]sample.md$/);
     });
     it('no flags specified', () => {
         const args  = Commands.validateParseArgs({
             _: ['parse', path.resolve(__dirname, 'data/latedeliveryandpenalty/')],
         });
         args.template.should.match(/cicero-cli[/\\]test[/\\]data[/\\]latedeliveryandpenalty$/);
-        args.sample.should.match(/sample.md$/);
+        args.sample.should.match(/text[/\\]sample.md$/);
     });
     it('verbose flag specified', () => {
         process.chdir(path.resolve(__dirname, 'data/latedeliveryandpenalty/'));
@@ -144,8 +144,8 @@ describe('#validateParseArgs', () => {
         process.chdir(path.resolve(__dirname, 'data/latedeliveryandpenalty/'));
         (() => Commands.validateParseArgs({
             _: ['parse'],
-            sample: 'sample_en.md'
-        })).should.throw('A sample.md file is required. Try the --sample flag or create a sample.md in the root folder of your template.');
+            sample: 'text/sample_en.md'
+        })).should.throw('A text/sample.md file is required. Try the --sample flag or create a text/sample.md in your template.');
     });
 });
 
@@ -225,7 +225,7 @@ describe('#validateDraftArgs', () => {
         args.data.should.match(/data.json$/);
     });
     it('all args specified, child folder, no sample', () => {
-        process.chdir(path.resolve(__dirname, 'data/latedeliveryandpenalty/grammar'));
+        process.chdir(path.resolve(__dirname, 'data/latedeliveryandpenalty/text'));
         const args  = Commands.validateDraftArgs({
             _: ['draft'],
             template: '../',
@@ -258,7 +258,7 @@ describe('#validateDraftArgs', () => {
         (() => Commands.validateDraftArgs({
             _: ['draft'],
             data: 'data_en.json'
-        })).should.throw('A data.json file is required. Try the --data flag or create a data.json in the root folder of your template.');
+        })).should.throw('A data.json file is required. Try the --data flag or create a data.json in your template.');
     });
 });
 
@@ -296,37 +296,37 @@ describe('#validateRedraftArgs', () => {
             _: ['redraft'],
         });
         args.template.should.match(/cicero-cli[/\\]test[/\\]data[/\\]latedeliveryandpenalty$/);
-        args.sample.should.match(/sample.md$/);
+        args.sample.should.match(/text[/\\]sample.md$/);
     });
     it('all args specified', () => {
         process.chdir(path.resolve(__dirname, 'data/latedeliveryandpenalty/'));
         const args  = Commands.validateRedraftArgs({
             _: ['redraft'],
             template: './',
-            sample: 'sample.md'
+            sample: 'text/sample.md'
         });
         args.template.should.match(/cicero-cli[/\\]test[/\\]data[/\\]latedeliveryandpenalty$/);
-        args.sample.should.match(/sample.md$/);
+        args.sample.should.match(/text[/\\]sample.md$/);
     });
     it('all args specified, parent folder', () => {
         process.chdir(path.resolve(__dirname, 'data/'));
         const args  = Commands.validateRedraftArgs({
             _: ['redraft'],
             template: 'latedeliveryandpenalty',
-            sample: 'latedeliveryandpenalty/sample.md'
+            sample: 'latedeliveryandpenalty/text/sample.md'
         });
         args.template.should.match(/cicero-cli[/\\]test[/\\]data[/\\]latedeliveryandpenalty$/);
-        args.sample.should.match(/sample.md$/);
+        args.sample.should.match(/text[/\\]sample.md$/);
     });
     it('all args specified, archive', () => {
         process.chdir(path.resolve(__dirname, 'data/'));
         const args  = Commands.validateRedraftArgs({
             _: ['redraft'],
             template: 'latedeliveryandpenalty.cta',
-            sample: 'latedeliveryandpenalty/sample.md'
+            sample: 'latedeliveryandpenalty/text/sample.md'
         });
         args.template.should.match(/cicero-cli[/\\]test[/\\]data[/\\]latedeliveryandpenalty.cta$/);
-        args.sample.should.match(/sample.md$/);
+        args.sample.should.match(/text[/\\]sample.md$/);
     });
     it('all args specified, parent folder, no sample', () => {
         process.chdir(path.resolve(__dirname, 'data/'));
@@ -335,23 +335,23 @@ describe('#validateRedraftArgs', () => {
             template: 'latedeliveryandpenalty',
         });
         args.template.should.match(/cicero-cli[/\\]test[/\\]data[/\\]latedeliveryandpenalty$/);
-        args.sample.should.match(/sample.md$/);
+        args.sample.should.match(/text[/\\]sample.md$/);
     });
     it('all args specified, child folder, no sample', () => {
-        process.chdir(path.resolve(__dirname, 'data/latedeliveryandpenalty/grammar'));
+        process.chdir(path.resolve(__dirname, 'data/latedeliveryandpenalty/text'));
         const args  = Commands.validateRedraftArgs({
             _: ['redraft'],
             template: '../',
         });
         args.template.should.match(/cicero-cli[/\\]test[/\\]data[/\\]latedeliveryandpenalty$/);
-        args.sample.should.match(/sample.md$/);
+        args.sample.should.match(/text[/\\]sample.md$/);
     });
     it('no flags specified', () => {
         const args  = Commands.validateRedraftArgs({
             _: ['redraft', path.resolve(__dirname, 'data/latedeliveryandpenalty/')],
         });
         args.template.should.match(/cicero-cli[/\\]test[/\\]data[/\\]latedeliveryandpenalty$/);
-        args.sample.should.match(/sample.md$/);
+        args.sample.should.match(/text[/\\]sample.md$/);
     });
     it('verbose flag specified', () => {
         process.chdir(path.resolve(__dirname, 'data/latedeliveryandpenalty/'));
@@ -370,8 +370,8 @@ describe('#validateRedraftArgs', () => {
         process.chdir(path.resolve(__dirname, 'data/latedeliveryandpenalty/'));
         (() => Commands.validateRedraftArgs({
             _: ['redraft'],
-            sample: 'sample_en.md'
-        })).should.throw('A sample.md file is required. Try the --sample flag or create a sample.md in the root folder of your template.');
+            sample: 'text/sample_en.md'
+        })).should.throw('A text/sample.md file is required. Try the --sample flag or create a text/sample.md in your template.');
     });
     it('output specified', () => {
         process.chdir(path.resolve(__dirname, 'data/latedeliveryandpenalty/'));
@@ -380,8 +380,8 @@ describe('#validateRedraftArgs', () => {
             output: sampleOut,
         });
         args.template.should.match(/cicero-cli[/\\]test[/\\]data[/\\]latedeliveryandpenalty$/);
-        args.output.should.match(/cicero-cli[/\\]test[/\\]data[/\\]latedeliveryandpenalty[/\\]sample_out.md$/);
-        args.sample.should.match(/sample.md$/);
+        args.output.should.match(/cicero-cli[/\\]test[/\\]data[/\\]latedeliveryandpenalty[/\\]text[/\\]sample_out.md$/);
+        args.sample.should.match(/text[/\\]sample.md$/);
     });
     it('overwrite specified', () => {
         process.chdir(path.resolve(__dirname, 'data/latedeliveryandpenalty/'));
@@ -390,8 +390,8 @@ describe('#validateRedraftArgs', () => {
             overwrite: true,
         });
         args.template.should.match(/cicero-cli[/\\]test[/\\]data[/\\]latedeliveryandpenalty$/);
-        args.output.should.match(/cicero-cli[/\\]test[/\\]data[/\\]latedeliveryandpenalty[/\\]sample.md$/);
-        args.sample.should.match(/sample.md$/);
+        args.output.should.match(/cicero-cli[/\\]test[/\\]data[/\\]latedeliveryandpenalty[/\\]text[/\\]sample.md$/);
+        args.sample.should.match(/text[/\\]sample.md$/);
     });
     it('both output and overwrite specified', () => {
         process.chdir(path.resolve(__dirname, 'data/latedeliveryandpenalty/'));
@@ -436,29 +436,29 @@ describe('#validateExecuteArgs', () => {
             _: ['execute'],
         });
         args.template.should.match(/cicero-cli[/\\]test[/\\]data[/\\]latedeliveryandpenalty$/);
-        args.sample.should.match(/sample.md$/);
+        args.sample.should.match(/text[/\\]sample.md$/);
     });
     it('all args specified', () => {
         process.chdir(path.resolve(__dirname, 'data/latedeliveryandpenalty/'));
         const args  = Commands.validateExecuteArgs({
             _: ['execute'],
             template: './',
-            sample: 'sample.md',
+            sample: 'text/sample.md',
             state: 'state.json'
         });
         args.template.should.match(/cicero-cli[/\\]test[/\\]data[/\\]latedeliveryandpenalty$/);
-        args.sample.should.match(/sample.md$/);
+        args.sample.should.match(/text[/\\]sample.md$/);
     });
     it('all args specified, parent folder', () => {
         process.chdir(path.resolve(__dirname, 'data/'));
         const args  = Commands.validateExecuteArgs({
             _: ['execute'],
             template: 'latedeliveryandpenalty',
-            sample: 'latedeliveryandpenalty/sample.md',
+            sample: 'latedeliveryandpenalty/text/sample.md',
             state: 'latedeliveryandpenalty/state.json'
         });
         args.template.should.match(/cicero-cli[/\\]test[/\\]data[/\\]latedeliveryandpenalty$/);
-        args.sample.should.match(/sample.md$/);
+        args.sample.should.match(/text[/\\]sample.md$/);
     });
     it('all args specified, parent folder, no sample, no state', () => {
         process.chdir(path.resolve(__dirname, 'data/'));
@@ -467,23 +467,23 @@ describe('#validateExecuteArgs', () => {
             template: 'latedeliveryandpenalty',
         });
         args.template.should.match(/cicero-cli[/\\]test[/\\]data[/\\]latedeliveryandpenalty$/);
-        args.sample.should.match(/sample.md$/);
+        args.sample.should.match(/text[/\\]sample.md$/);
     });
     it('all args specified, child folder, no sample', () => {
-        process.chdir(path.resolve(__dirname, 'data/latedeliveryandpenalty/grammar'));
+        process.chdir(path.resolve(__dirname, 'data/latedeliveryandpenalty/text'));
         const args  = Commands.validateExecuteArgs({
             _: ['execute'],
             template: '../',
         });
         args.template.should.match(/cicero-cli[/\\]test[/\\]data[/\\]latedeliveryandpenalty$/);
-        args.sample.should.match(/sample.md$/);
+        args.sample.should.match(/text[/\\]sample.md$/);
     });
     it('no flags specified', () => {
         const args  = Commands.validateExecuteArgs({
             _: ['execute', path.resolve(__dirname, 'data/latedeliveryandpenalty/')],
         });
         args.template.should.match(/cicero-cli[/\\]test[/\\]data[/\\]latedeliveryandpenalty$/);
-        args.sample.should.match(/sample.md$/);
+        args.sample.should.match(/text[/\\]sample.md$/);
     });
     it('verbose flag specified', () => {
         process.chdir(path.resolve(__dirname, 'data/latedeliveryandpenalty/'));
@@ -502,15 +502,15 @@ describe('#validateExecuteArgs', () => {
         process.chdir(path.resolve(__dirname, 'data/latedeliveryandpenalty/'));
         (() => Commands.validateExecuteArgs({
             _: ['execute'],
-            sample: 'sample_en.md'
-        })).should.throw('A sample.md file is required. Try the --sample flag or create a sample.md in the root folder of your template.');
+            sample: 'text/sample_en.md'
+        })).should.throw('A text/sample.md file is required. Try the --sample flag or create a text/sample.md in your template.');
     });
     it('bad requestjson', () => {
         process.chdir(path.resolve(__dirname, 'data/latedeliveryandpenalty/'));
         (() => Commands.validateExecuteArgs({
             _: ['execute'],
             request: ['request1.json']
-        })).should.throw('A request.json file is required. Try the --request flag or create a request.json in the root folder of your template.');
+        })).should.throw('A request.json file is required. Try the --request flag or create a request.json in your template.');
     });
 });
 
@@ -581,7 +581,7 @@ describe('#validateInvokeArgs', () => {
             _: ['invoke'],
         });
         args.template.should.match(/cicero-cli[/\\]test[/\\]data[/\\]latedeliveryandpenalty$/);
-        args.sample.should.match(/sample.md$/);
+        args.sample.should.match(/text[/\\]sample.md$/);
         args.params.should.match(/params.json$/);
     });
     it('all args specified', () => {
@@ -589,22 +589,22 @@ describe('#validateInvokeArgs', () => {
         const args  = Commands.validateInvokeArgs({
             _: ['invoke'],
             template: './',
-            sample: 'sample.md',
+            sample: 'text/sample.md',
             state: 'state.json'
         });
         args.template.should.match(/cicero-cli[/\\]test[/\\]data[/\\]latedeliveryandpenalty$/);
-        args.sample.should.match(/sample.md$/);
+        args.sample.should.match(/text[/\\]sample.md$/);
     });
     it('all args specified, parent folder', () => {
         process.chdir(path.resolve(__dirname, 'data/'));
         const args  = Commands.validateInvokeArgs({
             _: ['invoke'],
             template: 'latedeliveryandpenalty',
-            sample: 'latedeliveryandpenalty/sample.md',
+            sample: 'latedeliveryandpenalty/text/sample.md',
             state: 'latedeliveryandpenalty/state.json'
         });
         args.template.should.match(/cicero-cli[/\\]test[/\\]data[/\\]latedeliveryandpenalty$/);
-        args.sample.should.match(/sample.md$/);
+        args.sample.should.match(/text[/\\]sample.md$/);
     });
     it('all args specified, parent folder, no sample, no state', () => {
         process.chdir(path.resolve(__dirname, 'data/'));
@@ -613,23 +613,23 @@ describe('#validateInvokeArgs', () => {
             template: 'latedeliveryandpenalty',
         });
         args.template.should.match(/cicero-cli[/\\]test[/\\]data[/\\]latedeliveryandpenalty$/);
-        args.sample.should.match(/sample.md$/);
+        args.sample.should.match(/text[/\\]sample.md$/);
     });
     it('all args specified, child folder, no sample', () => {
-        process.chdir(path.resolve(__dirname, 'data/latedeliveryandpenalty/grammar'));
+        process.chdir(path.resolve(__dirname, 'data/latedeliveryandpenalty/text'));
         const args  = Commands.validateInvokeArgs({
             _: ['invoke'],
             template: '../',
         });
         args.template.should.match(/cicero-cli[/\\]test[/\\]data[/\\]latedeliveryandpenalty$/);
-        args.sample.should.match(/sample.md$/);
+        args.sample.should.match(/text[/\\]sample.md$/);
     });
     it('no flags specified', () => {
         const args  = Commands.validateInvokeArgs({
             _: ['invoke', path.resolve(__dirname, 'data/latedeliveryandpenalty/')],
         });
         args.template.should.match(/cicero-cli[/\\]test[/\\]data[/\\]latedeliveryandpenalty$/);
-        args.sample.should.match(/sample.md$/);
+        args.sample.should.match(/text[/\\]sample.md$/);
     });
     it('verbose flag specified', () => {
         process.chdir(path.resolve(__dirname, 'data/latedeliveryandpenalty/'));
@@ -648,15 +648,15 @@ describe('#validateInvokeArgs', () => {
         process.chdir(path.resolve(__dirname, 'data/latedeliveryandpenalty/'));
         (() => Commands.validateInvokeArgs({
             _: ['invoke'],
-            sample: 'sample_en.md'
-        })).should.throw('A sample.md file is required. Try the --sample flag or create a sample.md in the root folder of your template.');
+            sample: 'text/sample_en.md'
+        })).should.throw('A text/sample.md file is required. Try the --sample flag or create a text/sample.md in your template.');
     });
     it('bad requestjson', () => {
         process.chdir(path.resolve(__dirname, 'data/latedeliveryandpenalty/'));
         (() => Commands.validateInvokeArgs({
             _: ['invoke'],
             params: 'params1.json'
-        })).should.throw('A params.json file is required. Try the --params flag or create a params.json in the root folder of your template.');
+        })).should.throw('A params.json file is required. Try the --params flag or create a params.json in your template.');
     });
 });
 
@@ -702,27 +702,27 @@ describe('#validateInitializeArgs', () => {
             _: ['initialize'],
         });
         args.template.should.match(/cicero-cli[/\\]test[/\\]data[/\\]latedeliveryandpenalty$/);
-        args.sample.should.match(/sample.md$/);
+        args.sample.should.match(/text[/\\]sample.md$/);
     });
     it('all args specified', () => {
         process.chdir(path.resolve(__dirname, 'data/latedeliveryandpenalty/'));
         const args  = Commands.validateInitializeArgs({
             _: ['initialize'],
             template: './',
-            sample: 'sample.md'
+            sample: 'text/sample.md'
         });
         args.template.should.match(/cicero-cli[/\\]test[/\\]data[/\\]latedeliveryandpenalty$/);
-        args.sample.should.match(/sample.md$/);
+        args.sample.should.match(/text[/\\]sample.md$/);
     });
     it('all args specified, parent folder', () => {
         process.chdir(path.resolve(__dirname, 'data/'));
         const args  = Commands.validateInitializeArgs({
             _: ['initt'],
             template: 'latedeliveryandpenalty',
-            sample: 'latedeliveryandpenalty/sample.md'
+            sample: 'latedeliveryandpenalty/text/sample.md'
         });
         args.template.should.match(/cicero-cli[/\\]test[/\\]data[/\\]latedeliveryandpenalty$/);
-        args.sample.should.match(/sample.md$/);
+        args.sample.should.match(/text[/\\]sample.md$/);
     });
     it('all args specified, parent folder, no sample, no state', () => {
         process.chdir(path.resolve(__dirname, 'data/'));
@@ -731,23 +731,23 @@ describe('#validateInitializeArgs', () => {
             template: 'latedeliveryandpenalty',
         });
         args.template.should.match(/cicero-cli[/\\]test[/\\]data[/\\]latedeliveryandpenalty$/);
-        args.sample.should.match(/sample.md$/);
+        args.sample.should.match(/text[/\\]sample.md$/);
     });
     it('all args specified, child folder, no sample', () => {
-        process.chdir(path.resolve(__dirname, 'data/latedeliveryandpenalty/grammar'));
+        process.chdir(path.resolve(__dirname, 'data/latedeliveryandpenalty/text'));
         const args  = Commands.validateInitializeArgs({
             _: ['initialize'],
             template: '../',
         });
         args.template.should.match(/cicero-cli[/\\]test[/\\]data[/\\]latedeliveryandpenalty$/);
-        args.sample.should.match(/sample.md$/);
+        args.sample.should.match(/text[/\\]sample.md$/);
     });
     it('no flags specified', () => {
         const args  = Commands.validateInitializeArgs({
             _: ['initialize', path.resolve(__dirname, 'data/latedeliveryandpenalty/')],
         });
         args.template.should.match(/cicero-cli[/\\]test[/\\]data[/\\]latedeliveryandpenalty$/);
-        args.sample.should.match(/sample.md$/);
+        args.sample.should.match(/text[/\\]sample.md$/);
     });
     it('verbose flag specified', () => {
         process.chdir(path.resolve(__dirname, 'data/latedeliveryandpenalty/'));
@@ -766,8 +766,8 @@ describe('#validateInitializeArgs', () => {
         process.chdir(path.resolve(__dirname, 'data/latedeliveryandpenalty/'));
         (() => Commands.validateInitializeArgs({
             _: ['initialize'],
-            sample: 'sample_en.md'
-        })).should.throw('A sample.md file is required. Try the --sample flag or create a sample.md in the root folder of your template.');
+            sample: 'text/sample_en.md'
+        })).should.throw('A text/sample.md file is required. Try the --sample flag or create a text/sample.md in your template.');
     });
 });
 

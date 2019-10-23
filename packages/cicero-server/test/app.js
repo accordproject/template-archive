@@ -60,7 +60,7 @@ describe('cicero-server', () => {
     });
 
     it('/should execute a simple stateless request with a sample clause (ergo)', async () => {
-        return request.post('/execute/latedeliveryandpenalty/sample.md')
+        return request.post('/execute/latedeliveryandpenalty/text%2Fsample.md')
             .send(body)
             .expect(200)
             .then(response => {

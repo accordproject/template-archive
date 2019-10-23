@@ -255,7 +255,7 @@ class ParserManager {
      * @throws {TemplateException}
      */
     static _throwTemplateExceptionForElement(message, element) {
-        const fileName = 'grammar/template.tem';
+        const fileName = 'text/grammar.tem.md';
         let column = element.fieldName.col;
         let line = element.fieldName.line;
 
