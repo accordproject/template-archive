@@ -27,7 +27,7 @@ chai.use(require('chai-things'));
 chai.use(require('chai-as-promised'));
 
 describe('Contract', () => {
-    const sampleText = fs.readFileSync(path.resolve(__dirname, 'data/copyright-license', 'sample.md'), 'utf8');
+    const sampleText = fs.readFileSync(path.resolve(__dirname, 'data/copyright-license', 'text/sample.md'), 'utf8');
 
     describe('#parse', () => {
         it('should be able to set the data from copyright-license natural language text', async function() {

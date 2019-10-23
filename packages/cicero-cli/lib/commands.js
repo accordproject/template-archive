@@ -127,7 +127,7 @@ class Commands {
         }
 
         if (!argExists){
-            throw new Error(`A ${argDefaultName} file is required. Try the --${argName} flag or create a ${argDefaultName} in the root folder of your template.`);
+            throw new Error(`A ${argDefaultName} file is required. Try the --${argName} flag or create a ${argDefaultName} in your template.`);
         } else {
             return argv;
         }
@@ -141,7 +141,7 @@ class Commands {
      */
     static validateParseArgs(argv) {
         argv = Commands.validateCommonArgs(argv);
-        argv = Commands.setDefaultFileArg(argv, 'sample', 'sample.md', ((argv, argDefaultName) => { return path.resolve(argv.template,argDefaultName); }));
+        argv = Commands.setDefaultFileArg(argv, 'sample', 'text/sample.md', ((argv, argDefaultName) => { return path.resolve(argv.template,argDefaultName); }));
 
         if(argv.verbose) {
             Logger.info(`parse sample ${argv.sample} using a template ${argv.template}`);
@@ -287,7 +287,7 @@ class Commands {
      */
     static validateExecuteArgs(argv) {
         argv = Commands.validateCommonArgs(argv);
-        argv = Commands.setDefaultFileArg(argv, 'sample', 'sample.md', ((argv, argDefaultName) => { return path.resolve(argv.template,argDefaultName); }));
+        argv = Commands.setDefaultFileArg(argv, 'sample', 'text/sample.md', ((argv, argDefaultName) => { return path.resolve(argv.template,argDefaultName); }));
         argv = Commands.setDefaultFileArg(argv, 'request', 'request.json', ((argv, argDefaultName) => { return [path.resolve(argv.template,argDefaultName)]; }));
         //argv = Commands.setDefaultFileArg(argv, 'state', 'state.json', ((argv, argDefaultName) => { return path.resolve(argv.template,argDefaultName); }));
 
@@ -358,7 +358,7 @@ class Commands {
      */
     static validateInvokeArgs(argv) {
         argv = Commands.validateCommonArgs(argv);
-        argv = Commands.setDefaultFileArg(argv, 'sample', 'sample.md', ((argv, argDefaultName) => { return path.resolve(argv.template,argDefaultName); }));
+        argv = Commands.setDefaultFileArg(argv, 'sample', 'text/sample.md', ((argv, argDefaultName) => { return path.resolve(argv.template,argDefaultName); }));
         argv = Commands.setDefaultFileArg(argv, 'params', 'params.json', ((argv, argDefaultName) => { return [path.resolve(argv.template,argDefaultName)]; }));
 
         if(argv.verbose) {
@@ -416,7 +416,7 @@ class Commands {
      */
     static validateInitializeArgs(argv) {
         argv = Commands.validateCommonArgs(argv);
-        argv = Commands.setDefaultFileArg(argv, 'sample', 'sample.md', ((argv, argDefaultName) => { return path.resolve(argv.template,argDefaultName); }));
+        argv = Commands.setDefaultFileArg(argv, 'sample', 'text/sample.md', ((argv, argDefaultName) => { return path.resolve(argv.template,argDefaultName); }));
 
         if(argv.verbose) {
             Logger.info(`initialize sample ${argv.sample} using a template ${argv.template}`);

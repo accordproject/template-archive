@@ -26,7 +26,7 @@ const Logger = require('@accordproject/concerto-core').Logger;
 
 // Matches 'sample.md' or 'sample_TAG.md' where TAG is an IETF language tag (BCP 47)
 const IETF_REGEXP = languageTagRegex({ exact: false }).toString().slice(1,-2);
-const SAMPLE_FILE_REGEXP = xregexp('sample(_(' + IETF_REGEXP + '))?.md$');
+const SAMPLE_FILE_REGEXP = xregexp('text[/\\\\]sample(_(' + IETF_REGEXP + '))?.md$');
 
 /**
  * A utility class to create templates from data sources.
@@ -65,7 +65,7 @@ class TemplateLoader extends FileLoader {
 
         const requestContents = await TemplateLoader.loadZipFileContents(zip, 'request.json', true);
         const packageJsonObject = await TemplateLoader.loadZipFileContents(zip, 'package.json', true, true);
-        const templatizedGrammar = await TemplateLoader.loadZipFileContents(zip, 'grammar/template.tem.md', false, false);
+        const templatizedGrammar = await TemplateLoader.loadZipFileContents(zip, 'text/grammar.tem.md', false, false);
 
         Logger.debug(method, 'Looking for model files');
         let ctoFiles =  await TemplateLoader.loadZipFilesContents(zip, /model[/\\].*\.cto$/);
@@ -83,14 +83,14 @@ class TemplateLoader extends FileLoader {
 
         Logger.debug(method, 'Setting grammar');
         if(!templatizedGrammar) {
-            throw new Error('A template must contain a template.tem.md file.');
+            throw new Error('A template must contain a grammar.tem.md file.');
         } else {
             template.parserManager.buildGrammar(templatizedGrammar);
         }
 
         // load and add the ergo files
         if(template.getMetadata().getErgoVersion()) {
-            template.getLogicManager().addTemplateFile(templatizedGrammar,'grammar/template.tem.md');
+            template.getLogicManager().addTemplateFile(templatizedGrammar,'text/grammar.tem.md');
             Logger.debug(method, 'Adding Ergo files to script manager');
             const scriptFiles = await TemplateLoader.loadZipFilesContents(zip, /logic[/\\].*\.ergo$/);
             scriptFiles.forEach(function (obj) {
@@ -191,21 +191,21 @@ class TemplateLoader extends FileLoader {
 
 
         // load and add the template
-        let templatizedGrammar = await TemplateLoader.loadFileContents(path, 'grammar/template.tem.md', false, false);
+        let templatizedGrammar = await TemplateLoader.loadFileContents(path, 'text/grammar.tem.md', false, false);
 
         if(!templatizedGrammar) {
-            throw new Error('A template must either contain a template.tem.md file.');
+            throw new Error('A template must either contain a grammar.tem.md file.');
         } else {
             template.parserManager.buildGrammar(templatizedGrammar);
-            Logger.debug(method, 'Loaded template.tem.md', templatizedGrammar);
+            Logger.debug(method, 'Loaded grammar.tem.md', templatizedGrammar);
         }
 
-        Logger.debug(method, 'Loaded template.tem.md');
+        Logger.debug(method, 'Loaded grammar.tem.md');
 
         // load and add the ergo files
         if(template.getMetadata().getErgoVersion() && template.getMetadata().getRuntime() === 'ergo') {
             // If Ergo then also register the template
-            template.getLogicManager().addTemplateFile(templatizedGrammar,'grammar/template.tem.md');
+            template.getLogicManager().addTemplateFile(templatizedGrammar,'text/grammar.tem.md');
             const ergoFiles = await TemplateLoader.loadFilesContents(path, /logic[/\\].*\.ergo$/);
             ergoFiles.forEach((file) => {
                 const resolvedPath = slash(fsPath.resolve(path));

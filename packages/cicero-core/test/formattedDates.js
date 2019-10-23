@@ -47,11 +47,11 @@ describe('FormattedDates', () => {
                 const location = path.resolve(__dirname, `data/${testTemplate}`);
                 const template = await Template.fromDirectory(location);
                 const clause = new Clause(template);
-                const formattedDatesInput = fs.readFileSync(path.resolve(__dirname, 'data/', testTemplate + '/sample.md'), 'utf8');
+                const formattedDatesInput = fs.readFileSync(path.resolve(__dirname, 'data/', testTemplate + '/text/sample.md'), 'utf8');
                 clause.parse(formattedDatesInput, '2019-01-04T00:00:00Z');
                 const result = clause.getData();
                 delete result.clauseId;
-                const expected = JSON.parse(fs.readFileSync(path.resolve(__dirname, 'data/', testTemplate + '/expected.json'), 'utf8'));
+                const expected = JSON.parse(fs.readFileSync(path.resolve(__dirname, 'data/', testTemplate + '/text/expected.json'), 'utf8'));
                 result.should.eql(expected);
             });
         });
@@ -62,7 +62,7 @@ describe('FormattedDates', () => {
                 const location = path.resolve(__dirname, `data/${testTemplate}`);
                 const template = await Template.fromDirectory(location);
                 const clause = new Clause(template);
-                const formattedDatesInput = fs.readFileSync(path.resolve(__dirname, 'data/', testTemplate + '/sample.md'), 'utf8');
+                const formattedDatesInput = fs.readFileSync(path.resolve(__dirname, 'data/', testTemplate + '/text/sample.md'), 'utf8');
                 clause.parse(formattedDatesInput);
                 const nl = await clause.generateText(null, '2019-01-04T00:00:00+01:02');
                 nl.should.equal(formattedDatesInput);

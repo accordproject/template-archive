@@ -37,8 +37,8 @@ describe('EngineLatePenalty', () => {
     let clause2;
     let template;
     let template2;
-    const testLatePenaltyInput = fs.readFileSync(path.resolve(__dirname, 'data/latedeliveryandpenalty', 'sample.md'), 'utf8');
-    const testLatePenaltyPeriodInput = fs.readFileSync(path.resolve(__dirname, 'data/latedeliveryandpenalty-period', 'sample.md'), 'utf8');
+    const testLatePenaltyInput = fs.readFileSync(path.resolve(__dirname, 'data/latedeliveryandpenalty', 'text/sample.md'), 'utf8');
+    const testLatePenaltyPeriodInput = fs.readFileSync(path.resolve(__dirname, 'data/latedeliveryandpenalty-period', 'text/sample.md'), 'utf8');
 
     before(async () => {
         template = await Template.fromDirectory('./test/data/latedeliveryandpenalty', options);
@@ -186,7 +186,7 @@ describe('EngineLatePenalty (JavaScript)', () => {
 
     let engine;
     let clause;
-    const testLatePenaltyInput = fs.readFileSync(path.resolve(__dirname, 'data/latedeliveryandpenalty_js', 'sample.md'), 'utf8');
+    const testLatePenaltyInput = fs.readFileSync(path.resolve(__dirname, 'data/latedeliveryandpenalty_js', 'text/sample.md'), 'utf8');
 
     beforeEach(async function () {
         engine = new Engine();
@@ -250,7 +250,7 @@ describe('EngineHelloWorld', () => {
 
     let engine;
     let clause;
-    const helloWorldInput = fs.readFileSync(path.resolve(__dirname, 'data/helloworld', 'sample.md'), 'utf8');
+    const helloWorldInput = fs.readFileSync(path.resolve(__dirname, 'data/helloworld', 'text/sample.md'), 'utf8');
 
     beforeEach(async function () {
         engine = new Engine();
@@ -331,7 +331,7 @@ describe('EngineHelloModule', () => {
 
     let engine;
     let clause;
-    const helloWorldInput = fs.readFileSync(path.resolve(__dirname, 'data/hellomodule', 'sample.md'), 'utf8');
+    const helloWorldInput = fs.readFileSync(path.resolve(__dirname, 'data/hellomodule', 'text/sample.md'), 'utf8');
 
     beforeEach(async function () {
         engine = new Engine();
@@ -363,7 +363,7 @@ describe('EngineHelloEmit', () => {
 
     let engine;
     let clause;
-    const helloEmitInput = fs.readFileSync(path.resolve(__dirname, 'data/helloemit', 'sample.md'), 'utf8');
+    const helloEmitInput = fs.readFileSync(path.resolve(__dirname, 'data/helloemit', 'text/sample.md'), 'utf8');
 
     beforeEach(async function () {
         engine = new Engine();
@@ -397,7 +397,7 @@ describe('EngineHelloEmitInit', () => {
 
     let engine;
     let clause;
-    const helloEmitInitInput = fs.readFileSync(path.resolve(__dirname, 'data/helloemitinit', 'sample.md'), 'utf8');
+    const helloEmitInitInput = fs.readFileSync(path.resolve(__dirname, 'data/helloemitinit', 'text/sample.md'), 'utf8');
 
     beforeEach(async function () {
         engine = new Engine();
@@ -424,7 +424,7 @@ describe('EngineSaft', () => {
 
     let engine;
     let clause;
-    const saftInput = fs.readFileSync(path.resolve(__dirname, 'data/saft', 'sample.md'), 'utf8');
+    const saftInput = fs.readFileSync(path.resolve(__dirname, 'data/saft', 'text/sample.md'), 'utf8');
 
     beforeEach(async function () {
         engine = new Engine();
@@ -473,7 +473,7 @@ describe('EngineSaft', () => {
 describe('BogusClauses', () => {
     let engine;
     let clause;
-    const testNoLogic = fs.readFileSync(path.resolve(__dirname, 'data/no-logic', 'sample.md'), 'utf8');
+    const testNoLogic = fs.readFileSync(path.resolve(__dirname, 'data/no-logic', 'text/sample.md'), 'utf8');
 
     beforeEach(async function () {
         engine = new Engine();
@@ -515,7 +515,7 @@ describe('EngineInstallmentSaleErgo', () => {
 
     let engine;
     let clause;
-    const testLatePenaltyInput = fs.readFileSync(path.resolve(__dirname, 'data/installment-sale-ergo', 'sample.md'), 'utf8');
+    const testLatePenaltyInput = fs.readFileSync(path.resolve(__dirname, 'data/installment-sale-ergo', 'text/sample.md'), 'utf8');
 
     beforeEach(async function () {
         engine = new Engine();

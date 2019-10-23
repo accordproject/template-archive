@@ -231,10 +231,10 @@ In case of delayed delivery except for Force Majeure cases, the Seller shall pay
             return Template.fromDirectory('./test/data/locales-conga', options).should.be.fulfilled;
         });
 
-        it('should throw an error if a sample.md file does not exist', async () => {
+        it('should throw an error if a text/sample.md file does not exist', async () => {
             try {
                 await Template.fromDirectory('./test/data/no-sample', options);
-                assert.isOk(false,'should throw an error if a sample.md file does not exist');
+                assert.isOk(false,'should throw an error if a text/sample.md file does not exist');
             }
             catch(err) {
                 // ignore
@@ -570,7 +570,7 @@ In case of delayed delivery except for Force Majeure cases, the Seller shall pay
             const template = await Template.fromDirectory('./test/data/latedeliveryandpenalty', options);
             template.getParserManager().getParser().should.not.be.null;
 
-            const sampleText = fs.readFileSync('./test/data/latedeliveryandpenalty/sample.md', 'utf8');
+            const sampleText = fs.readFileSync('./test/data/latedeliveryandpenalty/text/sample.md', 'utf8');
             const clause = new Clause(template);
             clause.parse(sampleText);
             const result = clause.getData();
@@ -600,7 +600,7 @@ In case of delayed delivery except for Force Majeure cases, the Seller shall pay
             const template = await Template.fromDirectory('./test/data/copyright-license', options);
             template.getParserManager().getParser().should.not.be.null;
 
-            const sampleText = fs.readFileSync('./test/data/copyright-license/sample.md', 'utf8');
+            const sampleText = fs.readFileSync('./test/data/copyright-license/text/sample.md', 'utf8');
             const clause = new Clause(template);
             clause.parse(sampleText);
             const result = clause.getData();

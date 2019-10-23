@@ -50,7 +50,7 @@ class TemplateSaver {
         }));
 
         if (template.getParserManager().getTemplatizedGrammar()) {
-            zip.file('grammar/template.tem.md', template.getParserManager().getTemplatizedGrammar(), options);
+            zip.file('text/grammar.tem.md', template.getParserManager().getTemplatizedGrammar(), options);
         }
 
         // save the README.md if present
@@ -64,9 +64,9 @@ class TemplateSaver {
             Object.keys(sampleFiles).forEach(function (locale) {
                 let fileName;
                 if(locale === 'default'){
-                    fileName = 'sample.md';
+                    fileName = 'text/sample.md';
                 } else {
-                    fileName = `sample_${locale}.md`;
+                    fileName = `text/sample_${locale}.md`;
                 }
                 zip.file(fileName, sampleFiles[locale], options);
             });
