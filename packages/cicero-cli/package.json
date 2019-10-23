@@ -39,7 +39,17 @@
   "bugs": {
     "url": "https://github.com/accordproject/cicero/issues"
   },
-  "homepage": "https://github.com/accordproject/cicero#readme",
+  "homepage": "https://www.accordproject.org/projects/cicero",
+  "dependencies": {
+    "@accordproject/concerto-core": "0.82.2",
+    "@accordproject/cicero-core": "0.20.0-beta.1",
+    "@accordproject/cicero-engine": "0.20.0-beta.1",
+    "@accordproject/cicero-test": "0.20.0-beta.1",
+    "@accordproject/cicero-tools": "0.20.0-beta.1",
+    "uuid": "3.3.2",
+    "mkdirp": "0.5.1",
+    "yargs": "13.2.4"
+  },
   "devDependencies": {
     "chai": "4.2.0",
     "chai-as-promised": "7.1.1",
@@ -51,16 +61,6 @@
     "mocha": "6.1.4",
     "nyc": "14.1.1",
     "tmp-promise": "2.0.2"
-  },
-  "dependencies": {
-    "@accordproject/concerto-core": "0.82.1",
-    "@accordproject/cicero-core": "0.20.0-beta.1",
-    "@accordproject/cicero-engine": "0.20.0-beta.1",
-    "@accordproject/cicero-test": "0.20.0-beta.1",
-    "@accordproject/cicero-tools": "0.20.0-beta.1",
-    "uuid": "3.3.2",
-    "mkdirp": "0.5.1",
-    "yargs": "13.2.4"
   },
   "license-check-config": {
     "src": [
