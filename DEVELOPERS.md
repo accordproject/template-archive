@@ -18,7 +18,7 @@ machine:
 * [Git][git]: The [Github Guide to Installing Git][git-setup] is a good source of information.
 
 * [Node.js v10.16.0 'Dubnium' (LTS)][node]: We use Node to generate the documentation, run a
-  development web server, run tests, and generate distributable files. Depending on your system,
+  development of web server, run tests and generate distributable files. Depending on your system,
   you can install Node either from source or as a pre-packaged bundle.
 
   We recommend using [nvm][nvm] (or [nvm-windows][nvm-windows])
@@ -30,7 +30,7 @@ To contribute code to Cicero, you must have a GitHub account so you can push cod
 fork of Cicero and open Pull Requests in the [GitHub Repository][github].
 
 To create a Github account, follow the instructions [here][github-signup].
-Afterwards, go ahead and [fork][github-forking] the
+Afterward, go ahead and [fork][github-forking] the
 [main Cicero repository][github].
 
 ### Building Cicero
@@ -94,7 +94,7 @@ We have very precise rules over how our git commit messages can be formatted.  T
 readable messages** that are easy to follow when looking through the **project history** and **git logs**.  
 But also, we use the git commit messages to **generate the Cicero change log**.
 
-The commit message formatting can be added using a version of typical git workflow.
+The commit message formatting can be added using a version of the typical git workflow.
 
 ### Commit Message Format
 Each commit message consists of a mandatory **type**, **scope**, **subject**, and **footer**. This is a specific format:
@@ -134,7 +134,7 @@ You can use `*` when the change affects more than a single scope.
 The subject contains succinct description of the change:
 
 * use the imperative, present tense: "change" not "changed" nor "changes"
-* don't capitalize first letter
+* don't capitalize the first letter
 * kept under 50 characters
 * no dot (.) at the end
 
@@ -154,10 +154,10 @@ Formatting for the body is displayed in this example:
 
 ### Changes
 - Change one
-  - Subchange one
-  - Subchange two
+  - Sub change one
+  - Sub change two
 - Change two
-- Theoretically this should be listing all the commit messages included in this PR
+- Theoretically, this should be listing all the commit messages included in this PR
 
 ### Flags
 - Possible issues or holds for reviewers to note
