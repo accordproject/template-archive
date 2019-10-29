@@ -35,7 +35,7 @@ class Engine {
 
     /**
      * Send a request to a clause for execution
-     * @param {Clause} clause  - the clause to execute
+     * @param {Clause} clause  - the clause
      * @param {object} request  - the request, a JS object that can be deserialized
      * using the Composer serializer.
      * @param {object} state  - the contract state, a JS object that can be deserialized
@@ -43,17 +43,17 @@ class Engine {
      * @param {string} currentTime - the definition of 'now'
      * @return {Promise} a promise that resolves to a result for the clause
      */
-    async execute(clause, request, state, currentTime) {
+    async trigger(clause, request, state, currentTime) {
         const logicManager = clause.getLogicManager();
         const clauseId = clause.getIdentifier();
         const contract = clause.getData();
 
-        return this.ergoEngine.execute(logicManager,clauseId,contract,request,state,currentTime,null);
+        return this.ergoEngine.trigger(logicManager,clauseId,contract,request,state,currentTime,null);
     }
 
     /**
      * Invoke a specific clause for execution
-     * @param {Clause} clause  - the clause to execute
+     * @param {Clause} clause  - the clause
      * @param {string} clauseName - the clause name
      * @param {object} params - the clause parameters, a JS object
      * whose fields that can be deserialized using the Composer
@@ -73,7 +73,7 @@ class Engine {
 
     /**
      * Initialize a clause
-     * @param {Clause} clause  - the clause to execute
+     * @param {Clause} clause  - the clause
      * @param {string} currentTime - the definition of 'now'
      * @return {Promise} a promise that resolves to a result for the clause initialization
      */
@@ -87,7 +87,7 @@ class Engine {
 
     /**
      * Generate Text for a clause
-     * @param {Clause} clause  - the clause to execute
+     * @param {Clause} clause  - the clause
      * @param {*} [options] text generation options. options.wrapVariables encloses variables
      * and editable sections in '<variable ...' and '/>'
      * @param {string} currentTime - the definition of 'now'

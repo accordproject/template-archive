@@ -280,26 +280,26 @@ class Commands {
     }
 
     /**
-     * Set default params before we execute a template
+     * Set default params before we trigger a template
      *
      * @param {object} argv the inbound argument values object
      * @returns {object} a modfied argument object
      */
-    static validateExecuteArgs(argv) {
+    static validateTriggerArgs(argv) {
         argv = Commands.validateCommonArgs(argv);
         argv = Commands.setDefaultFileArg(argv, 'sample', 'text/sample.md', ((argv, argDefaultName) => { return path.resolve(argv.template,argDefaultName); }));
         argv = Commands.setDefaultFileArg(argv, 'request', 'request.json', ((argv, argDefaultName) => { return [path.resolve(argv.template,argDefaultName)]; }));
         //argv = Commands.setDefaultFileArg(argv, 'state', 'state.json', ((argv, argDefaultName) => { return path.resolve(argv.template,argDefaultName); }));
 
         if(argv.verbose) {
-            Logger.info(`execute sample ${argv.sample} using a template ${argv.template} with request ${argv.request} with state ${argv.state}`);
+            Logger.info(`trigger sample ${argv.sample} using a template ${argv.template} with request ${argv.request} with state ${argv.state}`);
         }
 
         return argv;
     }
 
     /**
-     * Execute a sample text using a template
+     * Trigger a sample text using a template
      *
      * @param {string} templatePath - path to the template directory or archive
      * @param {string} samplePath - to the sample file
@@ -309,7 +309,7 @@ class Commands {
      * @param {Object} [options] - an optional set of options
      * @returns {object} Promise to the result of execution
      */
-    static execute(templatePath, samplePath, requestsPath, statePath, currentTime, options) {
+    static trigger(templatePath, samplePath, requestsPath, statePath, currentTime, options) {
         let clause;
         const sampleText = fs.readFileSync(samplePath, 'utf8');
         let requestsJson = [];
@@ -336,12 +336,12 @@ class Commands {
 
                 // First execution to get the initial response
                 const firstRequest = requestsJson[0];
-                const initResponse = engine.execute(clause, firstRequest, stateJson, currentTime);
+                const initResponse = engine.trigger(clause, firstRequest, stateJson, currentTime);
                 // Get all the other requests and chain execution through Promise.reduce()
                 const otherRequests = requestsJson.slice(1, requestsJson.length);
                 return otherRequests.reduce((promise,requestJson) => {
                     return promise.then((result) => {
-                        return engine.execute(clause, requestJson, result.state);
+                        return engine.trigger(clause, requestJson, result.state);
                     });
                 }, initResponse);
             })

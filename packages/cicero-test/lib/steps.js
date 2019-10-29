@@ -45,7 +45,7 @@ async function init(engine,clause,currentTime) {
 }
 
 /**
- * Sends a request to the contract
+ * Send a request to the contract
  *
  * @param {object} engine - the Cicero engine
  * @param {object} clause - the clause instance
@@ -54,13 +54,13 @@ async function init(engine,clause,currentTime) {
  * @param {string} currentTime - the definition of 'now'
  * @returns {object} Promise to the response
  */
-async function send(engine,clause,request,state,currentTime) {
+async function trigger(engine,clause,request,state,currentTime) {
     if (state === null) {
         const initAnswer = await init(engine,clause,currentTime);
         const initState = initAnswer.state;
-        return engine.execute(clause,request,initState,currentTime);
+        return engine.trigger(clause,request,initState,currentTime);
     } else {
-        return engine.execute(clause,request,state,currentTime);
+        return engine.trigger(clause,request,state,currentTime);
     }
 }
 
@@ -178,7 +178,7 @@ Then('it should respond with', function (expectedResponse) {
         expect(this.answer).to.not.have.property('error');
         return Util.compareSuccess({ response },this.answer);
     } else {
-        return send(this.engine,this.clause,this.request,this.state,this.currentTime)
+        return trigger(this.engine,this.clause,this.request,this.state,this.currentTime)
             .then((actualAnswer) => {
                 this.answer = actualAnswer;
                 expect(actualAnswer).to.have.property('response');
@@ -195,7 +195,7 @@ Then('the new state( of the contract) should be', function (expectedState) {
         expect(this.answer).to.not.have.property('error');
         return Util.compareSuccess({ state },this.answer);
     } else {
-        return send(this.engine,this.clause,this.request,this.state,this.currentTime)
+        return trigger(this.engine,this.clause,this.request,this.state,this.currentTime)
             .then((actualAnswer) => {
                 this.answer = actualAnswer;
                 expect(actualAnswer).to.have.property('state');
@@ -212,7 +212,7 @@ Then('the following obligations should have( also) been emitted', function (expe
         expect(this.answer).to.not.have.property('error');
         return Util.compareSuccess({ emit },this.answer);
     } else {
-        return send(this.engine,this.clause,this.request,this.state,this.currentTime)
+        return trigger(this.engine,this.clause,this.request,this.state,this.currentTime)
             .then((actualAnswer) => {
                 this.answer = actualAnswer;
                 expect(actualAnswer).to.have.property('emit');
@@ -223,7 +223,7 @@ Then('the following obligations should have( also) been emitted', function (expe
 });
 
 Then('it should reject the request with the error {string}', function (expectedError) {
-    return send(this.engine,this.clause,this.request,this.state,this.currentTime)
+    return trigger(this.engine,this.clause,this.request,this.state,this.currentTime)
         .catch((actualError) => {
             expect(actualError.message).to.equal(expectedError);
         });

@@ -35,7 +35,7 @@ app.use(bodyParser.json());
 app.set('port', PORT);
 
 /**
- * Handle POST requests to /execute/:template/:data
+ * Handle POST requests to /trigger/:template/:data
  * The body of the POST should contain the request data.
  * The clause is created using the template and the data. If
  * the data ends with .json then setData is called on the Clause,
@@ -57,7 +57,7 @@ app.set('port', PORT);
  * then 'request' is used as the execution request,
  * 'state' is used as the contract state.
  */
-app.post('/execute/:template/:data', async function (req, httpResponse, next) {
+app.post('/trigger/:template/:data', async function (req, httpResponse, next) {
     console.log('Template: ' + req.params.template);
     console.log('Clause: ' + req.params.data);
     try {
@@ -75,11 +75,11 @@ app.post('/execute/:template/:data', async function (req, httpResponse, next) {
         if(Object.keys(req.body).length === 2 &&
            Object.prototype.hasOwnProperty.call(req.body,'request') &&
            Object.prototype.hasOwnProperty.call(req.body,'state')) {
-            result = await engine.execute(clause, req.body.request, req.body.state);
+            result = await engine.trigger(clause, req.body.request, req.body.state);
         } else {
             // Add empty state in input, remove it on output
             const state = { '$class' : 'org.accordproject.cicero.contract.AccordContractState', 'stateId' : 'ehlo' };
-            result = await engine.execute(clause, req.body, state);
+            result = await engine.trigger(clause, req.body, state);
             delete result.state;
         }
         httpResponse.send(result);

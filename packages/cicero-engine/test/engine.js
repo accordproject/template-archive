@@ -55,9 +55,9 @@ describe('EngineLatePenalty', () => {
 
     afterEach(() => {});
 
-    describe('#executeergo', function () {
+    describe('#triggerergo', function () {
 
-        it('should execute a late delivery and penalty smart clause', async function () {
+        it('should trigger a late delivery and penalty smart clause', async function () {
             const request = {};
             request.$class = 'org.accordproject.latedeliveryandpenalty.LateDeliveryAndPenaltyRequest';
             request.forceMajeure = false;
@@ -67,13 +67,13 @@ describe('EngineLatePenalty', () => {
             const state = {};
             state.$class = 'org.accordproject.cicero.contract.AccordContractState';
             state.stateId = '1';
-            const result = await engine.execute(clause, request, state, '2017-11-12T17:38:01Z');
+            const result = await engine.trigger(clause, request, state, '2017-11-12T17:38:01Z');
             result.should.not.be.null;
             result.response.penalty.should.equal(110);
             result.response.buyerMayTerminate.should.equal(true);
         });
 
-        it('should execute a late delivery and penalty smart clause in the ET timezone', async function () {
+        it('should trigger a late delivery and penalty smart clause in the ET timezone', async function () {
             const request = {};
             request.$class = 'org.accordproject.latedeliveryandpenalty.LateDeliveryAndPenaltyRequest';
             request.forceMajeure = false;
@@ -83,13 +83,13 @@ describe('EngineLatePenalty', () => {
             const state = {};
             state.$class = 'org.accordproject.cicero.contract.AccordContractState';
             state.stateId = '1';
-            const result = await engine.execute(clause, request, state, '2017-11-12T17:38:01-05:00');
+            const result = await engine.trigger(clause, request, state, '2017-11-12T17:38:01-05:00');
             result.should.not.be.null;
             result.response.penalty.should.equal(21);
             result.response.buyerMayTerminate.should.equal(false);
         });
 
-        it('should fail to execute if the current time is not in the right format', async function () {
+        it('should fail to trigger if the current time is not in the right format', async function () {
             const request = {};
             request.$class = 'org.accordproject.latedeliveryandpenalty.LateDeliveryAndPenaltyRequest';
             request.forceMajeure = false;
@@ -99,10 +99,10 @@ describe('EngineLatePenalty', () => {
             const state = {};
             state.$class = 'org.accordproject.cicero.contract.AccordContractState';
             state.stateId = '1';
-            return engine.execute(clause, request, state, '2017-11-12').should.be.rejectedWith('2017-11-12 is not a valid moment with the format \'YYYY-MM-DDTHH:mm:ssZ\'');
+            return engine.trigger(clause, request, state, '2017-11-12').should.be.rejectedWith('2017-11-12 is not a valid moment with the format \'YYYY-MM-DDTHH:mm:ssZ\'');
         });
 
-        it('should execute a late delivery and penalty smart clause with a time period', async function () {
+        it('should trigger a late delivery and penalty smart clause with a time period', async function () {
             const request = {};
             request.$class = 'org.accordproject.simplelatedeliveryandpenalty.SimpleLateDeliveryAndPenaltyRequest';
             request.agreedDelivery = '2017-10-07T16:38:01Z';
@@ -111,7 +111,7 @@ describe('EngineLatePenalty', () => {
             const state = {};
             state.$class = 'org.accordproject.cicero.contract.AccordContractState';
             state.stateId = '1';
-            const result = await engine.execute(clause2, request, state, '2019-11-12T17:38:01Z');
+            const result = await engine.trigger(clause2, request, state, '2019-11-12T17:38:01Z');
             result.should.not.be.null;
             result.response.penalty.should.equal(87.5);
             result.response.buyerMayTerminate.should.equal(true);
@@ -197,9 +197,9 @@ describe('EngineLatePenalty (JavaScript)', () => {
 
     afterEach(() => {});
 
-    describe('#executejavascript', function () {
+    describe('#triggerjavascript', function () {
 
-        it('should execute a late delivery and penalty smart clause (JavaScript)', async function () {
+        it('should trigger a late delivery and penalty smart clause (JavaScript)', async function () {
             const request = {};
             request.$class = 'org.accordproject.latedeliveryandpenalty.LateDeliveryAndPenaltyRequest';
             request.forceMajeure = false;
@@ -209,13 +209,13 @@ describe('EngineLatePenalty (JavaScript)', () => {
             const state = {};
             state.$class = 'org.accordproject.cicero.contract.AccordContractState';
             state.stateId = '1';
-            const result = await engine.execute(clause, request, state, '2017-11-12T17:38:01Z');
+            const result = await engine.trigger(clause, request, state, '2017-11-12T17:38:01Z');
             result.should.not.be.null;
             result.response.penalty.should.equal(110);
             result.response.buyerMayTerminate.should.equal(true);
         });
 
-        it('should execute a late delivery and penalty smart clause in the ET timezone (JavaScript)', async function () {
+        it('should trigger a late delivery and penalty smart clause in the ET timezone (JavaScript)', async function () {
             const request = {};
             request.$class = 'org.accordproject.latedeliveryandpenalty.LateDeliveryAndPenaltyRequest';
             request.forceMajeure = false;
@@ -225,13 +225,13 @@ describe('EngineLatePenalty (JavaScript)', () => {
             const state = {};
             state.$class = 'org.accordproject.cicero.contract.AccordContractState';
             state.stateId = '1';
-            const result = await engine.execute(clause, request, state, '2017-11-12T17:38:01-05:00');
+            const result = await engine.trigger(clause, request, state, '2017-11-12T17:38:01-05:00');
             result.should.not.be.null;
             result.response.penalty.should.equal(21);
             result.response.buyerMayTerminate.should.equal(false);
         });
 
-        it('should fail to execute if the current time is not in the right format (JavaScript)', async function () {
+        it('should fail to trigger if the current time is not in the right format (JavaScript)', async function () {
             const request = {};
             request.$class = 'org.accordproject.latedeliveryandpenalty.LateDeliveryAndPenaltyRequest';
             request.forceMajeure = false;
@@ -241,7 +241,7 @@ describe('EngineLatePenalty (JavaScript)', () => {
             const state = {};
             state.$class = 'org.accordproject.cicero.contract.AccordContractState';
             state.stateId = '1';
-            return engine.execute(clause, request, state, '2017-11-12').should.be.rejectedWith('2017-11-12 is not a valid moment with the format \'YYYY-MM-DDTHH:mm:ssZ\'');
+            return engine.trigger(clause, request, state, '2017-11-12').should.be.rejectedWith('2017-11-12 is not a valid moment with the format \'YYYY-MM-DDTHH:mm:ssZ\'');
         });
     });
 });
@@ -261,9 +261,9 @@ describe('EngineHelloWorld', () => {
 
     afterEach(() => {});
 
-    describe('#execute', function () {
+    describe('#trigger', function () {
 
-        it('should execute a smart clause', async function () {
+        it('should trigger a smart clause', async function () {
             const request = {
                 '$class': 'org.accordproject.helloworld.MyRequest',
                 'input': 'Accord Project'
@@ -271,12 +271,12 @@ describe('EngineHelloWorld', () => {
             const state = {};
             state.$class = 'org.accordproject.cicero.contract.AccordContractState';
             state.stateId = '1';
-            const result = await engine.execute(clause, request, state);
+            const result = await engine.trigger(clause, request, state);
             result.should.not.be.null;
             result.response.output.should.equal('Hello Fred Blogs (Accord Project)');
         });
 
-        it('should execute a smart clause with state initialization', async function () {
+        it('should trigger a smart clause with state initialization', async function () {
             const result = await engine.init(clause);
             result.state.should.not.be.null;
             const state = result.state;
@@ -286,14 +286,14 @@ describe('EngineHelloWorld', () => {
                 '$class': 'org.accordproject.helloworld.MyRequest',
                 'input': 'Accord Project'
             };
-            const result1 = await engine.execute(clause, request1, state);
+            const result1 = await engine.trigger(clause, request1, state);
             result1.should.not.be.null;
             result1.response.output.should.equal('Hello Fred Blogs (Accord Project)');
         });
     });
-    describe('#execute2', function () {
+    describe('#trigger2', function () {
 
-        it('should execute a smart clause', async function () {
+        it('should trigger a smart clause', async function () {
             try {
                 const request = {
                     '$class': 'org.accordproject.helloworld.MyRequest',
@@ -302,7 +302,7 @@ describe('EngineHelloWorld', () => {
                 const state = {};
                 state.$class = 'org.accordproject.cicero.contract.AccordContractState';
                 state.stateId = '1';
-                const result = await engine.execute(clause, request, state);
+                const result = await engine.trigger(clause, request, state);
                 return result;
             } catch (err) {
                 err.should.be.Error;
@@ -342,9 +342,9 @@ describe('EngineHelloModule', () => {
 
     afterEach(() => {});
 
-    describe('#execute', function () {
+    describe('#trigger', function () {
 
-        it('should execute a smart clause', async function () {
+        it('should trigger a smart clause', async function () {
             const request = {
                 '$class': 'org.accordproject.hellomodule.MyRequest',
                 'input': 'Accord Project'
@@ -352,7 +352,7 @@ describe('EngineHelloModule', () => {
             const state = {};
             state.$class = 'org.accordproject.cicero.contract.AccordContractState';
             state.stateId = '1';
-            const result = await engine.execute(clause, request, state);
+            const result = await engine.trigger(clause, request, state);
             result.should.not.be.null;
             result.response.output.should.equal('Hello Fred Blogs (Accord Project) [motd: PI/2.0 radians is 90.0 degrees]');
         });
@@ -374,9 +374,9 @@ describe('EngineHelloEmit', () => {
 
     afterEach(() => {});
 
-    describe('#executeandemit', function () {
+    describe('#triggerandemit', function () {
 
-        it('should execute a smart clause which emits', async function () {
+        it('should trigger a smart clause which emits', async function () {
             const request = {
                 '$class': 'org.accordproject.helloemit.MyRequest',
                 'input': 'Accord Project'
@@ -384,7 +384,7 @@ describe('EngineHelloEmit', () => {
             const state = {};
             state.$class = 'org.accordproject.cicero.contract.AccordContractState';
             state.stateId = '1';
-            const result = await engine.execute(clause, request, state);
+            const result = await engine.trigger(clause, request, state);
             result.should.not.be.null;
             result.response.output.should.equal('Hello Fred Blogs (Accord Project)');
             result.emit[0].$class.should.equal('org.accordproject.helloemit.Greeting');
@@ -408,9 +408,9 @@ describe('EngineHelloEmitInit', () => {
 
     afterEach(() => {});
 
-    describe('#executeandemitinit', function () {
+    describe('#triggerandemitinit', function () {
 
-        it('should execute a smart clause which emits during initialization', async function () {
+        it('should trigger a smart clause which emits during initialization', async function () {
             const result = await engine.init(clause);
             result.should.not.be.null;
             result.response.should.not.be.null;
@@ -435,9 +435,9 @@ describe('EngineSaft', () => {
 
     afterEach(() => {});
 
-    describe('#execute', function () {
+    describe('#trigger', function () {
 
-        it('should execute a smart clause', async function () {
+        it('should trigger a smart clause', async function () {
             const request = {};
             const NS = 'org.accordproject.saft';
             request.$class = `${NS}.Launch`;
@@ -445,7 +445,7 @@ describe('EngineSaft', () => {
             const state = {};
             state.$class = 'org.accordproject.cicero.contract.AccordContractState';
             state.stateId = '1';
-            const result = await engine.execute(clause, request, state);
+            const result = await engine.trigger(clause, request, state);
             result.should.not.be.null;
             result.response.tokenAmount.doubleValue.should.equal(100);
             result.response.tokenAddress.should.equal('Daniel Charles Selman');
@@ -526,9 +526,9 @@ describe('EngineInstallmentSaleErgo', () => {
 
     afterEach(() => {});
 
-    describe('#execute', function () {
+    describe('#trigger', function () {
 
-        it('should execute a smart clause', async function () {
+        it('should trigger a smart clause', async function () {
             const request = {};
             request.$class = 'org.accordproject.installmentsale.Installment';
             request.amount = 2500.00;
@@ -539,7 +539,7 @@ describe('EngineInstallmentSaleErgo', () => {
             state.balance_remaining = 10000.00;
             state.total_paid = 0.00;
             state.next_payment_month = 3.0;
-            const result = await engine.execute(clause, request, state);
+            const result = await engine.trigger(clause, request, state);
             result.should.not.be.null;
             result.response.balance.should.equal(7612.499999999999);
             result.state.balance_remaining.should.equal(7612.499999999999);
@@ -554,7 +554,7 @@ describe('EngineInstallmentSaleErgo', () => {
             result.state.total_paid.should.equal(0.0);
         });
 
-        it('should initialize a smart clause and execute one installment', async function () {
+        it('should initialize a smart clause and trigger one installment', async function () {
             const result = await engine.init(clause);
             result.should.not.be.null;
             result.response.should.not.be.null;
@@ -563,7 +563,7 @@ describe('EngineInstallmentSaleErgo', () => {
             const request1 = {};
             request1.$class = 'org.accordproject.installmentsale.Installment';
             request1.amount = 2500.00;
-            const result1 = await engine.execute(clause, request1, result.state);
+            const result1 = await engine.trigger(clause, request1, result.state);
             result1.should.not.be.null;
             result1.response.balance.should.equal(7612.499999999999);
             result1.state.balance_remaining.should.equal(7612.499999999999);

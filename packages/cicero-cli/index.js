@@ -38,7 +38,7 @@ require('yargs')
             type: 'string'
         });
         yargs.option('currentTime', {
-            describe: 'execute with this current time',
+            describe: 'set current time',
             type: 'string',
             default: null
         });
@@ -83,7 +83,7 @@ require('yargs')
             type: 'string'
         });
         yargs.option('currentTime', {
-            describe: 'execute with this current time',
+            describe: 'set current time',
             type: 'string',
             default: null
         });
@@ -139,7 +139,7 @@ require('yargs')
             type: 'string'
         });
         yargs.option('currentTime', {
-            describe: 'execute with this current time',
+            describe: 'set current time',
             type: 'string',
             default: null
         });
@@ -175,7 +175,7 @@ require('yargs')
             return;
         }
     })
-    .command('execute', 'send a request to the contract', (yargs) => {
+    .command('trigger', 'send a request to the contract', (yargs) => {
         yargs.option('template', {
             describe: 'path to the template',
             type: 'string'
@@ -193,7 +193,7 @@ require('yargs')
             type: 'string'
         });
         yargs.option('currentTime', {
-            describe: 'execute with this current time',
+            describe: 'set current time',
             type: 'string',
             default: null
         });
@@ -205,11 +205,11 @@ require('yargs')
     }, (argv) => {
 
         try {
-            argv = Commands.validateExecuteArgs(argv);
+            argv = Commands.validateTriggerArgs(argv);
             const options = {
                 warnings: argv.warnings,
             };
-            return Commands.execute(argv.template, argv.sample, argv.request, argv.state, argv.currentTime, options)
+            return Commands.trigger(argv.template, argv.sample, argv.request, argv.state, argv.currentTime, options)
                 .then((result) => {
                     if(result) {Logger.info(JSON.stringify(result));}
                 })
@@ -242,7 +242,7 @@ require('yargs')
             type: 'string'
         });
         yargs.option('currentTime', {
-            describe: 'execute with this current time',
+            describe: 'set current time',
             type: 'string',
             default: null
         });
@@ -370,7 +370,7 @@ require('yargs')
         }
 
         try {
-            argv = Commands.validateExecuteArgs(argv);
+            argv = Commands.validateTriggerArgs(argv);
             const options = {
                 warnings: argv.warnings,
             };

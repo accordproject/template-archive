@@ -49,8 +49,8 @@ describe('cicero-server', () => {
         request = request(server);
     });
 
-    it('/should execute a simple stateless request (ergo)', async () => {
-        return request.post('/execute/latedeliveryandpenalty/data.json')
+    it('/should trigger a simple stateless request (ergo)', async () => {
+        return request.post('/trigger/latedeliveryandpenalty/data.json')
             .send(body)
             .expect(200)
             .then(response => {
@@ -59,8 +59,8 @@ describe('cicero-server', () => {
             });
     });
 
-    it('/should execute a simple stateless request with a sample clause (ergo)', async () => {
-        return request.post('/execute/latedeliveryandpenalty/text%2Fsample.md')
+    it('/should trigger a simple stateless request with a sample clause (ergo)', async () => {
+        return request.post('/trigger/latedeliveryandpenalty/text%2Fsample.md')
             .send(body)
             .expect(200)
             .then(response => {
@@ -69,14 +69,14 @@ describe('cicero-server', () => {
             });
     });
 
-    it('/should fail to execute a simple stateless request with a bad data file (ergo)', async () => {
-        return request.post('/execute/latedeliveryandpenalty/bad.txt')
+    it('/should fail to trigger a simple stateless request with a bad data file (ergo)', async () => {
+        return request.post('/trigger/latedeliveryandpenalty/bad.txt')
             .send(body)
             .expect(500);
     });
 
-    it('/should execute a stateful request (ergo)', async () => {
-        return request.post('/execute/latedeliveryandpenalty/data.json')
+    it('/should trigger a stateful request (ergo)', async () => {
+        return request.post('/trigger/latedeliveryandpenalty/data.json')
             .send({
                 request: body,
                 state,
