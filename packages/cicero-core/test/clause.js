@@ -318,7 +318,7 @@ describe('Clause', () => {
             nl.should.equal(`Late Delivery and Penalty
 ----
 
-In case of delayed delivery<variable id="forceMajeure" value="%20except%20for%20Force%20Majeure%20cases,"/> the Seller shall pay to the Buyer for every <variable id="penaltyDuration" value="9%20days"/> of delay penalty amounting to <variable id="penaltyPercentage" value="7.0"/>% of the total value of the Equipment whose delivery has been delayed.
+In case of delayed delivery<variable id="forceMajeure" value="%20except%20for%20Force%20Majeure%20cases%2C"/> the Seller shall pay to the Buyer for every <variable id="penaltyDuration" value="9%20days"/> of delay penalty amounting to <variable id="penaltyPercentage" value="7.0"/>% of the total value of the Equipment whose delivery has been delayed.
 
 1. Any fractional part of a <variable id="fractionalPart" value="days"/> is to be considered a full <variable id="fractionalPart" value="days"/>.
 1. The total amount of penalty shall not however, exceed <variable id="capPercentage" value="2.0"/>% of the total value of the Equipment involved in late delivery.
@@ -330,7 +330,7 @@ In case of delayed delivery<variable id="forceMajeure" value="%20except%20for%20
             const clause = new Clause(template);
             clause.parse('dateTimeProperty: 01/12/2018');
             const nl = await clause.generateText({ wrapVariables: true });
-            nl.should.equal('dateTimeProperty: <variable id="dateTimeProperty" value="01/12/2018" format="DD/MM/YYYY"/>');
+            nl.should.equal('dateTimeProperty: <variable id="dateTimeProperty" value="01%2F12%2F2018" format="DD%2FMM%2FYYYY"/>');
         });
 
         it('should be able to roundtrip latedelivery natural language text (with a Period)', async function() {
