@@ -309,17 +309,17 @@ describe('EngineHelloWorld', () => {
             }
         });
     });
-    describe('#generateText', function () {
+    describe('#draft', function () {
 
         it('should generate text for a smart clause', async function () {
-            const result = await engine.generateText(clause, null, null);
+            const result = await engine.draft(clause, null, null);
             result.should.not.be.null;
             result.response.should.equal(`Name of the person to greet: "Fred Blogs".
 Thank you!`);
         });
 
         it('should generate text for a smart clause, with wrapped variables', async function () {
-            const result = await engine.generateText(clause, {wrapVariables:true},null);
+            const result = await engine.draft(clause, {wrapVariables:true},null);
             result.should.not.be.null;
             result.response.should.equal(`Name of the person to greet: <variable id="name" value="%22Fred%20Blogs%22"/>.
 Thank you!`);
@@ -452,7 +452,7 @@ describe('EngineSaft', () => {
         });
     });
 
-    describe('#generateText', function () {
+    describe('#draft', function () {
 
         it('should generate text for a smart clause', async function () {
             const request = {};
@@ -462,7 +462,7 @@ describe('EngineSaft', () => {
             const state = {};
             state.$class = 'org.accordproject.cicero.contract.AccordContractState';
             state.stateId = '1';
-            const result = await engine.generateText(clause);
+            const result = await engine.draft(clause);
             result.should.not.be.null;
             result.response.should.equal(TemplateLoader.normalizeText(saftInput));
         });

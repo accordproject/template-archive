@@ -275,7 +275,7 @@ describe('#draft', () => {
         result.should.eql(draftResponse);
     });
 
-    it('should fail generating the text for a clause using a template', async () => {
+    it('should fail drafting the text for a clause using a template', async () => {
         const result = await Commands.draft(template, dataErr, null);
         should.equal(result,undefined);
     });
@@ -289,19 +289,19 @@ describe('#draft-output', async () => {
     });
 });
 
-describe('#validateRedraftArgs', () => {
+describe('#validateNormalizeArgs', () => {
     it('no args specified', () => {
         process.chdir(path.resolve(__dirname, 'data/latedeliveryandpenalty/'));
-        const args  = Commands.validateRedraftArgs({
-            _: ['redraft'],
+        const args  = Commands.validateNormalizeArgs({
+            _: ['normalize'],
         });
         args.template.should.match(/cicero-cli[/\\]test[/\\]data[/\\]latedeliveryandpenalty$/);
         args.sample.should.match(/text[/\\]sample.md$/);
     });
     it('all args specified', () => {
         process.chdir(path.resolve(__dirname, 'data/latedeliveryandpenalty/'));
-        const args  = Commands.validateRedraftArgs({
-            _: ['redraft'],
+        const args  = Commands.validateNormalizeArgs({
+            _: ['normalize'],
             template: './',
             sample: 'text/sample.md'
         });
@@ -310,8 +310,8 @@ describe('#validateRedraftArgs', () => {
     });
     it('all args specified, parent folder', () => {
         process.chdir(path.resolve(__dirname, 'data/'));
-        const args  = Commands.validateRedraftArgs({
-            _: ['redraft'],
+        const args  = Commands.validateNormalizeArgs({
+            _: ['normalize'],
             template: 'latedeliveryandpenalty',
             sample: 'latedeliveryandpenalty/text/sample.md'
         });
@@ -320,8 +320,8 @@ describe('#validateRedraftArgs', () => {
     });
     it('all args specified, archive', () => {
         process.chdir(path.resolve(__dirname, 'data/'));
-        const args  = Commands.validateRedraftArgs({
-            _: ['redraft'],
+        const args  = Commands.validateNormalizeArgs({
+            _: ['normalize'],
             template: 'latedeliveryandpenalty.cta',
             sample: 'latedeliveryandpenalty/text/sample.md'
         });
@@ -330,8 +330,8 @@ describe('#validateRedraftArgs', () => {
     });
     it('all args specified, parent folder, no sample', () => {
         process.chdir(path.resolve(__dirname, 'data/'));
-        const args  = Commands.validateRedraftArgs({
-            _: ['redraft'],
+        const args  = Commands.validateNormalizeArgs({
+            _: ['normalize'],
             template: 'latedeliveryandpenalty',
         });
         args.template.should.match(/cicero-cli[/\\]test[/\\]data[/\\]latedeliveryandpenalty$/);
@@ -339,44 +339,44 @@ describe('#validateRedraftArgs', () => {
     });
     it('all args specified, child folder, no sample', () => {
         process.chdir(path.resolve(__dirname, 'data/latedeliveryandpenalty/text'));
-        const args  = Commands.validateRedraftArgs({
-            _: ['redraft'],
+        const args  = Commands.validateNormalizeArgs({
+            _: ['normalize'],
             template: '../',
         });
         args.template.should.match(/cicero-cli[/\\]test[/\\]data[/\\]latedeliveryandpenalty$/);
         args.sample.should.match(/text[/\\]sample.md$/);
     });
     it('no flags specified', () => {
-        const args  = Commands.validateRedraftArgs({
-            _: ['redraft', path.resolve(__dirname, 'data/latedeliveryandpenalty/')],
+        const args  = Commands.validateNormalizeArgs({
+            _: ['normalize', path.resolve(__dirname, 'data/latedeliveryandpenalty/')],
         });
         args.template.should.match(/cicero-cli[/\\]test[/\\]data[/\\]latedeliveryandpenalty$/);
         args.sample.should.match(/text[/\\]sample.md$/);
     });
     it('verbose flag specified', () => {
         process.chdir(path.resolve(__dirname, 'data/latedeliveryandpenalty/'));
-        Commands.validateRedraftArgs({
-            _: ['redraft'],
+        Commands.validateNormalizeArgs({
+            _: ['normalize'],
             verbose: true
         });
     });
     it('bad package.json', () => {
         process.chdir(path.resolve(__dirname, 'data/'));
-        (() => Commands.validateRedraftArgs({
-            _: ['redraft'],
+        (() => Commands.validateNormalizeArgs({
+            _: ['normalize'],
         })).should.throw(' not a valid cicero template. Make sure that package.json exists and that it has a cicero entry.');
     });
     it('bad sample.md', () => {
         process.chdir(path.resolve(__dirname, 'data/latedeliveryandpenalty/'));
-        (() => Commands.validateRedraftArgs({
-            _: ['redraft'],
+        (() => Commands.validateNormalizeArgs({
+            _: ['normalize'],
             sample: 'text/sample_en.md'
         })).should.throw('A text/sample.md file is required. Try the --sample flag or create a text/sample.md in your template.');
     });
     it('output specified', () => {
         process.chdir(path.resolve(__dirname, 'data/latedeliveryandpenalty/'));
-        const args  = Commands.validateRedraftArgs({
-            _: ['redraft'],
+        const args  = Commands.validateNormalizeArgs({
+            _: ['normalize'],
             output: sampleOut,
         });
         args.template.should.match(/cicero-cli[/\\]test[/\\]data[/\\]latedeliveryandpenalty$/);
@@ -385,8 +385,8 @@ describe('#validateRedraftArgs', () => {
     });
     it('overwrite specified', () => {
         process.chdir(path.resolve(__dirname, 'data/latedeliveryandpenalty/'));
-        const args  = Commands.validateRedraftArgs({
-            _: ['redraft'],
+        const args  = Commands.validateNormalizeArgs({
+            _: ['normalize'],
             overwrite: true,
         });
         args.template.should.match(/cicero-cli[/\\]test[/\\]data[/\\]latedeliveryandpenalty$/);
@@ -395,36 +395,36 @@ describe('#validateRedraftArgs', () => {
     });
     it('both output and overwrite specified', () => {
         process.chdir(path.resolve(__dirname, 'data/latedeliveryandpenalty/'));
-        (() => Commands.validateRedraftArgs({
-            _: ['redraft'],
+        (() => Commands.validateNormalizeArgs({
+            _: ['normalize'],
             output: sampleOut,
             overwrite: true,
         })).should.throw('Cannot use both --overwrite and --output');
     });
 });
 
-describe('#redraft', () => {
-    it('should redraft a clause using a template', async () => {
-        const result = await Commands.redraft(template, sample, false, null);
+describe('#normalize', () => {
+    it('should normalize a clause using a template', async () => {
+        const result = await Commands.normalize(template, sample, false, null);
         delete result.clauseId;
         result.should.eql(draftResponse);
     });
 
-    it('should redraft a clause using a template archive', async () => {
-        const result = await Commands.redraft(templateArchive, sample, false, null);
+    it('should normalize a clause using a template archive', async () => {
+        const result = await Commands.normalize(templateArchive, sample, false, null);
         delete result.clauseId;
         result.should.eql(draftResponse);
     });
 
-    it('should fail redrafting a clause using a template', async () => {
-        const result = await Commands.redraft(template, sampleErr, false, null);
+    it('should fail normalizeing a clause using a template', async () => {
+        const result = await Commands.normalize(template, sampleErr, false, null);
         should.equal(result,undefined);
     });
 });
 
-describe('#redraft-output', async () => {
+describe('#normalize-output', async () => {
     it('should parse a clause using a template and save to a JSON file', async () => {
-        const result = await Commands.redraft(template, sample, false, dataOut);
+        const result = await Commands.normalize(template, sample, false, dataOut);
         result.should.eql(draftResponse);
     });
 });

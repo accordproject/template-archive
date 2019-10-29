@@ -120,7 +120,7 @@ require('yargs')
             return;
         }
     })
-    .command('redraft', 'parse a contract text and re-create it', (yargs) => {
+    .command('normalize', 'normalize markdown (parse & redraft)', (yargs) => {
         yargs.option('template', {
             describe: 'path to the template',
             type: 'string'
@@ -159,11 +159,11 @@ require('yargs')
         }
 
         try {
-            argv = Commands.validateRedraftArgs(argv);
+            argv = Commands.validateNormalizeArgs(argv);
             const options = {
                 warnings: argv.warnings,
             };
-            return Commands.redraft(argv.template, argv.sample, argv.overwrite, argv.output, argv.currentTime, options)
+            return Commands.normalize(argv.template, argv.sample, argv.overwrite, argv.output, argv.currentTime, options)
                 .then((result) => {
                     if(result) {Logger.info(result);}
                 })

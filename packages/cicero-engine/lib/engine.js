@@ -93,11 +93,11 @@ class Engine {
      * @param {string} currentTime - the definition of 'now'
      * @return {Promise} a promise that resolves to a result for the clause initialization
      */
-    async generateText(clause, options, currentTime) {
+    async draft(clause, options, currentTime) {
         const logicManager = clause.getLogicManager();
         const clauseId = clause.getIdentifier();
         const contract = clause.getData();
-        return this.ergoEngine.generateText(logicManager,clauseId,contract,{},currentTime, options);
+        return this.ergoEngine.draft(logicManager,clauseId,contract,{},currentTime, options);
     }
 
     /**
