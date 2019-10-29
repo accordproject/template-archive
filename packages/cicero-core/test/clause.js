@@ -300,13 +300,13 @@ describe('Clause', () => {
 
     });
 
-    describe('#generateText', () => {
+    describe('#draft', () => {
 
         it('should be able to roundtrip latedelivery natural language text', async function() {
             const template = await Template.fromDirectory('./test/data/latedeliveryandpenalty', options);
             const clause = new Clause(template);
             clause.parse(testLatePenaltyInput);
-            const nl = await clause.generateText();
+            const nl = await clause.draft();
             nl.should.equal(TemplateLoader.normalizeText(testLatePenaltyInput));
         });
 
@@ -314,7 +314,7 @@ describe('Clause', () => {
             const template = await Template.fromDirectory('./test/data/latedeliveryandpenalty', options);
             const clause = new Clause(template);
             clause.parse(testLatePenaltyInput);
-            const nl = await clause.generateText({ wrapVariables: true });
+            const nl = await clause.draft({ wrapVariables: true });
             nl.should.equal(`Late Delivery and Penalty
 ----
 
@@ -329,7 +329,7 @@ In case of delayed delivery<variable id="forceMajeure" value="%20except%20for%20
             const template = await Template.fromDirectory('./test/data/formatted-dates-DD_MM_YYYY', options);
             const clause = new Clause(template);
             clause.parse('dateTimeProperty: 01/12/2018');
-            const nl = await clause.generateText({ wrapVariables: true });
+            const nl = await clause.draft({ wrapVariables: true });
             nl.should.equal('dateTimeProperty: <variable id="dateTimeProperty" value="01%2F12%2F2018" format="DD%2FMM%2FYYYY"/>');
         });
 
@@ -337,7 +337,7 @@ In case of delayed delivery<variable id="forceMajeure" value="%20except%20for%20
             const template = await Template.fromDirectory('./test/data/latedeliveryandpenalty-period', options);
             const clause = new Clause(template);
             clause.parse(testLatePenaltyPeriodInput);
-            const nl = await clause.generateText();
+            const nl = await clause.draft();
             nl.should.equal(TemplateLoader.normalizeText(testLatePenaltyPeriodInput));
         });
 
@@ -345,7 +345,7 @@ In case of delayed delivery<variable id="forceMajeure" value="%20except%20for%20
             const template = await Template.fromDirectory('./test/data/conga', options);
             const clause = new Clause(template);
             clause.parse(testCongaInput);
-            const nl = await clause.generateText();
+            const nl = await clause.draft();
             nl.should.equal(TemplateLoader.normalizeText(testCongaInput));
         });
 
@@ -353,7 +353,7 @@ In case of delayed delivery<variable id="forceMajeure" value="%20except%20for%20
             const template = await Template.fromDirectory('./test/data/alltypes', options);
             const clause = new Clause(template);
             clause.parse(testAllTypesInput);
-            const nl = await clause.generateText();
+            const nl = await clause.draft();
             nl.should.equal(TemplateLoader.normalizeText(testAllTypesInput));
         });
 
@@ -361,7 +361,7 @@ In case of delayed delivery<variable id="forceMajeure" value="%20except%20for%20
             const template = await Template.fromDirectory('./test/data/allblocks', options);
             const clause = new Clause(template);
             clause.parse(testAllBlocksInput);
-            const nl = await clause.generateText();
+            const nl = await clause.draft();
             nl.should.equal(TemplateLoader.normalizeText(testAllBlocksInput));
         });
     });

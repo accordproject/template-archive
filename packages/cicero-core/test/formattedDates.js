@@ -56,7 +56,7 @@ describe('FormattedDates', () => {
             });
         });
 
-        describe(`#generateText - ${testTemplate}`, () => {
+        describe(`#draft - ${testTemplate}`, () => {
 
             it('should be able to roundtrip formatted-dates natural language text', async function() {
                 const location = path.resolve(__dirname, `data/${testTemplate}`);
@@ -64,7 +64,7 @@ describe('FormattedDates', () => {
                 const clause = new Clause(template);
                 const formattedDatesInput = fs.readFileSync(path.resolve(__dirname, 'data/', testTemplate + '/text/sample.md'), 'utf8');
                 clause.parse(formattedDatesInput);
-                const nl = await clause.generateText(null, '2019-01-04T00:00:00+01:02');
+                const nl = await clause.draft(null, '2019-01-04T00:00:00+01:02');
                 nl.should.equal(formattedDatesInput);
             });
         });

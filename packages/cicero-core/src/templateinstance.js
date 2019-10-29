@@ -192,7 +192,7 @@ class TemplateInstance {
      * @returns {string} the natural language text for the contract or clause; created by combining the structure of
      * the template with the JSON data for the clause.
      */
-    async generateText(options, currentTime) {
+    async draft(options, currentTime) {
         if(!this.concertoData) {
             throw new Error('Data has not been set. Call setData or parse before calling this method.');
         }
@@ -207,7 +207,7 @@ class TemplateInstance {
         const contract = this.getData();
 
         return logicManager.compileLogic(false).then(async () => {
-            const result = await this.getEngine().generateText(logicManager,clauseId,contract,{},currentTime,markdownOptions);
+            const result = await this.getEngine().draft(logicManager,clauseId,contract,{},currentTime,markdownOptions);
             // Roundtrip the response through the Commonmark parser
             return this.getTemplate().getParserManager().roundtripMarkdown(result.response);
         });

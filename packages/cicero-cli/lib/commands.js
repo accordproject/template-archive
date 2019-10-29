@@ -180,7 +180,7 @@ class Commands {
     }
 
     /**
-     * Set default params before we generatet a sample text using a template
+     * Set default params before we draft a sample text using a template
      *
      * @param {object} argv - the inbound argument values object
      * @returns {object} a modfied argument object
@@ -190,14 +190,14 @@ class Commands {
         argv = Commands.setDefaultFileArg(argv, 'data', 'data.json', ((argv, argDefaultName) => { return path.resolve(argv.template,argDefaultName); }));
 
         if(argv.verbose) {
-            Logger.info(`generate text from data ${argv.data} using a template ${argv.template}`);
+            Logger.info(`draft text from data ${argv.data} using a template ${argv.template}`);
         }
 
         return argv;
     }
 
     /**
-     * Generate a contract text from JSON data
+     * Draft a contract text from JSON data
      *
      * @param {string} templatePath - path to the template directory or archive
      * @param {string} dataPath - path to the JSON data
@@ -214,7 +214,7 @@ class Commands {
             .then(async function (template) {
                 clause = new Clause(template);
                 clause.setData(dataJson);
-                const text = await clause.generateText(options, currentTime);
+                const text = await clause.draft(options, currentTime);
                 if (outputPath) {
                     Logger.info('Creating file: ' + outputPath);
                     fs.writeFileSync(outputPath, text);
@@ -232,7 +232,7 @@ class Commands {
      * @param {object} argv - the inbound argument values object
      * @returns {object} a modfied argument object
      */
-    static validateRedraftArgs(argv) {
+    static validateNormalizeArgs(argv) {
         argv = Commands.validateParseArgs(argv);
         if (argv.overwrite) {
             if (argv.output) {
@@ -255,7 +255,7 @@ class Commands {
      * @param {Object} [options] - an optional set of options
      * @returns {object} Promise to the result of parsing
      */
-    static redraft(templatePath, samplePath, overwrite, outputPath, currentTime, options) {
+    static normalize(templatePath, samplePath, overwrite, outputPath, currentTime, options) {
         let clause;
         const sampleText = fs.readFileSync(samplePath, 'utf8');
 
@@ -267,7 +267,7 @@ class Commands {
                     Logger.info('Creating file: ' + outputPath);
                     fs.writeFileSync(outputPath, JSON.stringify(clause.getData(),null,2));
                 }
-                const text = await clause.generateText(options, currentTime);
+                const text = await clause.draft(options, currentTime);
                 if (outputPath) {
                     Logger.info('Creating file: ' + outputPath);
                     fs.writeFileSync(outputPath, text);
@@ -500,7 +500,7 @@ class Commands {
      * Compile the template to a given target
      *
      * @param {string} templatePath - path to the template directory or archive
-     * @param {string} target - the target format to generate
+     * @param {string} target - the target format
      * @param {string} outputPath - the output directory
      * @param {Object} [options] - an optional set of options
      * @returns {object} Promise to the result of code generation
