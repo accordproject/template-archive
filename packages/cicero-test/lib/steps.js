@@ -104,7 +104,7 @@ Given('that the contract says', async function (contractText) {
         this.request = clause.getTemplate().getMetadata().getRequest();
         this.clause = clause;
     }
-    this.clause.parse(contractText);
+    this.clause.parse(contractText,this.currentTime);
 });
 
 Given('that the contract data is', async function (contractData) {
@@ -125,7 +125,7 @@ Given('the default( sample) contract', async function () {
         this.request = clause.getTemplate().getMetadata().getRequest();
         this.clause = clause;
     }
-    this.clause.parse(this.clause.getTemplate().getMetadata().getSample());
+    this.clause.parse(this.clause.getTemplate().getMetadata().getSample(),this.currentTime);
 });
 
 Given('the state', function (actualState) {
