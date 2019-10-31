@@ -462,19 +462,6 @@ describe('Metadata', () => {
         });
     });
 
-    describe('#ergoVersion', () => {
-        it('should return ergoVersion', () => {
-            const md = new Metadata({
-                name: 'template',
-                version: '1.0.0',
-                accordproject: {ergo:'0.20.0-alpha.2',cicero:caretRange(ciceroVersion),runtime:'cicero'}
-            }, null, {
-                en: 'sample'
-            });
-            md.getErgoVersion().should.be.equal('0.20.0-alpha.2');
-        });
-    });
-
     describe('#targetRuntime', () => {
         it('should return target runtime', () => {
             const md = new Metadata({
