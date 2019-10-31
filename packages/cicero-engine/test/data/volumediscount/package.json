@@ -4,7 +4,6 @@
     "description": "A sample volume discount clause.",
     "accordproject": {
         "template": "clause",
-        "ergo": "0.20.0-alpha.2",
         "cicero": "^0.20.0-alpha.1"
     }
 }

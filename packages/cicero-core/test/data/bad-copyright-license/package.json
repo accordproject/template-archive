@@ -3,7 +3,6 @@
     "version": "0.0.1",
     "accordproject": {
       "template": "contract",
-      "ergo": "0.20.0-alpha.2",
       "cicero": "^0.20.0-alpha.1"
     }
 }

@@ -58,9 +58,6 @@ class Metadata {
         // the version of Cicero that this template is compatible with
         this.ciceroVersion = null;
 
-        // the version of Ergo that the Ergo source in this template is compatible with (if the tempalte contains source code)
-        this.ergoVersion = null;
-
         if(!packageJson || typeof(packageJson) !== 'object') {
             throw new Error('package.json is required and must be an object');
         }
@@ -95,18 +92,13 @@ class Metadata {
             throw new Error(msg);
         }
 
-        // the runtime property is optional, and is only present for templates that have been compiled
+        // the runtime property is optional, and is only mandatory for templates that have been compiled
         if (packageJson.accordproject.runtime && packageJson.accordproject.runtime !== 'ergo') {
             ErgoCompiler.isValidTarget(packageJson.accordproject.runtime);
         } else {
             packageJson.accordproject.runtime = 'ergo';
         }
         this.runtime = packageJson.accordproject.runtime;
-
-        // ergo property is optional, must be present for templates containing Ergo code
-        if (packageJson.accordproject.ergo) {
-            this.ergoVersion = packageJson.accordproject.ergo;
-        }
 
         if(!samples || typeof(samples) !== 'object') {
             throw new Error('sample.md is required');
@@ -193,15 +185,6 @@ class Metadata {
      */
     getRuntime(){
         return this.runtime;
-    }
-
-    /**
-     * Returns the Ergo version that the Ergo code in this template is compatible with. This
-     * is null for templates that do not contain source Ergo code.
-     * @returns {string} the version of Ergo
-     */
-    getErgoVersion(){
-        return this.ergoVersion;
     }
 
     /**

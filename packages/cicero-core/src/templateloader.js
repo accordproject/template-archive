@@ -89,17 +89,15 @@ class TemplateLoader extends FileLoader {
         }
 
         // load and add the ergo files
-        if(template.getMetadata().getErgoVersion()) {
+        if(template.getMetadata().getRuntime() === 'ergo') {
             template.getLogicManager().addTemplateFile(templatizedGrammar,'text/grammar.tem.md');
             Logger.debug(method, 'Adding Ergo files to script manager');
             const scriptFiles = await TemplateLoader.loadZipFilesContents(zip, /logic[/\\].*\.ergo$/);
             scriptFiles.forEach(function (obj) {
                 template.getLogicManager().addLogicFile(obj.contents, obj.name);
             });
-        }
-
-        // load and add compiled JS files - we assume all runtimes are JS based (review!)
-        if(template.getMetadata().getRuntime()) {
+        } else {
+            // load and add compiled JS files - we assume all runtimes are JS based (review!)
             Logger.debug(method, 'Adding JS files to script manager');
             const scriptFiles = await TemplateLoader.loadZipFilesContents(zip, /logic[/\\].*\.js$/);
             scriptFiles.forEach(function (obj) {
@@ -203,7 +201,7 @@ class TemplateLoader extends FileLoader {
         Logger.debug(method, 'Loaded grammar.tem.md');
 
         // load and add the ergo files
-        if(template.getMetadata().getErgoVersion() && template.getMetadata().getRuntime() === 'ergo') {
+        if(template.getMetadata().getRuntime() === 'ergo') {
             // If Ergo then also register the template
             template.getLogicManager().addTemplateFile(templatizedGrammar,'text/grammar.tem.md');
             const ergoFiles = await TemplateLoader.loadFilesContents(path, /logic[/\\].*\.ergo$/);
@@ -213,10 +211,8 @@ class TemplateLoader extends FileLoader {
                 const truncatedPath = resolvedFilePath.replace(resolvedPath+'/', '');
                 template.getLogicManager().addLogicFile(file.contents, truncatedPath);
             });
-        }
-
-        // load and add compiled JS files - we assume all runtimes are JS based (review!)
-        if(template.getMetadata().getRuntime() !== 'ergo') {
+        } else {
+            // load and add compiled JS files - we assume all runtimes are JS based (review!)
             const jsFiles = await TemplateLoader.loadFilesContents(path, /logic[/\\].*\.js$/);
             jsFiles.forEach((file) => {
                 const resolvedPath = slash(fsPath.resolve(path));
