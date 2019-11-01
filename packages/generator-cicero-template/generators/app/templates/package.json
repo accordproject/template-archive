@@ -4,9 +4,9 @@
     "description": "Name of the person to greet: \"Dan\".\nThank you!",
     "accordproject": {
         "template": "contract",
-        "ergo": "0.20.0-alpha.2",
-        "cicero": "^<%= data.engineVersion %>"
-      },
+        "cicero": "^<%= data.engineVersion %>",
+        "runtime": "ergo"
+    },
     "devDependencies": {
         "cucumber": "^5.1.0",
         "chai": "4.2.0",
