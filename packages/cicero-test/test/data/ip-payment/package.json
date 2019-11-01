@@ -6,7 +6,7 @@
     "license": "Apache-2.0",
     "accordproject": {
         "template": "clause",
-        "cicero": "^0.20.0-alpha.1"
+        "cicero": "^0.20.0"
       },
     "devDependencies": {
         "mocha": "5.2.0"
