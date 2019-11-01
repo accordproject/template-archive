@@ -50,7 +50,7 @@
   },
   "dependencies": {
     "@accordproject/cicero-core": "0.20.0-beta.3",
-    "@accordproject/ergo-engine": "0.20.0-beta.3",
+    "@accordproject/ergo-engine": "0.20.0",
     "moment-mini": "2.22.1"
   },
   "license-check-config": {
