@@ -45,7 +45,7 @@ class TemplateSaver {
         zip.file('package.json', packageFileContents, options);
 
         // save the grammar
-        zip.file('grammar/', null, Object.assign({}, options, {
+        zip.file('text/', null, Object.assign({}, options, {
             dir: true
         }));
 
