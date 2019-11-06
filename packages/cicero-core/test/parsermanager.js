@@ -28,7 +28,7 @@ describe('ParserManager', () => {
 
     describe('#getTemplateAst', () => {
 
-        it.only('should return the AST for a template', async () => {
+        it('should return the AST for a template', async () => {
             const packageJson = {
                 name: 'my-template',
                 version: '0.0.1',
