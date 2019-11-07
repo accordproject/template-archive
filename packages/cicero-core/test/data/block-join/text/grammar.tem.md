@@ -1,0 +1,1 @@
+This is a list: {{#join rates ", "}}{{rate}}%{{/join}} (And more Text)

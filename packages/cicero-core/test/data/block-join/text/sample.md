@@ -1,0 +1,1 @@
+This is a list: 3.1%, 3.3%, 2.9% (And more Text)

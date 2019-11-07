@@ -39,27 +39,6 @@ const escapeNearley = (x) => {
         .replace(/\r/g, '\\r');
 }
 
-const adjustList = (x,kind) => {
-    const sep = kind === 'unordered' ? "\n- " : "\n1. ";
-    if (x.data[0] && x.data[0].type === "Chunk") {
-        x.data[0].value = sep + x.data[0].value;
-        return x;
-    } else {
-        return {
-            type: x.type,
-            data: [
-              { "type":"Chunk",
-                "value":sep,
-                "text":"",
-                "offset":0,
-                "lineBreaks":0,
-                "line":0,
-                "col":0}
-            ].concat(x.data),
-        };
-    }
-}
-
 // we use lexer states to distinguish between the tokens
 // in the text and the tokens inside the variables
 const lexer = moo.states({
@@ -101,6 +80,7 @@ const lexer = moo.states({
             match: '}}',
             pop: true
         }, // pop back to main state
+        varelseid: 'else',
         varid: {
           match: /[a-zA-Z_][_a-zA-Z0-9]*/,
           type: moo.keywords({varas: 'as'})
@@ -125,7 +105,9 @@ const lexer = moo.states({
         startwithid: 'with',
         startulistid: 'ulist',
         startolistid: 'olist',
+        startjoinid: 'join',
         startifid: 'if',
+        startblockstring: /".*?"/,
         startblockid: /[a-zA-Z_][_a-zA-Z0-9]*/,
     },
     startref: {
@@ -145,6 +127,7 @@ const lexer = moo.states({
         endwithid: 'with',
         endulistid: 'ulist',
         endolistid: 'olist',
+        endjoinid: 'join',
         endifid: 'if',
     },
 });
@@ -169,12 +152,13 @@ CONTRACT_TEMPLATE -> CONTRACT_ITEM:* %LastChunk:?
 
 CONTRACT_ITEM -> 
       %Chunk {% id %}
-    | %markupstartblock ULIST_VARIABLE_INLINE {% (data) => { return data[1]; } %}
-    | %markupstartblock OLIST_VARIABLE_INLINE {% (data) => { return data[1]; } %}
-    | %markupstartblock IF_VARIABLE_INLINE {% (data) => { return data[1]; } %}
-    | %markupstartblock CLAUSE_VARIABLE_INLINE {% (data) => { return data[1]; } %}
-    | %markupstartblock WITH_VARIABLE_INLINE {% (data) => { return data[1]; } %}
-    | %markupstartref CLAUSE_VARIABLE_EXTERNAL {% (data) => { return data[1]; } %}
+    | %markupstartblock ULIST_BLOCK_INLINE {% (data) => { return data[1]; } %}
+    | %markupstartblock OLIST_BLOCK_INLINE {% (data) => { return data[1]; } %}
+    | %markupstartblock JOIN_BLOCK_INLINE {% (data) => { return data[1]; } %}
+    | %markupstartblock IF_BLOCK_INLINE {% (data) => { return data[1]; } %}
+    | %markupstartblock CLAUSE_BLOCK_INLINE {% (data) => { return data[1]; } %}
+    | %markupstartblock WITH_BLOCK_INLINE {% (data) => { return data[1]; } %}
+    | %markupstartref CLAUSE_BLOCK_EXTERNAL {% (data) => { return data[1]; } %}
     | %markupexpr CLAUSE_EXPR {% (data) => { return data[1]; } %}
     | VARIABLE {% id %}
 
@@ -189,10 +173,11 @@ CLAUSE_TEMPLATE -> CLAUSE_ITEM:* %LastChunk:?
 
 CLAUSE_ITEM -> 
       %Chunk {% id %} 
-    | %markupstartblock ULIST_VARIABLE_INLINE {% (data) => { return data[1]; } %}
-    | %markupstartblock OLIST_VARIABLE_INLINE {% (data) => { return data[1]; } %}
-    | %markupstartblock IF_VARIABLE_INLINE {% (data) => { return data[1]; } %}
-    | %markupstartblock WITH_VARIABLE_INLINE {% (data) => { return data[1]; } %}
+    | %markupstartblock ULIST_BLOCK_INLINE {% (data) => { return data[1]; } %}
+    | %markupstartblock OLIST_BLOCK_INLINE {% (data) => { return data[1]; } %}
+    | %markupstartblock JOIN_BLOCK_INLINE {% (data) => { return data[1]; } %}
+    | %markupstartblock IF_BLOCK_INLINE {% (data) => { return data[1]; } %}
+    | %markupstartblock WITH_BLOCK_INLINE {% (data) => { return data[1]; } %}
     | %markupexpr CLAUSE_EXPR {% (data) => { return data[1]; } %}
     | VARIABLE {% id %}
 
@@ -205,7 +190,7 @@ CLAUSE_EXPR -> %exprend
     }
 %}
 
-CLAUSE_VARIABLE_INLINE -> %startclauseid %startblockspace %startblockid %startblockend CLAUSE_TEMPLATE %markupendblock %endclauseid %endblockend
+CLAUSE_BLOCK_INLINE -> %startclauseid %startblockspace %startblockid %startblockend CLAUSE_TEMPLATE %markupendblock %endclauseid %endblockend
 {% (data,l,reject) => {
     // Check that opening and closing clause tags match
     // Note: this line makes the parser non-context-free
@@ -217,7 +202,7 @@ CLAUSE_VARIABLE_INLINE -> %startclauseid %startblockspace %startblockid %startbl
 }
 %}
 
-WITH_VARIABLE_INLINE -> %startwithid %startblockspace %startblockid %startblockend CLAUSE_TEMPLATE %markupendblock %endwithid %endblockend
+WITH_BLOCK_INLINE -> %startwithid %startblockspace %startblockid %startblockend CLAUSE_TEMPLATE %markupendblock %endwithid %endblockend
 {% (data,l,reject) => {
     // Check that opening and closing clause tags match
     // Note: this line makes the parser non-context-free
@@ -231,7 +216,7 @@ WITH_VARIABLE_INLINE -> %startwithid %startblockspace %startblockid %startblocke
 
 # Binds the variable to a Clause in the template model. The type of the clause
 # in the grammar is inferred from the type of the model element
-CLAUSE_VARIABLE_EXTERNAL -> %startrefspace:? %startrefid %startrefend
+CLAUSE_BLOCK_EXTERNAL -> %startrefspace:? %startrefid %startrefend
 {% (data) => {
     return {
         type: 'ClauseExternalBinding',
@@ -240,39 +225,63 @@ CLAUSE_VARIABLE_EXTERNAL -> %startrefspace:? %startrefid %startrefend
 } 
 %}
 
-ULIST_VARIABLE_INLINE -> %startulistid %startblockspace %startblockid %startblockend CLAUSE_TEMPLATE %markupendblock %endulistid %endblockend
+ULIST_BLOCK_INLINE -> %startulistid %startblockspace %startblockid %startblockend CLAUSE_TEMPLATE %markupendblock %endulistid %endblockend
 {% (data,l,reject) => {
     // Check that opening and closing clause tags match
     // Note: this line makes the parser non-context-free
         return {
-            type: 'ListBinding',
-            kind: 'unordered',
-            template: adjustList(data[4],'unordered'),
+            type: 'UListBinding',
+            template: data[4],
             fieldName: data[2]
         }
 }
 %}
 
-OLIST_VARIABLE_INLINE -> %startolistid %startblockspace %startblockid %startblockend CLAUSE_TEMPLATE %markupendblock %endolistid %endblockend
+OLIST_BLOCK_INLINE -> %startolistid %startblockspace %startblockid %startblockend CLAUSE_TEMPLATE %markupendblock %endolistid %endblockend
 {% (data,l,reject) => {
     // Check that opening and closing clause tags match
     // Note: this line makes the parser non-context-free
         return {
-            type: 'ListBinding',
-            kind: 'ordered',
-            template: adjustList(data[4],'ordered'),
+            type: 'OListBinding',
+            template: data[4],
             fieldName: data[2]
         }
 }
 %}
 
-IF_VARIABLE_INLINE -> %startifid %startblockspace %startblockid %startblockend %Chunk %markupendblock %endifid %endblockend
+JOIN_BLOCK_INLINE -> %startjoinid %startblockspace %startblockid %startblockspace %startblockstring %startblockend CLAUSE_TEMPLATE %markupendblock %endjoinid %endblockend
 {% (data,l,reject) => {
     // Check that opening and closing clause tags match
     // Note: this line makes the parser non-context-free
         return {
-            type: 'BooleanBinding',
-            string: data[4],
+            type: 'JoinBinding',
+            template: data[6],
+            separator: JSON.parse(data[4].value),
+            fieldName: data[2]
+        }
+}
+%}
+
+IF_BLOCK_INLINE ->
+      %startifid %startblockspace %startblockid %startblockend %Chunk %markupendblock %endifid %endblockend
+{% (data,l,reject) => {
+    // Check that opening and closing clause tags match
+    // Note: this line makes the parser non-context-free
+        return {
+            type: 'IfBinding',
+            stringIf: data[4],
+            fieldName: data[2]
+        }
+}
+%}
+    | %startifid %startblockspace %startblockid %startblockend %Chunk %varelseid %varend %Chunk %markupendblock %endifid %endblockend
+{% (data,l,reject) => {
+    // Check that opening and closing clause tags match
+    // Note: this line makes the parser non-context-free
+        return {
+            type: 'IfElseBinding',
+            stringIf: data[4],
+            stringElse: data[7],
             fieldName: data[2]
         }
 }

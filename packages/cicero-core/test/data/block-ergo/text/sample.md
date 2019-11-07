@@ -1,0 +1,1 @@
+This is a list: 3.0%, 3.2%, 2.8% (Average: {{3.0}})

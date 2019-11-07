@@ -1,0 +1,81 @@
+/*
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+namespace org.accordproject.cicero.runtime
+
+import org.accordproject.cicero.contract.AccordContract from https://models.accordproject.org/cicero/contract.cto
+import org.accordproject.cicero.contract.AccordContractState from https://models.accordproject.org/cicero/contract.cto
+import org.accordproject.money.MonetaryAmount from https://models.accordproject.org/money.cto
+
+/**
+ * Contract API
+ * -- Describes input and output of calls to a contract's clause
+ */
+
+/* A request is a transaction */
+transaction Request {}
+
+/* A response is a transaction */
+transaction Response {}
+
+/* An Error is a transaction */
+abstract transaction ErrorResponse {}
+
+/* An event that represents an obligation that needs to be fulfilled */
+abstract event Obligation {
+  /* A back reference to the governing contract that emitted this obligation */
+  --> AccordContract contract
+
+  /* The party that is obligated */
+  --> Participant promisor optional // TODO make this mandatory once proper party support is in place
+
+  /* The party that receives the performance */
+  --> Participant promisee optional // TODO make this mandatory once proper party support is in place
+
+  /* The time before which the obligation is fulfilled */
+  o DateTime deadline optional
+}
+
+event PaymentObligation extends Obligation{
+  o MonetaryAmount amount
+  o String description
+}
+
+event NotificationObligation extends Obligation {
+  o String title
+  o String message
+}
+
+/* A payload has contract data, a request and a state */
+concept Payload {
+  o AccordContract contract  // the contract data
+  o Request request
+  o AccordContractState state optional
+}
+
+/* If the call to a contract's clause succeeds, it returns a response, a list of events and a new state */
+concept Success {
+  o Response response
+  o AccordContractState state
+  o Event[] emit
+}
+/* If the call to a contract's clause fails, it returns and error */ 
+concept Failure {
+  o ErrorResponse error
+}
+
+/**
+ * The functional signature for a contract call is as follows:
+ * clausecall : String contractName -> String clauseName -> Payload payload -> Success | Failure
+ */

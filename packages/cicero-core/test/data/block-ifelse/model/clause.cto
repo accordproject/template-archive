@@ -1,0 +1,39 @@
+namespace org.accordproject.volumediscountlist
+
+import org.accordproject.cicero.contract.* from https://models.accordproject.org/cicero/contract.cto
+import org.accordproject.cicero.runtime.* from https://models.accordproject.org/cicero/runtime.cto
+
+/**
+ * Defines the data model for the VolumeDiscount template.
+ * This defines the structure of the abstract syntax tree that the parser for the template
+ * must generate from input source text.
+ */
+concept RateRange {
+ o String name
+}
+
+asset VolumeDiscountContract extends AccordContract {
+  o Boolean isActive
+}
+
+/**
+ * Defines the input data required by the template
+ */
+transaction VolumeDiscountRequest {
+
+  /**
+   * 
+   */
+  o Double netAnnualChargeVolume
+
+}
+
+/**
+ * Defines the output data for the template
+ */
+transaction VolumeDiscountResponse {
+  /**
+   * The discount rate
+   */
+  o Double discountRate
+}
