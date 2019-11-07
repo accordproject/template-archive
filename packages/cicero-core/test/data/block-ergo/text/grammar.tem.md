@@ -1,0 +1,1 @@
+This is a list: {{#join rates ", "}}{{rate}}%{{/join}} (Average: {{% average(foreach r in rates return r.rate) %}})

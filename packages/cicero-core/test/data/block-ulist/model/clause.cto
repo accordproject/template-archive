@@ -1,0 +1,14 @@
+namespace org.accordproject.volumediscountlist
+
+import org.accordproject.cicero.contract.* from https://models.accordproject.org/cicero/contract.cto
+
+concept RateRange {
+ o Double volumeUpTo
+ o Double volumeAbove
+ o Double rate
+}
+
+asset VolumeDiscountContract extends AccordContract {
+  o RateRange[] rates
+}
+

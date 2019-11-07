@@ -1,0 +1,17 @@
+{
+    "name": "volumediscountolist",
+    "version": "0.2.0",
+    "description": "A sample volume discount contract (ordered list).",
+    "license": "Apache-2.0",
+    "accordproject": {
+        "template": "contract",
+        "cicero": "^0.20.0"
+    },
+    "devDependencies": {
+        "cucumber": "^5.1.0"
+    },
+    "scripts": {
+        "test": "cucumber-js test -r .cucumber.js"
+    },
+    "keywords": ["volume", "discount", "contract", "agreement", "percentage", "percent", "rate", "flat", "monthly", "credit", "chargeback", "rejection", "deduction", "withholding"]
+}

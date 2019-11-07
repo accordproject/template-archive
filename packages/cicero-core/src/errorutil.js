@@ -16,7 +16,7 @@
 
 /**
  * Extract the file location from the parse error
- * @param {object} error the parse error
+ * @param {object} error - the error object
  * @return {object} - the file location information
  */
 function locationOfError(error) {

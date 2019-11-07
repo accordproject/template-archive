@@ -66,7 +66,7 @@ describe('Clause', () => {
             try {
                 await Template.fromDirectory('./test/data/bad-boolean-binding', options);
             } catch (err) {
-                err.message.should.equal('A boolean binding can only be used with a boolean property. Property participant has type Participant File text/grammar.tem.md line 1 column 7');
+                err.message.should.equal('An if block can only be used with a boolean property. Property participant has type Participant File text/grammar.tem.md line 1 column 7');
             }
         });
 
@@ -296,6 +296,180 @@ describe('Clause', () => {
 
         it('should create a template from a directory no logic', () => {
             return Template.fromDirectory('./test/data/no-logic', options).should.be.fulfilled;
+        });
+
+    });
+
+    describe('#parse-block', () => {
+
+        it('should be able to parse an if-else block (true)', async function() {
+            const template = await Template.fromDirectory('./test/data/block-ifelse', options);
+            const clause = new Clause(template);
+            clause.parse('I\'m active');
+            const data = {
+                '$class': 'org.accordproject.volumediscountlist.VolumeDiscountContract',
+                'isActive': true
+            };
+            // remove the generated clause id
+            delete clause.getData().contractId;
+            clause.getData().should.eql(data);
+        });
+
+        it('should be able to parse an if-else block (false)', async function() {
+            const template = await Template.fromDirectory('./test/data/block-ifelse', options);
+            const clause = new Clause(template);
+            clause.parse('I\'m inactive');
+            const data = {
+                '$class': 'org.accordproject.volumediscountlist.VolumeDiscountContract',
+                'isActive': false
+            };
+            // remove the generated clause id
+            delete clause.getData().contractId;
+            clause.getData().should.eql(data);
+        });
+
+        it('should not be able to parse an if-else block if the text is neither options', async function() {
+            const template = await Template.fromDirectory('./test/data/block-ifelse', options);
+            const clause = new Clause(template);
+            (()=> clause.parse('I\'m not active')).should.throw(`invalid syntax at line 1 col 5:
+
+  I'm not active
+      ^
+Unexpected "n"`);
+        });
+
+        it('should not be able to parse an if-else block on the wrong type (not Boolean)', async function() {
+            try {
+                await Template.fromDirectory('./test/data/block-ifelse-error', options);
+            } catch (err) {
+                err.message.should.eql('An if block can only be used with a boolean property. Property isActive has type Double File text/grammar.tem.md line 1 column 7');
+            }
+        });
+
+        it('should be able to parse an olist-else block', async function() {
+            const template = await Template.fromDirectory('./test/data/block-olist', options);
+            const clause = new Clause(template);
+            clause.parse(`This is a list
+1. 0.0$ million <= Volume < 1.0$ million : 3.1%
+1. 1.0$ million <= Volume < 10.0$ million : 3.1%
+1. 10.0$ million <= Volume < 50.0$ million : 2.9%
+This is more text
+`);
+            const data = {
+                '$class': 'org.accordproject.volumediscountlist.VolumeDiscountContract',
+                'rates': [
+                    {
+                        '$class': 'org.accordproject.volumediscountlist.RateRange',
+                        'volumeUpTo': 1,
+                        'volumeAbove': 0,
+                        'rate': 3.1
+                    },
+                    {
+                        '$class': 'org.accordproject.volumediscountlist.RateRange',
+                        'volumeUpTo': 10,
+                        'volumeAbove': 1,
+                        'rate': 3.1
+                    },
+                    {
+                        '$class': 'org.accordproject.volumediscountlist.RateRange',
+                        'volumeUpTo': 50,
+                        'volumeAbove': 10,
+                        'rate': 2.9
+                    }
+                ]
+            };
+            // remove the generated clause id
+            delete clause.getData().contractId;
+            clause.getData().should.eql(data);
+        });
+
+        it('should be able to parse an ulist block', async function() {
+            const template = await Template.fromDirectory('./test/data/block-ulist', options);
+            const clause = new Clause(template);
+            clause.parse(`This is a list
+- 0.0$ million <= Volume < 1.0$ million : 3.1%
+- 1.0$ million <= Volume < 10.0$ million : 3.1%
+- 10.0$ million <= Volume < 50.0$ million : 2.9%
+This is more text
+`);
+            const data = {
+                '$class': 'org.accordproject.volumediscountlist.VolumeDiscountContract',
+                'rates': [
+                    {
+                        '$class': 'org.accordproject.volumediscountlist.RateRange',
+                        'volumeUpTo': 1,
+                        'volumeAbove': 0,
+                        'rate': 3.1
+                    },
+                    {
+                        '$class': 'org.accordproject.volumediscountlist.RateRange',
+                        'volumeUpTo': 10,
+                        'volumeAbove': 1,
+                        'rate': 3.1
+                    },
+                    {
+                        '$class': 'org.accordproject.volumediscountlist.RateRange',
+                        'volumeUpTo': 50,
+                        'volumeAbove': 10,
+                        'rate': 2.9
+                    }
+                ]
+            };
+            // remove the generated clause id
+            delete clause.getData().contractId;
+            clause.getData().should.eql(data);
+        });
+
+        it('should be able to parse a join block', async function() {
+            const template = await Template.fromDirectory('./test/data/block-join', options);
+            const clause = new Clause(template);
+            clause.parse('This is a list: 3.1%, 3.3%, 2.9% (And more Text)');
+            const data = {
+                '$class': 'org.accordproject.volumediscountlist.VolumeDiscountContract',
+                'rates': [
+                    {
+                        '$class': 'org.accordproject.volumediscountlist.RateRange',
+                        'rate': 3.1
+                    },
+                    {
+                        '$class': 'org.accordproject.volumediscountlist.RateRange',
+                        'rate': 3.3
+                    },
+                    {
+                        '$class': 'org.accordproject.volumediscountlist.RateRange',
+                        'rate': 2.9
+                    }
+                ]
+            };
+            // remove the generated clause id
+            delete clause.getData().contractId;
+            clause.getData().should.eql(data);
+        });
+
+        it('should be able to parse an ergo expressions', async function() {
+            const template = await Template.fromDirectory('./test/data/block-ergo', options);
+            const clause = new Clause(template);
+            clause.parse('This is a list: 3.1%, 3.3%, 2.9% (Average: {{Some text}})');
+            const data = {
+                '$class': 'org.accordproject.volumediscountlist.VolumeDiscountContract',
+                'rates': [
+                    {
+                        '$class': 'org.accordproject.volumediscountlist.RateRange',
+                        'rate': 3.1
+                    },
+                    {
+                        '$class': 'org.accordproject.volumediscountlist.RateRange',
+                        'rate': 3.3
+                    },
+                    {
+                        '$class': 'org.accordproject.volumediscountlist.RateRange',
+                        'rate': 2.9
+                    }
+                ]
+            };
+            // remove the generated clause id
+            delete clause.getData().contractId;
+            clause.getData().should.eql(data);
         });
 
     });

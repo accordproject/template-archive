@@ -90,6 +90,21 @@ class ParserManager {
     }
 
     /**
+     * Adjust the template for list blocks
+     * @param {object} x - The current template AST node
+     * @param {String} separator - The list separator
+     * @return {object} the new template AST node
+     */
+    static adjustListBlock(x,separator) {
+        if (x.data[0] && x.data[0].type === 'Chunk') {
+            x.data[0].value = separator + x.data[0].value;
+            return x;
+        } else {
+            throw new Error('List block in template should contain text');
+        }
+    }
+
+    /**
      * Build a grammar from a template
      * @param {String} templatizedGrammar  - the annotated template
      * using the markdown parser
@@ -183,7 +198,6 @@ class ParserManager {
             const sep = index < templateModel.getProperties().length - 1 ? ',' : '';
             const bindingIndex = this.findFirstBinding(property.getName(), ast.data);
             if (bindingIndex !== -1) { // ignore things like transactionId
-                // TODO (DCS) add !==null check for BooleanBinding
                 textRules.properties.push(`${property.getName()} : ${prefix}${bindingIndex}${sep}`);
             }
         });
@@ -201,14 +215,25 @@ class ParserManager {
                     symbols: [this.cleanChunk(element.value)],
                 });
                 break;
-            case 'BooleanBinding': {
+            case 'IfBinding': {
                 const property = ParserManager.getProperty(templateModel, element);
                 if(property.getType() !== 'Boolean') {
-                    ParserManager._throwTemplateExceptionForElement(`A boolean binding can only be used with a boolean property. Property ${element.fieldName.value} has type ${property.getType()}`, element);
+                    ParserManager._throwTemplateExceptionForElement(`An if block can only be used with a boolean property. Property ${element.fieldName.value} has type ${property.getType()}`, element);
                 }
                 parts.modelRules.push({
                     prefix: rule,
-                    symbols: [`"${element.string.value}":? {% (d) => {return d[0] !== null;}%} # ${element.fieldName.value}`],
+                    symbols: [`"${element.stringIf.value}":? {% (d) => {return d[0] !== null;}%} # ${element.fieldName.value}`],
+                });
+            }
+                break;
+            case 'IfElseBinding': {
+                const property = ParserManager.getProperty(templateModel, element);
+                if(property.getType() !== 'Boolean') {
+                    ParserManager._throwTemplateExceptionForElement(`An if block can only be used with a boolean property. Property ${element.fieldName.value} has type ${property.getType()}`, element);
+                }
+                parts.modelRules.push({
+                    prefix: rule,
+                    symbols: [`("${element.stringIf.value}"|"${element.stringElse.value}") {% (d) => {return d[0][0] === "${element.stringIf.value}";}%} # ${element.fieldName.value}`],
                 });
             }
                 break;
@@ -216,7 +241,9 @@ class ParserManager {
             case 'Binding':
             case 'ClauseBinding':
             case 'WithBinding':
-            case 'ListBinding':
+            case 'UListBinding':
+            case 'OListBinding':
+            case 'JoinBinding':
                 this.handleBinding(templateModel, parts, rule, element);
                 break;
             case 'Expr':
@@ -290,6 +317,7 @@ class ParserManager {
         let action = null;
         let suffix = ':';
         let type = property.getType();
+        let firstType = null;
 
         // if the type/action have not been set explicity, then we infer them
         if(!action) {
@@ -317,11 +345,35 @@ class ParserManager {
                         symbols: [`${formatRule.tokens} ${formatRule.action} # ${propertyName} as ${format}`],
                     });
                 }
-            } else if(element.type === 'ClauseBinding' || element.type === 'WithBinding' || element.type === 'ListBinding') {
+            } else if(element.type === 'ClauseBinding' || element.type === 'WithBinding') {
                 const nestedTemplate = element.template;
                 const nestedTemplateModel = this.template.getIntrospector().getClassDeclaration(property.getFullyQualifiedTypeName());
                 this.buildGrammarRules(nestedTemplate, nestedTemplateModel, propertyName, parts);
                 type = element.fieldName.value;
+            } else if(element.type === 'UListBinding' || element.type === 'OListBinding') {
+                const separator = element.type === 'UListBinding' ? '\n- ' : '\n1. ';
+                const nestedTemplate = ParserManager.adjustListBlock(element.template, separator);
+                const nestedTemplateModel = this.template.getIntrospector().getClassDeclaration(property.getFullyQualifiedTypeName());
+                this.buildGrammarRules(nestedTemplate, nestedTemplateModel, propertyName, parts);
+                type = element.fieldName.value;
+            } else if(element.type === 'JoinBinding') {
+                const nestedTemplateModel = this.template.getIntrospector().getClassDeclaration(property.getFullyQualifiedTypeName());
+
+                const firstNestedTemplate = element.template;
+                this.buildGrammarRules(firstNestedTemplate, nestedTemplateModel, propertyName + 'First', parts);
+                firstType = element.fieldName.value + 'First';
+
+                const separator = element.separator;
+                const nestedTemplate = ParserManager.adjustListBlock(element.template, separator);
+
+                this.buildGrammarRules(nestedTemplate, nestedTemplateModel, propertyName, parts);
+                type = element.fieldName.value;
+                action = `
+{%
+  ([ ${propertyName + 'First'}, ${propertyName} ]) => {
+    return [${propertyName + 'First'}].concat(${propertyName});
+}
+%}`;
             } else {
                 // relationships need to be transformed into strings
                 if (property instanceof RelationshipDeclaration) {
@@ -331,7 +383,7 @@ class ParserManager {
         }
 
         if (property.isArray()) {
-            suffix += '+';
+            suffix += element.type === 'JoinBinding' ? '*' : '+';
         }
         if (property.isOptional()) {
             suffix += '?';
@@ -342,11 +394,19 @@ class ParserManager {
 
         // console.log(`${inputRule} => ${type}${suffix} ${action} # ${propertyName}`);
 
-        parts.modelRules.push({
-            prefix: inputRule,
-            //symbols: [`"[{" ${type}${suffix} "}]" ${action} # ${propertyName}`],
-            symbols: [`${type}${suffix} ${action} # ${propertyName}`],
-        });
+        if(element.type === 'JoinBinding') {
+            parts.modelRules.push({
+                prefix: inputRule,
+                //symbols: [`"[{" ${type}${suffix} "}]" ${action} # ${propertyName}`],
+                symbols: [`${firstType} ${type}${suffix} ${action} # ${propertyName}`],
+            });
+        } else {
+            parts.modelRules.push({
+                prefix: inputRule,
+                //symbols: [`"[{" ${type}${suffix} "}]" ${action} # ${propertyName}`],
+                symbols: [`${type}${suffix} ${action} # ${propertyName}`],
+            });
+        }
     }
 
     /**
@@ -376,7 +436,7 @@ class ParserManager {
     findFirstBinding(propertyName, elements) {
         for(let n=0; n < elements.length; n++) {
             const element = elements[n];
-            if(element !== null && ['Binding','FormattedBinding', 'BooleanBinding','ListBinding','ClauseBinding','WithBinding'].includes(element.type)) {
+            if(element !== null && ['Binding','FormattedBinding','IfBinding','IfElseBinding','UListBinding','OListBinding','JoinBinding','ClauseBinding','WithBinding'].includes(element.type)) {
                 if(element.fieldName.value === propertyName) {
                     return n;
                 }
