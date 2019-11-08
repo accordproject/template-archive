@@ -74,9 +74,9 @@
   },
   "dependencies": {
     "@accordproject/concerto-core": "0.82.4",
-    "@accordproject/ergo-compiler": "0.20.0",
-    "@accordproject/ergo-engine": "0.20.0",
-    "@accordproject/markdown-common": "0.7.3",
+    "@accordproject/ergo-compiler": "0.20.1",
+    "@accordproject/ergo-engine": "0.20.1",
+    "@accordproject/markdown-common": "0.7.6",
     "axios": "0.19.0",
     "debug": "4.1.0",
     "ietf-language-tag-regex": "0.0.5",
