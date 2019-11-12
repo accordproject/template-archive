@@ -350,21 +350,34 @@ class ParserManager {
                 const nestedTemplateModel = this.template.getIntrospector().getClassDeclaration(property.getFullyQualifiedTypeName());
                 this.buildGrammarRules(nestedTemplate, nestedTemplateModel, propertyName, parts);
                 type = element.fieldName.value;
-            } else if(element.type === 'UListBinding' || element.type === 'OListBinding') {
-                const separator = element.type === 'UListBinding' ? '\n- ' : '\n1. ';
-                const nestedTemplate = ParserManager.adjustListBlock(element.template, separator);
-                const nestedTemplateModel = this.template.getIntrospector().getClassDeclaration(property.getFullyQualifiedTypeName());
-                this.buildGrammarRules(nestedTemplate, nestedTemplateModel, propertyName, parts);
-                type = element.fieldName.value;
-            } else if(element.type === 'JoinBinding') {
+            } else if(element.type === 'UListBinding' || element.type === 'OListBinding' || element.type === 'JoinBinding') {
                 const nestedTemplateModel = this.template.getIntrospector().getClassDeclaration(property.getFullyQualifiedTypeName());
 
-                const firstNestedTemplate = element.template;
+                // What separates elements in the list?
+                let separator;
+                if (element.type === 'JoinBinding') {
+                    separator = element.separator;
+                } else {
+                    separator = element.type === 'UListBinding' ? '- ' : '1. ';
+                }
+
+                // Rule for first item in the list
+                let firstNestedTemplate;
+                if (element.type === 'JoinBinding') {
+                    firstNestedTemplate = element.template;
+                } else {
+                    firstNestedTemplate = ParserManager.adjustListBlock(element.template, separator);
+                }
                 this.buildGrammarRules(firstNestedTemplate, nestedTemplateModel, propertyName + 'First', parts);
                 firstType = element.fieldName.value + 'First';
 
-                const separator = element.separator;
-                const nestedTemplate = ParserManager.adjustListBlock(element.template, separator);
+                // Rule for all other items in the list
+                let nestedTemplate;
+                if (element.type === 'JoinBinding') {
+                    nestedTemplate = ParserManager.adjustListBlock(element.template, separator);
+                } else {
+                    nestedTemplate = ParserManager.adjustListBlock(element.template, '\n');
+                }
 
                 this.buildGrammarRules(nestedTemplate, nestedTemplateModel, propertyName, parts);
                 type = element.fieldName.value;
@@ -383,7 +396,7 @@ class ParserManager {
         }
 
         if (property.isArray()) {
-            suffix += element.type === 'JoinBinding' ? '*' : '+';
+            suffix += '*';
         }
         if (property.isOptional()) {
             suffix += '?';
@@ -394,7 +407,7 @@ class ParserManager {
 
         // console.log(`${inputRule} => ${type}${suffix} ${action} # ${propertyName}`);
 
-        if(element.type === 'JoinBinding') {
+        if(element.type === 'UListBinding' || element.type === 'OListBinding' || element.type === 'JoinBinding') {
             parts.modelRules.push({
                 prefix: inputRule,
                 //symbols: [`"[{" ${type}${suffix} "}]" ${action} # ${propertyName}`],
