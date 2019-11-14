@@ -23,7 +23,7 @@ Assuming you cloned the [Cicero template library](https://github.com/accordproje
 ```
 export CICERO_DIR=<cicero-template-library-dir>/src
 cicero-server
-curl -X POST --header 'Content-Type: application/json' --header 'Accept: application/json' http://localhost:6001/execute/latedeliveryandpenalty/sample.txt -d '{ "request": { "$class": "org.accordproject.latedeliveryandpenalty.LateDeliveryAndPenaltyRequest", "forceMajeure": false,"agreedDelivery": "December 17, 2017 03:24:00", "deliveredAt": null, "goodsValue": 200.00 }, "state": { "$class": "org.accordproject.cicero.contract.AccordContractState", "stateId" : "org.accordproject.cicero.contract.AccordContractState#1"}}' '
+curl -X POST --header 'Content-Type: application/json' --header 'Accept: application/json' http://localhost:6001/trigger/latedeliveryandpenalty/text%2Fsample.md -d '{ "request": { "$class": "org.accordproject.latedeliveryandpenalty.LateDeliveryAndPenaltyRequest", "forceMajeure": false,"agreedDelivery": "December 17, 2017 03:24:00", "deliveredAt": null, "goodsValue": 200.00 }, "state": { "$class": "org.accordproject.cicero.contract.AccordContractState", "stateId" : "org.accordproject.cicero.contract.AccordContractState#1"}}'
 ```
 
 ### Stateless request (legacy)
@@ -35,7 +35,7 @@ Assuming you cloned the [Cicero template library](https://github.com/accordproje
 ```
 export CICERO_DIR=<cicero-template-dir>
 cicero-server
-curl -X POST --header 'Content-Type: application/json' --header 'Accept: application/json' http://localhost:6001/execute/latedeliveryandpenalty/sample.txt -d '{ "$class": "org.accordproject.latedeliveryandpenalty.LateDeliveryAndPenaltyRequest", "forceMajeure": false,"agreedDelivery": "December 17, 2017 03:24:00", "deliveredAt": null, "goodsValue": 200.00 }'
+curl -X POST --header 'Content-Type: application/json' --header 'Accept: application/json' http://localhost:6001/trigger/latedeliveryandpenalty/text%2Fsample.md -d '{ "$class": "org.accordproject.latedeliveryandpenalty.LateDeliveryAndPenaltyRequest", "forceMajeure": false,"agreedDelivery": "December 17, 2017 03:24:00", "deliveredAt": null, "goodsValue": 200.00 }'
 ```
 
 ## License <a name="license"></a>
