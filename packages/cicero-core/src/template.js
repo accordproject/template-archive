@@ -425,6 +425,15 @@ class Template {
         }
         return false;
     }
+
+    /**
+     * Checks whether the template grammar has computer (Ergo) expressions
+     * @returns {boolean} True if the template grammar has Ergo expressions (`{{% ... %}}`)
+     */
+    grammarHasErgoExpression() {
+        return this.getParserManager().ergoExpression;
+    }
+
 }
 
 module.exports = Template;
