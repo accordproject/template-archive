@@ -54,6 +54,7 @@ class ParserManager {
         this.grammarAst = null;
         this.templatizedGrammar = null;
         this.templateAst = null;
+        this.ergoExpression = false;
     }
 
     /**
@@ -110,6 +111,9 @@ class ParserManager {
      * using the markdown parser
      */
     buildGrammar(templatizedGrammar) {
+        // Set ergoExpression flag to false
+        this.ergoExpression = false;
+
         // Roundtrip the grammar through the Commonmark parser
         templatizedGrammar = this.roundtripMarkdown(templatizedGrammar);
         // console.log(templatizedGrammar);
@@ -208,7 +212,6 @@ class ParserManager {
             const element = rules[rule];
             switch (element.type) {
             case 'Chunk':
-            case 'ExprChunk':
             case 'LastChunk':
                 parts.modelRules.push({
                     prefix: rule,
@@ -247,6 +250,8 @@ class ParserManager {
                 this.handleBinding(templateModel, parts, rule, element);
                 break;
             case 'Expr':
+                this.ergoExpression = true;
+
                 parts.modelRules.push({
                     prefix: rule,
                     symbols: ['Any'],
