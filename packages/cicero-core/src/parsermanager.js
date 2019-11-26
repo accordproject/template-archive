@@ -209,7 +209,6 @@ class ParserManager {
 
   }
 
-
   /**
    * Recursive method to parse the nearley parse trees, extract all unique variables
    * and build a json representation of the minimum number of variable declaration required
@@ -422,7 +421,6 @@ class ParserManager {
 
     //Depending on the type of CTO definition we're building, wrap it up differently.
     switch(object.type) {
-
       case "clause":
         currentDefinition = `asset ${object.name} extends AccordClause {\n${currentDefinition}}`;
         break;
@@ -435,12 +433,9 @@ class ParserManager {
       default:
         console.log("WARNING - Unknown model type.");
         break;
-
     }
-
     return currentDefinition;
   }
-
 
   /**
    * Build stringified package.json for a grammar parsed with this template. 
@@ -476,7 +471,6 @@ class ParserManager {
     `;
   }
 
-
    /**
    * Build stringified request for the default request to include in the cto. 
    * @return {String} - The stringified request for the default request generated for the parsed grammar.
@@ -489,7 +483,6 @@ class ParserManager {
     `;
   }
 
-  
    /**
    * For parsed templatizedGrammar, return default model.cto and logic.ergo in stringified form embedded in an object like:
    * {
@@ -524,7 +517,6 @@ class ParserManager {
 
     return {model: modelCode, logic};
   }
-
 
   /**
    * Package up minimum default data necessary to fill in every variable in the template. 
@@ -631,42 +623,40 @@ class ParserManager {
   }
 
   /**
-   * Build a grammar from a template
-   * @param {String} templatizedGrammar  - the annotated template
-   * using the markdown parser
-   */
+  * Build a grammar from a template
+  * @param {String} templatizedGrammar  - the annotated template
+  * using the markdown parser
+  */
   buildGrammar(templatizedGrammar) {
     // Set ergoExpression flag to false
     this.ergoExpression = false;
 
     // Roundtrip the grammar through the Commonmark parser
     templatizedGrammar = this.roundtripMarkdown(templatizedGrammar);
-    console.log("Roundtripped");
+    // console.log(templatizedGrammar);
 
     Logger.debug('buildGrammar', templatizedGrammar);
     const parser = new nearley.Parser(nearley.Grammar.fromCompiled(templateGrammar));
     parser.feed(templatizedGrammar);
     if (parser.results.length !== 1) {
-        throw new Error('Ambiguous parse!');
+      throw new Error('Ambiguous parse!');
     }
 
     // parse the template grammar to generate a dynamic grammar
-    console.log("Parser template grammar to generate dynamic grammar");
     const ast = parser.results[0];
     this.templateAst = ast;
     const parts = {
-        textRules: [],
-        modelRules: [],
-        grammars : {}
+      textRules: [],
+      modelRules: [],
+      grammars : {}
     };
     parts.grammars.base = require('./grammars/base');
     this.buildGrammarRules(ast, this.template.getTemplateModel(), 'rule', parts);
 
-    console.log("Generate frammar for model");
     // generate the grammar for the model
     const parameters = {
-        writer: new Writer(),
-        rules : []
+      writer: new Writer(),
+      rules : []
     };
     const gv = new GrammarVisitor();
     this.template.getModelManager().accept(gv, parameters);
@@ -674,24 +664,20 @@ class ParserManager {
 
     // combine the results
     nunjucks.configure(fsPath.resolve(__dirname), {
-        tags: {
-            blockStart: '<%',
-            blockEnd: '%>'
-        },
-        autoescape: false  // Required to allow nearley syntax strings
+      tags: {
+        blockStart: '<%',
+        blockEnd: '%>'
+      },
+      autoescape: false  // Required to allow nearley syntax strings
     });
-
-    console.log("Started combined");
     const combined = nunjucks.render('template.ne', parts);
     Logger.debug('Generated template grammar' + combined);
-    console.log("Finished combined");
 
-    //console.log(combined);
+    // console.log(combined);
     this.setGrammar(combined);
-    console.log("Set grammar to combined:");
     this.templatizedGrammar = templatizedGrammar;
-    console.log("finished and set templatizedGrammar to combined");
-}
+  }
+
   /**
    * Build grammar rules from a template
    * @param {object} ast  - the AST from which to build the grammar
@@ -699,8 +685,6 @@ class ParserManager {
    * @param {String} prefix - A unique prefix for the grammar rules
    * @param {Object} parts - Result object to acculumate rules and required sub-grammars
    */
-
-
   buildGrammarRules(ast, templateModel, prefix, parts) {
     // these are the rules for variables
     const rules = {}; // these are the rules for static text
