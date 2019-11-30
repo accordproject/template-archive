@@ -214,16 +214,17 @@ class Template {
      * @return {Promise<Template>} - Promise to the template
      */
 
-    static fromGrammar(modelTxt, requestStringified, data, packageStringified, logic, templatizedGrammar, readme) {
-        console.log("Called fromGrammar");
-        var _arguments3 = arguments;
-        return _asyncToGenerator(function* () {
-        let options = _arguments3.length > 7 && _arguments3[7] !== undefined ? _arguments3[7] : null;
-        console.log("Trying TemplateLoader.fromGrammar");
+    static fromGrammar(modelTxt, requestStringified, data, packageStringified, logic, templatizedGrammar, readme, options=null) {
         return TemplateLoader.fromGrammar(Template, modelTxt, requestStringified, data, packageStringified, logic, templatizedGrammar, readme, options);
-        })();
     }
 
+    // console.log("Called fromGrammar");
+    // var _arguments3 = arguments;
+    // return _asyncToGenerator(function* () {
+    // let options = _arguments3.length > 7 && _arguments3[7] !== undefined ? _arguments3[7] : null;
+    // console.log("Trying TemplateLoader.fromGrammar");
+    // return TemplateLoader.fromGrammar(Template, modelTxt, requestStringified, data, packageStringified, logic, templatizedGrammar, readme, options);
+    // })();
 
     /**
      * Create a template from an URL.
