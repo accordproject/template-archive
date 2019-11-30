@@ -23,7 +23,8 @@ const moment = require('moment-mini');
 // Make sure Moment serialization preserves utcOffset. See https://momentjs.com/docs/#/displaying/as-json/
 moment.fn.toJSON = Util.momentToJson;
 const TemplateLoader = require('./templateloader');
-const ErgoEngine = require('@accordproject/ergo-engine/index.browser.js').EvalEngine;
+const ErgoEngine = require('@accordproject/ergo-engine/index.browser.js')
+    .EvalEngine;
 
 /**
  * A TemplateInstance is an instance of a Clause or Contract template. It is executable business logic, linked to
@@ -36,14 +37,15 @@ const ErgoEngine = require('@accordproject/ergo-engine/index.browser.js').EvalEn
  * @class
  */
 class TemplateInstance {
-
     /**
      * Create the Clause and link it to a Template.
      * @param {Template} template  - the template for the clause
      */
     constructor(template) {
         if (this.constructor === TemplateInstance) {
-            throw new TypeError('Abstract class "TemplateInstance" cannot be instantiated directly.');
+            throw new TypeError(
+                'Abstract class "TemplateInstance" cannot be instantiated directly.'
+            );
         }
         this.template = template;
         this.data = null;
@@ -62,12 +64,18 @@ class TemplateInstance {
         const templateModel = this.getTemplate().getTemplateModel();
 
         if (data.$class !== templateModel.getFullyQualifiedName()) {
-            throw new Error(`Invalid data, must be a valid instance of the template model ${templateModel.getFullyQualifiedName()} but got: ${JSON.stringify(data)} `);
+            throw new Error(
+                `Invalid data, must be a valid instance of the template model ${templateModel.getFullyQualifiedName()} but got: ${JSON.stringify(
+                    data
+                )} `
+            );
         }
 
         // downloadExternalDependencies the data using the template model
         Logger.debug('Setting clause data: ' + JSON.stringify(data));
-        const resource = this.getTemplate().getSerializer().fromJSON(data);
+        const resource = this.getTemplate()
+            .getSerializer()
+            .fromJSON(data);
         resource.validate();
 
         // save the data
@@ -112,33 +120,50 @@ class TemplateInstance {
     parse(input, currentTime, fileName) {
         let text = TemplateLoader.normalizeText(input);
         // Roundtrip the sample through the Commonmark parser
-        text = this.getTemplate().getParserManager().roundtripMarkdown(text);
+        text = this.getTemplate()
+            .getParserManager()
+            .roundtripMarkdown(text);
 
         // Set the current time and UTC Offset
         const now = Util.setCurrentTime(currentTime);
         const utcOffset = now.utcOffset();
 
-        let parser = this.getTemplate().getParserManager().getParser();
+        let parser = this.getTemplate()
+            .getParserManager()
+            .getParser();
         try {
             parser.feed(text);
-        } catch(err) {
+        } catch (err) {
             const fileLocation = ErrorUtil.locationOfError(err);
-            throw new ParseException(err.message, fileLocation, fileName, err.message, 'cicero-core');
+            throw new ParseException(
+                err.message,
+                fileLocation,
+                fileName,
+                err.message,
+                'cicero-core'
+            );
         }
         if (parser.results.length !== 1) {
             const head = JSON.stringify(parser.results[0]);
 
-            parser.results.forEach(function (element) {
+            parser.results.forEach(function(element) {
                 if (head !== JSON.stringify(element)) {
-                    throw new Error('Ambiguous text. Got ' + parser.results.length + ' ASTs for text: ' + text);
+                    throw new Error(
+                        'Ambiguous text. Got ' +
+                            parser.results.length +
+                            ' ASTs for text: ' +
+                            text
+                    );
                 }
             }, this);
         }
         let ast = parser.results[0];
         Logger.debug('Result of parsing: ' + JSON.stringify(ast));
 
-        if(!ast) {
-            throw new Error('Parsing clause text returned a null AST. This may mean the text is valid, but not complete.');
+        if (!ast) {
+            throw new Error(
+                'Parsing clause text returned a null AST. This may mean the text is valid, but not complete.'
+            );
         }
 
         ast = TemplateInstance.convertDateTimes(ast, utcOffset);
@@ -153,31 +178,31 @@ class TemplateInstance {
      * @returns {*} the converted object
      */
     static convertDateTimes(obj, utcOffset) {
-        if(obj.$class === 'ParsedDateTime') {
-
+        if (obj.$class === 'ParsedDateTime') {
             let instance = null;
 
-            if(obj.timezone) {
+            if (obj.timezone) {
                 instance = moment(obj).utcOffset(obj.timezone, true);
-            }
-            else {
-                instance = moment(obj)
-                    .utcOffset(utcOffset, true);
+            } else {
+                instance = moment(obj).utcOffset(utcOffset, true);
             }
 
-            if(!instance) {
-                throw new Error(`Failed to handle datetime ${JSON.stringify(obj, null, 4)}`);
+            if (!instance) {
+                throw new Error(
+                    `Failed to handle datetime ${JSON.stringify(obj, null, 4)}`
+                );
             }
             const result = instance.format('YYYY-MM-DDTHH:mm:ss.SSSZ');
-            if(result === 'Invalid date') {
-                throw new Error(`Failed to handle datetime ${JSON.stringify(obj, null, 4)}`);
+            if (result === 'Invalid date') {
+                throw new Error(
+                    `Failed to handle datetime ${JSON.stringify(obj, null, 4)}`
+                );
             }
             return result;
-        }
-        else if( typeof obj === 'object' && obj !== null) {
-            Object.entries(obj).forEach(
-                ([key, value]) => {obj[key] = TemplateInstance.convertDateTimes(value, utcOffset);}
-            );
+        } else if (typeof obj === 'object' && obj !== null) {
+            Object.entries(obj).forEach(([key, value]) => {
+                obj[key] = TemplateInstance.convertDateTimes(value, utcOffset);
+            });
         }
 
         return obj;
@@ -193,23 +218,37 @@ class TemplateInstance {
      * the template with the JSON data for the clause.
      */
     async draft(options, currentTime) {
-        if(!this.concertoData) {
-            throw new Error('Data has not been set. Call setData or parse before calling this method.');
+        if (!this.concertoData) {
+            throw new Error(
+                'Data has not been set. Call setData or parse before calling this method.'
+            );
         }
 
         const markdownOptions = {
-            '$class': 'org.accordproject.markdown.MarkdownOptions',
-            'wrapVariables': options && options.wrapVariables ? options.wrapVariables : false,
-            'template': true
+            $class: 'org.accordproject.markdown.MarkdownOptions',
+            wrapVariables:
+                options && options.wrapVariables
+                    ? options.wrapVariables
+                    : false,
+            template: true
         };
         const logicManager = this.getLogicManager();
         const clauseId = this.getIdentifier();
         const contract = this.getData();
 
         return logicManager.compileLogic(false).then(async () => {
-            const result = await this.getEngine().draft(logicManager,clauseId,contract,{},currentTime,markdownOptions);
+            const result = await this.getEngine().draft(
+                logicManager,
+                clauseId,
+                contract,
+                {},
+                currentTime,
+                markdownOptions
+            );
             // Roundtrip the response through the Commonmark parser
-            return this.getTemplate().getParserManager().roundtripMarkdown(result.response);
+            return this.getTemplate()
+                .getParserManager()
+                .roundtripMarkdown(result.response);
         });
     }
 

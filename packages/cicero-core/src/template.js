@@ -32,7 +32,6 @@ const TemplateSaver = require('./templatesaver');
  * @abstract
  */
 class Template {
-
     /**
      * Create the Template.
      * Note: Only to be called by framework code. Applications should
@@ -65,20 +64,27 @@ class Template {
      * @returns {ClassDeclaration} the template model for the template
      */
     getTemplateModel() {
-
         let modelType = 'org.accordproject.cicero.contract.AccordContract';
 
-        if(this.getMetadata().getTemplateType() !== 0) {
+        if (this.getMetadata().getTemplateType() !== 0) {
             modelType = 'org.accordproject.cicero.contract.AccordClause';
         }
-        const templateModels = this.getIntrospector().getClassDeclarations().filter((item) => {
-            return !item.isAbstract() && Template.instanceOf(item,modelType);
-        });
+        const templateModels = this.getIntrospector()
+            .getClassDeclarations()
+            .filter(item => {
+                return (
+                    !item.isAbstract() && Template.instanceOf(item, modelType)
+                );
+            });
 
         if (templateModels.length > 1) {
-            throw new Error(`Found multiple instances of ${modelType} in ${this.metadata.getName()}. The model for the template must contain a single asset that extends ${modelType}.`);
+            throw new Error(
+                `Found multiple instances of ${modelType} in ${this.metadata.getName()}. The model for the template must contain a single asset that extends ${modelType}.`
+            );
         } else if (templateModels.length === 0) {
-            throw new Error(`Failed to find an asset that extends ${modelType} in ${this.metadata.getName()}. The model for the template must contain a single asset that extends ${modelType}.`);
+            throw new Error(
+                `Failed to find an asset that extends ${modelType} in ${this.metadata.getName()}. The model for the template must contain a single asset that extends ${modelType}.`
+            );
         } else {
             return templateModels[0];
         }
@@ -125,7 +131,6 @@ class Template {
         return this.getMetadata().getVersion();
     }
 
-
     /**
      * Returns the description for this template
      * @return {String} the description of this template
@@ -143,10 +148,9 @@ class Template {
     getHash() {
         const content = {};
         content.metadata = this.getMetadata();
-        if(this.parserManager.getTemplatizedGrammar()) {
+        if (this.parserManager.getTemplatizedGrammar()) {
             content.templatizedGrammar = this.parserManager.getTemplatizedGrammar();
-        }
-        else {
+        } else {
             // do not include the generated grammar because
             // the contents is not deterministic
             content.grammar = this.parserManager.getGrammar();
@@ -155,13 +159,13 @@ class Template {
         content.scripts = {};
 
         let modelFiles = this.getModelManager().getModels();
-        modelFiles.forEach(function (file) {
+        modelFiles.forEach(function(file) {
             content.models[file.name] = file.content;
         });
 
         let scriptManager = this.getScriptManager();
         let scriptFiles = scriptManager.getScripts();
-        scriptFiles.forEach(function (file) {
+        scriptFiles.forEach(function(file) {
             content.scripts[file.getIdentifier()] = file.contents;
         });
 
@@ -189,7 +193,7 @@ class Template {
      * @param {Object} [options] - an optional set of options to configure the instance.
      * @return {Promise<Template>} a Promise to the instantiated template
      */
-    static async fromDirectory(path, options=null) {
+    static async fromDirectory(path, options = null) {
         return TemplateLoader.fromDirectory(Template, path, options);
     }
 
@@ -199,7 +203,7 @@ class Template {
      * @param {Object} [options] - an optional set of options to configure the instance.
      * @return {Promise<Template>} a Promise to the template
      */
-    static async fromArchive(buffer, options=null) {
+    static async fromArchive(buffer, options = null) {
         return TemplateLoader.fromArchive(Template, buffer, options);
     }
 
@@ -214,17 +218,28 @@ class Template {
      * @return {Promise<Template>} - Promise to the template
      */
 
-    static fromGrammar(modelTxt, requestStringified, data, packageStringified, logic, templatizedGrammar, readme, options=null) {
-        return TemplateLoader.fromGrammar(Template, modelTxt, requestStringified, data, packageStringified, logic, templatizedGrammar, readme, options);
+    static fromGrammar(
+        modelTxt,
+        requestStringified,
+        data,
+        packageStringified,
+        logic,
+        templatizedGrammar,
+        readme,
+        options = null
+    ) {
+        return TemplateLoader.fromGrammar(
+            Template,
+            modelTxt,
+            requestStringified,
+            data,
+            packageStringified,
+            logic,
+            templatizedGrammar,
+            readme,
+            options
+        );
     }
-
-    // console.log("Called fromGrammar");
-    // var _arguments3 = arguments;
-    // return _asyncToGenerator(function* () {
-    // let options = _arguments3.length > 7 && _arguments3[7] !== undefined ? _arguments3[7] : null;
-    // console.log("Trying TemplateLoader.fromGrammar");
-    // return TemplateLoader.fromGrammar(Template, modelTxt, requestStringified, data, packageStringified, logic, templatizedGrammar, readme, options);
-    // })();
 
     /**
      * Create a template from an URL.
@@ -232,7 +247,7 @@ class Template {
      * @param {Object} [options] - an optional set of options to configure the instance.
      * @return {Promise} a Promise to the template
      */
-    static async fromUrl(url, options=null) {
+    static async fromUrl(url, options = null) {
         return TemplateLoader.fromUrl(Template, url, options);
     }
 
@@ -319,7 +334,12 @@ class Template {
      * @private
      */
     setSamples(samples) {
-        this.metadata = new Metadata(this.metadata.getPackageJson(), this.metadata.getREADME(), samples, this.metadata.getRequest());
+        this.metadata = new Metadata(
+            this.metadata.getPackageJson(),
+            this.metadata.getREADME(),
+            samples,
+            this.metadata.getRequest()
+        );
     }
 
     /**
@@ -331,7 +351,12 @@ class Template {
     setSample(sample, locale) {
         const samples = this.metadata.getSamples();
         samples[locale] = sample;
-        this.metadata = new Metadata(this.metadata.getPackageJson(), this.metadata.getREADME(), samples, this.metadata.getRequest());
+        this.metadata = new Metadata(
+            this.metadata.getPackageJson(),
+            this.metadata.getREADME(),
+            samples,
+            this.metadata.getRequest()
+        );
     }
 
     /**
@@ -340,7 +365,12 @@ class Template {
      * @private
      */
     setRequest(request) {
-        this.metadata = new Metadata(this.metadata.getPackageJson(), this.metadata.getREADME(), this.metadata.getSamples(), request);
+        this.metadata = new Metadata(
+            this.metadata.getPackageJson(),
+            this.metadata.getREADME(),
+            this.metadata.getSamples(),
+            request
+        );
     }
 
     /**
@@ -349,7 +379,12 @@ class Template {
      * @private
      */
     setReadme(readme) {
-        this.metadata = new Metadata(this.metadata.getPackageJson(), readme, this.metadata.getSamples(), this.metadata.getRequest());
+        this.metadata = new Metadata(
+            this.metadata.getPackageJson(),
+            readme,
+            this.metadata.getSamples(),
+            this.metadata.getRequest()
+        );
     }
 
     /**
@@ -358,7 +393,12 @@ class Template {
      * @private
      */
     setPackageJson(packageJson) {
-        this.metadata = new Metadata(packageJson, this.metadata.getREADME(), this.metadata.getSamples(), this.metadata.getRequest());
+        this.metadata = new Metadata(
+            packageJson,
+            this.metadata.getREADME(),
+            this.metadata.getSamples(),
+            this.metadata.getRequest()
+        );
     }
 
     /**
@@ -456,8 +496,6 @@ class Template {
     grammarHasErgoExpression() {
         return this.getParserManager().ergoExpression;
     }
-
 }
 
 module.exports = Template;
-  

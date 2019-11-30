@@ -28,13 +28,14 @@ const fs = require('fs');
 require('@babel/core');
 require('@babel/polyfill');
 
-const defaultlog =
-      { text: 'success',
-        model: 'success',
-        logic: 'success',
-        meta: 'success',
-        execute: 'success',
-        loading: 'success' };
+const defaultlog = {
+    text: 'success',
+    model: 'success',
+    logic: 'success',
+    meta: 'success',
+    execute: 'success',
+    loading: 'success'
+};
 
 let templatizedGrammar = `
 #### Discount.
@@ -59,11 +60,16 @@ follows: {{paymentProcedure}}.{{/clause}}
 
 `;
 
-let grammarName = "Test Contract 1";
+let grammarName = 'Test Contract 1';
 
 let parser = new ParserManager();
 
-parser.inferVariablesFromGrammar("org.accord.auto", grammarName, "contract", templatizedGrammar);
+parser.inferVariablesFromGrammar(
+    'org.accord.auto',
+    grammarName,
+    'contract',
+    templatizedGrammar
+);
 parser.createModelsAndLogicFromInferred();
 parser.packageDefaultData();
 
@@ -80,98 +86,107 @@ function textLog(log, msg) {
         logic: log.logic,
         meta: log.meta,
         execute: log.execute,
-        loading: log.loading,
+        loading: log.loading
     };
 }
 
 async function draft(clause, data, log) {
     const changes = {};
-  try {
-    const dataContent = JSON.parse(data);
-    clause.setData(dataContent);
-    const options = {
-      wrapVariables: false
-    };
-    // clear engine script cache before re-generating text 
-    clause.getEngine().clearCacheJsScript();
-    const text = await clause.draft(options);
-    //console.log('>>> DRAFT text' + JSON.stringify(text));
-    changes.text = text;
-    changes.data = data;
-    if (updateTemplateSample(clause, text)) {
-      changes.status = 'changed';
+    try {
+        const dataContent = JSON.parse(data);
+        clause.setData(dataContent);
+        const options = {
+            wrapVariables: false
+        };
+        // clear engine script cache before re-generating text
+        clause.getEngine().clearCacheJsScript();
+        const text = await clause.draft(options);
+        //console.log('>>> DRAFT text' + JSON.stringify(text));
+        changes.text = text;
+        changes.data = data;
+        if (updateTemplateSample(clause, text)) {
+            changes.status = 'changed';
+        }
+        changes.log = textLog(log, 'GenerateText successful!');
+    } catch (error) {
+        changes.data = data;
+        changes.log = textLog(log, `[Instantiate Contract] ${error.message}`);
     }
-    changes.log = textLog(log, 'GenerateText successful!');
-  } catch (error) {
-    changes.data = data;
-    changes.log = textLog(log, `[Instantiate Contract] ${error.message}`);
-  }
-  return changes;
-  }
+    return changes;
+}
 
-  function updateTemplateSample(clause, sample) {
+function updateTemplateSample(clause, sample) {
     const template = clause.getTemplate();
-    //console.log(clause.getDataAsComposerObject());
     const samples = template.getMetadata().getSamples();
     if (samples.default !== sample) {
-      samples.default = sample;
-      template.setSamples(samples);
-      return true;
+        samples.default = sample;
+        template.setSamples(samples);
+        return true;
     }
     return false;
-  }
+}
 
 //Create a clause object to create the sample
 let promisedTemplate;
 try {
-    console.log("\n\nmodelTxt");
-    console.log(modelTxt);
-    console.log("\n\nRequest");
-    console.log(JSON.parse(defaultRequest));
-    console.log("\n\nDefault Data");
-    console.log(defaultData);
-    console.log("\n\ndefaultMetadata");
-    console.log(JSON.parse(defaultMetadata));
-    console.log("\n\nlogicTxt");
-    console.log(logicTxt);
-    console.log("\n\nTemplatizedGrammar");
-    console.log(templatizedGrammar);
-    promisedTemplate = Template.fromGrammar(modelTxt, JSON.parse(defaultRequest), defaultData, JSON.parse(defaultMetadata), logicTxt, templatizedGrammar, "READ THIS!");
-    console.log("Template successfully created");
+    promisedTemplate = Template.fromGrammar(
+        modelTxt,
+        JSON.parse(defaultRequest),
+        defaultData,
+        JSON.parse(defaultMetadata),
+        logicTxt,
+        templatizedGrammar,
+        'READ THIS!'
+    );
+    console.log('Template successfully created');
 } catch (error) {
     console.log(`LOAD FAILED! ${error.message}`); // Error!
 }
 
-let result = promisedTemplate.then((template) => {
-
-    //now, create a Clause object... then... need to run Utils.draft with clause object and default data... this will produce a sample. 
-    let clause = new Clause(template);
-    console.log("\n\n##################################\nCreated clause");
-    draft(clause, JSON.stringify(defaultData, null, 2), { defaultlog, text: "Building sample automatically" }).then((changes) => {
-        console.log(changes);
-        if (changes.log.text.indexOf('successful') === -1) {
-          throw new Error('Error generating text from this new grammar');
-        }
-
-        let zip = TemplateSaver.grammarToCTO(modelTxt, defaultRequest, defaultData, defaultMetadata, logicTxt, templatizedGrammar, "READ THIS!", changes.text);
-        zip.then((cta) => {
-        
-            fs.writeFile( 'test.cto', cta, function( err ){
-        
-                if( err ){
-                    console.log(err);
+let result = promisedTemplate.then(
+    template => {
+        //now, create a Clause object... then... need to run Utils.draft with clause object and default data... this will produce a sample.
+        let clause = new Clause(template);
+        console.log('\n\n##################################\nCreated clause');
+        draft(clause, JSON.stringify(defaultData, null, 2), {
+            defaultlog,
+            text: 'Building sample automatically'
+        })
+            .then(changes => {
+                console.log(changes);
+                if (changes.log.text.indexOf('successful') === -1) {
+                    throw new Error(
+                        'Error generating text from this new grammar'
+                    );
                 }
-                else{
-                    console.log("Success!");
-                }
+
+                let zip = TemplateSaver.grammarToCTO(
+                    modelTxt,
+                    defaultRequest,
+                    defaultData,
+                    defaultMetadata,
+                    logicTxt,
+                    templatizedGrammar,
+                    'READ THIS!',
+                    changes.text
+                );
+                zip.then(cta => {
+                    fs.writeFile('test.cto', cta, function(err) {
+                        if (err) {
+                            console.log(err);
+                        } else {
+                            console.log('Success!');
+                        }
+                    });
+                });
+            })
+            .catch(error => {
+                throw error;
             });
-        });
-
-    }).catch((error) => {
-        throw error;
-    });
-    return true;
-}, (reason) => {
-    console.log(`LOAD FAILED! ${reason.message}`); // Error!
-    return false;
-});
+        return true;
+    },
+    reason => {
+        console.log(`LOAD FAILED! ${reason.message}`); // Error!
+        return false;
+    }
+);

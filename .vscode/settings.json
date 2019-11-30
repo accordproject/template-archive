@@ -1,0 +1,6 @@
+{
+    "typescript.preferences.quoteStyle": "single",
+    "prettier.singleQuote": true,
+    "prettier.endOfLine": "lf",
+    "prettier.tabWidth": 4
+}
