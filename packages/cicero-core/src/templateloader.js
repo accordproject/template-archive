@@ -15,8 +15,8 @@
 
 function asyncGeneratorStep(gen, resolve, reject, _next, _throw, key, arg) {
     try {
-        let info = gen[key](arg);
-        let value = info.value;
+        var info = gen[key](arg);
+        var value = info.value;
     } catch (error) {
         reject(error);
         return;

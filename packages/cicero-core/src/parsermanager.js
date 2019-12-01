@@ -258,105 +258,105 @@ class ParserManager {
             const element = rules[rule];
 
             switch (element.type) {
-                case 'Chunk':
-                case 'ExprChunk':
-                case 'LastChunk':
-                    parts.modelRules.push({
-                        prefix: rule,
-                        symbols: [this.cleanChunk(element.value)]
-                    });
-                    break;
+			case 'Chunk':
+			case 'ExprChunk':
+			case 'LastChunk':
+				parts.modelRules.push({
+					prefix: rule,
+					symbols: [this.cleanChunk(element.value)]
+				});
+				break;
 
-                case 'IfBinding':
-                    {
-                        const property = ParserManager.getProperty(
-                            templateModel,
-                            element
-                        );
+			case 'IfBinding':
+				{
+					const property = ParserManager.getProperty(
+						templateModel,
+						element
+					);
 
-                        if (property.getType() !== 'Boolean') {
-                            ParserManager._throwTemplateExceptionForElement(
-                                'An if block can only be used with a boolean property. Property '
-                                    .concat(
-                                        element.fieldName.value,
-                                        ' has type '
-                                    )
-                                    .concat(property.getType()),
-                                element
-                            );
-                        }
+					if (property.getType() !== 'Boolean') {
+						ParserManager._throwTemplateExceptionForElement(
+							'An if block can only be used with a boolean property. Property '
+								.concat(
+									element.fieldName.value,
+									' has type '
+								)
+								.concat(property.getType()),
+							element
+						);
+					}
 
-                        parts.modelRules.push({
-                            prefix: rule,
-                            symbols: [
-                                '"'
-                                    .concat(
-                                        element.stringIf.value,
-                                        '":? {% (d) => {return d[0] !== null;}%} # '
-                                    )
-                                    .concat(element.fieldName.value)
-                            ]
-                        });
-                    }
-                    break;
+					parts.modelRules.push({
+						prefix: rule,
+						symbols: [
+							'"'
+								.concat(
+									element.stringIf.value,
+									'":? {% (d) => {return d[0] !== null;}%} # '
+								)
+								.concat(element.fieldName.value)
+						]
+					});
+				}
+				break;
 
-                case 'IfElseBinding':
-                    {
-                        const property = ParserManager.getProperty(
-                            templateModel,
-                            element
-                        );
+			case 'IfElseBinding':
+				{
+					const property = ParserManager.getProperty(
+						templateModel,
+						element
+					);
 
-                        if (property.getType() !== 'Boolean') {
-                            ParserManager._throwTemplateExceptionForElement(
-                                'An if block can only be used with a boolean property. Property '
-                                    .concat(
-                                        element.fieldName.value,
-                                        ' has type '
-                                    )
-                                    .concat(property.getType()),
-                                element
-                            );
-                        }
+					if (property.getType() !== 'Boolean') {
+						ParserManager._throwTemplateExceptionForElement(
+							'An if block can only be used with a boolean property. Property '
+								.concat(
+									element.fieldName.value,
+									' has type '
+								)
+								.concat(property.getType()),
+							element
+						);
+					}
 
-                        parts.modelRules.push({
-                            prefix: rule,
-                            symbols: [
-                                '("'
-                                    .concat(element.stringIf.value, '"|"')
-                                    .concat(
-                                        element.stringElse.value,
-                                        '") {% (d) => {return d[0][0] === "'
-                                    )
-                                    .concat(element.stringIf.value, '";}%} # ')
-                                    .concat(element.fieldName.value)
-                            ]
-                        });
-                    }
-                    break;
+					parts.modelRules.push({
+						prefix: rule,
+						symbols: [
+							'("'
+								.concat(element.stringIf.value, '"|"')
+								.concat(
+									element.stringElse.value,
+									'") {% (d) => {return d[0][0] === "'
+								)
+								.concat(element.stringIf.value, '";}%} # ')
+								.concat(element.fieldName.value)
+						]
+					});
+				}
+				break;
 
-                case 'FormattedBinding':
-                case 'Binding':
-                case 'ClauseBinding':
-                case 'WithBinding':
-                case 'UListBinding':
-                case 'OListBinding':
-                case 'JoinBinding':
-                    this.handleBinding(templateModel, parts, rule, element);
-                    break;
+			case 'FormattedBinding':
+			case 'Binding':
+			case 'ClauseBinding':
+			case 'WithBinding':
+			case 'UListBinding':
+			case 'OListBinding':
+			case 'JoinBinding':
+				this.handleBinding(templateModel, parts, rule, element);
+				break;
 
-                case 'Expr':
-                    parts.modelRules.push({
-                        prefix: rule,
-                        symbols: ['Any']
-                    });
-                    break;
+			case 'Expr':
+				parts.modelRules.push({
+					prefix: rule,
+					symbols: ['Any']
+				});
+				break;
 
-                default:
-                    ParserManager._throwTemplateExceptionForElement(
-                        'Unrecognized type '.concat(element.type),
-                        element
-                    );
+			default:
+				ParserManager._throwTemplateExceptionForElement(
+					'Unrecognized type '.concat(element.type),
+					element
+				);
             }
         }
     }
