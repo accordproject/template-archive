@@ -2,5 +2,8 @@
     "typescript.preferences.quoteStyle": "single",
     "prettier.singleQuote": true,
     "prettier.endOfLine": "lf",
-    "prettier.tabWidth": 4
+    "prettier.tabWidth": 4,
+    "travis.github_user": "JSv4",
+    "travis.github_password": "batteriesRaboy$bestfriend",
+    "travis.repository": "cicero"
 }

@@ -373,10 +373,10 @@ class ParserManager {
 
         if (!property) {
             ParserManager._throwTemplateExceptionForElement(
-                "Template references a property '"
+                'Template references a property '
                     .concat(
                         propertyName,
-                        "' that is not declared in the template model '"
+                        ' that is not declared in the template model '
                     )
                     .concat(templateModel.getFullyQualifiedName(), "'"),
                 element
@@ -704,7 +704,9 @@ class ParserManager {
             throw new Error(
                 'Must call parseVariablesFromGrammar before calling getVariables'
             );
-        } else return this.variables;
+        } else {
+            return this.variables;
+        }
     }
 
     /**
@@ -716,7 +718,9 @@ class ParserManager {
             throw new Error(
                 'Must call packageDefaultData before calling getDefaultData'
             );
-        } else return this.defaultData;
+        } else {
+            return this.defaultData;
+        }
     }
 
     /**
@@ -728,7 +732,9 @@ class ParserManager {
             throw new Error(
                 'Must call createCTOFromInferredVariables before calling getDefaultModel'
             );
-        } else return this.defaultModel;
+        } else {
+            return this.defaultModel;
+        }
     }
 
     /**
@@ -740,7 +746,9 @@ class ParserManager {
             throw new Error(
                 'Must call createModelsAndLogicFromInferred before calling getDefaultLogic'
             );
-        } else return this.defaultLogic;
+        } else {
+            return this.defaultLogic;
+        }
     }
 
     /**
@@ -787,11 +795,11 @@ class ParserManager {
      * Recursive method to parse the nearley parse trees, extract all unique variables
      * and build a json representation of the minimum number of variable declaration required
      * to represent it.
-     * @param {String} tree - the parse tree (or subtree) from the parser
-     * @param {String} type  - indicates whether this level of the tree is a "contract", "concept" (obj) or "clause"
      * @param {String} parentName - name of the parse tree being parsed. E.g. if we're starting to parse
      * a parse tree from "Test Contract 1", the first level has name "Test Contract 1". Then, we might pop off object
      * parse trees referenced within Test Contract 1 and parse those using the same method as with type "concept" and name "TObject 1"
+     * @param {String} type  - indicates whether this level of the tree is a "contract", "concept" (obj) or "clause"
+     * @param {String} tree - the parse tree (or subtree) from the parser
      * @return {Object} - an array of the json objects representing this parse tree and all child parse trees.
      */
     parseVariablesFromGrammar(parentName, type, tree) {
@@ -1035,6 +1043,8 @@ class ParserManager {
      * @param {Object} concepts - an array of all the concept (obj) definitions which
      * we'll use to lookup data definitions of any objs referenced by the object and then
      * create dummy data for.
+     * @return {object} - returns a json object with the minimum default data necessary to
+     * populate the template.
      */
     generateDefaultDataForObj(object, concepts) {
         let data = { $class: object.data.$class };
@@ -1066,7 +1076,7 @@ class ParserManager {
                     let matchingObjects = concepts.filter(function(el) {
                         return el.name === object.data[key][0].type;
                     });
-                    if (matchingObjects.length == 1) {
+                    if (matchingObjects.length === 1) {
                         data[key] = [
                             this.generateDefaultDataForObj(
                                 matchingObjects[0],
@@ -1081,7 +1091,7 @@ class ParserManager {
                     let matchingObjects = concepts.filter(function(el) {
                         return el.name === object.data[key].type;
                     });
-                    if (matchingObjects.length == 1) {
+                    if (matchingObjects.length === 1) {
                         data[key] = this.generateDefaultDataForObj(
                             matchingObjects[0],
                             concepts

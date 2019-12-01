@@ -21,7 +21,6 @@ const Clause = require('./lib/clause');
 const ParserManager = require('./lib/parsermanager');
 const Template = require('./lib/template');
 const TemplateSaver = require('./lib/templatesaver');
-const TemplateLoader = require('./lib/templateloader');
 
 const fs = require('fs');
 
@@ -143,7 +142,7 @@ try {
     console.log(`LOAD FAILED! ${error.message}`); // Error!
 }
 
-let result = promisedTemplate.then(
+promisedTemplate.then(
     template => {
         //now, create a Clause object... then... need to run Utils.draft with clause object and default data... this will produce a sample.
         let clause = new Clause(template);
