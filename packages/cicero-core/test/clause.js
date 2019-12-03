@@ -346,7 +346,7 @@ Unexpected "n"`);
             }
         });
 
-        it('should be able to parse an olist-else block', async function() {
+        it('should be able to parse an olist block', async function() {
             const template = await Template.fromDirectory('./test/data/block-olist', options);
             const clause = new Clause(template);
             clause.parse(`This is a list
@@ -383,15 +383,95 @@ This is more text
             clause.getData().should.eql(data);
         });
 
+        it('should be able to draft an olist block', async function() {
+            const template = await Template.fromDirectory('./test/data/block-olist', options);
+            const clause = new Clause(template);
+            const text = `This is a list
+1. 0.0$ million <= Volume < 1.0$ million : 3.1%
+1. 1.0$ million <= Volume < 10.0$ million : 3.1%
+1. 10.0$ million <= Volume < 50.0$ million : 2.9%
+This is more text`;
+            const data = {
+                '$class': 'org.accordproject.volumediscountlist.VolumeDiscountContract',
+                'contractId': 'c0884078-882d-42e0-87d6-4cc824b4f194',
+                'rates': [
+                    {
+                        '$class': 'org.accordproject.volumediscountlist.RateRange',
+                        'volumeUpTo': 1,
+                        'volumeAbove': 0,
+                        'rate': 3.1
+                    },
+                    {
+                        '$class': 'org.accordproject.volumediscountlist.RateRange',
+                        'volumeUpTo': 10,
+                        'volumeAbove': 1,
+                        'rate': 3.1
+                    },
+                    {
+                        '$class': 'org.accordproject.volumediscountlist.RateRange',
+                        'volumeUpTo': 50,
+                        'volumeAbove': 10,
+                        'rate': 2.9
+                    }
+                ]
+            };
+            clause.setData(data);
+            const newText = await clause.draft();
+            // remove the generated clause id
+            newText.should.eql(text);
+        });
+
+        it('should be able to draft an olist block (wrapped variables)', async function() {
+            const template = await Template.fromDirectory('./test/data/block-olist', options);
+            const clause = new Clause(template);
+            const text = `This is a list
+
+\`\`\` <list/>
+1. <variable id="volumeAbove" value="0.0"/>$ million <= Volume < <variable id="volumeUpTo" value="1.0"/>$ million : <variable id="rate" value="3.1"/>%
+1. <variable id="volumeAbove" value="1.0"/>$ million <= Volume < <variable id="volumeUpTo" value="10.0"/>$ million : <variable id="rate" value="3.1"/>%
+1. <variable id="volumeAbove" value="10.0"/>$ million <= Volume < <variable id="volumeUpTo" value="50.0"/>$ million : <variable id="rate" value="2.9"/>%
+\`\`\`
+
+This is more text`;
+            const data = {
+                '$class': 'org.accordproject.volumediscountlist.VolumeDiscountContract',
+                'contractId': 'c0884078-882d-42e0-87d6-4cc824b4f194',
+                'rates': [
+                    {
+                        '$class': 'org.accordproject.volumediscountlist.RateRange',
+                        'volumeUpTo': 1,
+                        'volumeAbove': 0,
+                        'rate': 3.1
+                    },
+                    {
+                        '$class': 'org.accordproject.volumediscountlist.RateRange',
+                        'volumeUpTo': 10,
+                        'volumeAbove': 1,
+                        'rate': 3.1
+                    },
+                    {
+                        '$class': 'org.accordproject.volumediscountlist.RateRange',
+                        'volumeUpTo': 50,
+                        'volumeAbove': 10,
+                        'rate': 2.9
+                    }
+                ]
+            };
+            clause.setData(data);
+            const newText = await clause.draft({wrapVariables:true});
+            // remove the generated clause id
+            newText.should.eql(text);
+        });
+
         it('should be able to parse an ulist block', async function() {
             const template = await Template.fromDirectory('./test/data/block-ulist', options);
             const clause = new Clause(template);
-            clause.parse(`This is a list
+            const text = `This is a list
 - 0.0$ million <= Volume < 1.0$ million : 3.1%
 - 1.0$ million <= Volume < 10.0$ million : 3.1%
 - 10.0$ million <= Volume < 50.0$ million : 2.9%
-This is more text
-`);
+This is more text`;
+            clause.parse(text);
             const data = {
                 '$class': 'org.accordproject.volumediscountlist.VolumeDiscountContract',
                 'rates': [
@@ -418,6 +498,86 @@ This is more text
             // remove the generated clause id
             delete clause.getData().contractId;
             clause.getData().should.eql(data);
+        });
+
+        it('should be able to draft an ulist block', async function() {
+            const template = await Template.fromDirectory('./test/data/block-ulist', options);
+            const clause = new Clause(template);
+            const text = `This is a list
+- 0.0$ million <= Volume < 1.0$ million : 3.1%
+- 1.0$ million <= Volume < 10.0$ million : 3.1%
+- 10.0$ million <= Volume < 50.0$ million : 2.9%
+This is more text`;
+            const data = {
+                '$class': 'org.accordproject.volumediscountlist.VolumeDiscountContract',
+                'contractId': 'c0884078-882d-42e0-87d6-4cc824b4f194',
+                'rates': [
+                    {
+                        '$class': 'org.accordproject.volumediscountlist.RateRange',
+                        'volumeUpTo': 1,
+                        'volumeAbove': 0,
+                        'rate': 3.1
+                    },
+                    {
+                        '$class': 'org.accordproject.volumediscountlist.RateRange',
+                        'volumeUpTo': 10,
+                        'volumeAbove': 1,
+                        'rate': 3.1
+                    },
+                    {
+                        '$class': 'org.accordproject.volumediscountlist.RateRange',
+                        'volumeUpTo': 50,
+                        'volumeAbove': 10,
+                        'rate': 2.9
+                    }
+                ]
+            };
+            clause.setData(data);
+            const newText = await clause.draft();
+            // remove the generated clause id
+            newText.should.eql(text);
+        });
+
+        it('should be able to draft an ulist block (wrapped variables)', async function() {
+            const template = await Template.fromDirectory('./test/data/block-ulist', options);
+            const clause = new Clause(template);
+            const text = `This is a list
+
+\`\`\` <list/>
+- <variable id="volumeAbove" value="0.0"/>$ million <= Volume < <variable id="volumeUpTo" value="1.0"/>$ million : <variable id="rate" value="3.1"/>%
+- <variable id="volumeAbove" value="1.0"/>$ million <= Volume < <variable id="volumeUpTo" value="10.0"/>$ million : <variable id="rate" value="3.1"/>%
+- <variable id="volumeAbove" value="10.0"/>$ million <= Volume < <variable id="volumeUpTo" value="50.0"/>$ million : <variable id="rate" value="2.9"/>%
+\`\`\`
+
+This is more text`;
+            const data = {
+                '$class': 'org.accordproject.volumediscountlist.VolumeDiscountContract',
+                'contractId': 'c0884078-882d-42e0-87d6-4cc824b4f194',
+                'rates': [
+                    {
+                        '$class': 'org.accordproject.volumediscountlist.RateRange',
+                        'volumeUpTo': 1,
+                        'volumeAbove': 0,
+                        'rate': 3.1
+                    },
+                    {
+                        '$class': 'org.accordproject.volumediscountlist.RateRange',
+                        'volumeUpTo': 10,
+                        'volumeAbove': 1,
+                        'rate': 3.1
+                    },
+                    {
+                        '$class': 'org.accordproject.volumediscountlist.RateRange',
+                        'volumeUpTo': 50,
+                        'volumeAbove': 10,
+                        'rate': 2.9
+                    }
+                ]
+            };
+            clause.setData(data);
+            const newText = await clause.draft({wrapVariables:true});
+            // remove the generated clause id
+            newText.should.eql(text);
         });
 
         it('should be able to parse a join block', async function() {
