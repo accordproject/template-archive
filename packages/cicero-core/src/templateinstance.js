@@ -130,7 +130,8 @@ class TemplateInstance {
 
             parser.results.forEach(function (element) {
                 if (head !== JSON.stringify(element)) {
-                    throw new Error('Ambiguous text. Got ' + parser.results.length + ' ASTs for text: ' + text);
+                    const err = `Ambiguous text. Got ${parser.results.length} ASTs for text: ${text}`;
+                    throw new ParseException(err, null, fileName, err, 'cicero-core' );
                 }
             }, this);
         }
@@ -138,7 +139,8 @@ class TemplateInstance {
         Logger.debug('Result of parsing: ' + JSON.stringify(ast));
 
         if(!ast) {
-            throw new Error('Parsing clause text returned a null AST. This may mean the text is valid, but not complete.');
+            const err = 'Parsing clause text returned a null AST. This may mean the text is valid, but not complete.';
+            throw new ParseException(err, null, fileName, err, 'cicero-core' );
         }
 
         ast = TemplateInstance.convertDateTimes(ast, utcOffset);
