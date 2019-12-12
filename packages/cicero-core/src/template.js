@@ -174,10 +174,11 @@ class Template {
      * Persists this template to a Cicero Template Archive (cta) file.
      * @param {string} [language] - target language for the archive (should be 'ergo')
      * @param {Object} [options] - JSZip options
+     * @param {Object} [sign] - PKCS#7 signer cert and key, if specified
      * @return {Promise<Buffer>} the zlib buffer
      */
-    async toArchive(language, options) {
-        return TemplateSaver.toArchive(this, language, options);
+    async toArchive(language, options, sign) {
+        return TemplateSaver.toArchive(this, language, options, sign);
     }
 
     /**

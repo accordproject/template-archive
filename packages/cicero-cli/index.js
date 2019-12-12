@@ -325,6 +325,16 @@ require('yargs')
             type: 'boolean',
             default: false
         });
+        yargs.option('sign', {
+            describe: 'path to a PKCS#12 file',
+            type: 'string',
+            default: null
+        });
+        yargs.option('signPassword', {
+            describe: 'password to access the PKCS#12 file',
+            type: 'string',
+            default: null
+        });
     }, (argv) => {
         if (argv.verbose) {
             Logger.info(`create an archive for ${argv.template}`);
@@ -333,6 +343,7 @@ require('yargs')
         try {
             argv = Commands.validateArchiveArgs(argv);
             const options = {
+                sign: argv.sign,
                 warnings: argv.warnings,
             };
             return Commands.archive(argv.template, argv.target, argv.output, options)

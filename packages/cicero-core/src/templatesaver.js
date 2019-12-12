@@ -14,6 +14,7 @@
 
 'use strict';
 
+const forge = require('node-forge');
 const fsPath = require('path');
 const JSZip = require('jszip');
 
@@ -30,19 +31,34 @@ class TemplateSaver {
      * @param {Template} template - the template to persist
      * @param {string} [language] - target language for the archive (should be 'ergo')
      * @param {Object} [options] - JSZip options
+     * @param {Object} [sign] - PKCS#7 signer cert and key, if specified
      * @return {Promise<Buffer>} the zlib buffer
      */
-    static async toArchive(template, language, options) {
+    static async toArchive(template, language, options, sign) {
+        let digests = {};
+        let md = forge.md.sha256.create();
+
+        let processFile = (fn, content) => {
+            if(sign !== undefined) {
+                digests[fn] = md.start().update(content).digest().toHex();
+            }
+            zip.file(fn, content, options);
+        };
+
         if(!language || typeof(language) !== 'string') {
             throw new Error('language is required and must be a string');
         }
 
         const metadata = template.getMetadata().createTargetMetadata(language);
 
+        // work around Stuk/jszip issue #369
+        const currentDate = new Date();
+        const dateWithTzOffset = new Date(currentDate.getTime() - currentDate.getTimezoneOffset() * 60000);
+        JSZip.defaults.date = dateWithTzOffset;
+
         let zip = new JSZip();
 
-        let packageFileContents = JSON.stringify(metadata.getPackageJson());
-        zip.file('package.json', packageFileContents, options);
+        processFile('package.json', JSON.stringify(metadata.getPackageJson()));
 
         // save the grammar
         zip.file('text/', null, Object.assign({}, options, {
@@ -50,12 +66,12 @@ class TemplateSaver {
         }));
 
         if (template.getParserManager().getTemplatizedGrammar()) {
-            zip.file('text/grammar.tem.md', template.getParserManager().getTemplatizedGrammar(), options);
+            processFile('text/grammar.tem.md', template.getParserManager().getTemplatizedGrammar());
         }
 
         // save the README.md if present
         if (metadata.getREADME()) {
-            zip.file('README.md', metadata.getREADME(), options);
+            processFile('README.md', metadata.getREADME());
         }
 
         // Save the sample files
@@ -68,14 +84,13 @@ class TemplateSaver {
                 } else {
                     fileName = `text/sample_${locale}.md`;
                 }
-                zip.file(fileName, sampleFiles[locale], options);
+                processFile(fileName, sampleFiles[locale]);
             });
         }
 
         // save the request.json if present & not text-only
         if (metadata.getRequest()) {
-            let requestFileContents = JSON.stringify(metadata.getRequest());
-            zip.file('request.json', requestFileContents, options);
+            processFile('request.json', JSON.stringify(metadata.getRequest()));
         }
 
         let modelFiles = template.getModelManager().getModels();
@@ -83,7 +98,7 @@ class TemplateSaver {
             dir: true
         }));
         modelFiles.forEach(function (file) {
-            zip.file('model/' + file.name, file.content, options);
+            processFile('model/' + file.name, file.content);
         });
 
         zip.file('logic/', null, Object.assign({}, options, {
@@ -93,8 +108,39 @@ class TemplateSaver {
         scriptFiles.forEach(function (file) {
             let fileIdentifier = file.getIdentifier();
             let fileName = fsPath.basename(fileIdentifier);
-            zip.file('logic/' + fileName, file.contents, options);
+            processFile('logic/' + fileName, file.contents);
         });
+
+        let manifest = {
+            version: 1,
+            files: digests,
+        };
+        let manifestJson = JSON.stringify(manifest);
+        zip.file('manifest.json', manifestJson, options);
+
+        if(sign !== undefined) {
+            let p7 = forge.pkcs7.createSignedData();
+            p7.content = forge.util.createBuffer(manifestJson, 'utf8');
+            p7.addCertificate(sign.cert);
+            p7.addSigner({
+                key: sign.key,
+                certificate: sign.cert,
+                digestAlgorithm: forge.pki.oids.sha256,
+                authenticatedAttributes: [{
+                    type: forge.pki.oids.contentType,
+                    value: forge.pki.oids.data,
+                }, {
+                    type: forge.pki.oids.messageDigest,
+                }, {
+                    type: forge.pki.oids.signingTime,
+                    value: new Date(),
+                }],
+            });
+            p7.sign({detached: true});
+
+            let pem = forge.pkcs7.messageToPem(p7);
+            zip.file('manifest.pem', pem, options);
+        }
 
         return zip.generateAsync({
             type: 'nodebuffer'

@@ -14,6 +14,7 @@
 
 'use strict';
 
+const forge = require('node-forge');
 const fs = require('fs');
 const fsPath = require('path');
 const slash = require('slash');
@@ -36,6 +37,111 @@ const SAMPLE_FILE_REGEXP = xregexp('text[/\\\\]sample(_(' + IETF_REGEXP + '))?.m
  */
 class TemplateLoader extends FileLoader {
     /**
+     * Load system CA certificates.
+     * @return {*} a forge CA store
+     */
+    static async loadCaStore() {
+        // list copied from https://golang.org/src/crypto/x509/root_linux.go
+        let caPaths = [
+            '/etc/ssl/certs/ca-certificates.crt',
+            '/etc/pki/tls/certs/ca-bundle.crt',
+            '/etc/ssl/ca-bundle.pem',
+            '/etc/pki/tls/cacert.pem',
+            '/etc/pki/ca-trust/extracted/pem/tls-ca-bundle.pem',
+        ];
+
+        for(let caPath of caPaths) {
+            if(fs.existsSync(caPath)) {
+                let caStore = forge.pki.createCaStore();
+                let caContents = fs.readFileSync(caPath, 'binary');
+                let caPemArray = caContents
+                    // remove comments
+                    .split(/[\r\n]/)
+                    .map(s => s.trim())
+                    .filter(s => s && !s.startsWith('#'))
+                    .join('\n')
+                    // split into PEM strings
+                    .split(/(?=-----BEGIN )/);
+                for(let caPem of caPemArray) {
+                    try {
+                        caStore.addCertificate(caPem);
+                    } catch (err) {
+                        Logger.debug(err);
+                        Logger.debug(caPem);
+                    }
+                }
+                return caStore;
+            }
+        }
+
+        return null;
+    }
+
+    /**
+     * Verify a V1 archive.
+     * @param {*} zip the JSZip instance
+     * @param {string} manifestJson the V1 manifest as parsed JSON
+     */
+    static async verifyArchiveV1(zip, manifestJson) {
+        let digestFailures = 0;
+        let md = forge.md.sha256.create();
+
+        for(let filePath in manifestJson.files) {
+            let origDigest = manifestJson.files[filePath];
+            try {
+                let content = await TemplateLoader.loadZipFileContents(zip, filePath, false, true);
+                let newDigest = md.start().update(content).digest().toHex();
+                Logger.debug(`file ${filePath} orig ${origDigest} new ${newDigest}`);
+                if(newDigest !== origDigest) {
+                    digestFailures++;
+                    Logger.error(`Checksum verification failed for ${filePath}`);
+                }
+            } catch (err) {
+                Logger.error(err);
+            }
+        }
+
+        const manifestPem = await TemplateLoader.loadZipFileContents(zip, 'manifest.pem');
+        if(manifestPem !== null) {
+            let caStore = await TemplateLoader.loadCaStore();
+            let p7 = forge.pkcs7.messageFromPem(manifestPem);
+            // v1 uses detached signatures; reattach the content
+            p7.content = forge.util.createBuffer(JSON.stringify(manifestJson), 'utf8');
+            // print a message for each signature
+            let callback = (error, siginfo) => {
+                if(error) {
+                    Logger.error(error);
+                    return;
+                }
+
+                let byCert = siginfo.signer;
+                let verified = siginfo.verified;
+                let subject = '';
+                byCert.subject.attributes.map(attr => {
+                    subject += '/' + (attr.shortName || attr.name) + '=' + attr.value;
+                });
+                if(verified) {
+                    Logger.info(`Verified digital signature from ${subject}`);
+                } else {
+                    Logger.error(`Invalid digital signature from ${subject}`);
+                }
+            };
+            // verify that the signature is valid
+            try {
+                if(!p7.verify(caStore, { onSignatureVerificationComplete: callback })) {
+                    throw new Error('Aborting processing due to invalid signature(s).');
+                }
+            } catch (err) {
+                Logger.error(err);
+            }
+        }
+
+        if(digestFailures) {
+            throw new Error('Aborting processing due to failed checksum(s).');
+        }
+    }
+
+    /**
      * Create a template from an archive.
      * @param {*} Template - the type to construct
      * @param {Buffer} buffer  - the buffer to a Cicero Template Archive (cta) file
@@ -50,6 +156,18 @@ class TemplateLoader extends FileLoader {
         const ctoModelFiles = [];
         const ctoModelFileNames = [];
         const sampleTextFiles = {};
+
+        const manifestJson = await TemplateLoader.loadZipFileContents(zip, 'manifest.json', true);
+        if(manifestJson !== null) {
+            switch(manifestJson.version) {
+            case 1:
+                TemplateLoader.verifyArchiveV1(zip, manifestJson);
+                break;
+            default:
+                Logger.warn(`unknown manifest version ${manifestJson.version}`);
+                break;
+            }
+        }
 
         const readmeContents = await TemplateLoader.loadZipFileContents(zip, 'README.md');
         let sampleFiles = await TemplateLoader.loadZipFilesContents(zip, SAMPLE_FILE_REGEXP);

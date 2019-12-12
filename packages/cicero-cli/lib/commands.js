@@ -20,6 +20,7 @@ const Clause = require('@accordproject/cicero-core').Clause;
 const Engine = require('@accordproject/cicero-engine').Engine;
 const CodeGen = require('@accordproject/cicero-tools').CodeGen;
 const FileWriter = CodeGen.FileWriter;
+const forge = require('node-forge');
 const fs = require('fs');
 const path = require('path');
 const mkdirp = require('mkdirp');
@@ -466,6 +467,55 @@ class Commands {
             argv.target = 'ergo';
         }
 
+        if(argv.signPassword && !argv.sign){
+            Logger.warn('PKCS#12 password given without specifying a PKCS#12 file!');
+        }
+
+        if(argv.sign) {
+            let getBags = (p12, oid) => { return p12.getBags({bagType: oid})[oid]; };
+
+            let p12der = fs.readFileSync(argv.sign, {encoding: 'binary'});
+            let p12asn = forge.asn1.fromDer(forge.util.createBuffer(p12der, 'binary'));
+            let p12obj = forge.pkcs12.pkcs12FromAsn1(p12asn, argv.signPassword);
+
+            let cert = null;
+            let certBags = getBags(p12obj, forge.pki.oids.certBag);
+            for(let certBag of certBags) {
+                if(certBag.cert === null) {
+                    continue;
+                }
+                let ext = certBag.cert.getExtension('extKeyUsage');
+                if(ext && ext.codeSigning === true) {
+                    cert = certBag.cert;
+                }
+            }
+            if(cert === null) {
+                throw new Error('PKCS#12 does not contain a certificate with EKU codeSigning set!');
+            }
+
+            let key = null;
+            let keyBags = getBags(p12obj, forge.pki.oids.keyBag);
+            let shroudedKeyBags = getBags(p12obj, forge.pki.oids.pkcs8ShroudedKeyBag);
+            if(keyBags.length + shroudedKeyBags.length !== 1) {
+                throw new Error('PKCS#12 contains too many keys');
+            }
+            if(keyBags.length === 1) {
+                key = keyBags[0].key;
+            } else {
+                key = shroudedKeyBags[0].key;
+            }
+
+            if(cert !== null && key !== null) {
+                argv.sign = {
+                    cert: cert,
+                    key: key,
+                };
+            } else {
+                delete argv.sign;
+            }
+            delete argv.signPassword;
+        }
+
         return argv;
     }
 
@@ -481,7 +531,8 @@ class Commands {
     static archive(templatePath, target, outputPath, options) {
         return Commands.loadTemplate(templatePath, options)
             .then(async (template) => {
-                const archive = await template.toArchive(target);
+                const sign = options === undefined ? undefined : options.sign;
+                const archive = await template.toArchive(target, {}, sign);
                 let file;
                 if (outputPath) {
                     file = outputPath;
