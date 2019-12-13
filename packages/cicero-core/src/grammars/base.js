@@ -61,7 +61,7 @@ String -> dqstring {% id %}
 Double -> decimal {% id %}
 Integer -> int {% id %}
 Long -> int {% id %}
-Boolean -> "true" {% id %} | "false" {% id %}
+Boolean -> "true" {% (d) => { return true; } %} | "false" {% (d) => { return false; } %}
 DateTime -> DATE  {% id %}
 
 # https://github.com/kach/nearley/blob/master/builtin/number.ne
