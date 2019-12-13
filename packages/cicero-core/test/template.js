@@ -330,7 +330,7 @@ In case of delayed delivery except for Force Majeure cases, the Seller shall pay
             return Template.fromUrl(url, {'encoding':null,'headers':{'Accept': '*/*','Accept-Encoding': 'deflate, gzip'}}).should.be.fulfilled;
         });
 
-        it.skip('should throw an error if creating a template from a wrong URL', async () => {
+        it('should throw an error if creating a template from a wrong URL', async () => {
             const url = 'https://templates.accordproject.org/archives/doesnotexist@0.3.0.cta';
             return Template.fromUrl(url, null).should.be.rejectedWith('Request to URL [https://templates.accordproject.org/archives/doesnotexist@0.3.0.cta] returned with error code: 404');
         });
