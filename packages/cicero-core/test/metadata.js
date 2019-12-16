@@ -155,7 +155,20 @@ describe('Metadata', () => {
             }, null, {})).should.throw('The template version must be a valid semantic version (semver) number.');
         });
 
-        it('should throw an error if cicero version is not valid semver ', () => {
+        it('should throw an error if template version is not valid semver (1.0)', () => {
+            return (() => new Metadata({
+                name: 'template',
+                version: '1.0',
+                accordproject: {
+                    template: 'clause',
+                    ergo:'0.20.0-alpha.2',
+                    cicero:ciceroVersion,
+                    language: 'ergo'
+                },
+            }, null, {})).should.throw('The template version must be a valid semantic version (semver) number.');
+        });
+
+        it('should throw an error if cicero version is not valid semver range', () => {
             return (() => new Metadata({
                 name: 'template',
                 version: '1.0.0',
@@ -165,7 +178,7 @@ describe('Metadata', () => {
                     ergo: 'BLEH',
                     language: 'ergo'
                 },
-            }, null, {})).should.throw('The cicero version must be a valid semantic version (semver) number.');
+            }, null, {})).should.throw('The cicero version must be a valid semantic version (semver) range.');
         });
 
         it('should throw an error if cicero version is not valid semver for current version of cicero', () => {
