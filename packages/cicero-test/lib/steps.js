@@ -19,17 +19,16 @@ const Path = require('path');
 const Chai = require('chai');
 const expect = Chai.expect;
 
-const Util = require('@accordproject/ergo-test/lib/util');
 const Template = require('@accordproject/cicero-core').Template;
 const Clause = require('@accordproject/cicero-core').Clause;
 const Engine = require('@accordproject/cicero-engine').Engine;
+const Util = require('@accordproject/ergo-test/lib/util');
 
 const { Before, Given, When, Then, setDefaultTimeout } = require('cucumber');
 
 // Defaults
 const defaultState = {
-    '$class':'org.accordproject.cicero.contract.AccordContractState',
-    'stateId':'org.accordproject.cicero.contract.AccordContractState#1'
+    '$class':'org.accordproject.runtime.State'
 };
 
 /**
@@ -38,10 +37,11 @@ const defaultState = {
  * @param {object} engine - the Cicero engine
  * @param {object} clause - the clause instance
  * @param {string} currentTime - the definition of 'now'
+ * @param {utcOffset} utcOffset - UTC Offset for this execution
  * @returns {object} Promise to the response
  */
-async function init(engine,clause,currentTime) {
-    return engine.init(clause,currentTime);
+async function init(engine,clause,currentTime,utcOffset) {
+    return engine.init(clause,currentTime,utcOffset);
 }
 
 /**
@@ -52,15 +52,16 @@ async function init(engine,clause,currentTime) {
  * @param {object} request - the request data in JSON
  * @param {object} state - the state data in JSON
  * @param {string} currentTime - the definition of 'now'
+ * @param {utcOffset} utcOffset - UTC Offset for this execution
  * @returns {object} Promise to the response
  */
-async function trigger(engine,clause,request,state,currentTime) {
+async function trigger(engine,clause,request,state,currentTime,utcOffset) {
     if (state === null) {
-        const initAnswer = await init(engine,clause,currentTime);
+        const initAnswer = await init(engine,clause,currentTime,utcOffset);
         const initState = initAnswer.state;
-        return engine.trigger(clause,request,initState,currentTime);
+        return engine.trigger(clause,request,initState,currentTime,utcOffset);
     } else {
-        return engine.trigger(clause,request,state,currentTime);
+        return engine.trigger(clause,request,state,currentTime,utcOffset);
     }
 }
 
@@ -80,6 +81,7 @@ Before(function () {
 
     this.engine = new Engine();
     this.currentTime = '1970-01-01T00:00:00Z';
+    this.utcOffset = 0;
     this.state = null;
     this.clause = null;
     this.request = null;
@@ -97,6 +99,10 @@ Given('the current time is {string}', function(currentTime) {
     this.currentTime = currentTime;
 });
 
+Given('the UTC offset is {int}', function(utcOffset) {
+    this.utcOffset = utcOffset;
+});
+
 Given('that the contract says', async function (contractText) {
     if (!this.clause) {
         const templateDir = Path.resolve(Util.resolveRootDir(this.parameters),'.');
@@ -104,7 +110,7 @@ Given('that the contract says', async function (contractText) {
         this.request = clause.getTemplate().getMetadata().getRequest();
         this.clause = clause;
     }
-    this.clause.parse(contractText,this.currentTime);
+    this.clause.parse(contractText,this.currentTime,this.utcOffset);
 });
 
 Given('that the contract data is', async function (contractData) {
@@ -125,7 +131,7 @@ Given('the default( sample) contract', async function () {
         this.request = clause.getTemplate().getMetadata().getRequest();
         this.clause = clause;
     }
-    this.clause.parse(this.clause.getTemplate().getMetadata().getSample(),this.currentTime);
+    this.clause.parse(this.clause.getTemplate().getMetadata().getSample(),this.currentTime,this.utcOffset);
 });
 
 Given('the state', function (actualState) {
@@ -146,7 +152,7 @@ When('it receives the default request', function () {
 
 Then('the initial state( of the contract) should be', function (expectedState) {
     const state = JSON.parse(expectedState);
-    return init(this.engine,this.clause,this.currentTime)
+    return init(this.engine,this.clause,this.currentTime,this.utcOffset)
         .then((actualAnswer) => {
             this.answer = actualAnswer;
             expect(actualAnswer).to.have.property('state');
@@ -157,7 +163,7 @@ Then('the initial state( of the contract) should be', function (expectedState) {
 
 Then('the initial state( of the contract) should be the default state', function () {
     const state = defaultState;
-    return init(this.engine,this.clause,this.currentTime)
+    return init(this.engine,this.clause,this.currentTime,this.utcOffset)
         .then((actualAnswer) => {
             this.answer = actualAnswer;
             expect(actualAnswer).to.have.property('state');
@@ -178,7 +184,7 @@ Then('it should respond with', function (expectedResponse) {
         expect(this.answer).to.not.have.property('error');
         return Util.compareSuccess({ response },this.answer);
     } else {
-        return trigger(this.engine,this.clause,this.request,this.state,this.currentTime)
+        return trigger(this.engine,this.clause,this.request,this.state,this.currentTime,this.utcOffset)
             .then((actualAnswer) => {
                 this.answer = actualAnswer;
                 expect(actualAnswer).to.have.property('response');
@@ -195,7 +201,7 @@ Then('the new state( of the contract) should be', function (expectedState) {
         expect(this.answer).to.not.have.property('error');
         return Util.compareSuccess({ state },this.answer);
     } else {
-        return trigger(this.engine,this.clause,this.request,this.state,this.currentTime)
+        return trigger(this.engine,this.clause,this.request,this.state,this.currentTime,this.utcOffset)
             .then((actualAnswer) => {
                 this.answer = actualAnswer;
                 expect(actualAnswer).to.have.property('state');
@@ -212,7 +218,7 @@ Then('the following obligations should have( also) been emitted', function (expe
         expect(this.answer).to.not.have.property('error');
         return Util.compareSuccess({ emit },this.answer);
     } else {
-        return trigger(this.engine,this.clause,this.request,this.state,this.currentTime)
+        return trigger(this.engine,this.clause,this.request,this.state,this.currentTime,this.utcOffset)
             .then((actualAnswer) => {
                 this.answer = actualAnswer;
                 expect(actualAnswer).to.have.property('emit');
@@ -223,9 +229,8 @@ Then('the following obligations should have( also) been emitted', function (expe
 });
 
 Then('it should reject the request with the error {string}', function (expectedError) {
-    return trigger(this.engine,this.clause,this.request,this.state,this.currentTime)
+    return trigger(this.engine,this.clause,this.request,this.state,this.currentTime,this.utcOffset)
         .catch((actualError) => {
             expect(actualError.message).to.equal(expectedError);
         });
 });
-

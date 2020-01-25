@@ -1,5 +1,4 @@
 {
     "$class": "org.accordproject.helloworldstate.HelloWorldState",
-    "stateId": "org.accordproject.helloworldstate.HelloWorldState#0",
 		"counter" : 2.0
 }

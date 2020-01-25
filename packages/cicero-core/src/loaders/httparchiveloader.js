@@ -28,7 +28,6 @@ class HTTPArchiveLoader {
      * @private
      */
     constructor() {
-        Logger.entry('constructor');
     }
 
     /**

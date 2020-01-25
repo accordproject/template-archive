@@ -53,17 +53,11 @@ const parseCopyrightBody = {
     '$class': 'org.accordproject.copyrightlicense.CopyrightLicenseContract',
     'contractId': '1',
     'effectiveDate': '2018-01-01T00:00:00.000-04:00',
-    'licensee': {
-        '$class': 'org.accordproject.cicero.contract.AccordParty',
-        'partyId': 'Me'
-    },
+    'licensee': 'resource:org.accordproject.contract.Party#Me',
     'licenseeState': 'NY',
     'licenseeEntityType': 'Company',
     'licenseeAddress': '1 Broadway',
-    'licensor': {
-        '$class': 'org.accordproject.cicero.contract.AccordParty',
-        'partyId': 'Myself'
-    },
+    'licensor': 'resource:org.accordproject.contract.Party#Myself',
     'licensorState': 'NY',
     'licensorEntityType': 'Company',
     'licensorAddress': '2 Broadway',

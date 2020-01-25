@@ -88,11 +88,11 @@ class Metadata {
             throw new Error('Failed to find accordproject cicero version in package.json');
         }
 
-        if(!semver.valid(semver.coerce(packageJson.accordproject.cicero))){
-            throw new Error('The cicero version must be a valid semantic version (semver) number.');
+        if(!semver.validRange(packageJson.accordproject.cicero)){
+            throw new Error('The cicero version must be a valid semantic version (semver) range.');
         }
 
-        if(!semver.valid(semver.coerce(packageJson.version))){
+        if(!semver.valid(packageJson.version)){
             throw new Error('The template version must be a valid semantic version (semver) number.');
         }
 

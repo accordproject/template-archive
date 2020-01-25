@@ -295,7 +295,6 @@ describe('CordaVisitor', function () {
             }]);
             mockClassDeclaration.isConcept.returns(false);
             mockClassDeclaration.isAbstract.returns(false);
-            mockClassDeclaration.isSystemCoreType.returns(false);
             mockClassDeclaration.getSuperType.returns(false);
             mockClassDeclaration.getIdentifierFieldName.returns(false);
 
@@ -359,8 +358,6 @@ describe('CordaVisitor', function () {
         });
 
         it('should write a system core type class declaration and call accept on each property', () => {
-            mockClassDeclaration.isSystemCoreType.returns(true);
-
             cordaVisit.visitClassDeclaration(mockClassDeclaration, param);
 
             mockStartClassFile.withArgs(mockClassDeclaration, param).calledOnce.should.be.ok;
@@ -368,7 +365,7 @@ describe('CordaVisitor', function () {
             param.fileWriter.writeLine.getCall(0).args.should.deep.equal([0, 'import oranges;']);
             param.fileWriter.writeLine.getCall(1).args.should.deep.equal([0, 'import apples;']);
             param.fileWriter.writeLine.getCall(2).args.should.deep.equal([0, '@CordaSerializable']);
-            param.fileWriter.writeLine.getCall(3).args.should.deep.equal([0, 'public class Bob extends org.hyperledger.composer.system.Resource {']);
+            param.fileWriter.writeLine.getCall(3).args.should.deep.equal([0, 'public class Bob {']);
             param.fileWriter.writeLine.getCall(4).args.should.deep.equal([0, '}']);
             acceptSpy.withArgs(cordaVisit, Object.assign({},param,{mode:'field'})).calledTwice.should.be.ok;
             acceptSpy.withArgs(cordaVisit, Object.assign({},param,{mode:'getter'})).calledTwice.should.be.ok;

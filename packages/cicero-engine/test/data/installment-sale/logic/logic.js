@@ -68,7 +68,7 @@ class orgXaccordprojectXinstallmentsaleXInstallmentSale {
       var vlemit_0 = vemit;
       var t2;
       if (!(equal(deref(unbrand(vrequest), "amount"), (deref(unbrand(vlstate_0), "balance_remaining") + deref(unbrand(vcontract), "DUE_AT_CLOSING"))))) {
-        t2 = {"right" : {"type": ["org.accordproject.ergo.stdlib.ErgoErrorResponse"], "data": {"message": "Enforce Error at 63:4-84:5 ''"}}};
+        t2 = {"right" : {"type": ["org.accordproject.ergo.stdlib.Error"], "data": {"message": "Enforce Error at 63:4-84:5 ''"}}};
       } else {
         var vbalance = ((deref(unbrand(vlstate_0), "balance_remaining") + deref(unbrand(vcontract), "DUE_AT_CLOSING")) - deref(unbrand(vrequest), "amount"));
         var vtotal_paid = (deref(unbrand(vlstate_0), "total_paid") + deref(unbrand(vrequest), "amount"));
@@ -105,15 +105,15 @@ class orgXaccordprojectXinstallmentsaleXInstallmentSale {
         var vlemit_0$0 = vemit;
         var t6;
         if (!(((deref(unbrand(vcontract), "MIN_PAYMENT") <= deref(unbrand(vlstate_0$0), "balance_remaining")) && (compare(deref(unbrand(vlstate_0$0), "next_payment_month"),23) < 0)))) {
-          t6 = {"right" : {"type": ["org.accordproject.ergo.stdlib.ErgoErrorResponse"], "data": {"message": "Enforce Error at 34:4-60:5 ''"}}};
+          t6 = {"right" : {"type": ["org.accordproject.ergo.stdlib.Error"], "data": {"message": "Enforce Error at 34:4-60:5 ''"}}};
         } else {
           var t5;
           if (!((deref(unbrand(vcontract), "MIN_PAYMENT") <= deref(unbrand(vrequest), "amount")))) {
-            t5 = {"right" : {"type": ["org.accordproject.ergo.stdlib.ErgoErrorResponse"], "data": {"message": "Enforce Error at 35:4-60:5 ''"}}};
+            t5 = {"right" : {"type": ["org.accordproject.ergo.stdlib.Error"], "data": {"message": "Enforce Error at 35:4-60:5 ''"}}};
           } else {
             var t4;
             if (!((deref(unbrand(vrequest), "amount") <= deref(unbrand(vlstate_0$0), "balance_remaining")))) {
-              t4 = {"right" : {"type": ["org.accordproject.ergo.stdlib.ErgoErrorResponse"], "data": {"message": "Enforce Error at 36:4-60:5 ''"}}};
+              t4 = {"right" : {"type": ["org.accordproject.ergo.stdlib.Error"], "data": {"message": "Enforce Error at 36:4-60:5 ''"}}};
             } else {
               var vbefore_interest = (deref(unbrand(vlstate_0$0), "balance_remaining") - deref(unbrand(vrequest), "amount"));
               var vbalance$0 = (vbefore_interest * (1 + (deref(unbrand(vcontract), "INTEREST_RATE") / 100)));
@@ -130,7 +130,7 @@ class orgXaccordprojectXinstallmentsaleXInstallmentSale {
       } else {
         var vX$6 = null;
         vX$6 = toRight(res3);
-        res7 = {"right" : {"type": ["org.accordproject.ergo.stdlib.ErgoErrorResponse"], "data": {"message": "Dispatch Error: no clause in the contract matches the request"}}};
+        res7 = {"right" : {"type": ["org.accordproject.ergo.stdlib.Error"], "data": {"message": "Dispatch Error: no clause in the contract matches the request"}}};
       }
       res8 = res7;
     }
@@ -145,7 +145,7 @@ class orgXaccordprojectXinstallmentsaleXInstallmentSale {
     var vlemit_0 = vemit;
     var t1;
     if (!(equal(deref(unbrand(vrequest), "amount"), (deref(unbrand(vlstate_0), "balance_remaining") + deref(unbrand(vcontract), "DUE_AT_CLOSING"))))) {
-      t1 = {"right" : {"type": ["org.accordproject.ergo.stdlib.ErgoErrorResponse"], "data": {"message": "Enforce Error at 63:4-84:5 ''"}}};
+      t1 = {"right" : {"type": ["org.accordproject.ergo.stdlib.Error"], "data": {"message": "Enforce Error at 63:4-84:5 ''"}}};
     } else {
       var vbalance = ((deref(unbrand(vlstate_0), "balance_remaining") + deref(unbrand(vcontract), "DUE_AT_CLOSING")) - deref(unbrand(vrequest), "amount"));
       var vtotal_paid = (deref(unbrand(vlstate_0), "total_paid") + deref(unbrand(vrequest), "amount"));
@@ -164,15 +164,15 @@ class orgXaccordprojectXinstallmentsaleXInstallmentSale {
     var vlemit_0 = vemit;
     var t3;
     if (!(((deref(unbrand(vcontract), "MIN_PAYMENT") <= deref(unbrand(vlstate_0), "balance_remaining")) && (compare(deref(unbrand(vlstate_0), "next_payment_month"),23) < 0)))) {
-      t3 = {"right" : {"type": ["org.accordproject.ergo.stdlib.ErgoErrorResponse"], "data": {"message": "Enforce Error at 34:4-60:5 ''"}}};
+      t3 = {"right" : {"type": ["org.accordproject.ergo.stdlib.Error"], "data": {"message": "Enforce Error at 34:4-60:5 ''"}}};
     } else {
       var t2;
       if (!((deref(unbrand(vcontract), "MIN_PAYMENT") <= deref(unbrand(vrequest), "amount")))) {
-        t2 = {"right" : {"type": ["org.accordproject.ergo.stdlib.ErgoErrorResponse"], "data": {"message": "Enforce Error at 35:4-60:5 ''"}}};
+        t2 = {"right" : {"type": ["org.accordproject.ergo.stdlib.Error"], "data": {"message": "Enforce Error at 35:4-60:5 ''"}}};
       } else {
         var t1;
         if (!((deref(unbrand(vrequest), "amount") <= deref(unbrand(vlstate_0), "balance_remaining")))) {
-          t1 = {"right" : {"type": ["org.accordproject.ergo.stdlib.ErgoErrorResponse"], "data": {"message": "Enforce Error at 36:4-60:5 ''"}}};
+          t1 = {"right" : {"type": ["org.accordproject.ergo.stdlib.Error"], "data": {"message": "Enforce Error at 36:4-60:5 ''"}}};
         } else {
           var vbefore_interest = (deref(unbrand(vlstate_0), "balance_remaining") - deref(unbrand(vrequest), "amount"));
           var vbalance = (vbefore_interest * (1 + (deref(unbrand(vcontract), "INTEREST_RATE") / 100)));
@@ -967,10 +967,10 @@ function unwrapError(result) {
     } else {
         var failure = toRight(result);
         var message = "Unknown Ergo Logic Error (Please file a GitHub issue)";
-        if (either(cast(["org.accordproject.ergo.stdlib.ErgoErrorResponse"],failure))) {
-            message = unbrand(toLeft(cast(["org.accordproject.ergo.stdlib.ErgoErrorResponse"],failure))).message;
+        if (either(cast(["org.accordproject.ergo.stdlib.Error"],failure))) {
+            message = unbrand(toLeft(cast(["org.accordproject.ergo.stdlib.Error"],failure))).message;
         } else {
-            message = JSON.stringify(toRight(cast(["org.accordproject.ergo.stdlib.ErgoErrorResponse"],failure)));
+            message = JSON.stringify(toRight(cast(["org.accordproject.ergo.stdlib.Error"],failure)));
         }
         throw new Error("[Ergo] " + message);
     }

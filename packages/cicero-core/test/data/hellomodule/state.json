@@ -1,4 +1,3 @@
 {
-    "stateId": "1",
-    "$class": "org.accordproject.cicero.contract.AccordContractState"
-  }
+    "$class": "org.accordproject.runtime.State"
+}

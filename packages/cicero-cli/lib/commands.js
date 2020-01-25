@@ -454,7 +454,8 @@ class Commands {
                 clause = new Clause(template);
                 clause.parse(sampleText, currentTime);
 
-                return engine.init(clause, currentTime, paramsJson);
+                // XXX Third parameter is utcOffset, should be added to CLI
+                return engine.init(clause, currentTime, null, paramsJson);
             })
             .catch((err) => {
                 Logger.error(err.message);

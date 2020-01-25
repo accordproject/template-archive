@@ -1,14 +1,14 @@
 namespace org.accordproject.conga
 
-import org.accordproject.cicero.contract.AccordClause from https://models.accordproject.org/cicero/contract.cto
+import org.accordproject.contract.Clause from https://models.accordproject.org/accordproject/contract.cto
 
-import org.accordproject.cicero.runtime.Request from https://models.accordproject.org/cicero/runtime.cto
-import org.accordproject.cicero.runtime.Response from https://models.accordproject.org/cicero/runtime.cto
+import org.accordproject.runtime.Request from https://models.accordproject.org/accordproject/runtime.cto
+import org.accordproject.runtime.Response from https://models.accordproject.org/accordproject/runtime.cto
 
 /**
  * Defines the data model for the Conga template.
  */
-asset TemplateModel extends AccordClause {
+asset TemplateModel extends Clause {
   o Double amount
   o String swag
   --> Participant participant

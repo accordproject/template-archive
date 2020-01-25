@@ -67,7 +67,7 @@ class orgXaccordprojectXvolumediscountXVolumeDiscount {
     } else {
       var vX$1 = null;
       vX$1 = toRight(res1);
-      res4 = {"right" : {"type": ["org.accordproject.ergo.stdlib.ErgoErrorResponse"], "data": {"message": "DefaultMatch Error at 17:0-26:1 ''"}}};
+      res4 = {"right" : {"type": ["org.accordproject.ergo.stdlib.Error"], "data": {"message": "DefaultMatch Error at 17:0-26:1 ''"}}};
     }
     return res4;
   }
@@ -867,10 +867,10 @@ function unwrapError(result) {
     } else {
         var failure = toRight(result);
         var message = "Unknown Ergo Logic Error (Please file a GitHub issue)";
-        if (either(cast(["org.accordproject.ergo.stdlib.ErgoErrorResponse"],failure))) {
-            message = unbrand(toLeft(cast(["org.accordproject.ergo.stdlib.ErgoErrorResponse"],failure))).message;
+        if (either(cast(["org.accordproject.ergo.stdlib.Error"],failure))) {
+            message = unbrand(toLeft(cast(["org.accordproject.ergo.stdlib.Error"],failure))).message;
         } else {
-            message = JSON.stringify(toRight(cast(["org.accordproject.ergo.stdlib.ErgoErrorResponse"],failure)));
+            message = JSON.stringify(toRight(cast(["org.accordproject.ergo.stdlib.Error"],failure)));
         }
         throw new Error("[Ergo] " + message);
     }
