@@ -41,7 +41,7 @@
   },
   "homepage": "https://www.accordproject.org/projects/cicero",
   "dependencies": {
-    "@accordproject/concerto-core": "0.82.8",
+    "@accordproject/concerto-core": "0.82.7-20191212180105",
     "@accordproject/cicero-core": "0.21.3",
     "@accordproject/cicero-engine": "0.21.3",
     "@accordproject/cicero-test": "0.21.3",
