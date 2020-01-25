@@ -70,7 +70,7 @@ app.post('/trigger/:template', async function (req, httpResponse, next) {
         } else if(Object.keys(req.body).length === 2 &&
            Object.prototype.hasOwnProperty.call(req.body,'request') &&
            Object.prototype.hasOwnProperty.call(req.body,'data')) {
-            const state = { '$class' : 'org.accordproject.cicero.contract.AccordContractState', 'stateId' : 'ehlo' };
+            const state = { '$class' : 'org.accordproject.runtime.State' };
             clause.setData(req.body.data);
             result = await engine.trigger(clause, req.body.request, state);
             delete result.state;

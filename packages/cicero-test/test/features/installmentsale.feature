@@ -23,8 +23,7 @@ Monthly payments, which shall start on month 3, include both principal and inter
   "status" : "WaitingForFirstDayOfNextMonth",
   "balance_remaining" : 10000.00,
 	"total_paid" : 0.00,
-  "next_payment_month" : 3,
-  "stateId": "#1"
+  "next_payment_month" : 3
 }
 """
 
@@ -36,8 +35,7 @@ Monthly payments, which shall start on month 3, include both principal and inter
   "status" : "WaitingForFirstDayOfNextMonth",
   "balance_remaining" : 10000.00,
 	"total_paid" : 0.00,
-  "next_payment_month" : 3,
-  "stateId": "#1"
+  "next_payment_month" : 3
 }
 """
     When it receives the request
@@ -62,8 +60,7 @@ Monthly payments, which shall start on month 3, include both principal and inter
   "status" : "WaitingForFirstDayOfNextMonth",
   "balance_remaining" : 7612.499999999999,
 	"total_paid" : 2500,
-  "next_payment_month" : 4,
-  "stateId": "#1"
+  "next_payment_month" : 4
 }
 """
 
@@ -75,8 +72,7 @@ Monthly payments, which shall start on month 3, include both principal and inter
   "status" : "WaitingForFirstDayOfNextMonth",
   "balance_remaining" : 7612.499999999999,
 	"total_paid" : 2500,
-  "next_payment_month" : 1,
-  "stateId": "#1"
+  "next_payment_month" : 1
 }
 """
     When it receives the request
@@ -93,8 +89,7 @@ Monthly payments, which shall start on month 3, include both principal and inter
   "status" : "WaitingForFirstDayOfNextMonth",
   "balance_remaining" : 5189.187499999998,
 	"total_paid" : 5000,
-  "next_payment_month" : 2,
-  "stateId": "#1"
+  "next_payment_month" : 2
 }
 """
     And it should respond with

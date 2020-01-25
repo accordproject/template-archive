@@ -164,7 +164,20 @@ describe('Metadata', () => {
             }, null, {})).should.throw('The template version must be a valid semantic version (semver) number.');
         });
 
-        it('should throw an error if cicero version is not valid semver ', () => {
+        it('should throw an error if template version is not valid semver (1.0)', () => {
+            return (() => new Metadata({
+                name: 'template',
+                version: '1.0',
+                accordproject: {
+                    template: 'clause',
+                    ergo:'0.20.0-alpha.2',
+                    cicero:ciceroVersion,
+                    language: 'ergo'
+                },
+            }, null, {})).should.throw('The template version must be a valid semantic version (semver) number.');
+        });
+
+        it('should throw an error if cicero version is not valid semver range', () => {
             return (() => new Metadata({
                 name: 'template',
                 version: '1.0.0',
@@ -174,7 +187,7 @@ describe('Metadata', () => {
                     ergo: 'BLEH',
                     language: 'ergo'
                 },
-            }, null, {})).should.throw('The cicero version must be a valid semantic version (semver) number.');
+            }, null, {})).should.throw('The cicero version must be a valid semantic version (semver) range.');
         });
 
         it('should throw an error if cicero version is not valid semver for current version of cicero', () => {
@@ -241,7 +254,7 @@ describe('Metadata', () => {
                 name: 'template',
                 description: 'This is a template',
                 version: '0.1.0',
-                accordproject: {ergo:'0.20.0-alpha.2',cicero:caretRange(ciceroVersion),runtime:'cicero'}
+                accordproject: {ergo:'0.20.0-alpha.2',cicero:caretRange(ciceroVersion),runtime:'es6'}
             }, '#README', {
                 en: 'sample'
             }, {
@@ -257,7 +270,7 @@ describe('Metadata', () => {
             const md = new Metadata({
                 name: 'template',
                 version: '1.0.0',
-                accordproject: {ergo:'0.20.0-alpha.2',cicero:caretRange(ciceroVersion),runtime:'cicero'}
+                accordproject: {ergo:'0.20.0-alpha.2',cicero:caretRange(ciceroVersion),runtime:'es6'}
             }, '#README', {
                 en: 'sample'
             }, {
@@ -271,7 +284,7 @@ describe('Metadata', () => {
             const md = new Metadata({
                 name: 'template',
                 version: '1.0.0',
-                accordproject: {ergo:'0.20.0-alpha.2',cicero:caretRange(ciceroVersion),runtime:'cicero'}
+                accordproject: {ergo:'0.20.0-alpha.2',cicero:caretRange(ciceroVersion),runtime:'es6'}
             }, '#README', {
                 en: 'sample'
             }, {
@@ -283,7 +296,7 @@ describe('Metadata', () => {
             const md = new Metadata({
                 name: 'template',
                 version: '1.0.0',
-                accordproject: {ergo:'0.20.0-alpha.2',cicero:caretRange(ciceroVersion),runtime:'cicero'}
+                accordproject: {ergo:'0.20.0-alpha.2',cicero:caretRange(ciceroVersion),runtime:'es6'}
             }, '#README', {
                 en: 'sample'
             }, {
@@ -447,7 +460,7 @@ describe('Metadata', () => {
             const md = new Metadata({
                 name: 'template',
                 version: '1.0.0',
-                accordproject: {ergo:'0.20.0-alpha.2',cicero:caretRange(ciceroVersion),runtime:'cicero'}
+                accordproject: {ergo:'0.20.0-alpha.2',cicero:caretRange(ciceroVersion),runtime:'es6'}
             }, null, {});
             md.getKeywords().should.deep.equal([]);
         });
@@ -456,7 +469,7 @@ describe('Metadata', () => {
                 name: 'template',
                 version: '1.0.0',
                 keywords: null,
-                accordproject: {ergo:'0.20.0-alpha.2',cicero:caretRange(ciceroVersion),runtime:'cicero'}
+                accordproject: {ergo:'0.20.0-alpha.2',cicero:caretRange(ciceroVersion),runtime:'es6'}
             }, null, {});
             md.getKeywords().should.deep.equal([]);
         });
@@ -465,7 +478,7 @@ describe('Metadata', () => {
                 name: 'template',
                 version: '1.0.0',
                 keywords: ['foo','bar'],
-                accordproject: {ergo:'0.20.0-alpha.2',cicero:caretRange(ciceroVersion),runtime:'cicero'}
+                accordproject: {ergo:'0.20.0-alpha.2',cicero:caretRange(ciceroVersion),runtime:'es6'}
             }, null, {});
             md.getKeywords().should.deep.equal(['foo','bar']);
         });
@@ -476,7 +489,7 @@ describe('Metadata', () => {
             const md = new Metadata({
                 name: 'template',
                 version: '1.0.0',
-                accordproject: {ergo:'0.20.0-alpha.2',cicero:caretRange(ciceroVersion),runtime:'cicero'}
+                accordproject: {ergo:'0.20.0-alpha.2',cicero:caretRange(ciceroVersion),runtime:'es6'}
             }, null, {});
             should.not.exist(md.getAuthor());
         });
@@ -485,7 +498,7 @@ describe('Metadata', () => {
                 name: 'template',
                 version: '1.0.0',
                 author: 'foo',
-                accordproject: {ergo:'0.20.0-alpha.2',cicero:caretRange(ciceroVersion),runtime:'cicero'}
+                accordproject: {ergo:'0.20.0-alpha.2',cicero:caretRange(ciceroVersion),runtime:'es6'}
             }, null, {});
             md.getAuthor().should.equal('foo');
         });
@@ -496,11 +509,11 @@ describe('Metadata', () => {
             const md = new Metadata({
                 name: 'template',
                 version: '1.0.0',
-                accordproject: {ergo:'0.20.0-alpha.2',cicero:caretRange(ciceroVersion),runtime:'cicero'}
+                accordproject: {ergo:'0.20.0-alpha.2',cicero:caretRange(ciceroVersion),runtime:'es6'}
             }, null, {
                 en: 'sample'
             });
-            md.getRuntime().should.be.equal('cicero');
+            md.getRuntime().should.be.equal('es6');
         });
         it('should fail for an unknown target runtime', () => {
             (() => new Metadata({
@@ -509,7 +522,7 @@ describe('Metadata', () => {
                 accordproject: {ergo:'0.20.0-alpha.2',cicero:caretRange(ciceroVersion),runtime:'foo'}
             }, null, {
                 en: 'sample'
-            })).should.throw('Unknown target: foo (available: es5,es6,cicero,java)');
+            })).should.throw('Unknown target: foo (available: es6,java)');
         });
 
         it('should create a new metadata for the given target runtime', () => {
@@ -520,10 +533,10 @@ describe('Metadata', () => {
             }, null, {
                 en: 'sample'
             });
-            const mdes5 = md.createTargetMetadata('es5');
+            const mdes5 = md.createTargetMetadata('es6');
             mdes5.getPackageJson().should.not.be.null;
             mdes5.getName().should.equal('template');
-            mdes5.getRuntime().should.equal('es5');
+            mdes5.getRuntime().should.equal('es6');
         });
         it('should fail to create a new metadata for an unknown target runtime', () => {
             const md = new Metadata({
@@ -533,7 +546,7 @@ describe('Metadata', () => {
             }, null, {
                 en: 'sample'
             });
-            (() => md.createTargetMetadata('foo')).should.throw('Unknown target: foo (available: es5,es6,cicero,java)');
+            (() => md.createTargetMetadata('foo')).should.throw('Unknown target: foo (available: es6,java)');
         });
     });
 

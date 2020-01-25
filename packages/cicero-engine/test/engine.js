@@ -62,10 +62,8 @@ describe('EngineLatePenalty', () => {
             request.forceMajeure = false;
             request.agreedDelivery = '2017-10-07T16:38:01Z';
             request.goodsValue = 200.00;
-            request.transactionId = '402c8f50-9e61-433e-a7c1-afe61c06ef00';
             const state = {};
-            state.$class = 'org.accordproject.cicero.contract.AccordContractState';
-            state.stateId = '1';
+            state.$class = 'org.accordproject.runtime.State';
             const result = await engine.trigger(clause, request, state, '2017-11-12T17:38:01Z');
             result.should.not.be.null;
             result.response.penalty.should.equal(110);
@@ -78,10 +76,8 @@ describe('EngineLatePenalty', () => {
             request.forceMajeure = false;
             request.agreedDelivery = '2017-11-10T16:38:01-05:00';
             request.goodsValue = 200.00;
-            request.transactionId = '402c8f50-9e61-433e-a7c1-afe61c06ef00';
             const state = {};
-            state.$class = 'org.accordproject.cicero.contract.AccordContractState';
-            state.stateId = '1';
+            state.$class = 'org.accordproject.runtime.State';
             const result = await engine.trigger(clause, request, state, '2017-11-12T17:38:01-05:00');
             result.should.not.be.null;
             result.response.penalty.should.equal(21);
@@ -94,11 +90,9 @@ describe('EngineLatePenalty', () => {
             request.forceMajeure = false;
             request.agreedDelivery = '2017-11-10T16:38:01-05:00';
             request.goodsValue = 200.00;
-            request.transactionId = '402c8f50-9e61-433e-a7c1-afe61c06ef00';
             const state = {};
-            state.$class = 'org.accordproject.cicero.contract.AccordContractState';
-            state.stateId = '1';
-            return engine.trigger(clause, request, state, '2017-11-12').should.be.rejectedWith('2017-11-12 is not a valid moment with the format \'YYYY-MM-DDTHH:mm:ssZ\'');
+            state.$class = 'org.accordproject.runtime.State';
+            return engine.trigger(clause, request, state, 'foobar').should.be.rejectedWith('Cannot set current time to \'foobar\' with UTC offset \'undefined\'');
         });
 
         it('should trigger a late delivery and penalty smart clause with a time period', async function () {
@@ -106,10 +100,8 @@ describe('EngineLatePenalty', () => {
             request.$class = 'org.accordproject.simplelatedeliveryandpenalty.SimpleLateDeliveryAndPenaltyRequest';
             request.agreedDelivery = '2017-10-07T16:38:01Z';
             request.goodsValue = 200.00;
-            request.transactionId = '402c8f50-9e61-433e-a7c1-afe61c06ef00';
             const state = {};
-            state.$class = 'org.accordproject.cicero.contract.AccordContractState';
-            state.stateId = '1';
+            state.$class = 'org.accordproject.runtime.State';
             const result = await engine.trigger(clause2, request, state, '2019-11-12T17:38:01Z');
             result.should.not.be.null;
             result.response.penalty.should.equal(87.5);
@@ -125,10 +117,8 @@ describe('EngineLatePenalty', () => {
             params.request.forceMajeure = false;
             params.request.agreedDelivery = '2017-10-07T16:38:01Z';
             params.request.goodsValue = 200.00;
-            params.request.transactionId = '402c8f50-9e61-433e-a7c1-afe61c06ef00';
             const state = {};
-            state.$class = 'org.accordproject.cicero.contract.AccordContractState';
-            state.stateId = '1';
+            state.$class = 'org.accordproject.runtime.State';
             const result = await engine.invoke(clause, 'latedeliveryandpenalty', params, state, '2017-11-12T17:38:01Z');
             result.should.not.be.null;
             result.response.penalty.should.equal(110);
@@ -141,10 +131,8 @@ describe('EngineLatePenalty', () => {
             params.request.forceMajeure = false;
             params.request.agreedDelivery = '2017-11-10T16:38:01-05:00';
             params.request.goodsValue = 200.00;
-            params.request.transactionId = '402c8f50-9e61-433e-a7c1-afe61c06ef00';
             const state = {};
-            state.$class = 'org.accordproject.cicero.contract.AccordContractState';
-            state.stateId = '1';
+            state.$class = 'org.accordproject.runtime.State';
             const result = await engine.invoke(clause, 'latedeliveryandpenalty', params, state, '2017-11-12T17:38:01-05:00');
             result.should.not.be.null;
             result.response.penalty.should.equal(21);
@@ -157,11 +145,9 @@ describe('EngineLatePenalty', () => {
             params.request.forceMajeure = false;
             params.request.agreedDelivery = '2017-11-10T16:38:01-05:00';
             params.request.goodsValue = 200.00;
-            params.request.transactionId = '402c8f50-9e61-433e-a7c1-afe61c06ef00';
             const state = {};
-            state.$class = 'org.accordproject.cicero.contract.AccordContractState';
-            state.stateId = '1';
-            return engine.invoke(clause, 'latedeliveryandpenalty', params, state, '2017-11-12').should.be.rejectedWith('2017-11-12 is not a valid moment with the format \'YYYY-MM-DDTHH:mm:ssZ\'');
+            state.$class = 'org.accordproject.runtime.State';
+            return engine.invoke(clause, 'latedeliveryandpenalty', params, state, 'foobar').should.be.rejectedWith('Cannot set current time to \'foobar\' with UTC offset \'undefined\'');
         });
 
         it('should invoke a late delivery and penalty smart clause with a time period', async function () {
@@ -169,10 +155,8 @@ describe('EngineLatePenalty', () => {
             params.request.$class = 'org.accordproject.simplelatedeliveryandpenalty.SimpleLateDeliveryAndPenaltyRequest';
             params.request.agreedDelivery = '2017-10-07T16:38:01Z';
             params.request.goodsValue = 200.00;
-            params.request.transactionId = '402c8f50-9e61-433e-a7c1-afe61c06ef00';
             const state = {};
-            state.$class = 'org.accordproject.cicero.contract.AccordContractState';
-            state.stateId = '1';
+            state.$class = 'org.accordproject.runtime.State';
             const result = await engine.invoke(clause2, 'latedeliveryandpenalty', params, state, '2019-11-12T17:38:01Z');
             result.should.not.be.null;
             result.response.penalty.should.equal(87.5);
@@ -204,10 +188,8 @@ describe('EngineLatePenalty (JavaScript)', () => {
             request.forceMajeure = false;
             request.agreedDelivery = '2017-10-07T16:38:01Z';
             request.goodsValue = 200.00;
-            request.transactionId = '402c8f50-9e61-433e-a7c1-afe61c06ef00';
             const state = {};
-            state.$class = 'org.accordproject.cicero.contract.AccordContractState';
-            state.stateId = '1';
+            state.$class = 'org.accordproject.runtime.State';
             const result = await engine.trigger(clause, request, state, '2017-11-12T17:38:01Z');
             result.should.not.be.null;
             result.response.penalty.should.equal(110);
@@ -220,10 +202,8 @@ describe('EngineLatePenalty (JavaScript)', () => {
             request.forceMajeure = false;
             request.agreedDelivery = '2017-11-10T16:38:01-05:00';
             request.goodsValue = 200.00;
-            request.transactionId = '402c8f50-9e61-433e-a7c1-afe61c06ef00';
             const state = {};
-            state.$class = 'org.accordproject.cicero.contract.AccordContractState';
-            state.stateId = '1';
+            state.$class = 'org.accordproject.runtime.State';
             const result = await engine.trigger(clause, request, state, '2017-11-12T17:38:01-05:00');
             result.should.not.be.null;
             result.response.penalty.should.equal(21);
@@ -236,11 +216,9 @@ describe('EngineLatePenalty (JavaScript)', () => {
             request.forceMajeure = false;
             request.agreedDelivery = '2017-11-10T16:38:01-05:00';
             request.goodsValue = 200.00;
-            request.transactionId = '402c8f50-9e61-433e-a7c1-afe61c06ef00';
             const state = {};
-            state.$class = 'org.accordproject.cicero.contract.AccordContractState';
-            state.stateId = '1';
-            return engine.trigger(clause, request, state, '2017-11-12').should.be.rejectedWith('2017-11-12 is not a valid moment with the format \'YYYY-MM-DDTHH:mm:ssZ\'');
+            state.$class = 'org.accordproject.runtime.State';
+            return engine.trigger(clause, request, state, 'foobar').should.be.rejectedWith('Cannot set current time to \'foobar\' with UTC offset \'undefined\'');
         });
     });
 });
@@ -268,8 +246,7 @@ describe('EngineHelloWorld', () => {
                 'input': 'Accord Project'
             };
             const state = {};
-            state.$class = 'org.accordproject.cicero.contract.AccordContractState';
-            state.stateId = '1';
+            state.$class = 'org.accordproject.runtime.State';
             const result = await engine.trigger(clause, request, state);
             result.should.not.be.null;
             result.response.output.should.equal('Hello Fred Blogs (Accord Project)');
@@ -279,8 +256,7 @@ describe('EngineHelloWorld', () => {
             const result = await engine.init(clause);
             result.state.should.not.be.null;
             const state = result.state;
-            state.$class.should.equal('org.accordproject.cicero.contract.AccordContractState');
-            state.stateId.should.equal('org.accordproject.cicero.contract.AccordContractState#1');
+            state.$class.should.equal('org.accordproject.runtime.State');
             const request1 = {
                 '$class': 'org.accordproject.helloworld.MyRequest',
                 'input': 'Accord Project'
@@ -299,8 +275,7 @@ describe('EngineHelloWorld', () => {
                     'input': 'Accord Project'
                 };
                 const state = {};
-                state.$class = 'org.accordproject.cicero.contract.AccordContractState';
-                state.stateId = '1';
+                state.$class = 'org.accordproject.runtime.State';
                 const result = await engine.trigger(clause, request, state);
                 return result;
             } catch (err) {
@@ -329,7 +304,7 @@ describe('EngineHelloWorldState', () => {
 
         it('should initialize a state with counter set to 2', async function () {
             const params = { startsAt : 2 };
-            const result = await engine.init(clause, null, params);
+            const result = await engine.init(clause, null, null, params);
             result.should.not.be.null;
             result.state.counter.should.equal(2);
         });
@@ -360,8 +335,7 @@ describe('EngineHelloModule', () => {
                 'input': 'Accord Project'
             };
             const state = {};
-            state.$class = 'org.accordproject.cicero.contract.AccordContractState';
-            state.stateId = '1';
+            state.$class = 'org.accordproject.runtime.State';
             const result = await engine.trigger(clause, request, state);
             result.should.not.be.null;
             result.response.output.should.equal('Hello Fred Blogs (Accord Project) [motd: PI/2.0 radians is 90.0 degrees]');
@@ -392,8 +366,7 @@ describe('EngineHelloEmit', () => {
                 'input': 'Accord Project'
             };
             const state = {};
-            state.$class = 'org.accordproject.cicero.contract.AccordContractState';
-            state.stateId = '1';
+            state.$class = 'org.accordproject.runtime.State';
             const result = await engine.trigger(clause, request, state);
             result.should.not.be.null;
             result.response.output.should.equal('Hello Fred Blogs (Accord Project)');
@@ -453,8 +426,7 @@ describe('EngineSaft', () => {
             request.$class = `${NS}.Launch`;
             request.exchangeRate = 100;
             const state = {};
-            state.$class = 'org.accordproject.cicero.contract.AccordContractState';
-            state.stateId = '1';
+            state.$class = 'org.accordproject.runtime.State';
             const result = await engine.trigger(clause, request, state);
             result.should.not.be.null;
             result.response.tokenAmount.doubleValue.should.equal(100);
@@ -527,7 +499,6 @@ describe('EngineInstallmentSaleErgo', () => {
             request.amount = 2500.00;
             const state = {};
             state.$class = 'org.accordproject.installmentsale.InstallmentSaleState';
-            state.stateId = 'org.accordproject.installmentsale.InstallmentSaleState#1';
             state.status = 'WaitingForFirstDayOfNextMonth';
             state.balance_remaining = 10000.00;
             state.total_paid = 0.00;

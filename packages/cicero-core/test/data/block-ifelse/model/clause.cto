@@ -1,7 +1,7 @@
 namespace org.accordproject.volumediscountlist
 
-import org.accordproject.cicero.contract.* from https://models.accordproject.org/cicero/contract.cto
-import org.accordproject.cicero.runtime.* from https://models.accordproject.org/cicero/runtime.cto
+import org.accordproject.contract.* from https://models.accordproject.org/accordproject/contract.cto
+import org.accordproject.runtime.* from https://models.accordproject.org/accordproject/runtime.cto
 
 /**
  * Defines the data model for the VolumeDiscount template.
@@ -12,7 +12,7 @@ concept RateRange {
  o String name
 }
 
-asset VolumeDiscountContract extends AccordContract {
+asset VolumeDiscountContract extends Contract {
   o Boolean isActive
 }
 

@@ -1,12 +1,11 @@
 namespace org.accordproject.helloemit
 
-import org.accordproject.cicero.contract.*
+import org.accordproject.runtime.*
 
 contract HelloWorld over TemplateModel {
    // Simple Clause
    clause init() : MyResponse emits Greeting {
-		 set state AccordContractState{
-			 stateId: "1"
+		 set state State{
 		 };
      emit Greeting{ message: "Voila!" };
      return MyResponse{ output: "Hello " ++ contract.name }

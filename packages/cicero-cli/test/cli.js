@@ -154,12 +154,14 @@ describe('#parse', () => {
     it('should parse a clause using a template', async () => {
         const result = await Commands.parse(template, sample, null);
         delete result.clauseId;
+        delete result.$identifier;
         result.should.eql(parseReponse);
     });
 
     it('should parse a clause using a template archive', async () => {
         const result = await Commands.parse(templateArchive, sample, null);
         delete result.clauseId;
+        delete result.$identifier;
         result.should.eql(parseReponse);
     });
 
@@ -173,6 +175,7 @@ describe('#parse-output', async () => {
     it('should parse a clause using a template and save to a JSON file', async () => {
         const result = await Commands.parse(template, sample, dataOut);
         delete result.clauseId;
+        delete result.$identifier;
         result.should.eql(parseReponse);
     });
 });
@@ -267,12 +270,14 @@ describe('#draft', () => {
     it('should create the text for a clause using a template', async () => {
         const result = await Commands.draft(template, data, null);
         delete result.clauseId;
+        delete result.$identifier;
         result.should.eql(draftResponse);
     });
 
     it('should create the text for a clause using a template archive', async () => {
         const result = await Commands.draft(templateArchive, data, null);
         delete result.clauseId;
+        delete result.$identifier;
         result.should.eql(draftResponse);
     });
 
@@ -286,18 +291,21 @@ describe('#draft-output', async () => {
     it('should create the text for a clause using a template and save to a file', async () => {
         const result = await Commands.draft(template, data, sampleOut);
         delete result.clauseId;
+        delete result.$identifier;
         result.should.eql(draftResponse);
     });
 
     it('should create the slate for a clause using a template and save to a JSON file', async () => {
         const result = await Commands.draft(template, data, sampleOutJson, null, { format: 'slate' });
         delete result.clauseId;
+        delete result.$identifier;
         result.should.not.be.null;
     });
 
     it('should create the slate for a ciceromark_parsed using a template and save to a JSON file', async () => {
         const result = await Commands.draft(template, data, sampleOutJson, null, { format: 'ciceromark_parsed' });
         delete result.clauseId;
+        delete result.$identifier;
         result.should.not.be.null;
     });
 });
@@ -420,12 +428,14 @@ describe('#normalize', () => {
     it('should normalize a clause using a template', async () => {
         const result = await Commands.normalize(template, sample, false, null);
         delete result.clauseId;
+        delete result.$identifier;
         result.should.eql(draftResponse);
     });
 
     it('should normalize a clause using a template archive', async () => {
         const result = await Commands.normalize(templateArchive, sample, false, null);
         delete result.clauseId;
+        delete result.$identifier;
         result.should.eql(draftResponse);
     });
 
@@ -787,14 +797,12 @@ describe('#validateInitializeArgs', () => {
 describe('#initialize', () => {
     it('should initialize a clause using a template', async () => {
         const response = await Commands.initialize(template, sample);
-        response.state.$class.should.be.equal('org.accordproject.cicero.contract.AccordContractState');
-        response.state.stateId.should.be.equal('org.accordproject.cicero.contract.AccordContractState#1');
+        response.state.$class.should.be.equal('org.accordproject.runtime.State');
     });
 
     it('should initialize a clause using a template archive', async () => {
         const response = await Commands.initialize(templateArchive, sample);
-        response.state.$class.should.be.equal('org.accordproject.cicero.contract.AccordContractState');
-        response.state.stateId.should.be.equal('org.accordproject.cicero.contract.AccordContractState#1');
+        response.state.$class.should.be.equal('org.accordproject.runtime.State');
     });
 
     it('should fail to initialize on a bogus sample', async () => {
@@ -962,7 +970,7 @@ describe('#archive', async () => {
     it('should create a JavaScript archive', async () => {
         const tmpFile = await tmp.file();
         const tmpArchive = tmpFile.path + '.cta';
-        await Commands.archive(template, 'cicero', tmpArchive, false);
+        await Commands.archive(template, 'es6', tmpArchive, false);
         fs.readFileSync(tmpArchive).length.should.be.above(0);
         tmpFile.cleanup();
     });
@@ -970,7 +978,7 @@ describe('#archive', async () => {
         const tmpFile = await tmp.file();
         const tmpArchive = tmpFile.path + '.cta';
         return Commands.archive(template, 'foo', tmpArchive, false)
-            .should.be.rejectedWith('Unknown target: foo (available: es5,es6,cicero,java)');
+            .should.be.rejectedWith('Unknown target: foo (available: es6,java)');
     });
 
 });

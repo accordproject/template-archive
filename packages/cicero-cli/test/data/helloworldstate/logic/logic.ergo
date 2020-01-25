@@ -14,12 +14,11 @@
 
 namespace org.accordproject.helloworldstate
 
-import org.accordproject.cicero.runtime.*
+import org.accordproject.runtime.*
 
 contract HelloWorldState over HelloWorldClause state HelloWorldState {
   clause init(startsAt : Double) : Response {
     set state HelloWorldState{
-      stateId: "org.accordproject.helloworldstate.HelloWorldState#0.0",
       counter: startsAt
     };
     return Response{}
@@ -29,7 +28,6 @@ contract HelloWorldState over HelloWorldClause state HelloWorldState {
   clause helloworldstate(request : MyRequest) : MyResponse {
     let newCounter = state.counter + 1.0;
     set state HelloWorldState{
-      stateId: "org.accordproject.helloworldstate.HelloWorldState#" ++ toString(state.counter),
       counter: newCounter
     };
     return MyResponse{

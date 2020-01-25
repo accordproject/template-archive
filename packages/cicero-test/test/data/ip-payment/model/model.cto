@@ -1,7 +1,7 @@
 namespace org.accordproject.ippayment
 
-import org.accordproject.cicero.contract.* from https://models.accordproject.org/cicero/contract.cto
-import org.accordproject.cicero.runtime.* from https://models.accordproject.org/cicero/runtime.cto
+import org.accordproject.contract.* from https://models.accordproject.org/accordproject/contract.cto
+import org.accordproject.runtime.* from https://models.accordproject.org/accordproject/runtime.cto
 import org.accordproject.time.* from https://models.accordproject.org/v2.0/time.cto
 
 /**
@@ -24,7 +24,7 @@ transaction PayOut extends Response {
 /**
  * The template model
  */
-asset IntellectualPropertyPaymentClause extends AccordClause {
+asset IntellectualPropertyPaymentClause extends Clause {
   /* royalty */
   o String royaltyText
   o Double royaltyRate

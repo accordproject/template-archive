@@ -1,6 +1,6 @@
 namespace org.accordproject.test
 
-import org.accordproject.cicero.contract.AccordClause from https://models.accordproject.org/cicero/contract.cto
+import org.accordproject.contract.Clause from https://models.accordproject.org/accordproject/contract.cto
 
 enum Gender {
   o MAN
@@ -19,7 +19,7 @@ concept Address {
 /**
  * Defines the data model for the template
  */
-asset TemplateModel extends AccordClause {
+asset TemplateModel extends Clause {
   o Double doubleProperty
   o Integer integerProperty
   o Long longProperty

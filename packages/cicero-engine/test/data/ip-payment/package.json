@@ -7,7 +7,7 @@
     "accordproject": {
         "template": "clause",
         "cicero": "^0.21.0"
-    }
+    },
     "devDependencies": {
         "mocha": "5.2.0"
     },

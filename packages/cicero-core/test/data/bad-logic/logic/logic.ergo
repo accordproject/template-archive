@@ -1,6 +1,6 @@
 namespace io.clause.latedeliveryandpenalty
 
-import org.accordproject.cicero.runtime.*
+import org.accordproject.runtime.*
 
 /* From template:
 Late Delivery and Penalty. In case of delayed delivery{{" except for Force Majeure cases,":? forceMajeure}} the Seller shall pay to the Buyer for every {{penaltyDuration}} of delay penalty amounting to {{penaltyPercentage}}% of the total value of the Equipment whose delivery has been delayed. Any fractional part of a {{fractionalPart}} is to be considered a full {{fractionalPart}}. The total amount of penalty shall not however, exceed {{capPercentage}}% of the total value of the Equipment involved in late delivery. If the delay is more than {{termination}}, the Buyer is entitled to terminate this Contract.
@@ -13,7 +13,7 @@ contract LateDeliveryAndPenalty over TemplateModel {
     // Guard against calling late delivery clause too early
     define agreed = request.agreedDelivery;
     enforce momentIsBefore(agreed,now()) else
-    throw ErgoErrorResponse{ message : "Cannot exercise late delivery before delivery date" }
+    throw Error{ message : "Cannot exercise late delivery before delivery date" }
     ;
     // Guard against force majeure
     enforce !contract.forceMajeure or !request.forceMajeure else

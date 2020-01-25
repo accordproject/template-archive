@@ -40,15 +40,16 @@ class Engine {
      * using the Composer serializer.
      * @param {object} state  - the contract state, a JS object that can be deserialized
      * using the Composer serializer.
-     * @param {string} currentTime - the definition of 'now'
+     * @param {string} [currentTime] - the definition of 'now', defaults to current time
+     * @param {number} [utcOffset] - UTC Offset for this execution, defaults to local offset
      * @return {Promise} a promise that resolves to a result for the clause
      */
-    async trigger(clause, request, state, currentTime) {
+    async trigger(clause, request, state, currentTime, utcOffset) {
         const logicManager = clause.getLogicManager();
         const clauseId = clause.getIdentifier();
         const contract = clause.getData();
 
-        return this.ergoEngine.trigger(logicManager,clauseId,contract,request,state,currentTime,null);
+        return this.ergoEngine.trigger(logicManager,clauseId,contract,request,state,currentTime,utcOffset,null);
     }
 
     /**
@@ -60,33 +61,35 @@ class Engine {
      * serializer.
      * @param {object} state  - the contract state, a JS object that can be deserialized
      * using the Composer serializer.
-     * @param {string} currentTime - the definition of 'now'
+     * @param {string} [currentTime] - the definition of 'now', defaults to current time
+     * @param {number} [utcOffset] - UTC Offset for this execution, defaults to local offset
      * @return {Promise} a promise that resolves to a result for the clause
      */
-    async invoke(clause, clauseName, params, state, currentTime) {
+    async invoke(clause, clauseName, params, state, currentTime, utcOffset) {
         const logicManager = clause.getLogicManager();
         const clauseId = clause.getIdentifier();
         const contract = clause.getData();
 
-        return this.ergoEngine.invoke(logicManager,clauseId,clauseName,contract,params,state,currentTime,null);
+        return this.ergoEngine.invoke(logicManager,clauseId,clauseName,contract,params,state,currentTime,utcOffset,null);
     }
 
     /**
      * Initialize a clause
      * @param {Clause} clause  - the clause
-     * @param {string} currentTime - the definition of 'now'
+     * @param {string} [currentTime] - the definition of 'now', defaults to current time
+     * @param {number} [utcOffset] - UTC Offset for this execution, defaults to local offset
      * @param {object} params - the clause parameters, a JS object
      * whose fields that can be deserialized using the Composer
      * serializer.
      * @return {Promise} a promise that resolves to a result for the clause initialization
      */
-    async init(clause, currentTime, params) {
+    async init(clause, currentTime, utcOffset, params) {
         const effectiveParams = params || {};
         const logicManager = clause.getLogicManager();
         const clauseId = clause.getIdentifier();
         const contract = clause.getData();
 
-        return this.ergoEngine.init(logicManager,clauseId,contract,effectiveParams,currentTime,null);
+        return this.ergoEngine.init(logicManager,clauseId,contract,effectiveParams,currentTime,utcOffset,null);
     }
 
     /**
