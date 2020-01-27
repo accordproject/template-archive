@@ -962,7 +962,7 @@ describe('#archive', async () => {
     it('should create a JavaScript archive', async () => {
         const tmpFile = await tmp.file();
         const tmpArchive = tmpFile.path + '.cta';
-        await Commands.archive(template, 'cicero', tmpArchive, false);
+        await Commands.archive(template, 'es6', tmpArchive, false);
         fs.readFileSync(tmpArchive).length.should.be.above(0);
         tmpFile.cleanup();
     });
@@ -970,7 +970,7 @@ describe('#archive', async () => {
         const tmpFile = await tmp.file();
         const tmpArchive = tmpFile.path + '.cta';
         return Commands.archive(template, 'foo', tmpArchive, false)
-            .should.be.rejectedWith('Unknown target: foo (available: es6,cicero,java)');
+            .should.be.rejectedWith('Unknown target: foo (available: es6,java)');
     });
 
 });

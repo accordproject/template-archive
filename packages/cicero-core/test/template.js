@@ -96,7 +96,7 @@ describe('Template', () => {
 
         it('should throw an error if archive language is not a valid target', async () => {
             const templatePromise = Template.fromDirectory('./test/data/latedeliveryandpenalty', options);
-            return templatePromise.then((template) => template.toArchive('foo')).should.be.rejectedWith('Unknown target: foo (available: es6,cicero,java)');
+            return templatePromise.then((template) => template.toArchive('foo')).should.be.rejectedWith('Unknown target: foo (available: es6,java)');
         });
 
         it('should throw an error if archive language is is absent', async () => {
@@ -216,8 +216,8 @@ In case of delayed delivery except for Force Majeure cases, the Seller shall pay
             template.getDescription().should.equal('Late Delivery and Penalty. In case of delayed delivery except for Force Majeure cases, the Seller shall pay to the Buyer for every 9 DAY of delay penalty amounting to 7% of the total value of the Equipment whose delivery has been delayed. Any fractional part of a DAY is to be considered a full DAY. The total amount of penalty shall not however, exceed 2% of the total value of the Equipment involved in late delivery. If the delay is more than 2 WEEK, the Buyer is entitled to terminate this Contract.');
             template.getVersion().should.equal('0.0.1');
             template.getMetadata().getSample().should.equal('Late Delivery and Penalty. In case of delayed delivery except for Force Majeure cases, the Seller shall pay to the Buyer for every 9 days of delay penalty amounting to 7% of the total value of the Equipment whose delivery has been delayed. Any fractional part of a days is to be considered a full days. The total amount of penalty shall not however, exceed 2% of the total value of the Equipment involved in late delivery. If the delay is more than 2 weeks, the Buyer is entitled to terminate this Contract.');
-            template.getHash().should.equal('791a747ada14a1765493dae358c410fc4c5e32f9d3b4cf29ea949e1e22cac63d');
-            const buffer = await template.toArchive('cicero');
+            template.getHash().should.equal('6e8f24aeb84c4ec02007375487623318c693d8a9086ecaa87cf7264ad77cf10a');
+            const buffer = await template.toArchive('es6');
             buffer.should.not.be.null;
             const template2 = await Template.fromArchive(buffer);
             template2.getIdentifier().should.equal(template.getIdentifier());
@@ -229,7 +229,7 @@ In case of delayed delivery except for Force Majeure cases, the Seller shall pay
             template2.getMetadata().getKeywords().should.eql(template.getMetadata().getKeywords());
             template2.getMetadata().getSamples().should.eql(template.getMetadata().getSamples());
             template2.getHash().should.equal(template.getHash());
-            const buffer2 = await template2.toArchive('cicero');
+            const buffer2 = await template2.toArchive('es6');
             buffer2.should.not.be.null;
         });
 
@@ -586,7 +586,7 @@ and monthly payments of {{%"£667.00"%}}`;
         it('should return a Template Logic', async () => {
             const LogicManager = require('@accordproject/ergo-compiler').LogicManager;
             const template = await Template.fromDirectory('./test/data/latedeliveryandpenalty', options);
-            template.getLogicManager('cicero').should.be.an.instanceof(LogicManager);
+            template.getLogicManager('es6').should.be.an.instanceof(LogicManager);
         });
     });
 
