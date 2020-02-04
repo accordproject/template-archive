@@ -161,6 +161,7 @@ require('yargs')
         try {
             argv = Commands.validateNormalizeArgs(argv);
             const options = {
+                wrapVariables: argv.wrapVariables,
                 warnings: argv.warnings,
             };
             return Commands.normalize(argv.template, argv.sample, argv.overwrite, argv.output, argv.currentTime, options)

@@ -416,7 +416,7 @@ describe('#normalize', () => {
         result.should.eql(draftResponse);
     });
 
-    it('should fail normalizeing a clause using a template', async () => {
+    it('should fail normalizing a clause using a template', async () => {
         const result = await Commands.normalize(template, sampleErr, false, null);
         should.equal(result,undefined);
     });
