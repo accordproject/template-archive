@@ -363,7 +363,7 @@ class ParserManager {
                 if (element.type === 'JoinBinding') {
                     separator = element.separator;
                 } else {
-                    separator = element.type === 'UListBinding' ? '- ' : '1. ';
+                    separator = element.type === 'UListBinding' ? '-  ' : '1. ';
                 }
 
                 // Rule for first item in the list

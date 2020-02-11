@@ -353,6 +353,7 @@ Unexpected "n"`);
 1. 0.0$ million <= Volume < 1.0$ million : 3.1%
 1. 1.0$ million <= Volume < 10.0$ million : 3.1%
 1. 10.0$ million <= Volume < 50.0$ million : 2.9%
+
 This is more text
 `);
             const data = {
@@ -390,6 +391,7 @@ This is more text
 1. 0.0$ million <= Volume < 1.0$ million : 3.1%
 1. 1.0$ million <= Volume < 10.0$ million : 3.1%
 1. 10.0$ million <= Volume < 50.0$ million : 2.9%
+
 This is more text`;
             const data = {
                 '$class': 'org.accordproject.volumediscountlist.VolumeDiscountContract',
@@ -470,6 +472,7 @@ This is more text`;
 - 0.0$ million <= Volume < 1.0$ million : 3.1%
 - 1.0$ million <= Volume < 10.0$ million : 3.1%
 - 10.0$ million <= Volume < 50.0$ million : 2.9%
+
 This is more text`;
             clause.parse(text);
             const data = {
@@ -504,9 +507,10 @@ This is more text`;
             const template = await Template.fromDirectory('./test/data/block-ulist', options);
             const clause = new Clause(template);
             const text = `This is a list
-- 0.0$ million <= Volume < 1.0$ million : 3.1%
-- 1.0$ million <= Volume < 10.0$ million : 3.1%
-- 10.0$ million <= Volume < 50.0$ million : 2.9%
+-  0.0$ million <= Volume < 1.0$ million : 3.1%
+-  1.0$ million <= Volume < 10.0$ million : 3.1%
+-  10.0$ million <= Volume < 50.0$ million : 2.9%
+
 This is more text`;
             const data = {
                 '$class': 'org.accordproject.volumediscountlist.VolumeDiscountContract',
