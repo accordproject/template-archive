@@ -31,6 +31,7 @@ const options = { skipUpdateExternalModels: true };
 describe('Clause', () => {
 
     const testLatePenaltyInput = fs.readFileSync(path.resolve(__dirname, 'data/latedeliveryandpenalty', 'text/sample.md'), 'utf8');
+    const testLatePenaltyInputNoForce = fs.readFileSync(path.resolve(__dirname, 'data/latedeliveryandpenalty', 'text/sample-noforce.md'), 'utf8');
     const testLatePenaltyPeriodInput = fs.readFileSync(path.resolve(__dirname, 'data/latedeliveryandpenalty-period', 'text/sample.md'), 'utf8');
     const testLatePenaltyCrInput = fs.readFileSync(path.resolve(__dirname, 'data/latedeliveryandpenalty-cr', 'text/sample.md'), 'utf8');
     const testCongaInput = fs.readFileSync(path.resolve(__dirname, 'data/conga', 'text/sample.md'), 'utf8');
@@ -648,7 +649,7 @@ This is more text`;
             nl.should.equal(TemplateLoader.normalizeText(testLatePenaltyInput));
         });
 
-        it('should be able to generate natural language text with wrapped variables', async function() {
+        it('should be able to generate natural language text with wrapped variables (conditional true)', async function() {
             const template = await Template.fromDirectory('./test/data/latedeliveryandpenalty', options);
             const clause = new Clause(template);
             clause.parse(testLatePenaltyInput);
@@ -656,13 +657,27 @@ This is more text`;
             nl.should.equal(`Late Delivery and Penalty
 ----
 
-In case of delayed delivery<if id="forceMajeure" value="%20except%20for%20Force%20Majeure%20cases%2C"/> the Seller shall pay to the Buyer for every <variable id="penaltyDuration" value="9%20days"/> of delay penalty amounting to <variable id="penaltyPercentage" value="7.0"/>% of the total value of the Equipment whose delivery has been delayed.
+In case of delayed delivery<if id="forceMajeure" value="%20except%20for%20Force%20Majeure%20cases%2C" whenTrue="%20except%20for%20Force%20Majeure%20cases%2C" whenFalse=""/> the Seller shall pay to the Buyer for every <variable id="penaltyDuration" value="9%20days"/> of delay penalty amounting to <variable id="penaltyPercentage" value="7.0"/>% of the total value of the Equipment whose delivery has been delayed.
 1. Any fractional part of a <variable id="fractionalPart" value="days"/> is to be considered a full <variable id="fractionalPart" value="days"/>.
 1. The total amount of penalty shall not however, exceed <variable id="capPercentage" value="2.0"/>% of the total value of the Equipment involved in late delivery.
 1. If the delay is more than <variable id="termination" value="2%20weeks"/>, the Buyer is entitled to terminate this Contract.`);
         });
 
-        it('should be able to generate natural language text with wrapped variables and formatted dates', async function() {
+        it('should be able to generate natural language text with wrapped variables (conditional false)', async function() {
+            const template = await Template.fromDirectory('./test/data/latedeliveryandpenalty', options);
+            const clause = new Clause(template);
+            clause.parse(testLatePenaltyInputNoForce);
+            const nl = await clause.draft({ wrapVariables: true });
+            nl.should.equal(`Late Delivery and Penalty
+----
+
+In case of delayed delivery<if id="forceMajeure" value="" whenTrue="%20except%20for%20Force%20Majeure%20cases%2C" whenFalse=""/> the Seller shall pay to the Buyer for every <variable id="penaltyDuration" value="9%20days"/> of delay penalty amounting to <variable id="penaltyPercentage" value="7.0"/>% of the total value of the Equipment whose delivery has been delayed.
+1. Any fractional part of a <variable id="fractionalPart" value="days"/> is to be considered a full <variable id="fractionalPart" value="days"/>.
+1. The total amount of penalty shall not however, exceed <variable id="capPercentage" value="2.0"/>% of the total value of the Equipment involved in late delivery.
+1. If the delay is more than <variable id="termination" value="2%20weeks"/>, the Buyer is entitled to terminate this Contract.`);
+        });
+
+        it('should be able to generate natural language text with wrapped variables (formatted dates)', async function() {
             const template = await Template.fromDirectory('./test/data/formatted-dates-DD_MM_YYYY', options);
             const clause = new Clause(template);
             clause.parse('dateTimeProperty: 01/12/2018');
