@@ -112,6 +112,31 @@ app.post('/parse/:template/:data', async function (req, httpResponse, next) {
     }
 });
 
+app.post('/draft/:template/:data', async function (req, httpResponse, next) {
+
+    console.log('Template: ' + req.params.template);
+    console.log('Clause: ' + req.params.data);
+    try {
+
+        const template = await Template.fromDirectory(`${process.env.CICERO_DIR}/${req.params.template}`);
+        const data = fs.readFileSync(`${process.env.CICERO_DIR}/${req.params.template}/${req.params.data}`);
+        const clause = new Clause(template);
+        if(req.params.data.endsWith('.json')) {
+            clause.setData(JSON.parse(data.toString()));
+        }
+        else {
+            clause.parse(data.toString());
+        }
+
+        clause.draft().then((result) => {
+            httpResponse.send(result);
+        });
+    }
+    catch(err) {
+        return next(err);
+    }
+});
+
 
 const server = app.listen(app.get('port'), function () {
     console.log('Server listening on port: ', app.get('port'));
