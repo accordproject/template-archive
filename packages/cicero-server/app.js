@@ -28,6 +28,11 @@ if(!process.env.CICERO_DIR) {
 
 const PORT = process.env.PORT | 6001;
 
+// shared variables used across API endpoints
+let template;
+let data;
+let clause;
+
 // to automatically decode JSON POST
 app.use(bodyParser.json());
 
@@ -61,15 +66,8 @@ app.post('/trigger/:template/:data', async function (req, httpResponse, next) {
     console.log('Template: ' + req.params.template);
     console.log('Clause: ' + req.params.data);
     try {
-        const template = await Template.fromDirectory(`${process.env.CICERO_DIR}/${req.params.template}`);
-        const data = fs.readFileSync(`${process.env.CICERO_DIR}/${req.params.template}/${req.params.data}`);
-        const clause = new Clause(template);
-        if(req.params.data.endsWith('.json')) {
-            clause.setData(JSON.parse(data.toString()));
-        }
-        else {
-            clause.parse(data.toString());
-        }
+        await initClauseTemplate(req);
+
         const engine = new Engine();
         let result;
         if(Object.keys(req.body).length === 2 &&
@@ -116,17 +114,7 @@ app.post('/parse/:template/:data', async function (req, httpResponse, next) {
     console.log('Template: ' + req.params.template);
     console.log('Clause: ' + req.params.data);
     try {
-
-        const template = await Template.fromDirectory(`${process.env.CICERO_DIR}/${req.params.template}`);
-        const data = fs.readFileSync(`${process.env.CICERO_DIR}/${req.params.template}/${req.params.data}`);
-        const clause = new Clause(template);
-        if(req.params.data.endsWith('.json')) {
-            clause.setData(JSON.parse(data.toString()));
-        }
-        else {
-            clause.parse(data.toString());
-        }
-
+        await initClauseTemplate(req);
         httpResponse.send(data);
     }
     catch(err) {
@@ -161,17 +149,7 @@ app.post('/draft/:template/:data', async function (req, httpResponse, next) {
     console.log('Template: ' + req.params.template);
     console.log('Clause: ' + req.params.data);
     try {
-
-        const template = await Template.fromDirectory(`${process.env.CICERO_DIR}/${req.params.template}`);
-        const data = fs.readFileSync(`${process.env.CICERO_DIR}/${req.params.template}/${req.params.data}`);
-        const clause = new Clause(template);
-        if(req.params.data.endsWith('.json')) {
-            clause.setData(JSON.parse(data.toString()));
-        }
-        else {
-            clause.parse(data.toString());
-        }
-
+        await initClauseTemplate(req);
         clause.draft().then((result) => {
             httpResponse.send(result);
         });
@@ -181,6 +159,23 @@ app.post('/draft/:template/:data', async function (req, httpResponse, next) {
     }
 });
 
+/**
+ * Helper function to initialise the Clause template.
+ * Used identically by all endpoints.  
+ */
+async function initClauseTemplate(req) {
+
+    template = await Template.fromDirectory(`${process.env.CICERO_DIR}/${req.params.template}`);
+    data = fs.readFileSync(`${process.env.CICERO_DIR}/${req.params.template}/${req.params.data}`);
+    clause = new Clause(template);
+
+    if(req.params.data.endsWith('.json')) {
+        clause.setData(JSON.parse(data.toString()));
+    }
+    else {
+        clause.parse(data.toString());
+    }
+}
 
 const server = app.listen(app.get('port'), function () {
     console.log('Server listening on port: ', app.get('port'));
