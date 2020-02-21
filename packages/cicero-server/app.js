@@ -89,6 +89,28 @@ app.post('/trigger/:template/:data', async function (req, httpResponse, next) {
     }
 });
 
+/**
+ * Handle POST requests to /parse/:template/:data
+ * The body of the POST should contain the request data.
+ * The clause is created using the template and the data. If
+ * the data ends with .json then setData is called on the Clause,
+ * otherwise the contents of the file is parsed.
+ *
+ * The template parameter is the name of a directory under CICERO_DIR that contains
+ * the template to use.
+ *
+ * The data parameter is either a JSON data file or a TXT file that is used to create
+ * the clause from the Template.
+ *
+ * Stateless execution
+ * --------------------
+ * The HTTP POST body is the request used for execution of the clause.
+ *
+ * Response
+ * ----------
+ * A data string containing the parsed output
+ * 
+ */
 app.post('/parse/:template/:data', async function (req, httpResponse, next) {
 
     console.log('Template: ' + req.params.template);
@@ -112,6 +134,28 @@ app.post('/parse/:template/:data', async function (req, httpResponse, next) {
     }
 });
 
+/**
+ * Handle POST requests to /parse/:template/:data
+ * The body of the POST should contain the request data.
+ * The clause is created using the template and the data. If
+ * the data ends with .json then setData is called on the Clause,
+ * otherwise the contents of the file is parsed.
+ *
+ * The template parameter is the name of a directory under CICERO_DIR that contains
+ * the template to use.
+ *
+ * The data parameter is either a JSON data file or a TXT file that is used to create
+ * the clause from the Template.
+ *
+ * Stateless execution
+ * --------------------
+ * The HTTP POST body is the request used for execution of the clause.
+ *
+ * Response
+ * ----------
+ * A data string containing the draft output
+ * 
+ */
 app.post('/draft/:template/:data', async function (req, httpResponse, next) {
 
     console.log('Template: ' + req.params.template);
