@@ -88,6 +88,18 @@ describe('cicero-server', () => {
             });
     });
 
+    it('/should parse a simple stateless request (ergo)', async () => {
+        return request.post('/parse/latedeliveryandpenalty/data.json')
+            .send(body)
+            .expect(200);
+    });
+
+    it('/should draft a simple stateless request (ergo)', async () => {
+        return request.post('/draft/latedeliveryandpenalty/data.json')
+            .send(body)
+            .expect(200);
+    });
+
     after(() => {
         server.close();
     });
