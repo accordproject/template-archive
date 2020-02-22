@@ -1,4 +1,5 @@
 #!/usr/bin/env node
+/* eslint-disable no-console */
 /*
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -27,11 +28,6 @@ if(!process.env.CICERO_DIR) {
 }
 
 const PORT = process.env.PORT | 6001;
-
-// shared variables used across API endpoints
-let template;
-let data;
-let clause;
 
 // to automatically decode JSON POST
 app.use(bodyParser.json());
@@ -66,8 +62,7 @@ app.post('/trigger/:template/:data', async function (req, httpResponse, next) {
     console.log('Template: ' + req.params.template);
     console.log('Clause: ' + req.params.data);
     try {
-        await initClauseTemplate(req);
-
+        const clause = await initClauseInstance(req);
         const engine = new Engine();
         let result;
         if(Object.keys(req.body).length === 2 &&
@@ -107,15 +102,15 @@ app.post('/trigger/:template/:data', async function (req, httpResponse, next) {
  * Response
  * ----------
  * A data string containing the parsed output
- * 
+ *
  */
 app.post('/parse/:template/:data', async function (req, httpResponse, next) {
 
     console.log('Template: ' + req.params.template);
     console.log('Clause: ' + req.params.data);
     try {
-        await initClauseTemplate(req);
-        httpResponse.send(data);
+        const clause = await initClauseInstance(req);
+        httpResponse.send(clause.data);
     }
     catch(err) {
         return next(err);
@@ -142,14 +137,15 @@ app.post('/parse/:template/:data', async function (req, httpResponse, next) {
  * Response
  * ----------
  * A data string containing the draft output
- * 
+ *
  */
 app.post('/draft/:template/:data', async function (req, httpResponse, next) {
 
     console.log('Template: ' + req.params.template);
     console.log('Clause: ' + req.params.data);
     try {
-        await initClauseTemplate(req);
+
+        const clause = await initClauseInstance(req);
         clause.draft().then((result) => {
             httpResponse.send(result);
         });
@@ -160,14 +156,15 @@ app.post('/draft/:template/:data', async function (req, httpResponse, next) {
 });
 
 /**
- * Helper function to initialise the Clause template.
- * Used identically by all endpoints.  
+ * Helper function to initialise Clause template.
+ * @param {req} req The request object passed in from endpoint.
+ * @returns {clause} An initialised instance of a clause template.
  */
-async function initClauseTemplate(req) {
+async function initClauseInstance(req) {
 
-    template = await Template.fromDirectory(`${process.env.CICERO_DIR}/${req.params.template}`);
-    data = fs.readFileSync(`${process.env.CICERO_DIR}/${req.params.template}/${req.params.data}`);
-    clause = new Clause(template);
+    const template = await Template.fromDirectory(`${process.env.CICERO_DIR}/${req.params.template}`);
+    const data = fs.readFileSync(`${process.env.CICERO_DIR}/${req.params.template}/${req.params.data}`);
+    const clause = new Clause(template);
 
     if(req.params.data.endsWith('.json')) {
         clause.setData(JSON.parse(data.toString()));
@@ -175,6 +172,7 @@ async function initClauseTemplate(req) {
     else {
         clause.parse(data.toString());
     }
+    return clause;
 }
 
 const server = app.listen(app.get('port'), function () {
