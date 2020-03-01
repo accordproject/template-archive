@@ -59,6 +59,7 @@ app.set('port', PORT);
  * 'state' is used as the contract state.
  */
 app.post('/trigger/:template/:data', async function (req, httpResponse, next) {
+    console.log('CICERO_DIR: ' + process.env.CICERO_DIR);
     console.log('Template: ' + req.params.template);
     console.log('Clause: ' + req.params.data);
     try {
@@ -105,7 +106,7 @@ app.post('/trigger/:template/:data', async function (req, httpResponse, next) {
  *
  */
 app.post('/parse/:template/:data', async function (req, httpResponse, next) {
-
+    console.log('CICERO_DIR: ' + process.env.CICERO_DIR);
     console.log('Template: ' + req.params.template);
     console.log('Clause: ' + req.params.data);
     try {
@@ -140,7 +141,7 @@ app.post('/parse/:template/:data', async function (req, httpResponse, next) {
  *
  */
 app.post('/draft/:template/:data', async function (req, httpResponse, next) {
-
+    console.log('CICERO_DIR: ' + process.env.CICERO_DIR);
     console.log('Template: ' + req.params.template);
     console.log('Clause: ' + req.params.data);
     try {
