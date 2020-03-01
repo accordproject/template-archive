@@ -53,6 +53,7 @@ describe('cicero-server', () => {
         return request.post('/trigger/latedeliveryandpenalty/data.json')
             .send(body)
             .expect(200)
+            .expect('Content-Type',/json/)
             .then(response => {
                 response.body.response.should.include(responseBody);
                 response.body.should.not.have.property('state');
@@ -63,6 +64,7 @@ describe('cicero-server', () => {
         return request.post('/trigger/latedeliveryandpenalty/text%2Fsample.md')
             .send(body)
             .expect(200)
+            .expect('Content-Type',/json/)
             .then(response => {
                 response.body.response.should.include(responseBody);
                 response.body.should.not.have.property('state');
@@ -82,6 +84,7 @@ describe('cicero-server', () => {
                 state,
             })
             .expect(200)
+            .expect('Content-Type',/json/)
             .then(response => {
                 response.body.response.should.include(responseBody);
                 response.body.state.should.include(state);
@@ -91,13 +94,18 @@ describe('cicero-server', () => {
     it('/should parse a simple stateless request (ergo)', async () => {
         return request.post('/parse/latedeliveryandpenalty/data.json')
             .send(body)
-            .expect(200);
+            .expect(200)
+            .expect('Content-Type',/json/)
+            .then(response => {
+                response.body.should.have.property('clauseId');
+            });
     });
 
     it('/should draft a simple stateless request (ergo)', async () => {
         return request.post('/draft/latedeliveryandpenalty/data.json')
             .send(body)
-            .expect(200);
+            .expect(200)
+            .expect('Content-Type',/text/);
     });
 
     after(() => {
