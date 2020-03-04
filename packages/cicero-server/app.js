@@ -27,10 +27,6 @@ if(!process.env.CICERO_DIR) {
     throw new Error('You must set the CICERO_DIR environment variable.');
 }
 
-if(!process.env.CICERO_DATA) {
-    throw new Error('You must set the CICERO_DATA environment variable.');
-}
-
 const PORT = process.env.PORT | 6001;
 
 // to automatically decode JSON POST
@@ -64,7 +60,6 @@ app.set('port', PORT);
  */
 app.post('/trigger/:template/:data', async function (req, httpResponse, next) {
     console.log('CICERO_DIR: ' + process.env.CICERO_DIR);
-    console.log('CICERO_DATA: ' + process.env.CICERO_DATA);
     console.log('Template: ' + req.params.template);
     console.log('Clause: ' + req.params.data);
     try {
@@ -112,7 +107,6 @@ app.post('/trigger/:template/:data', async function (req, httpResponse, next) {
  */
 app.post('/parse/:template/:data', async function (req, httpResponse, next) {
     console.log('CICERO_DIR: ' + process.env.CICERO_DIR);
-    console.log('CICERO_DATA: ' + process.env.CICERO_DATA);
     console.log('Template: ' + req.params.template);
     console.log('Clause: ' + req.params.data);
     try {
@@ -148,7 +142,6 @@ app.post('/parse/:template/:data', async function (req, httpResponse, next) {
  */
 app.post('/draft/:template/:data', async function (req, httpResponse, next) {
     console.log('CICERO_DIR: ' + process.env.CICERO_DIR);
-    console.log('CICERO_DATA: ' + process.env.CICERO_DATA);
     console.log('Template: ' + req.params.template);
     console.log('Clause: ' + req.params.data);
     try {
@@ -171,7 +164,7 @@ app.post('/draft/:template/:data', async function (req, httpResponse, next) {
 async function initClauseInstance(req) {
 
     const template = await Template.fromDirectory(`${process.env.CICERO_DIR}/${req.params.template}`);
-    const data = fs.readFileSync(`${process.env.CICERO_DATA}/${req.params.template}/${req.params.data}`);
+    const data = fs.readFileSync(`${process.env.CICERO_DIR}/${req.params.template}/${req.params.data}`);
     const clause = new Clause(template);
 
     if(req.params.data.endsWith('.json')) {
