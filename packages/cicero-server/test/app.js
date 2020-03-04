@@ -30,14 +30,7 @@ const responseBody = {
     buyerMayTerminate: true,
 };
 
-describe('cicero-server bad CICERO_DIR', () => {
-
-    it('/should fail to start the server without CICERO_DATA defined', async () => {
-        delete process.env.CICERO_DATA;
-        (() => require('../app')).should.throw('You must set the CICERO_DATA environment variable.');
-        decache('../app');
-
-    });
+describe('cicero-server bad environment', () => {
 
     it('/should fail to start the server without CICERO_DIR defined', async () => {
         delete process.env.CICERO_DIR;
@@ -52,7 +45,6 @@ describe('cicero-server', () => {
 
     before(()=>{
         process.env.CICERO_DIR = './test/data';
-        process.env.CICERO_DATA = './test/data';
         server = require('../app');
         request = request(server);
     });
