@@ -1,0 +1,8 @@
+{
+    "$class" : "org.accordproject.test.TemplateModel",
+    "monetaryAmountProperty" : {
+        "$class" : "org.accordproject.money.MonetaryAmount",
+        "currencyCode": "USD",
+        "doubleValue": 34031.94
+    }
+}

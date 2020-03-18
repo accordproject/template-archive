@@ -143,18 +143,18 @@ class TemplateInstance {
             throw new ParseException(err, null, fileName, err, 'cicero-core' );
         }
 
-        ast = TemplateInstance.convertDateTimes(ast, utcOffset);
+        ast = TemplateInstance.convertFormattedParsed(ast, utcOffset);
         this.setData(ast);
     }
 
     /**
-     * Recursive function that converts all instances of ParsedDateTime
+     * Recursive function that converts all instances of Formated objects (ParsedDateTime or ParsedMonetaryAmount)
      * to a Moment.
      * @param {*} obj the input object
      * @param {number} utcOffset - the default utcOffset
      * @returns {*} the converted object
      */
-    static convertDateTimes(obj, utcOffset) {
+    static convertFormattedParsed(obj, utcOffset) {
         if(obj.$class === 'ParsedDateTime') {
 
             let instance = null;
@@ -175,10 +175,22 @@ class TemplateInstance {
                 throw new Error(`Failed to handle datetime ${JSON.stringify(obj, null, 4)}`);
             }
             return result;
-        }
-        else if( typeof obj === 'object' && obj !== null) {
+        } else if(obj.$class === 'ParsedAmount') {
+            const result = obj.doubleValue;
+            return result;
+        } else if(obj.$class === 'ParsedMonetaryAmount') {
+            if (obj.currencyCode && obj.currencySymbol && obj.currencyCode !== obj.currencySymbol) {
+                throw new Error(`Currency symbol ${obj.currencySymbol} and currency code ${obj.currencyCode} are incompatible`);
+            }
+            const result = {
+                $class : 'org.accordproject.money.MonetaryAmount',
+                doubleValue : obj.doubleValue,
+                currencyCode : obj.currencySymbol ? obj.currencySymbol : obj.currencyCode,
+            };
+            return result;
+        } else if( typeof obj === 'object' && obj !== null) {
             Object.entries(obj).forEach(
-                ([key, value]) => {obj[key] = TemplateInstance.convertDateTimes(value, utcOffset);}
+                ([key, value]) => {obj[key] = TemplateInstance.convertFormattedParsed(value, utcOffset);}
             );
         }
 

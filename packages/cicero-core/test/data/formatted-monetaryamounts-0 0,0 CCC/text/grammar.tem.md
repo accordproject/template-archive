@@ -1,0 +1,1 @@
+monetaryAmountProperty: {{monetaryAmountProperty as "0 0,0 CCC"}}

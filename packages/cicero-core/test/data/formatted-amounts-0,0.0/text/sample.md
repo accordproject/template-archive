@@ -1,0 +1,1 @@
+amountProperty: 34,031.9
