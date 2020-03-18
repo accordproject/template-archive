@@ -1,0 +1,1 @@
+monetaryAmountProperty: $34,031.94

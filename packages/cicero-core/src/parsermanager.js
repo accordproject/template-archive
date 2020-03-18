@@ -28,6 +28,8 @@ const GrammarVisitor = require('./grammarvisitor');
 const uuid = require('uuid');
 const nunjucks = require('nunjucks');
 const DateTimeFormatParser = require('./datetimeformatparser');
+const AmountFormatParser = require('./amountformatparser');
+const MonetaryAmountFormatParser = require('./monetaryamountformatparser');
 const CommonMarkTransformer = require('@accordproject/markdown-common').CommonMarkTransformer;
 
 // This required because only compiled nunjucks templates are supported browser-side
@@ -154,6 +156,7 @@ class ParserManager {
             autoescape: false  // Required to allow nearley syntax strings
         });
         const combined = nunjucks.render('template.ne', parts);
+        // console.log('Generated template grammar' + combined);
         Logger.debug('Generated template grammar' + combined);
 
         // console.log(combined);
@@ -328,28 +331,35 @@ class ParserManager {
         if(!action) {
             action = '{% id %}';
 
-            if(property.getType() === 'DateTime' || element.type === 'FormattedBinding' ) {
-                if(property.getType() !== 'DateTime') {
-                    ParserManager._throwTemplateExceptionForElement('Formatted types are currently only supported for DateTime properties.', element);
+            if(element.type === 'FormattedBinding' || property.getType() === 'DateTime') {
+                let formatParser;
+                let format;
+                if(property.getType() === 'DateTime') {
+                    formatParser = new DateTimeFormatParser();
+                    format = element.format ? element.format.value : '"MM/DD/YYYY"';
+                } else if (property.getType() === 'Double') {
+                    formatParser = new AmountFormatParser();
+                    format = element.format.value;
+                } else if (property.getType() === 'MonetaryAmount') {
+                    formatParser = new MonetaryAmountFormatParser();
+                    format = element.format.value;
+                } else {
+                    ParserManager._throwTemplateExceptionForElement(`Formatted types are not currently supported for ${property.getType()} properties.`, element);
                 }
-
-                // we only include the datetime grammar if custom formats are used
-                if(!parts.grammars.dateTime) {
-                    parts.grammars.dateTime = require('./grammars/datetime');
-                    parts.grammars.dateTimeEn = require('./grammars/datetime-en');
-                }
-
-                // push the formatting rule, iff it has not been already declared
-                const format = element.format ? element.format.value : '"MM/DD/YYYY"';
-                const formatRule = DateTimeFormatParser.buildDateTimeFormatRule(format);
-                type = formatRule.name;
-                const ruleExists = parts.modelRules.some(rule => (rule.prefix === formatRule.name));
-                if(!ruleExists) {
-                    parts.modelRules.push({
-                        prefix: formatRule.name,
-                        symbols: [`${formatRule.tokens} ${formatRule.action} # ${propertyName} as ${format}`],
-                    });
-                }
+                // add the format-specific grammars
+                formatParser.addGrammars(parts.grammars);
+                // push the formatting rule for that format
+                const formatRules = formatParser.buildFormatRules(format);
+                formatRules.forEach((formatRule) => {
+                    type = formatRule.name;
+                    const ruleExists = parts.modelRules.some(rule => (rule.prefix === formatRule.name));
+                    if(!ruleExists) {
+                        parts.modelRules.push({
+                            prefix: formatRule.name,
+                            symbols: [`${formatRule.tokens} ${formatRule.action} # ${propertyName} as ${format}`],
+                        });
+                    }
+                });
             } else if(element.type === 'ClauseBinding' || element.type === 'WithBinding') {
                 const nestedTemplate = element.template;
                 const nestedTemplateModel = this.template.getIntrospector().getClassDeclaration(property.getFullyQualifiedTypeName());

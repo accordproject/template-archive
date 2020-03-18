@@ -1,0 +1,9 @@
+{
+    "name": "formatted-amounts",
+    "version": "0.0.1",
+    "description": "Test formatted amounts",
+    "accordproject": {
+      "template": "clause",
+      "cicero": "^0.20.0"
+    }
+}

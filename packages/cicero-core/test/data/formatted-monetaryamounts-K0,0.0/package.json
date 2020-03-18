@@ -1,0 +1,9 @@
+{
+    "name": "formatted-monetaryamounts",
+    "version": "0.0.1",
+    "description": "Test formatted monetary amounts",
+    "accordproject": {
+      "template": "clause",
+      "cicero": "^0.20.0"
+    }
+}

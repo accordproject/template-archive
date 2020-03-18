@@ -15,45 +15,24 @@
 'use strict';
 
 const crypto = require('crypto');
+const FormatParser = require('./formatparser');
 
 /**
  * Parses a date/time format string
  * @class
  * @public
  */
-class DateTimeFormatParser {
+class DateTimeFormatParser extends FormatParser {
     /**
-     * Given a format field (like HH or D) this method returns
-     * a logical name for the field. Note the logical names
-     * have been picked to align with the moment constructor that takes an object.
-     * @param {string} field - the input format field
-     * @returns {string} the field designator
+     * Given current grammar parts, add necessary grammars parts for the format.
+     * @param {object[]} grammars - the current grammar parts
+     * @param {string} field - grammar field
      */
-    static parseDateTimeFormatField(field) {
-        switch(field) {
-        case 'D':
-        case 'DD':
-            return 'days';
-        case 'M':
-        case 'MM':
-        case 'MMM':
-        case 'MMMM':
-            return 'months';
-        case 'YYYY':
-            return 'years';
-        case 'H':
-        case 'HH':
-            return 'hours';
-        case 'mm':
-            return 'minutes';
-        case 'ss':
-            return 'seconds';
-        case 'SSS':
-            return 'milliseconds';
-        case 'Z':
-            return 'timezone';
-        default:
-            return null;
+    addGrammars(grammars) {
+        super.addGrammars(grammars);
+        if(!grammars.dateTime) {
+            grammars.dateTime = require('./grammars/datetime');
+            grammars.dateTimeEn = require('./grammars/datetime-en');
         }
     }
 
@@ -62,7 +41,7 @@ class DateTimeFormatParser {
      * @param {string} formatString - the input format string
      * @returns {{tokens: String, action: String, name: String }} the tokens and action and name to use for the Nearley rule
      */
-    static buildDateTimeFormatRule(formatString) {
+    buildFormatRules(formatString) {
         // strip quotes
         let input = formatString.substr(1,formatString.length -2);
         const lastCharacter = input.charAt(input.length-1);
@@ -112,7 +91,42 @@ class DateTimeFormatParser {
         const action = `{% (d) => {return ${parsedDateTime};}%}`;
         const name = 'DateTime_' + crypto.createHash('md5').update(formatString).digest('hex');
 
-        return { tokens, name, action};
+        return [{ tokens, name, action}];
+    }
+
+    /**
+     * Given a format field (like HH or D) this method returns
+     * a logical name for the field. Note the logical names
+     * have been picked to align with the moment constructor that takes an object.
+     * @param {string} field - the input format field
+     * @returns {string} the field designator
+     */
+    static parseDateTimeFormatField(field) {
+        switch(field) {
+        case 'D':
+        case 'DD':
+            return 'days';
+        case 'M':
+        case 'MM':
+        case 'MMM':
+        case 'MMMM':
+            return 'months';
+        case 'YYYY':
+            return 'years';
+        case 'H':
+        case 'HH':
+            return 'hours';
+        case 'mm':
+            return 'minutes';
+        case 'ss':
+            return 'seconds';
+        case 'SSS':
+            return 'milliseconds';
+        case 'Z':
+            return 'timezone';
+        default:
+            return null;
+        }
     }
 }
 

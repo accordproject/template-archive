@@ -75,7 +75,7 @@ describe('Clause', () => {
             try {
                 await Template.fromDirectory('./test/data/bad-formatted-binding', options);
             } catch (err) {
-                err.message.should.equal('Formatted types are currently only supported for DateTime properties. File text/grammar.tem.md line 1 column 3');
+                err.message.should.equal('Formatted types are not currently supported for Participant properties. File text/grammar.tem.md line 1 column 3');
             }
         });
     });
