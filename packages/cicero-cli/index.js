@@ -321,6 +321,11 @@ require('yargs')
             type: 'string',
             default: null
         });
+        yargs.option('logo', {
+            describe: 'add logo (if logo.png exists)',
+            type: 'boolean',
+            default: false
+        })
         yargs.option('warnings', {
             describe: 'print warnings',
             type: 'boolean',
@@ -336,7 +341,7 @@ require('yargs')
             const options = {
                 warnings: argv.warnings,
             };
-            return Commands.archive(argv.template, argv.target, argv.output, options)
+            return Commands.archive(argv.template, argv.target, argv.output, argv.logo, options)
                 .catch((err) => {
                     Logger.error(err.message);
                 });
