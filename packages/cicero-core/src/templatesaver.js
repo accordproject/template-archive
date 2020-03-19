@@ -30,9 +30,10 @@ class TemplateSaver {
      * @param {Template} template - the template to persist
      * @param {string} [language] - target language for the archive (should be 'ergo')
      * @param {Object} [options] - JSZip options
+     * @param {Buffer} logoBuffer - Bytes data of the PNG file
      * @return {Promise<Buffer>} the zlib buffer
      */
-    static async toArchive(template, language, options) {
+    static async toArchive(template, language, logoBuffer, options) {
         if(!language || typeof(language) !== 'string') {
             throw new Error('language is required and must be a string');
         }
@@ -48,6 +49,8 @@ class TemplateSaver {
         zip.file('text/', null, Object.assign({}, options, {
             dir: true
         }));
+
+        zip.file('logo.png', logoBuffer, options)
 
         if (template.getParserManager().getTemplatizedGrammar()) {
             zip.file('text/grammar.tem.md', template.getParserManager().getTemplatizedGrammar(), options);

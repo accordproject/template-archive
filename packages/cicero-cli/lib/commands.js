@@ -465,7 +465,6 @@ class Commands {
             Logger.info('Using ergo as the default target for the archive.');
             argv.target = 'ergo';
         }
-
         return argv;
     }
 
@@ -481,7 +480,7 @@ class Commands {
     static archive(templatePath, target, outputPath, options) {
         return Commands.loadTemplate(templatePath, options)
             .then(async (template) => {
-                const archive = await template.toArchive(target);
+                const archive = await template.toArchive(target)
                 let file;
                 if (outputPath) {
                     file = outputPath;

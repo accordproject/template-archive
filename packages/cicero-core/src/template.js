@@ -174,10 +174,11 @@ class Template {
      * Persists this template to a Cicero Template Archive (cta) file.
      * @param {string} [language] - target language for the archive (should be 'ergo')
      * @param {Object} [options] - JSZip options
+     * @param {Buffer} logoBuffer - Bytes data of the PNG file
      * @return {Promise<Buffer>} the zlib buffer
      */
-    async toArchive(language, options) {
-        return TemplateSaver.toArchive(this, language, options);
+    async toArchive(language, logoBuffer, options) {
+        return TemplateSaver.toArchive(this, language, logoBuffer, options);
     }
 
     /**
