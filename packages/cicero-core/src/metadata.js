@@ -41,6 +41,7 @@ class Metadata {
      * @param {String} readme  - the README.md for the template (may be null)
      * @param {object} samples - the sample markdown for the template in different locales,
      * @param {object} request - the JS object for the sample request
+     * @param {Buffer} logo - the bytes data for the image
      * represented as an object whose keys are the locales and whose values are the sample markdown.
      * For example:
      *  {
@@ -51,7 +52,7 @@ class Metadata {
      * Locale keys (with the exception of default) conform to the IETF Language Tag specification (BCP 47).
      * THe `default` key represents sample template text in a non-specified language, stored in a file called `sample.md`.
      */
-    constructor(packageJson, readme, samples, request) {
+    constructor(packageJson, readme, samples, request, logo) {
         // name of the runtime that this template targets (if the template contains compiled code)
         this.runtime = null;
 
@@ -118,6 +119,10 @@ class Metadata {
             throw new Error('README must be a string');
         }
 
+        if(logo && typeof(logo) !== 'string') {
+            throw new Error ('logo must be a bytes data');
+        }
+
         if(!packageJson.keywords) {
             packageJson.keywords = [];
         }
@@ -131,6 +136,7 @@ class Metadata {
         }
 
         this.readme = readme;
+        this.logo = logo;
         this.samples = samples;
         this.request = request;
 
@@ -176,6 +182,14 @@ class Metadata {
      */
     getTemplateType(){
         return this.type;
+    }
+
+    /**
+     * Returns the logo at the root of the template
+     * @returns {Buffer} the bytes data of logo
+     */
+    getLogo(){
+        return this.logo;
     }
 
     /**

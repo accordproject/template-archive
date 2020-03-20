@@ -126,7 +126,7 @@ In case of delayed delivery except for Force Majeure cases, the Seller shall pay
 1. Any fractional part of a days is to be considered a full days.
 1. The total amount of penalty shall not however, exceed 2.0% of the total value of the Equipment involved in late delivery.
 1. If the delay is more than 2 weeks, the Buyer is entitled to terminate this Contract.`);
-            template.getHash().should.equal('3652879e7e86ddead7d4d83b91fac48abd4050551f84032613e6f3b4dd051f80');
+            template.getHash().should.equal('e1d30a7b87cbb0ddbaccc9aab6f98825e91cca2beb329a18967c473309e648a7');
             const buffer = await template.toArchive('ergo');
             buffer.should.not.be.null;
             const template2 = await Template.fromArchive(buffer);
@@ -480,7 +480,7 @@ In case of delayed delivery except for Force Majeure cases, the Seller shall pay
     describe('#getHash', () => {
         it('should return a SHA-256 hash', async () => {
             const template = await Template.fromDirectory('./test/data/latedeliveryandpenalty', options);
-            template.getHash().should.equal('3652879e7e86ddead7d4d83b91fac48abd4050551f84032613e6f3b4dd051f80');
+            template.getHash().should.equal('e1d30a7b87cbb0ddbaccc9aab6f98825e91cca2beb329a18967c473309e648a7');
         });
     });
 

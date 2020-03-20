@@ -41,10 +41,11 @@ class Template {
      * @param {String} readme  - the readme in markdown for the template (optional)
      * @param {object} samples - the sample text for the template in different locales
      * @param {object} request - the JS object for the sample request
+     * @param {Buffer} logo - the bytes data of logo
      * @param {Object} options  - e.g., { warnings: true }
      */
-    constructor(packageJson, readme, samples, request, options) {
-        this.metadata = new Metadata(packageJson, readme, samples, request);
+    constructor(packageJson, readme, samples, request, logo, options) {
+        this.metadata = new Metadata(packageJson, readme, samples, request, logo);
         this.logicManager = new LogicManager('cicero', null, options);
         this.parserManager = new ParserManager(this);
     }
@@ -174,11 +175,11 @@ class Template {
      * Persists this template to a Cicero Template Archive (cta) file.
      * @param {string} [language] - target language for the archive (should be 'ergo')
      * @param {Object} [options] - JSZip options
-     * @param {Buffer} logoBuffer - Bytes data of the PNG file
+     * @param {Buffer} logo - Bytes data of the PNG file
      * @return {Promise<Buffer>} the zlib buffer
      */
-    async toArchive(language, logoBuffer, options) {
-        return TemplateSaver.toArchive(this, language, logoBuffer, options);
+    async toArchive(language, options) {
+        return TemplateSaver.toArchive(this, language, options);
     }
 
     /**
@@ -297,7 +298,7 @@ class Template {
      * @private
      */
     setSamples(samples) {
-        this.metadata = new Metadata(this.metadata.getPackageJson(), this.metadata.getREADME(), samples, this.metadata.getRequest());
+        this.metadata = new Metadata(this.metadata.getPackageJson(), this.metadata.getREADME(), samples, this.metadata.getRequest(), this.metadata.getLogo());
     }
 
     /**
@@ -309,7 +310,7 @@ class Template {
     setSample(sample, locale) {
         const samples = this.metadata.getSamples();
         samples[locale] = sample;
-        this.metadata = new Metadata(this.metadata.getPackageJson(), this.metadata.getREADME(), samples, this.metadata.getRequest());
+        this.metadata = new Metadata(this.metadata.getPackageJson(), this.metadata.getREADME(), samples, this.metadata.getRequest(), this.metadata.getLogo());
     }
 
     /**
@@ -318,7 +319,7 @@ class Template {
      * @private
      */
     setRequest(request) {
-        this.metadata = new Metadata(this.metadata.getPackageJson(), this.metadata.getREADME(), this.metadata.getSamples(), request);
+        this.metadata = new Metadata(this.metadata.getPackageJson(), this.metadata.getREADME(), this.metadata.getSamples(), request, this.metadata.getLogo());
     }
 
     /**
@@ -336,7 +337,7 @@ class Template {
      * @private
      */
     setPackageJson(packageJson) {
-        this.metadata = new Metadata(packageJson, this.metadata.getREADME(), this.metadata.getSamples(), this.metadata.getRequest());
+        this.metadata = new Metadata(packageJson, this.metadata.getREADME(), this.metadata.getSamples(), this.metadata.getRequest(), this.metadata.getLogo());
     }
 
     /**

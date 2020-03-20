@@ -33,7 +33,7 @@ class TemplateSaver {
      * @param {Buffer} logoBuffer - Bytes data of the PNG file
      * @return {Promise<Buffer>} the zlib buffer
      */
-    static async toArchive(template, language, logoBuffer, options) {
+    static async toArchive(template, language, options) {
         if(!language || typeof(language) !== 'string') {
             throw new Error('language is required and must be a string');
         }
@@ -50,8 +50,6 @@ class TemplateSaver {
             dir: true
         }));
 
-        zip.file('logo.png', logoBuffer, options)
-
         if (template.getParserManager().getTemplatizedGrammar()) {
             zip.file('text/grammar.tem.md', template.getParserManager().getTemplatizedGrammar(), options);
         }
@@ -59,6 +57,11 @@ class TemplateSaver {
         // save the README.md if present
         if (metadata.getREADME()) {
             zip.file('README.md', metadata.getREADME(), options);
+        }
+
+        // save the logo.png if present
+        if (metadata.getLogo()) {
+            zip.file('logo.png', metadata.getLogo(), options);
         }
 
         // Save the sample files

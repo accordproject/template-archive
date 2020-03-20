@@ -321,11 +321,6 @@ require('yargs')
             type: 'string',
             default: null
         });
-        yargs.option('logo', {
-            describe: 'add logo (if logo.png exists)',
-            type: 'boolean',
-            default: false
-        })
         yargs.option('warnings', {
             describe: 'print warnings',
             type: 'boolean',
@@ -335,13 +330,12 @@ require('yargs')
         if (argv.verbose) {
             Logger.info(`create an archive for ${argv.template}`);
         }
-
         try {
             argv = Commands.validateArchiveArgs(argv);
             const options = {
                 warnings: argv.warnings,
             };
-            return Commands.archive(argv.template, argv.target, argv.output, argv.logo, options)
+            return Commands.archive(argv.template, argv.target, argv.output, options)
                 .catch((err) => {
                     Logger.error(err.message);
                 });
