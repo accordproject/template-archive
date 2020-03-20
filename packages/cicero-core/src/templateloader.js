@@ -52,6 +52,7 @@ class TemplateLoader extends FileLoader {
         const sampleTextFiles = {};
 
         const readmeContents = await TemplateLoader.loadZipFileContents(zip, 'README.md');
+        const logo = await TemplateLoader.loadZipFileContents(zip, 'logo.png');
         let sampleFiles = await TemplateLoader.loadZipFilesContents(zip, SAMPLE_FILE_REGEXP);
         sampleFiles.forEach( async (sampleFile) => {
             let matches = sampleFile.name.match(SAMPLE_FILE_REGEXP);
@@ -75,7 +76,7 @@ class TemplateLoader extends FileLoader {
         });
 
         // create the template
-        const template = new (Function.prototype.bind.call(Template, null, packageJsonObject, readmeContents, sampleTextFiles, requestContents, options));
+        const template = new (Function.prototype.bind.call(Template, null, packageJsonObject, readmeContents, sampleTextFiles, requestContents, logo, options));
 
         // add model files
         Logger.debug(method, 'Adding model files to model manager');
@@ -143,6 +144,9 @@ class TemplateLoader extends FileLoader {
         // grab the README.md
         const readmeContents = await TemplateLoader.loadFileContents(path, 'README.md');
 
+        // grab the logo.png
+        const logo = await TemplateLoader.loadFileContents(path, 'logo.png');
+
         // grab the request.json
         const requestJsonObject = await TemplateLoader.loadFileContents(path, 'request.json', true );
 
@@ -167,7 +171,7 @@ class TemplateLoader extends FileLoader {
         });
 
         // create the template
-        const template = new (Function.prototype.bind.call(Template, null, packageJsonObject, readmeContents, sampleTextFiles, requestJsonObject, options));
+        const template = new (Function.prototype.bind.call(Template, null, packageJsonObject, readmeContents, sampleTextFiles, requestJsonObject, logo, options));
         const modelFiles = [];
         const modelFileNames = [];
         const ctoFiles = await TemplateLoader.loadFilesContents(path, /model[/\\].*\.cto$/);
