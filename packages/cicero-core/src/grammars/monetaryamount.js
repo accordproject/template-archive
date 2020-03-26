@@ -25,7 +25,7 @@ K -> "€" {% (d) => { return "EUR";}%} |
 	   "zł" {% (d) => {return "PLN";}%} |
 	   "$" {% (d) => {return "USD";}%} | 
 	   "¥" {% (d) => {return "YEN";}%} |
-	   [A-Z] [A-Z] [A-Z] {% (d) => {return d;} %}
+	   [A-Z] [A-Z] [A-Z] {% (d) => {return '' + d[0] + d[1] + d[2];} %}
 `;
 
 module.exports = MONETARY_AMOUNT_GRAMMAR;
