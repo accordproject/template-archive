@@ -1,8 +1,28 @@
 {
     "$class" : "org.accordproject.test.TemplateModel",
-    "monetaryAmountProperty" : {
+    "monetaryAmountProperty1" : {
         "$class" : "org.accordproject.money.MonetaryAmount",
         "currencyCode": "USD",
+        "doubleValue": 34031.9
+    },
+    "monetaryAmountProperty2" : {
+        "$class" : "org.accordproject.money.MonetaryAmount",
+        "currencyCode": "EUR",
+        "doubleValue": 34031.9
+    },
+    "monetaryAmountProperty3" : {
+        "$class" : "org.accordproject.money.MonetaryAmount",
+        "currencyCode": "JPY",
+        "doubleValue": 34031.9
+    },
+    "monetaryAmountProperty4" : {
+        "$class" : "org.accordproject.money.MonetaryAmount",
+        "currencyCode": "GBP",
+        "doubleValue": 34031.9
+    },
+    "monetaryAmountProperty5" : {
+        "$class" : "org.accordproject.money.MonetaryAmount",
+        "currencyCode": "AUD",
         "doubleValue": 34031.9
     }
 }
