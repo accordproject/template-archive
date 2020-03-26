@@ -24,7 +24,7 @@ K -> "€" {% (d) => { return "EUR";}%} |
      "£" {% (d) => {return "GBP";}%} | 
 	   "zł" {% (d) => {return "PLN";}%} |
 	   "$" {% (d) => {return "USD";}%} | 
-	   "¥" {% (d) => {return "YEN";}%} |
+	   "¥" {% (d) => {return "JPY";}%} |
 	   [A-Z] [A-Z] [A-Z] {% (d) => {return '' + d[0] + d[1] + d[2];} %}
 `;
 

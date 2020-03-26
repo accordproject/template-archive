@@ -7,5 +7,9 @@ import org.accordproject.money.MonetaryAmount from https://models.accordproject.
  * Defines the data model for the template
  */
 asset TemplateModel extends AccordClause {
-  o MonetaryAmount monetaryAmountProperty
+  o MonetaryAmount monetaryAmountProperty1
+  o MonetaryAmount monetaryAmountProperty2
+  o MonetaryAmount monetaryAmountProperty3
+  o MonetaryAmount monetaryAmountProperty4
+  o MonetaryAmount monetaryAmountProperty5
 }
