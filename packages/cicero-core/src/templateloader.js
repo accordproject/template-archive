@@ -52,7 +52,7 @@ class TemplateLoader extends FileLoader {
         const sampleTextFiles = {};
 
         const readmeContents = await TemplateLoader.loadZipFileContents(zip, 'README.md');
-        const logo = await TemplateLoader.loadZipFileContents(zip, 'logo.png');
+        const logo = await TemplateLoader.loadZipFileBuffer(zip, 'logo.png');
         let sampleFiles = await TemplateLoader.loadZipFilesContents(zip, SAMPLE_FILE_REGEXP);
         sampleFiles.forEach( async (sampleFile) => {
             let matches = sampleFile.name.match(SAMPLE_FILE_REGEXP);
@@ -145,7 +145,7 @@ class TemplateLoader extends FileLoader {
         const readmeContents = await TemplateLoader.loadFileContents(path, 'README.md');
 
         // grab the logo.png
-        const logo = await TemplateLoader.loadFileContents(path, 'logo.png');
+        const logo = await TemplateLoader.loadFileBuffer(path, 'logo.png');
 
         // grab the request.json
         const requestJsonObject = await TemplateLoader.loadFileContents(path, 'request.json', true );

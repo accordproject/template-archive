@@ -330,6 +330,7 @@ require('yargs')
         if (argv.verbose) {
             Logger.info(`create an archive for ${argv.template}`);
         }
+
         try {
             argv = Commands.validateArchiveArgs(argv);
             const options = {

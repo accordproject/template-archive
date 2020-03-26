@@ -113,12 +113,12 @@ describe('Metadata', () => {
             }, {}, {})).should.throw('README must be a string');
         });
 
-        it('should throw an error if logo is not a string', () => {
+        it('should throw an error if logo is not a Buffer', () => {
             (() => new Metadata({
                 name: 'template',
                 version: '1.0.0',
                 accordproject: {template: 'contract',cicero:caretRange(ciceroVersion),ergo:'^0.1.0-0'}
-            }, '', {}, {}, {})).should.throw('logo must be a bytes data');
+            }, '', {}, {}, {})).should.throw('logo must be a Buffer');
         });
 
         it('should throw an error if keywords is not an array', () => {
