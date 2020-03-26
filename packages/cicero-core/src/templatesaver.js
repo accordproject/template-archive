@@ -61,7 +61,11 @@ class TemplateSaver {
 
         // save the logo.png if present
         if (metadata.getLogo()) {
-            zip.file('logo.png', metadata.getLogo(), options);
+            zip.file(
+                'logo.png',
+                metadata.getLogo(),
+                Object.assign({ binary: true }, options)
+            );
         }
 
         // Save the sample files

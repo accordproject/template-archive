@@ -119,8 +119,8 @@ class Metadata {
             throw new Error('README must be a string');
         }
 
-        if(logo && typeof(logo) !== 'string') {
-            throw new Error ('logo must be a bytes data');
+        if(logo && !(logo instanceof Buffer)) {
+            throw new Error ('logo must be a Buffer');
         }
 
         if(!packageJson.keywords) {
@@ -338,7 +338,7 @@ class Metadata {
     createTargetMetadata(runtimeName) {
         const packageJson = JSON.parse(JSON.stringify(this.packageJson));
         packageJson.accordproject.runtime = runtimeName;
-        return new Metadata(packageJson, this.readme, this.samples, this.request);
+        return new Metadata(packageJson, this.readme, this.samples, this.request, this.logo);
     }
 
 }
