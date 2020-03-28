@@ -139,7 +139,7 @@ class Metadata {
             throw new Error('The template displayName property is limited to a maximum of 214 characters.');
         }
 
-        if(logo && logo instanceof Buffer && !(getMimeType(logo) instanceof Error)) {
+        if(logo && logo instanceof Buffer) {
             const mimeType = getMimeType(logo).mime;
             const { height, width } = Metadata.getImageDimensions(logo, mimeType);
             Metadata.checkDimensions(height, width);
