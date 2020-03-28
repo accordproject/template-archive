@@ -143,9 +143,7 @@ class Metadata {
         }
 
         if(logo && logo instanceof Buffer) {
-            const mimeType = getMimeType(logo).mime;
-            const { height, width } = Metadata.getImageDimensions(logo, mimeType);
-            Metadata.checkDimensions(height, width);
+            Metadata.checkImage(logo);
         } else if(logo && !(logo instanceof Buffer)) {
             throw new Error ('logo must be a Buffer');
         }
@@ -346,31 +344,33 @@ class Metadata {
     }
 
     /**
-     * Returns the dimension of the image
-     * @param {Buffer} buffer buffer of the image
-     * @param {String} mimeType the mime-type of image
-     * @returns {Object} the dimension of the image
+     * Check the buffer is a png file with the right size
+     * @param {Buffer} buffer the buffer object
      */
-    static getImageDimensions(buffer, mimeType) {
-        if(mimeType === 'image/png') {
-            try {
-                return {
-                    height: buffer.readUInt32BE(20),
-                    width: buffer.readUInt32BE(16)
-                };
-            } catch (err) {
-                throw new Error('not a valid png file');
-            }
-        }
-        throw new Error('dimension calculation not supported for this file');
+    static checkImage(buffer) {
+        const mimeType = getMimeType(buffer).mime;
+        Metadata.checkImageDimensions(buffer, mimeType);
     }
 
     /**
      * Checks if dimentions for the image are correct.
-     * @param {Number} height height of the image
-     * @param {Number} width width of the image
+     * @param {Buffer} buffer the buffer object
+     * @param {string} mimeType the mime type of the object
      */
-    static checkDimensions(height, width) {
+    static checkImageDimensions(buffer, mimeType) {
+        let height;
+        let width;
+        if(mimeType === 'image/png') {
+            try {
+                height = buffer.readUInt32BE(20);
+                width = buffer.readUInt32BE(16);
+            } catch (err) {
+                throw new Error('not a valid png file');
+            }
+        } else {
+            throw new Error('dimension calculation not supported for this file');
+        }
+
         if (height === IMAGE_SIZE.height && width === IMAGE_SIZE.width) {
             return;
         } else {
