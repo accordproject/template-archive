@@ -353,7 +353,7 @@ class Metadata {
     }
 
     /**
-     * Checks if dimentions for the image are correct.
+     * Checks if dimensions for the image are correct.
      * @param {Buffer} buffer the buffer object
      * @param {string} mimeType the mime type of the object
      */
