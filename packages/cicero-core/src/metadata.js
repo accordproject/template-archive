@@ -19,9 +19,16 @@ const ErgoCompiler = require('@accordproject/ergo-compiler').Compiler;
 const ciceroVersion = require('../package.json').version;
 const semver = require('semver');
 
+const getMimeType = require('./mimetype');
+
 const templateTypes = {
     CONTRACT: 0,
     CLAUSE: 1
+};
+
+
+const IMAGE_SIZE = {
+    side: 128
 };
 
 /**
@@ -119,7 +126,14 @@ class Metadata {
             throw new Error('README must be a string');
         }
 
-        if(logo && !(logo instanceof Buffer)) {
+        if(logo && logo instanceof Buffer && !(getMimeType(logo) instanceof Error)) {
+            const mimeType = getMimeType(logo).mime;
+            const { height, width } = Metadata.getImageDimensions(logo, mimeType);
+            if (!Metadata.areDimensionsAllowed(height, width)) {
+                throw new Error('the dimensions of the image are incorrect');
+            }
+        }
+        else if(logo && !(logo instanceof Buffer)) {
             throw new Error ('logo must be a Buffer');
         }
 
@@ -328,6 +342,42 @@ class Metadata {
      */
     getIdentifier() {
         return this.packageJson.name + '@' + this.packageJson.version;
+    }
+
+    /**
+     * Returns the dimension of the image
+     * @param {Buffer} buffer buffer of the image
+     * @param {String} mimeType the mime-type of image
+     * @returns {Object} the dimension of the image
+     */
+    static getImageDimensions(buffer, mimeType) {
+        if(mimeType === 'image/png') {
+            return {
+                height: buffer.readUInt32BE(20),
+                width: buffer.readUInt32BE(16)
+            };
+        }
+        throw new Error('dimension calculation not supported for this file');
+    }
+
+    /**
+     * @param {Number} height height of the image
+     * @param {Number} width width of the image
+     * @param {Number} epsilon allowed error in dimensions of the image file
+     * @returns {Boolean} whether the dimensions are vaild
+     */
+    static areDimensionsAllowed(height, width, epsilon=4) {
+        if(height > 0 && width > 0) {
+            // this is done to give some allowance to the user so that they don't need to
+            // upload exact square images
+            const upperBound = IMAGE_SIZE.side + epsilon;
+            const lowerBound = IMAGE_SIZE.side - epsilon;
+            const sum = height + width;
+            if(lowerBound*2 <= sum && sum <= upperBound*2) {
+                return true;
+            }
+            return false;
+        }
     }
 
     /**

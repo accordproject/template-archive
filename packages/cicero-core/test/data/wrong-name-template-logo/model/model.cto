@@ -1,0 +1,11 @@
+namespace logo.support.WrongNameTemplateLogoClause
+
+import org.accordproject.cicero.contract.* from https://models.accordproject.org/cicero/contract.cto
+
+/**
+ * The template model
+ */
+asset WrongNameTemplateLogoClause extends AccordClause {
+  o String firstName
+  o String lastName
+}

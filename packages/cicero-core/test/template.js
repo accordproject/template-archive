@@ -109,10 +109,15 @@ describe('Template', () => {
             return templatePromise.then((template) => template.getMetadata().getLogo().should.be.an.instanceof(Buffer));
         });
 
+        it('should create a template without a logo if image is not named \'logo.png\'', () => {
+            const templatePromise = Template.fromDirectory('./test/data/wrong-name-template-logo', options);
+            return templatePromise.then((template) => assert.equal(template.getMetadata().getLogo(), null));
+        });
+
         it('should roundtrip a template with a logo', async () => {
             const template = await Template.fromDirectory('./test/data/template-logo', options);
             template.getIdentifier().should.equal('logo@0.0.1');
-            template.getHash().should.be.equal('9dc6a744976bcfacd6d3983eafe4a2676dcbca2deaacb310bd13e89d585d2e6b');
+            template.getHash().should.be.equal('9a16241d48204dffcba2958f9c468e48b7859fac0d4c7ea3096fe02201c179fb');
             template.getMetadata().getLogo().should.be.an.instanceof(Buffer);
             template.getMetadata().getSample().should.equal('"Aman" "Sharma" added the support for logo and hence created this template for testing!\n');
             const buffer = await template.toArchive('ergo');

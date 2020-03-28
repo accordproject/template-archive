@@ -515,4 +515,13 @@ describe('Metadata', () => {
             (() => md.createTargetMetadata('foo')).should.throw('Unknown target: foo (available: es5,es6,cicero,java)');
         });
     });
+
+    describe('#areDimensionsAllowed', () => {
+        it('should be true for correct dimensions', () => {
+            Metadata.areDimensionsAllowed(128, 127, 4).should.be.true;
+        });
+        it('should be false for incorrect dimensions', () => {
+            Metadata.areDimensionsAllowed(120, 127, 1).should.be.false;
+        });
+    });
 });
