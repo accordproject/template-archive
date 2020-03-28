@@ -28,7 +28,8 @@ const templateTypes = {
 
 
 const IMAGE_SIZE = {
-    side: 128
+    width: 128,
+    height: 128,
 };
 
 /**
@@ -126,17 +127,6 @@ class Metadata {
             throw new Error('README must be a string');
         }
 
-        if(logo && logo instanceof Buffer && !(getMimeType(logo) instanceof Error)) {
-            const mimeType = getMimeType(logo).mime;
-            const { height, width } = Metadata.getImageDimensions(logo, mimeType);
-            if (!Metadata.areDimensionsAllowed(height, width)) {
-                throw new Error('the dimensions of the image are incorrect');
-            }
-        }
-        else if(logo && !(logo instanceof Buffer)) {
-            throw new Error ('logo must be a Buffer');
-        }
-
         if(!packageJson.keywords) {
             packageJson.keywords = [];
         }
@@ -147,6 +137,15 @@ class Metadata {
 
         if(packageJson.displayName && packageJson.displayName.length > 214){
             throw new Error('The template displayName property is limited to a maximum of 214 characters.');
+        }
+
+        if(logo && logo instanceof Buffer && !(getMimeType(logo) instanceof Error)) {
+            const mimeType = getMimeType(logo).mime;
+            const { height, width } = Metadata.getImageDimensions(logo, mimeType);
+            Metadata.checkDimensions(height, width);
+        }
+        else if(logo && !(logo instanceof Buffer)) {
+            throw new Error ('logo must be a Buffer');
         }
 
         this.readme = readme;
@@ -352,31 +351,28 @@ class Metadata {
      */
     static getImageDimensions(buffer, mimeType) {
         if(mimeType === 'image/png') {
-            return {
-                height: buffer.readUInt32BE(20),
-                width: buffer.readUInt32BE(16)
-            };
+            try {
+                return {
+                    height: buffer.readUInt32BE(20),
+                    width: buffer.readUInt32BE(16)
+                };
+            } catch (err) {
+                throw new Error('not a valid png file');
+            }
         }
         throw new Error('dimension calculation not supported for this file');
     }
 
     /**
+     * Checks if dimentions for the image are correct.
      * @param {Number} height height of the image
      * @param {Number} width width of the image
-     * @param {Number} epsilon allowed error in dimensions of the image file
-     * @returns {Boolean} whether the dimensions are vaild
      */
-    static areDimensionsAllowed(height, width, epsilon=4) {
-        if(height > 0 && width > 0) {
-            // this is done to give some allowance to the user so that they don't need to
-            // upload exact square images
-            const upperBound = IMAGE_SIZE.side + epsilon;
-            const lowerBound = IMAGE_SIZE.side - epsilon;
-            const sum = height + width;
-            if(lowerBound*2 <= sum && sum <= upperBound*2) {
-                return true;
-            }
-            return false;
+    static checkDimensions(height, width) {
+        if (height === IMAGE_SIZE.height && width === IMAGE_SIZE.width) {
+            return;
+        } else {
+            throw new Error(`logo should be ${IMAGE_SIZE.height}x${IMAGE_SIZE.width}`);
         }
     }
 
@@ -391,6 +387,19 @@ class Metadata {
         return new Metadata(packageJson, this.readme, this.samples, this.request, this.logo);
     }
 
+    /**
+     * Return the whole metadata content, for hashing
+     * @return {object} the content of the metadata object
+     */
+    toJSON() {
+        return {
+            'packageJson' : this.getPackageJson(),
+            'readme' : this.getREADME(),
+            'samples' : this.getSamples(),
+            'request' : this.getRequest(),
+            'logo' : JSON.stringify(this.getLogo()),
+        };
+    }
 }
 
 module.exports = Metadata;

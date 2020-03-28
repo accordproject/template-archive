@@ -516,12 +516,12 @@ describe('Metadata', () => {
         });
     });
 
-    describe('#areDimensionsAllowed', () => {
-        it('should be true for correct dimensions', () => {
-            Metadata.areDimensionsAllowed(128, 127, 4).should.be.true;
+    describe('#checkDimensions', () => {
+        it('should not throw for correct dimensions', () => {
+            (() => Metadata.checkDimensions(128, 128)).should.not.throw();
         });
-        it('should be false for incorrect dimensions', () => {
-            Metadata.areDimensionsAllowed(120, 127, 1).should.be.false;
+        it('should throw for incorrect dimensions', () => {
+            (() => Metadata.checkDimensions(128, 127)).should.throw('logo should be 128x128');
         });
     });
 });

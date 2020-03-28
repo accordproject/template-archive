@@ -143,7 +143,7 @@ class Template {
      */
     getHash() {
         const content = {};
-        content.metadata = this.getMetadata();
+        content.metadata = this.getMetadata().toJSON();
         if(this.parserManager.getTemplatizedGrammar()) {
             content.templatizedGrammar = this.parserManager.getTemplatizedGrammar();
         }
