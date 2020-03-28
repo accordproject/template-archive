@@ -1,0 +1,9 @@
+{
+    "name": "wrong-name-logo",
+    "version": "0.0.1",
+    "description": "Aman Sharma added logo suport",
+    "accordproject": {
+        "template": "clause",
+        "cicero": "^0.20.0"
+    }
+}
