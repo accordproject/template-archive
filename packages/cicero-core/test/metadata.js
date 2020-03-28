@@ -18,6 +18,7 @@ const ciceroVersion = require('../package.json').version;
 const semver = require('semver');
 
 const Metadata = require('../lib/metadata');
+const FileLoader = require('@accordproject/ergo-compiler').FileLoader;
 
 const chai = require('chai');
 
@@ -516,12 +517,22 @@ describe('Metadata', () => {
         });
     });
 
-    describe('#checkDimensions', () => {
-        it('should not throw for correct dimensions', () => {
-            (() => Metadata.checkDimensions(128, 128)).should.not.throw();
+    describe('#checkImage', () => {
+        it('should not throw for correct png with correct dimensions', async () => {
+            const buffer = await FileLoader.loadFileBuffer('./test/data', 'logo_128_128.png', true);
+            (() => Metadata.checkImage(buffer)).should.not.throw();
         });
-        it('should throw for incorrect dimensions', () => {
-            (() => Metadata.checkDimensions(128, 127)).should.throw('logo should be 128x128');
+        it('should throw for correct png without correct dimensions', async () => {
+            const buffer = await FileLoader.loadFileBuffer('./test/data', 'logo_256_256.png', true);
+            (() => Metadata.checkImage(buffer)).should.throw('logo should be 128x128');
+        });
+        it('should throw for incorrect mime type', async () => {
+            const buffer = await FileLoader.loadFileBuffer('./test/data', 'logo_wrong_mime.png', true);
+            (() => Metadata.checkImage(buffer)).should.throw('the file type is not supported');
+        });
+        it('should throw for corrupted png', async () => {
+            const buffer = await FileLoader.loadFileBuffer('./test/data', 'logo_corrupted.png', true);
+            (() => Metadata.checkImage(buffer)).should.throw('not a valid png file');
         });
     });
 });
