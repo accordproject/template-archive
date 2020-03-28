@@ -67,6 +67,9 @@ class Metadata {
         // the version of Cicero that this template is compatible with
         this.ciceroVersion = null;
 
+        // the logo
+        this.logo = null;
+
         if(!packageJson || typeof(packageJson) !== 'object') {
             throw new Error('package.json is required and must be an object');
         }
@@ -143,8 +146,7 @@ class Metadata {
             const mimeType = getMimeType(logo).mime;
             const { height, width } = Metadata.getImageDimensions(logo, mimeType);
             Metadata.checkDimensions(height, width);
-        }
-        else if(logo && !(logo instanceof Buffer)) {
+        } else if(logo && !(logo instanceof Buffer)) {
             throw new Error ('logo must be a Buffer');
         }
 
@@ -397,7 +399,7 @@ class Metadata {
             'readme' : this.getREADME(),
             'samples' : this.getSamples(),
             'request' : this.getRequest(),
-            'logo' : JSON.stringify(this.getLogo()),
+            'logo' : this.getLogo() ? this.getLogo().toJSON() : null,
         };
     }
 }
