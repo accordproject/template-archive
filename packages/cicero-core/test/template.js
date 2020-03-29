@@ -117,7 +117,7 @@ describe('Template', () => {
         it('should roundtrip a template with a logo', async () => {
             const template = await Template.fromDirectory('./test/data/template-logo', options);
             template.getIdentifier().should.equal('logo@0.0.1');
-            template.getHash().should.be.equal('c58924a120fb6af28a43b3c53088ffbca9b52600bfb5870d36d8e33c2cc93bd5');
+            template.getHash().should.be.equal('6cf0f1820139631189105ddb5470f04f6f1ccebb0e36e9a055645014a4b7fce2');
             template.getMetadata().getLogo().should.be.an.instanceof(Buffer);
             template.getMetadata().getSample().should.equal('"Aman" "Sharma" added the support for logo and hence created this template for testing!\n');
             const buffer = await template.toArchive('ergo');

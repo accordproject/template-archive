@@ -399,7 +399,7 @@ class Metadata {
             'readme' : this.getREADME(),
             'samples' : this.getSamples(),
             'request' : this.getRequest(),
-            'logo' : this.getLogo() ? this.getLogo().toJSON() : null,
+            'logo' : this.getLogo() ? this.getLogo().toString('base64') : null,
         };
     }
 }
