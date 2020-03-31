@@ -300,6 +300,14 @@ Join the Accord Project Technology Working Group [Slack channel][apslack] to get
 
 For code contributions, read our [CONTRIBUTING guide][contributing] and information for [DEVELOPERS][developers].
 
+### README Badge
+
+Using Accord Project? Add a README badge to let everyone know: [![accord project](https://img.shields.io/badge/powered%20by-accord%20project-19C6C8.svg)](https://www.accordproject.org/)
+
+```
+[![accord project](https://img.shields.io/badge/powered%20by-accord%20project-19C6C8.svg)](https://www.accordproject.org/)
+```
+
 ## License <a name="license"></a>
 
 Accord Project source code files are made available under the [Apache License, Version 2.0][apache].
