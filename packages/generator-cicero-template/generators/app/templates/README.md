@@ -1,3 +1,4 @@
+[![accord project](https://img.shields.io/badge/powered%20by-accord%20project-19C6C8.svg)](https://www.accordproject.org/)
 
 # Accord Protocol Template: <%= data.templateName %>
 
