@@ -55,7 +55,7 @@ describe('TemplateLibrary', () => {
 
         it('should fail to retrieve index', async function() {
             const templateLibrary = new TemplateLibrary('http://foo.bar');
-            return templateLibrary.getTemplateIndex().should.be.rejectedWith('Error: getaddrinfo ENOTFOUND foo.bar foo.bar:80');
+            return templateLibrary.getTemplateIndex().should.be.rejectedWith('Error: getaddrinfo ENOTFOUND foo.bar');
         });
 
         it('should retrieve index for latest versions', async function() {
