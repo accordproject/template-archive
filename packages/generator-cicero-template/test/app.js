@@ -28,6 +28,7 @@ describe('generator-cicero-template:app', () => {
         assert.file('./test/text/grammar.tem.md');
         assert.file('./test/logic/logic.ergo');
         assert.file('./test/package.json');
+        assert.file('./test/logo.png');
         assert.file('./test/test/logic_default.feature');
         assert.file('./test/.cucumber.js');
     });
