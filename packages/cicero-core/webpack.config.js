@@ -49,6 +49,7 @@ limitations under the License.`),
                 'NODE_ENV': JSON.stringify('production')
             }
         }),
+        new webpack.IgnorePlugin(/jsdom$/),
     ],
     module: {
         rules: [
