@@ -471,6 +471,26 @@ describe('Metadata', () => {
         });
     });
 
+    describe('#getAuthor', () => {
+        it('should return null when author is missing', () => {
+            const md = new Metadata({
+                name: 'template',
+                version: '1.0.0',
+                accordproject: {ergo:'0.20.0-alpha.2',cicero:caretRange(ciceroVersion),runtime:'cicero'}
+            }, null, {});
+            should.not.exist(md.getAuthor());
+        });
+        it('should return author when present', () => {
+            const md = new Metadata({
+                name: 'template',
+                version: '1.0.0',
+                author: 'foo',
+                accordproject: {ergo:'0.20.0-alpha.2',cicero:caretRange(ciceroVersion),runtime:'cicero'}
+            }, null, {});
+            md.getAuthor().should.equal('foo');
+        });
+    });
+
     describe('#targetRuntime', () => {
         it('should return target runtime', () => {
             const md = new Metadata({

@@ -41,6 +41,12 @@ module.exports = class extends Generator {
             },
             {
                 type: 'input',
+                name: 'author',
+                message: 'Who is the author?',
+                default: null
+            },
+            {
+                type: 'input',
                 name: 'modelNamespace',
                 message: 'What is the namespace for your model?',
                 default: 'org.example.mytemplate'
