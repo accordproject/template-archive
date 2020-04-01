@@ -92,6 +92,15 @@ require('yargs')
             type: 'boolean',
             default: false
         });
+        yargs.option('format', {
+            describe: 'target format',
+            type: 'string'
+        });
+        yargs.option('unescapeExpressions', {
+            describe: 'remove variables quoting',
+            type: 'boolean',
+            default: false
+        });
         yargs.option('warnings', {
             describe: 'print warnings',
             type: 'boolean',
@@ -105,10 +114,11 @@ require('yargs')
         try {
             argv = Commands.validateDraftArgs(argv);
             const options = {
-                wrapVariables: argv.wrapVariables,
+                wrapVariables: argv.unescapeExpressions || argv.wrapVariables,
+                unescapeExpressions: argv.unescapeExpressions,
                 warnings: argv.warnings,
             };
-            return Commands.draft(argv.template, argv.data, argv.output, argv.currentTime, options)
+            return Commands.draft(argv.template, argv.data, argv.output, argv.currentTime, options, argv.format)
                 .then((result) => {
                     if(result) {Logger.info(result);}
                 })
@@ -153,6 +163,15 @@ require('yargs')
             type: 'boolean',
             default: false
         });
+        yargs.option('format', {
+            describe: 'target format',
+            type: 'string'
+        });
+        yargs.option('unescapeExpressions', {
+            describe: 'remove variables quoting',
+            type: 'boolean',
+            default: false
+        });
     }, (argv) => {
         if (argv.verbose) {
             Logger.info(`parse sample and re-create sample ${argv.sample} for template ${argv.template}`);
@@ -161,10 +180,11 @@ require('yargs')
         try {
             argv = Commands.validateNormalizeArgs(argv);
             const options = {
-                wrapVariables: argv.wrapVariables,
+                wrapVariables: argv.unescapeExpressions || argv.wrapVariables,
+                unescapeExpressions: argv.unescapeExpressions,
                 warnings: argv.warnings,
             };
-            return Commands.normalize(argv.template, argv.sample, argv.overwrite, argv.output, argv.currentTime, options)
+            return Commands.normalize(argv.template, argv.sample, argv.overwrite, argv.output, argv.currentTime, options, argv.format)
                 .then((result) => {
                     if(result) {Logger.info(result);}
                 })
