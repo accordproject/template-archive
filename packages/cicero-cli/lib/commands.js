@@ -204,9 +204,10 @@ class Commands {
      * @param {string} outputPath - to the contract file
      * @param {string} currentTime - the definition of 'now'
      * @param {Object} [options] - an optional set of options
+     * @param {string} format - the target format
      * @returns {object} Promise to the result of parsing
      */
-    static draft(templatePath, dataPath, outputPath, currentTime, options) {
+    static draft(templatePath, dataPath, outputPath, currentTime, options, format) {
         let clause;
         const dataJson = JSON.parse(fs.readFileSync(dataPath, 'utf8'));
 
@@ -214,7 +215,7 @@ class Commands {
             .then(async function (template) {
                 clause = new Clause(template);
                 clause.setData(dataJson);
-                const text = await clause.draft(options, currentTime);
+                const text = await clause.draft(options, currentTime, format);
                 if (outputPath) {
                     Logger.info('Creating file: ' + outputPath);
                     fs.writeFileSync(outputPath, text);
@@ -253,9 +254,10 @@ class Commands {
      * @param {string} outputPath - to the contract file
      * @param {string} currentTime - the definition of 'now'
      * @param {Object} [options] - an optional set of options
+     * @param {string} format - the target format
      * @returns {object} Promise to the result of parsing
      */
-    static normalize(templatePath, samplePath, overwrite, outputPath, currentTime, options) {
+    static normalize(templatePath, samplePath, overwrite, outputPath, currentTime, options, format) {
         let clause;
         const sampleText = fs.readFileSync(samplePath, 'utf8');
 
@@ -267,7 +269,7 @@ class Commands {
                     Logger.info('Creating file: ' + outputPath);
                     fs.writeFileSync(outputPath, JSON.stringify(clause.getData(),null,2));
                 }
-                const text = await clause.draft(options, currentTime);
+                const text = await clause.draft(options, currentTime, format);
                 if (outputPath) {
                     Logger.info('Creating file: ' + outputPath);
                     fs.writeFileSync(outputPath, text);

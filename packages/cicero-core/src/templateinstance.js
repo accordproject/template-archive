@@ -203,10 +203,11 @@ class TemplateInstance {
      * @param {*} [options] text generation options. options.wrapVariables encloses variables
      * and editable sections in '<variable ...' and '/>'
      * @param {string} currentTime - the definition of 'now' (optional)
+     * @param {string} format - the target format
      * @returns {string} the natural language text for the contract or clause; created by combining the structure of
      * the template with the JSON data for the clause.
      */
-    async draft(options, currentTime) {
+    async draft(options, currentTime, format) {
         if(!this.concertoData) {
             throw new Error('Data has not been set. Call setData or parse before calling this method.');
         }
@@ -223,7 +224,7 @@ class TemplateInstance {
         return logicManager.compileLogic(false).then(async () => {
             const result = await this.getEngine().draft(logicManager,clauseId,contract,{},currentTime,markdownOptions);
             // Roundtrip the response through the Commonmark parser
-            return this.getTemplate().getParserManager().roundtripMarkdown(result.response);
+            return this.getTemplate().getParserManager().formatText(result.response, options, format);
         });
     }
 

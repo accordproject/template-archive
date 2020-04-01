@@ -73,10 +73,12 @@
     "webpack-cli": "^3.3.5"
   },
   "dependencies": {
-    "@accordproject/concerto-core": "0.82.6",
-    "@accordproject/ergo-compiler": "0.20.10-20200326165219",
-    "@accordproject/ergo-engine": "0.20.10-20200326165219",
-    "@accordproject/markdown-common": "0.10.0",
+    "@accordproject/concerto-core": "0.82.7",
+    "@accordproject/ergo-compiler": "0.20.10-20200331163148",
+    "@accordproject/ergo-engine": "0.20.10-20200331163148",
+    "@accordproject/markdown-common": "0.10.4-20200331143151",
+    "@accordproject/markdown-cicero": "0.10.4-20200331143151",
+    "@accordproject/markdown-html": "0.10.4-20200331143151",
     "axios": "0.19.0",
     "debug": "4.1.0",
     "ietf-language-tag-regex": "0.0.5",

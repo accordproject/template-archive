@@ -31,6 +31,8 @@ const DateTimeFormatParser = require('./datetimeformatparser');
 const AmountFormatParser = require('./amountformatparser');
 const MonetaryAmountFormatParser = require('./monetaryamountformatparser');
 const CommonMarkTransformer = require('@accordproject/markdown-common').CommonMarkTransformer;
+const CiceroMarkTransformer = require('@accordproject/markdown-cicero').CiceroMarkTransformer;
+const HtmlTransformer = require('@accordproject/markdown-html').HtmlTransformer;
 
 // This required because only compiled nunjucks templates are supported browser-side
 // https://mozilla.github.io/nunjucks/api.html#browser-usage
@@ -529,6 +531,28 @@ class ParserManager {
         const commonMarkTransformer = new CommonMarkTransformer({ noIndex: true });
         const concertoAst = commonMarkTransformer.fromMarkdown(text);
         return commonMarkTransformer.toMarkdown(concertoAst);
+    }
+
+    /**
+     * Format text
+     * @param {string} text - the markdown text
+     * @param {object} options - parameters to the formatting
+     * @param {string} format - to the text generation
+     * @return {string} the result of parsing and printing back the text
+     */
+    formatText(text,options,format) {
+        if (!format) {
+            let result = this.roundtripMarkdown(text);
+            if (options && options.unescapeExpressions) {
+                const ciceroMarkTransformer = new CiceroMarkTransformer();
+                result = ciceroMarkTransformer.toMarkdown(ciceroMarkTransformer.fromMarkdown(text,'json'),options);
+            }
+            return result;
+        } else if (format === 'html'){
+            const ciceroMarkTransformer = new CiceroMarkTransformer();
+            const htmlTransformer = new HtmlTransformer();
+            return htmlTransformer.toHtml(ciceroMarkTransformer.fromMarkdown(text,'json'));
+        }
     }
 
 }
