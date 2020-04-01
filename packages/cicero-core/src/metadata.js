@@ -206,6 +206,18 @@ class Metadata {
     }
 
     /**
+     * Returns the author for this template.
+     * @return {*} the author information
+     */
+    getAuthor() {
+        if (this.packageJson.author) {
+            return this.packageJson.author;
+        } else {
+            return null;
+        }
+    }
+
+    /**
      * Returns the name of the runtime target for this template, or null if this template
      * has not been compiled for a specific runtime.
      * @returns {string} the name of the runtime
@@ -308,8 +320,8 @@ class Metadata {
     }
 
     /**
-     * Returns the name for this template.
-     * @return {Array} the name of the template
+     * Returns the keywords for this template.
+     * @return {Array} the keywords of the template
      */
     getKeywords() {
         if (this.packageJson.keywords.length < 1 || this.packageJson.keywords === undefined) {
