@@ -25,9 +25,9 @@ const ALLOWED_MIMETYPES = {
  */
 function isPNG(buffer) {
     // PNG header. Reference: http://www.libpng.org/pub/png/spec/1.2/PNG-Rationale.html#R.PNG-file-signature
-    const header = '89504e470d0a1a0a';
-    const bufferHeader = buffer.subarray(0,8).toString('hex');
-    return header === bufferHeader;
+    const header = [137,80,78,71,13,10,26,10];
+    const bufferHeader = buffer.subarray(0, 8);
+    return header.length === bufferHeader.length && header.every((x,i) => { return x === bufferHeader[i]; });
 }
 
 /**
