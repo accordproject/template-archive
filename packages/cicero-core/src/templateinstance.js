@@ -214,7 +214,7 @@ class TemplateInstance {
 
         const markdownOptions = {
             '$class': 'org.accordproject.markdown.MarkdownOptions',
-            'wrapVariables': options && options.wrapVariables ? options.wrapVariables : false,
+            'wrapVariables': options && (options.wrapVariables || options.unquoteVariables || format === 'html') ? true : false,
             'template': true
         };
         const logicManager = this.getLogicManager();
