@@ -38,23 +38,24 @@ const parseBody = {
 };
 const draftText = 'Late Delivery and Penalty. In case of delayed delivery except for Force Majeure cases, the Seller shall pay to the Buyer for every 9 days of delay penalty amounting to 7.0% of the total value of the Equipment whose delivery has been delayed. Any fractional part of a days is to be considered a full days. The total amount of penalty shall not however, exceed 2.0% of the total value of the Equipment involved in late delivery. If the delay is more than 2 weeks, the Buyer is entitled to terminate this Contract.';
 
-describe('cicero-server bad CICERO_DIR environment', () => {
+describe('cicero-server environment', () => {
+    beforeEach(()=>{
+        process.env.CICERO_DIR = './test/data1';
+        process.env.CICERO_DATA = './test/data2';
+    });
 
     it('/should fail to start the server without CICERO_DIR defined', async () => {
         delete process.env.CICERO_DIR;
+        console.log('ENV ' + JSON.stringify(process.env.CICERO_DIR));
         (() => require('../app')).should.throw('You must set the CICERO_DIR environment variable.');
-        process.env.CICERO_DIR = './test/data';
         decache('../app');
     });
 
-});
-
-describe('cicero-server bad CICERO_DATA environment', () => {
-
     it('/should fail to start the server without CICERO_DATA defined', async () => {
         delete process.env.CICERO_DATA;
-        (() => require('../app')).should.throw('You must set the CICERO_DATA environment variable.');
-        process.env.CICERO_DATA = './test/data';
+        const server = require('../app');
+        process.env.CICERO_DATA.should.eql(process.env.CICERO_DIR);
+        server.close();
         decache('../app');
     });
 

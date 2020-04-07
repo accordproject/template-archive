@@ -26,7 +26,8 @@ const Engine = require('@accordproject/cicero-engine').Engine;
 if(!process.env.CICERO_DIR) {
     throw new Error('You must set the CICERO_DIR environment variable.');
 } else if(!process.env.CICERO_DATA) {
-    throw new Error('You must set the CICERO_DATA environment variable.');
+    // CICERO_DATA defaults to CICERO_DIR if absent
+    process.env.CICERO_DATA = process.env.CICERO_DIR;
 }
 
 const PORT = process.env.PORT | 6001;
