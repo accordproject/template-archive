@@ -543,15 +543,15 @@ class ParserManager {
     formatText(text,options,format) {
         if (!format) {
             let result = this.roundtripMarkdown(text);
-            if (options && options.unescapeExpressions) {
+            if (options && options.unquoteVariables) {
                 const ciceroMarkTransformer = new CiceroMarkTransformer();
-                result = ciceroMarkTransformer.toMarkdown(ciceroMarkTransformer.fromMarkdown(text,'json'),options);
+                result = ciceroMarkTransformer.toMarkdown(ciceroMarkTransformer.fromMarkdown(text,'json',{quoteVariables:false}));
             }
             return result;
         } else if (format === 'html'){
             const ciceroMarkTransformer = new CiceroMarkTransformer();
             const htmlTransformer = new HtmlTransformer();
-            return htmlTransformer.toHtml(ciceroMarkTransformer.fromMarkdown(text,'json'));
+            return htmlTransformer.toHtml(ciceroMarkTransformer.fromMarkdown(text,'json',{quoteVariables:!options.unquoteVariables}));
         }
     }
 

@@ -96,7 +96,7 @@ require('yargs')
             describe: 'target format',
             type: 'string'
         });
-        yargs.option('unescapeExpressions', {
+        yargs.option('unquoteVariables', {
             describe: 'remove variables quoting',
             type: 'boolean',
             default: false
@@ -114,8 +114,8 @@ require('yargs')
         try {
             argv = Commands.validateDraftArgs(argv);
             const options = {
-                wrapVariables: argv.unescapeExpressions || argv.wrapVariables,
-                unescapeExpressions: argv.unescapeExpressions,
+                wrapVariables: argv.wrapVariables,
+                unquoteVariables: argv.unquoteVariables,
                 warnings: argv.warnings,
             };
             return Commands.draft(argv.template, argv.data, argv.output, argv.currentTime, options, argv.format)
@@ -167,7 +167,7 @@ require('yargs')
             describe: 'target format',
             type: 'string'
         });
-        yargs.option('unescapeExpressions', {
+        yargs.option('unquoteVariables', {
             describe: 'remove variables quoting',
             type: 'boolean',
             default: false
@@ -180,8 +180,8 @@ require('yargs')
         try {
             argv = Commands.validateNormalizeArgs(argv);
             const options = {
-                wrapVariables: argv.unescapeExpressions || argv.wrapVariables,
-                unescapeExpressions: argv.unescapeExpressions,
+                wrapVariables: argv.wrapVariables,
+                unquoteVariables: argv.unquoteVariables,
                 warnings: argv.warnings,
             };
             return Commands.normalize(argv.template, argv.sample, argv.overwrite, argv.output, argv.currentTime, options, argv.format)
