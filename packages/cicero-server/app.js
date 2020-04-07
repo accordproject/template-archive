@@ -67,7 +67,15 @@ app.post('/trigger/:template/:data', async function (req, httpResponse, next) {
     console.log('Template: ' + req.params.template);
     console.log('Clause: ' + req.params.data);
     try {
-        const clause = await initClauseInstance(req);
+        const clause = await initTemplateInstance(req);
+        const data = fs.readFileSync(`${process.env.CICERO_DATA}/${req.params.template}/${req.params.data}`);
+
+        if(req.params.data.endsWith('.json')) {
+            clause.setData(JSON.parse(data.toString()));
+        }
+        else {
+            clause.parse(data.toString());
+        }
         const engine = new Engine();
         let result;
         if(Object.keys(req.body).length === 2 &&
@@ -88,11 +96,9 @@ app.post('/trigger/:template/:data', async function (req, httpResponse, next) {
 });
 
 /**
- * Handle POST requests to /parse/:template/:data
- * The body of the POST should contain the request data.
- * The clause is created using the template and the data. If
- * the data ends with .json then setData is called on the Clause,
- * otherwise the contents of the file is parsed.
+ * Handle POST requests to /parse/:template
+ * The body of the POST should contain the sample text.
+ * The clause is created using the template, parsing the text and if parsing succeeds returning the contract data.
  *
  * The template parameter is the name of a directory under CICERO_DIR that contains
  * the template to use.
@@ -109,26 +115,29 @@ app.post('/trigger/:template/:data', async function (req, httpResponse, next) {
  * A data string containing the parsed output
  *
  */
-app.post('/parse/:template/:data', async function (req, httpResponse, next) {
+app.post('/parse/:template', async function (req, httpResponse, next) {
     console.log('CICERO_DIR: ' + process.env.CICERO_DIR);
     console.log('CICERO_DATA: ' + process.env.CICERO_DATA);
     console.log('Template: ' + req.params.template);
-    console.log('Clause: ' + req.params.data);
     try {
-        const clause = await initClauseInstance(req);
-        httpResponse.send(clause.data);
-    }
-    catch(err) {
+        const clause = await initTemplateInstance(req);
+        if(Object.keys(req.body).length === 1 &&
+           Object.prototype.hasOwnProperty.call(req.body,'sample')) {
+            clause.parse(req.body.sample.toString());
+            httpResponse.send(clause.getData());
+        } else {
+            throw new Error('Missing sample in /parse body');
+        }
+    } catch(err) {
         return next(err);
     }
 });
 
 /**
- * Handle POST requests to /parse/:template/:data
+ * Handle POST requests to /draft/:template
  * The body of the POST should contain the request data.
- * The clause is created using the template and the data. If
- * the data ends with .json then setData is called on the Clause,
- * otherwise the contents of the file is parsed.
+ * The clause is created using the template and the data.
+ * The call returns the text of the contract.
  *
  * The template parameter is the name of a directory under CICERO_DIR that contains
  * the template to use.
@@ -145,17 +154,28 @@ app.post('/parse/:template/:data', async function (req, httpResponse, next) {
  * A data string containing the draft output
  *
  */
-app.post('/draft/:template/:data', async function (req, httpResponse, next) {
+app.post('/draft/:template', async function (req, httpResponse, next) {
     console.log('CICERO_DIR: ' + process.env.CICERO_DIR);
     console.log('CICERO_DATA: ' + process.env.CICERO_DATA);
     console.log('Template: ' + req.params.template);
-    console.log('Clause: ' + req.params.data);
     try {
-
-        const clause = await initClauseInstance(req);
-        clause.draft().then((result) => {
-            httpResponse.send(result);
-        });
+        const clause = await initTemplateInstance(req);
+        if(Object.keys(req.body).length === 1 &&
+           Object.prototype.hasOwnProperty.call(req.body,'data')) {
+            clause.setData(req.body.data);
+            clause.draft().then((result) => {
+                httpResponse.send(result);
+            });
+        } else if(Object.keys(req.body).length === 2 &&
+                  Object.prototype.hasOwnProperty.call(req.body,'data') &&
+                  Object.prototype.hasOwnProperty.call(req.body,'options')) {
+            clause.setData(req.body.data);
+            clause.draft(req.body.options).then((result) => {
+                httpResponse.send(result);
+            });
+        } else {
+            throw new Error('Missing data or options in /draft body');
+        }
     }
     catch(err) {
         return next(err);
@@ -163,23 +183,13 @@ app.post('/draft/:template/:data', async function (req, httpResponse, next) {
 });
 
 /**
- * Helper function to initialise Clause template.
- * @param {req} req The request object passed in from endpoint.
- * @returns {clause} An initialised instance of a clause template.
+ * Helper function to initialise the template.
+ * @param {req} req The request passed in from endpoint.
+ * @returns {object} The template instance object.
  */
-async function initClauseInstance(req) {
-
+async function initTemplateInstance(req) {
     const template = await Template.fromDirectory(`${process.env.CICERO_DIR}/${req.params.template}`);
-    const data = fs.readFileSync(`${process.env.CICERO_DATA}/${req.params.template}/${req.params.data}`);
-    const clause = new Clause(template);
-
-    if(req.params.data.endsWith('.json')) {
-        clause.setData(JSON.parse(data.toString()));
-    }
-    else {
-        clause.parse(data.toString());
-    }
-    return clause;
+    return new Clause(template);
 }
 
 const server = app.listen(app.get('port'), function () {
