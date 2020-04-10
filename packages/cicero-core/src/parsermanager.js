@@ -540,7 +540,8 @@ class ParserManager {
      * @param {string} format - to the text generation
      * @return {string} the result of parsing and printing back the text
      */
-    formatText(text,options,format) {
+    formatText(text,options) {
+        const format = options ? options.format : null;
         if (!format) {
             let result = this.roundtripMarkdown(text);
             if (options && options.unquoteVariables) {
@@ -552,6 +553,8 @@ class ParserManager {
             const ciceroMarkTransformer = new CiceroMarkTransformer();
             const htmlTransformer = new HtmlTransformer();
             return htmlTransformer.toHtml(ciceroMarkTransformer.fromMarkdown(text,'json',{quoteVariables:!options.unquoteVariables}));
+        } else {
+            throw new Error('Unsupported format: ' + format);
         }
     }
 
