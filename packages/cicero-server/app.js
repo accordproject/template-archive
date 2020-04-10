@@ -40,7 +40,7 @@ app.set('port', PORT);
 
 /**
  * Handle POST requests to /trigger/:template/:data
- * The body of the POST should contain the request data.
+ * The body of the POST should contain the request.
  * The clause is created using the template and the data. If
  * the data ends with .json then setData is called on the Clause,
  * otherwise the contents of the file is parsed.
@@ -62,6 +62,7 @@ app.set('port', PORT);
  * 'state' is used as the contract state.
  */
 app.post('/trigger/:template/:data', async function (req, httpResponse, next) {
+    console.log('WARNING: This call is being deprecated, please use /trigger/:template instead');
     console.log('CICERO_DIR: ' + process.env.CICERO_DIR);
     console.log('CICERO_DATA: ' + process.env.CICERO_DATA);
     console.log('Template: ' + req.params.template);
@@ -72,8 +73,7 @@ app.post('/trigger/:template/:data', async function (req, httpResponse, next) {
 
         if(req.params.data.endsWith('.json')) {
             clause.setData(JSON.parse(data.toString()));
-        }
-        else {
+        } else {
             clause.parse(data.toString());
         }
         const engine = new Engine();
@@ -87,6 +87,58 @@ app.post('/trigger/:template/:data', async function (req, httpResponse, next) {
             const state = { '$class' : 'org.accordproject.cicero.contract.AccordContractState', 'stateId' : 'ehlo' };
             result = await engine.trigger(clause, req.body, state);
             delete result.state;
+        }
+        httpResponse.send(result);
+    }
+    catch(err) {
+        return next(err);
+    }
+});
+
+/**
+ * Handle POST requests to /trigger/:template
+ * The clause is created using the template and the data. If
+ * the data ends with .json then setData is called on the Clause,
+ * otherwise the contents of the file is parsed.
+ *
+ * The template parameter is the name of a directory under CICERO_DIR that contains
+ * the template to use.
+ *
+ * The data parameter is either a JSON data file or a TXT file that is used to create
+ * the clause from the Template.
+ *
+ * Stateless execution
+ * --------------------
+ * The body of the POST should contain the contract data and the request.
+ *
+ * Stateful execution
+ * --------------------
+ * The body of the POST should contain the contract data, the contract state and the request.
+ */
+app.post('/trigger/:template', async function (req, httpResponse, next) {
+    console.log('CICERO_DIR: ' + process.env.CICERO_DIR);
+    console.log('CICERO_DATA: ' + process.env.CICERO_DATA);
+    console.log('Template: ' + req.params.template);
+    try {
+        const clause = await initTemplateInstance(req);
+
+        const engine = new Engine();
+        let result;
+        if(Object.keys(req.body).length === 3 &&
+           Object.prototype.hasOwnProperty.call(req.body,'request') &&
+           Object.prototype.hasOwnProperty.call(req.body,'state') &&
+           Object.prototype.hasOwnProperty.call(req.body,'data')) {
+            clause.setData(req.body.data);
+            result = await engine.trigger(clause, req.body.request, req.body.state);
+        } else if(Object.keys(req.body).length === 2 &&
+           Object.prototype.hasOwnProperty.call(req.body,'request') &&
+           Object.prototype.hasOwnProperty.call(req.body,'data')) {
+            const state = { '$class' : 'org.accordproject.cicero.contract.AccordContractState', 'stateId' : 'ehlo' };
+            clause.setData(req.body.data);
+            result = await engine.trigger(clause, req.body.request, state);
+            delete result.state;
+        } else {
+            throw new Error('Missing request, state or data in /trigger body');
         }
         httpResponse.send(result);
     }

@@ -24,11 +24,13 @@ chai.should();
 
 const body = require('./data/latedeliveryandpenalty/request.json');
 const state = require('./data/latedeliveryandpenalty/state.json');
+const triggerData = require('./data/latedeliveryandpenalty/data.json');
 const responseBody = {
     '$class': 'org.accordproject.latedeliveryandpenalty.LateDeliveryAndPenaltyResponse',
     penalty: 4,
     buyerMayTerminate: true,
 };
+
 const parseBody = {
     '$class': 'org.accordproject.latedeliveryandpenalty.TemplateModel',
     'clauseId': '1',
@@ -168,7 +170,7 @@ describe('cicero-server', () => {
         request = request(server);
     });
 
-    it('/should trigger a simple stateless request (ergo)', async () => {
+    it('/should (old) trigger a simple stateless request (ergo)', async () => {
         return request.post('/trigger/latedeliveryandpenalty/data.json')
             .send(body)
             .expect(200)
@@ -179,7 +181,7 @@ describe('cicero-server', () => {
             });
     });
 
-    it('/should trigger a simple stateless request with a sample clause (ergo)', async () => {
+    it('/should (old) trigger a simple stateless request with a sample clause (ergo)', async () => {
         return request.post('/trigger/latedeliveryandpenalty/text%2Fsample.md')
             .send(body)
             .expect(200)
@@ -190,15 +192,58 @@ describe('cicero-server', () => {
             });
     });
 
-    it('/should fail to trigger a simple stateless request with a bad data file (ergo)', async () => {
+    it('/should fail to (old) trigger a simple stateless request with a bad data file (ergo)', async () => {
         return request.post('/trigger/latedeliveryandpenalty/bad.txt')
             .send(body)
             .expect(500);
     });
 
-    it('/should trigger a stateful request (ergo)', async () => {
+    it('/should (old) trigger a stateful request (ergo)', async () => {
         return request.post('/trigger/latedeliveryandpenalty/data.json')
             .send({
+                request: body,
+                state,
+            })
+            .expect(200)
+            .expect('Content-Type',/json/)
+            .then(response => {
+                response.body.response.should.include(responseBody);
+                response.body.state.should.include(state);
+            });
+    });
+
+    it('/should (new) trigger a simple stateless request (ergo)', async () => {
+        return request.post('/trigger/latedeliveryandpenalty')
+            .send({ 'request' : body, 'data' : triggerData })
+            .expect(200)
+            .expect('Content-Type',/json/)
+            .then(response => {
+                response.body.response.should.include(responseBody);
+                response.body.should.not.have.property('state');
+            });
+    });
+
+    it('/should fail to (new) trigger without data', async () => {
+        return request.post('/trigger/latedeliveryandpenalty')
+            .send({ 'request' : body })
+            .expect(500);
+    });
+
+    it('/should (new) trigger a simple stateless request with a sample clause (ergo)', async () => {
+        return request.post('/trigger/latedeliveryandpenalty')
+            .send({ 'request' : body, 'data' : triggerData })
+            .expect(200)
+            .expect('Content-Type',/json/)
+            .then(response => {
+                response.body.response.should.include(responseBody);
+                response.body.should.not.have.property('state');
+            });
+    });
+
+    it('/should (new) trigger a stateful request (ergo)', async () => {
+        return request.post('/trigger/latedeliveryandpenalty')
+            .send({
+                data: triggerData,
                 request: body,
                 state,
             })
@@ -223,6 +268,12 @@ describe('cicero-server', () => {
             });
     });
 
+    it('/should fail to parse without sample', async () => {
+        return request.post('/parse/latedeliveryandpenalty')
+            .send({})
+            .expect(500);
+    });
+
     it('/should draft from a template', async () => {
         return request.post('/draft/latedeliveryandpenalty')
             .send({ data: parseBody })
@@ -231,6 +282,12 @@ describe('cicero-server', () => {
             .then(response => {
                 response.text.should.equal(draftLateText);
             });
+    });
+
+    it('/should fail to draft without data', async () => {
+        return request.post('/draft/latedeliveryandpenalty')
+            .send({})
+            .expect(500);
     });
 
     it('/should draft from a template (copyright-notice)', async () => {
