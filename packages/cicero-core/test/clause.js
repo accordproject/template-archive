@@ -661,9 +661,49 @@ Assignment. Licensee may freely assign or otherwise transfer all or any of its r
                 }
             };
             clause.setData(data);
-            const newText = await clause.draft({unquoteVariables:true}, '2018-01-01T00:00:00-04:00', 'html');
+            const newText = await clause.draft({unquoteVariables:true, format:'html'});
             // remove the generated clause id
             newText.should.eql(text);
+        });
+
+        it('should throw when drafting to an unknown format', async function() {
+            const template = await Template.fromDirectory('./test/data/copyright-license', options);
+            const clause = new Clause(template);
+            const data = {
+                '$class': 'org.accordproject.copyrightlicense.CopyrightLicenseContract',
+                'contractId': 'e32a2ca7-78c9-4462-935f-487aad6e9c9b',
+                'effectiveDate': '2018-01-01T00:00:00.000-04:00',
+                'licensee': {
+                    '$class': 'org.accordproject.cicero.contract.AccordParty',
+                    'partyId': 'Me'
+                },
+                'licenseeState': 'NY',
+                'licenseeEntityType': 'Company',
+                'licenseeAddress': '1 Broadway',
+                'licensor': {
+                    '$class': 'org.accordproject.cicero.contract.AccordParty',
+                    'partyId': 'Myself'
+                },
+                'licensorState': 'NY',
+                'licensorEntityType': 'Company',
+                'licensorAddress': '2 Broadway',
+                'territory': 'United States',
+                'purposeDescription': 'stuff',
+                'workDescription': 'other stuff',
+                'paymentClause': {
+                    '$class': 'org.accordproject.copyrightlicense.PaymentClause',
+                    'clauseId': '25298022-2129-412c-ac60-b217ff766cb4',
+                    'amountText': 'one hundred US Dollars',
+                    'amount': {
+                        '$class': 'org.accordproject.money.MonetaryAmount',
+                        'doubleValue': 100,
+                        'currencyCode': 'USD'
+                    },
+                    'paymentProcedure': 'bank transfer'
+                }
+            };
+            clause.setData(data);
+            return clause.draft({unquoteVariables:true, format:'foo'}).should.be.rejectedWith('Unsupported format: foo');
         });
 
         it('should be able to parse an ulist block', async function() {

@@ -117,8 +117,9 @@ require('yargs')
                 wrapVariables: argv.wrapVariables,
                 unquoteVariables: argv.unquoteVariables,
                 warnings: argv.warnings,
+                format: argv.format,
             };
-            return Commands.draft(argv.template, argv.data, argv.output, argv.currentTime, options, argv.format)
+            return Commands.draft(argv.template, argv.data, argv.output, argv.currentTime, options)
                 .then((result) => {
                     if(result) {Logger.info(result);}
                 })
@@ -183,8 +184,9 @@ require('yargs')
                 wrapVariables: argv.wrapVariables,
                 unquoteVariables: argv.unquoteVariables,
                 warnings: argv.warnings,
+                format: argv.format,
             };
-            return Commands.normalize(argv.template, argv.sample, argv.overwrite, argv.output, argv.currentTime, options, argv.format)
+            return Commands.normalize(argv.template, argv.sample, argv.overwrite, argv.output, argv.currentTime, options)
                 .then((result) => {
                     if(result) {Logger.info(result);}
                 })
