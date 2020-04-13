@@ -73,7 +73,26 @@ describe('TemplateLibrary', () => {
 
         it('should retrieve latest version index for cicero version 0.20.0', async function() {
             const templateLibrary = new TemplateLibrary();
-            const templateIndex = await templateLibrary.getTemplateIndex({latestVersion: true, ciceroVersion: '0.20.0'});
+            const templateIndex = await templateLibrary.getTemplateIndex({latestVersion: true, ciceroVersion: '0.20.10'});
+            templateIndex.should.not.have.property('helloworld@0.0.5');
+            templateIndex.should.not.have.property('helloworld@0.2.0');
+            templateIndex.should.not.have.property('helloworld@0.2.1');
+            templateIndex.should.not.have.property('helloworld@0.3.0');
+            templateIndex.should.not.have.property('helloworld@0.4.0');
+            templateIndex.should.not.have.property('helloworld@0.5.0');
+            templateIndex.should.not.have.property('helloworld@0.6.0');
+            templateIndex.should.not.have.property('helloworld@0.7.2');
+            templateIndex.should.not.have.property('helloworld@0.8.0');
+            templateIndex.should.not.have.property('helloworld@0.9.0');
+            templateIndex.should.not.have.property('helloworld@0.10.1');
+            templateIndex.should.not.have.property('helloworld@0.11.1');
+            templateIndex.should.not.have.property('helloworld@0.12.0');
+            templateIndex.should.have.property('helloworld@0.12.1');
+        });
+
+        it('should retrieve latest version index for cicero version 0.20.9', async function() {
+            const templateLibrary = new TemplateLibrary();
+            const templateIndex = await templateLibrary.getTemplateIndex({ciceroVersion: '0.20.9'});
             templateIndex.should.not.have.property('helloworld@0.0.5');
             templateIndex.should.not.have.property('helloworld@0.2.0');
             templateIndex.should.not.have.property('helloworld@0.2.1');
@@ -89,9 +108,9 @@ describe('TemplateLibrary', () => {
             templateIndex.should.have.property('helloworld@0.12.0');
         });
 
-        it('should retrieve latest version index for cicero version 0.20.1-20190129142217', async function() {
+        it('should retrieve latest version index for cicero version 0.20.11-20190129142217', async function() {
             const templateLibrary = new TemplateLibrary();
-            const templateIndex = await templateLibrary.getTemplateIndex({latestVersion: false, ciceroVersion: '0.20.1-20190129142217'});
+            const templateIndex = await templateLibrary.getTemplateIndex({latestVersion: false, ciceroVersion: '0.20.10-20190129142217'});
             templateIndex.should.not.have.property('helloworld@0.0.5');
             templateIndex.should.not.have.property('helloworld@0.2.0');
             templateIndex.should.not.have.property('helloworld@0.2.1');
@@ -108,7 +127,7 @@ describe('TemplateLibrary', () => {
 
         it('should retrieve latest version index for cicero version 0.20.1-20190129142217', async function() {
             const templateLibrary = new TemplateLibrary();
-            const templateIndex = await templateLibrary.getTemplateIndex({latestVersion: true, ciceroVersion: '0.20.1-20190129142217'});
+            const templateIndex = await templateLibrary.getTemplateIndex({latestVersion: true, ciceroVersion: '0.20.11-20190129142217'});
             templateIndex.should.not.have.property('helloworld@0.0.5');
             templateIndex.should.not.have.property('helloworld@0.2.0');
             templateIndex.should.not.have.property('helloworld@0.2.1');
@@ -121,7 +140,8 @@ describe('TemplateLibrary', () => {
             templateIndex.should.not.have.property('helloworld@0.9.0');
             templateIndex.should.not.have.property('helloworld@0.10.1');
             templateIndex.should.not.have.property('helloworld@0.11.1');
-            templateIndex.should.have.property('helloworld@0.12.0');
+            templateIndex.should.not.have.property('helloworld@0.12.0');
+            templateIndex.should.have.property('helloworld@0.12.1');
         });
     });
 
