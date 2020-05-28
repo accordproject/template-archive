@@ -16,7 +16,7 @@
 
 const Metadata = require('./metadata');
 const Logger = require('@accordproject/concerto-core').Logger;
-const ParserManager = require('./parsermanager');
+const ParserManager = require('@accordproject/markdown-template').ParserManager;
 const crypto = require('crypto');
 const stringify = require('json-stable-stringify');
 const LogicManager = require('@accordproject/ergo-compiler').LogicManager;
@@ -47,7 +47,7 @@ class Template {
     constructor(packageJson, readme, samples, request, logo, options) {
         this.metadata = new Metadata(packageJson, readme, samples, request, logo);
         this.logicManager = new LogicManager('cicero', null, options);
-        this.parserManager = new ParserManager(this);
+        this.parserManager = new ParserManager(this.getModelManager());
     }
 
     /**
@@ -144,12 +144,7 @@ class Template {
     getHash() {
         const content = {};
         content.metadata = this.getMetadata().toJSON();
-        if(this.parserManager.getTemplatizedGrammar()) {
-            content.templatizedGrammar = this.parserManager.getTemplatizedGrammar();
-        }
-        else {
-            // do not include the generated grammar because
-            // the contents is not deterministic
+        if(this.parserManager.getGrammar()) {
             content.grammar = this.parserManager.getGrammar();
         }
         content.models = {};
@@ -427,15 +422,6 @@ class Template {
         }
         return false;
     }
-
-    /**
-     * Checks whether the template grammar has computer (Ergo) expressions
-     * @returns {boolean} True if the template grammar has Ergo expressions (`{{% ... %}}`)
-     */
-    grammarHasErgoExpression() {
-        return this.getParserManager().ergoExpression;
-    }
-
 }
 
 module.exports = Template;

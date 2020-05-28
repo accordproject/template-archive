@@ -23,6 +23,7 @@ const languageTagRegex = require('ietf-language-tag-regex');
 const DefaultArchiveLoader = require('./loaders/defaultarchiveloader');
 const FileLoader = require('@accordproject/ergo-compiler').FileLoader;
 const Logger = require('@accordproject/concerto-core').Logger;
+const TemplateMarkTransformer = require('@accordproject/markdown-template').TemplateMarkTransformer;
 
 // Matches 'sample.md' or 'sample_TAG.md' where TAG is an IETF language tag (BCP 47)
 const IETF_REGEXP = languageTagRegex({ exact: false }).toString().slice(1,-2);
@@ -66,7 +67,7 @@ class TemplateLoader extends FileLoader {
 
         const requestContents = await TemplateLoader.loadZipFileContents(zip, 'request.json', true);
         const packageJsonObject = await TemplateLoader.loadZipFileContents(zip, 'package.json', true, true);
-        const templatizedGrammar = await TemplateLoader.loadZipFileContents(zip, 'text/grammar.tem.md', false, false);
+        const grammar = await TemplateLoader.loadZipFileContents(zip, 'text/grammar.tem.md', false, false);
 
         Logger.debug(method, 'Looking for model files');
         let ctoFiles =  await TemplateLoader.loadZipFilesContents(zip, /model[/\\].*\.cto$/);
@@ -83,15 +84,20 @@ class TemplateLoader extends FileLoader {
         template.getModelManager().addModelFiles(ctoModelFiles, ctoModelFileNames, true); // validation is disabled
 
         Logger.debug(method, 'Setting grammar');
-        if(!templatizedGrammar) {
+        if(!grammar) {
             throw new Error('A template must contain a grammar.tem.md file.');
         } else {
-            template.parserManager.buildGrammar(templatizedGrammar);
+            template.parserManager.setGrammar(grammar);
+            const templateKind = template.getMetadata().getTemplateType() !== 0 ? 'clause' : 'contract';
+            const templateMarkTransformer = new TemplateMarkTransformer();
+            const grammarTemplateMark = templateMarkTransformer.fromMarkdownTemplate({ fileName:'text/grammar.tem.md', content:grammar }, template.getModelManager(), templateKind, {});
+            template.parserManager.setGrammarAst(grammarTemplateMark);
+            template.parserManager.buildParser();
         }
 
         // load and add the ergo files
         if(template.getMetadata().getRuntime() === 'ergo') {
-            template.getLogicManager().addTemplateFile(templatizedGrammar,'text/grammar.tem.md');
+            template.getLogicManager().addTemplateFile(grammar,'text/grammar.tem.md');
             Logger.debug(method, 'Adding Ergo files to script manager');
             const scriptFiles = await TemplateLoader.loadZipFilesContents(zip, /logic[/\\].*\.ergo$/);
             scriptFiles.forEach(function (obj) {
@@ -193,13 +199,18 @@ class TemplateLoader extends FileLoader {
 
 
         // load and add the template
-        let templatizedGrammar = await TemplateLoader.loadFileContents(path, 'text/grammar.tem.md', false, false);
+        let grammar = await TemplateLoader.loadFileContents(path, 'text/grammar.tem.md', false, false);
 
-        if(!templatizedGrammar) {
+        if(!grammar) {
             throw new Error('A template must either contain a grammar.tem.md file.');
         } else {
-            template.parserManager.buildGrammar(templatizedGrammar);
-            Logger.debug(method, 'Loaded grammar.tem.md', templatizedGrammar);
+            template.parserManager.setGrammar(grammar);
+            const templateKind = template.getMetadata().getTemplateType() !== 0 ? 'clause' : 'contract';
+            const templateMarkTransformer = new TemplateMarkTransformer();
+            const grammarTemplateMark = templateMarkTransformer.fromMarkdownTemplate({ fileName:'text/grammar.tem.md', content:grammar }, template.getModelManager(), templateKind, {});
+            template.parserManager.setGrammarAst(grammarTemplateMark);
+            template.parserManager.buildParser();
+            Logger.debug(method, 'Loaded grammar.tem.md', grammar);
         }
 
         Logger.debug(method, 'Loaded grammar.tem.md');
@@ -207,7 +218,7 @@ class TemplateLoader extends FileLoader {
         // load and add the ergo files
         if(template.getMetadata().getRuntime() === 'ergo') {
             // If Ergo then also register the template
-            template.getLogicManager().addTemplateFile(templatizedGrammar,'text/grammar.tem.md');
+            template.getLogicManager().addTemplateFile(grammar,'text/grammar.tem.md');
             const ergoFiles = await TemplateLoader.loadFilesContents(path, /logic[/\\].*\.ergo$/);
             ergoFiles.forEach((file) => {
                 const resolvedPath = slash(fsPath.resolve(path));

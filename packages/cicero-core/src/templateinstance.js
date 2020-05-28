@@ -22,7 +22,12 @@ const Util = require('@accordproject/ergo-compiler').Util;
 const moment = require('moment-mini');
 // Make sure Moment serialization preserves utcOffset. See https://momentjs.com/docs/#/displaying/as-json/
 moment.fn.toJSON = Util.momentToJson;
-const TemplateLoader = require('./templateloader');
+
+const CommonMarkTransformer = require('@accordproject/markdown-common').CommonMarkTransformer;
+const TemplateMarkTransformer = require('@accordproject/markdown-template').TemplateMarkTransformer;
+const CiceroMarkTransformer = require('@accordproject/markdown-cicero').CiceroMarkTransformer;
+const HtmlTransformer = require('@accordproject/markdown-html').HtmlTransformer;
+
 const ErgoEngine = require('@accordproject/ergo-engine/index.browser.js').EvalEngine;
 
 /**
@@ -110,41 +115,21 @@ class TemplateInstance {
      * @param {string} [fileName] - the fileName for the text (optional)
      */
     parse(input, currentTime, fileName) {
-        let text = TemplateLoader.normalizeText(input);
-        // Roundtrip the sample through the Commonmark parser
-        text = this.getTemplate().getParserManager().roundtripMarkdown(text);
+        // Setup
+        const metadata = this.getTemplate().getMetadata();
+        const parserManager = this.getTemplate().getParserManager();
+        const modelManager =  this.getTemplate().getModelManager();
 
-        // Set the current time and UTC Offset
-        const now = Util.setCurrentTime(currentTime);
-        const utcOffset = now.utcOffset();
+        const templateKind = metadata.getTemplateType() !== 0 ? 'clause' : 'contract';
 
-        let parser = this.getTemplate().getParserManager().getParser();
-        try {
-            parser.feed(text);
-        } catch(err) {
-            const fileLocation = ErrorUtil.locationOfError(err);
-            throw new ParseException(err.message, fileLocation, fileName, err.message, 'cicero-core');
-        }
-        if (parser.results.length !== 1) {
-            const head = JSON.stringify(parser.results[0]);
+        // Transform text to commonmark
+        const commonMarkTransformer = new CommonMarkTransformer({tagInfo: true});
+        const inputCommonMark = commonMarkTransformer.fromMarkdown(input, 'json');
 
-            parser.results.forEach(function (element) {
-                if (head !== JSON.stringify(element)) {
-                    const err = `Ambiguous text. Got ${parser.results.length} ASTs for text: ${text}`;
-                    throw new ParseException(err, null, fileName, err, 'cicero-core' );
-                }
-            }, this);
-        }
-        let ast = parser.results[0];
-        Logger.debug('Result of parsing: ' + JSON.stringify(ast));
-
-        if(!ast) {
-            const err = 'Parsing clause text returned a null AST. This may mean the text is valid, but not complete.';
-            throw new ParseException(err, null, fileName, err, 'cicero-core' );
-        }
-
-        ast = TemplateInstance.convertFormattedParsed(ast, utcOffset);
-        this.setData(ast);
+        // Parse
+        const templateMarkTransformer = new TemplateMarkTransformer();
+        const data = templateMarkTransformer.dataFromCommonMark({ fileName:fileName, content:inputCommonMark }, parserManager, templateKind, {});
+        this.setData(data);
     }
 
     /**
@@ -223,8 +208,45 @@ class TemplateInstance {
         return logicManager.compileLogic(false).then(async () => {
             const result = await this.getEngine().draft(logicManager,clauseId,contract,{},currentTime,markdownOptions);
             // Roundtrip the response through the Commonmark parser
-            return this.getTemplate().getParserManager().formatText(result.response, options);
+            return this.formatText(result.response, options);
         });
+    }
+
+    /**
+     * Round-trip markdown
+     * @param {string} text - the markdown text
+     * @return {string} the result of parsing and printing back the text
+     */
+    roundtripMarkdown(text) {
+        // Roundtrip the grammar through the Commonmark parser
+        const commonMarkTransformer = new CommonMarkTransformer({ noIndex: true });
+        const concertoAst = commonMarkTransformer.fromMarkdown(text);
+        return commonMarkTransformer.toMarkdown(concertoAst);
+    }
+
+    /**
+     * Format text
+     * @param {string} text - the markdown text
+     * @param {object} options - parameters to the formatting
+     * @param {string} format - to the text generation
+     * @return {string} the result of parsing and printing back the text
+     */
+    formatText(text,options) {
+        const format = options ? options.format : null;
+        if (!format) {
+            let result = this.roundtripMarkdown(text);
+            if (options && options.unquoteVariables) {
+                const ciceroMarkTransformer = new CiceroMarkTransformer();
+                result = ciceroMarkTransformer.toMarkdown(ciceroMarkTransformer.fromMarkdown(text,'json',{quoteVariables:false}));
+            }
+            return result;
+        } else if (format === 'html'){
+            const ciceroMarkTransformer = new CiceroMarkTransformer();
+            const htmlTransformer = new HtmlTransformer();
+            return htmlTransformer.toHtml(ciceroMarkTransformer.fromMarkdown(text,'json',{quoteVariables:!options.unquoteVariables}));
+        } else {
+            throw new Error('Unsupported format: ' + format);
+        }
     }
 
     /**

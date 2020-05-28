@@ -521,43 +521,6 @@ class ParserManager {
         }
     }
 
-    /**
-     * Round-trip markdown
-     * @param {string} text - the markdown text
-     * @return {string} the result of parsing and printing back the text
-     */
-    roundtripMarkdown(text) {
-        // Roundtrip the grammar through the Commonmark parser
-        const commonMarkTransformer = new CommonMarkTransformer({ noIndex: true });
-        const concertoAst = commonMarkTransformer.fromMarkdown(text);
-        return commonMarkTransformer.toMarkdown(concertoAst);
-    }
-
-    /**
-     * Format text
-     * @param {string} text - the markdown text
-     * @param {object} options - parameters to the formatting
-     * @param {string} format - to the text generation
-     * @return {string} the result of parsing and printing back the text
-     */
-    formatText(text,options) {
-        const format = options ? options.format : null;
-        if (!format) {
-            let result = this.roundtripMarkdown(text);
-            if (options && options.unquoteVariables) {
-                const ciceroMarkTransformer = new CiceroMarkTransformer();
-                result = ciceroMarkTransformer.toMarkdown(ciceroMarkTransformer.fromMarkdown(text,'json',{quoteVariables:false}));
-            }
-            return result;
-        } else if (format === 'html'){
-            const ciceroMarkTransformer = new CiceroMarkTransformer();
-            const htmlTransformer = new HtmlTransformer();
-            return htmlTransformer.toHtml(ciceroMarkTransformer.fromMarkdown(text,'json',{quoteVariables:!options.unquoteVariables}));
-        } else {
-            throw new Error('Unsupported format: ' + format);
-        }
-    }
-
 }
 
 module.exports = ParserManager;
