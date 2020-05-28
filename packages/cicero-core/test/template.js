@@ -583,21 +583,6 @@ In case of delayed delivery except for Force Majeure cases, the Seller shall pay
         });
     });
 
-    describe('#grammarHasErgoExpression', () => {
-
-        it('should return false on template grammars without Ergo expressions', async () => {
-            const template = await Template.fromDirectory('./test/data/latedeliveryandpenalty', options);
-            template.getScriptManager().getLogic().length.should.equal(1);
-            template.grammarHasErgoExpression().should.equal(false);
-        });
-
-        it('should return true on template grammars with Ergo expressions', async () => {
-            const template = await Template.fromDirectory('./test/data/block-ergo', options);
-            template.getScriptManager().getLogic().length.should.equal(0);
-            template.grammarHasErgoExpression().should.equal(true);
-        });
-    });
-
     describe('#accept', () => {
 
         it('should accept a visitor', async () => {
