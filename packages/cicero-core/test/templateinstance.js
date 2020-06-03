@@ -24,7 +24,6 @@ chai.use(require('chai-as-promised'));
 
 describe('TemplateInstance', () => {
 
-
     describe('#constructor', () => {
 
         it('should fail to instantiate', async function() {
