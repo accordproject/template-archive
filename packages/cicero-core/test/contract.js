@@ -26,7 +26,7 @@ chai.should();
 chai.use(require('chai-things'));
 chai.use(require('chai-as-promised'));
 
-describe('Contract', () => {
+describe.only('Contract', () => {
     const sampleText = fs.readFileSync(path.resolve(__dirname, 'data/copyright-license', 'text/sample.md'), 'utf8');
 
     describe('#parse', () => {

@@ -175,7 +175,7 @@ class Commands {
                 return clause.getData();
             })
             .catch((err) => {
-                Logger.error(err.message);
+                Logger.error(err);
             });
     }
 

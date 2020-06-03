@@ -15,9 +15,7 @@
 'use strict';
 
 const Logger = require('@accordproject/concerto-core').Logger;
-const ParseException = require('@accordproject/concerto-core').ParseException;
 const crypto = require('crypto');
-const ErrorUtil = require('./errorutil');
 const Util = require('@accordproject/ergo-compiler').Util;
 const moment = require('moment-mini');
 // Make sure Moment serialization preserves utcOffset. See https://momentjs.com/docs/#/displaying/as-json/
@@ -118,7 +116,6 @@ class TemplateInstance {
         // Setup
         const metadata = this.getTemplate().getMetadata();
         const parserManager = this.getTemplate().getParserManager();
-        const modelManager =  this.getTemplate().getModelManager();
 
         const templateKind = metadata.getTemplateType() !== 0 ? 'clause' : 'contract';
 
