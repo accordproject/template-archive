@@ -130,56 +130,6 @@ class TemplateInstance {
     }
 
     /**
-     * Recursive function that converts all instances of Formated objects (ParsedDateTime or ParsedMonetaryAmount)
-     * to a Moment.
-     * @param {*} obj the input object
-     * @param {number} utcOffset - the default utcOffset
-     * @returns {*} the converted object
-     */
-    static convertFormattedParsed(obj, utcOffset) {
-        if(obj.$class === 'ParsedDateTime') {
-
-            let instance = null;
-
-            if(obj.timezone) {
-                instance = moment(obj).utcOffset(obj.timezone, true);
-            }
-            else {
-                instance = moment(obj)
-                    .utcOffset(utcOffset, true);
-            }
-
-            if(!instance) {
-                throw new Error(`Failed to handle datetime ${JSON.stringify(obj, null, 4)}`);
-            }
-            const result = instance.format('YYYY-MM-DDTHH:mm:ss.SSSZ');
-            if(result === 'Invalid date') {
-                throw new Error(`Failed to handle datetime ${JSON.stringify(obj, null, 4)}`);
-            }
-            return result;
-        } else if(obj.$class === 'ParsedAmount') {
-            const result = obj.doubleValue;
-            return result;
-        } else if(obj.$class === 'ParsedMonetaryAmount') {
-            if (obj.currencyCode && obj.currencySymbol && obj.currencyCode !== obj.currencySymbol) {
-                throw new Error(`Currency symbol ${obj.currencySymbol} and currency code ${obj.currencyCode} are incompatible`);
-            }
-            const result = {
-                $class : 'org.accordproject.money.MonetaryAmount',
-                doubleValue : obj.doubleValue,
-                currencyCode : obj.currencySymbol ? obj.currencySymbol : obj.currencyCode,
-            };
-            return result;
-        } else if( typeof obj === 'object' && obj !== null) {
-            Object.entries(obj).forEach(
-                ([key, value]) => {obj[key] = TemplateInstance.convertFormattedParsed(value, utcOffset);}
-            );
-        }
-
-        return obj;
-    }
-
-    /**
      * Generates the natural language text for a contract or clause clause; combining the text from the template
      * and the instance data.
      * @param {*} [options] text generation options. options.wrapVariables encloses variables
@@ -210,18 +160,6 @@ class TemplateInstance {
     }
 
     /**
-     * Round-trip markdown
-     * @param {string} text - the markdown text
-     * @return {string} the result of parsing and printing back the text
-     */
-    roundtripMarkdown(text) {
-        // Roundtrip the grammar through the Commonmark parser
-        const commonMarkTransformer = new CommonMarkTransformer({ noIndex: true });
-        const concertoAst = commonMarkTransformer.fromMarkdown(text);
-        return commonMarkTransformer.toMarkdown(concertoAst);
-    }
-
-    /**
      * Format text
      * @param {string} text - the markdown text
      * @param {object} options - parameters to the formatting
@@ -231,7 +169,7 @@ class TemplateInstance {
     formatText(text,options) {
         const format = options ? options.format : null;
         if (!format) {
-            let result = this.roundtripMarkdown(text);
+            let result = text;
             if (options && options.unquoteVariables) {
                 const ciceroMarkTransformer = new CiceroMarkTransformer();
                 result = ciceroMarkTransformer.toMarkdown(ciceroMarkTransformer.fromMarkdown(text,'json',{quoteVariables:false}));
