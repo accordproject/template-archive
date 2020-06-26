@@ -79,7 +79,7 @@ describe('Template', () => {
 
         it('should create a template from a directory with no logic', async () => {
             const template = await Template.fromDirectory('./test/data/text-only', options);
-            template.hasLogic().should.equal(true);
+            template.hasLogic().should.equal(false);
         });
 
         it('should create a template from a directory and download external models by default', async () => {
@@ -117,7 +117,7 @@ describe('Template', () => {
         it('should roundtrip a template with a logo', async () => {
             const template = await Template.fromDirectory('./test/data/template-logo', options);
             template.getIdentifier().should.equal('logo@0.0.1');
-            template.getHash().should.be.equal('6cf0f1820139631189105ddb5470f04f6f1ccebb0e36e9a055645014a4b7fce2');
+            template.getHash().should.be.equal('7aac70fa0d40c977fcbf34a2e1b7e52d0bcfed95d9c764fac7849a40860a42cd');
             template.getMetadata().getLogo().should.be.an.instanceof(Buffer);
             template.getMetadata().getSample().should.equal('"Aman" "Sharma" added the support for logo and hence created this template for testing!\n');
             const buffer = await template.toArchive('ergo');
@@ -134,7 +134,7 @@ describe('Template', () => {
             template.hasLogic().should.equal(true);
             template.getIdentifier().should.equal('latedeliveryandpenalty@0.0.1');
             template.getModelManager().getModelFile('io.clause.latedeliveryandpenalty').should.not.be.null;
-            template.getParserManager().getGrammar().should.not.be.null;
+            template.getParserManager().getGrammarAst().should.not.be.null;
             template.getScriptManager().getScripts().length.should.equal(1);
             template.getScriptManager().getLogic().length.should.equal(1);
             template.getMetadata().getREADME().should.not.be.null;
@@ -151,14 +151,14 @@ In case of delayed delivery except for Force Majeure cases, the Seller shall pay
 1. Any fractional part of a days is to be considered a full days.
 1. The total amount of penalty shall not however, exceed 2.0% of the total value of the Equipment involved in late delivery.
 1. If the delay is more than 2 weeks, the Buyer is entitled to terminate this Contract.`);
-            template.getHash().should.equal('f666dbf9759f98e89cf795ab7089f2499948507eb4e8c81032f9d4df39dac83e');
+            template.getHash().should.equal('8bcbeb30b721167a8d2a313131e967dc76f7c19f30d4d1047d0523baeb274db6');
             const buffer = await template.toArchive('ergo');
             buffer.should.not.be.null;
             const template2 = await Template.fromArchive(buffer);
             template2.getIdentifier().should.equal(template.getIdentifier());
             template2.getModelManager().getModelFile('io.clause.latedeliveryandpenalty').should.not.be.null;
-            template2.getParserManager().getGrammar().should.not.be.null;
-            template2.getParserManager().getTemplatizedGrammar().should.equal(template.getParserManager().getTemplatizedGrammar());
+            template2.getParserManager().getGrammarAst().should.not.be.null;
+            template2.getParserManager().getGrammar().should.equal(template.getParserManager().getGrammar());
             template2.getScriptManager().getScripts().length.should.equal(template.getScriptManager().getScripts().length);
             template2.getMetadata().getREADME().should.equal(template.getMetadata().getREADME());
             template2.getMetadata().getKeywords().should.eql(template.getMetadata().getKeywords());
@@ -174,7 +174,7 @@ In case of delayed delivery except for Force Majeure cases, the Seller shall pay
             template.hasLogic().should.equal(true);
             template.getIdentifier().should.equal('latedeliveryandpenalty@0.0.1');
             template.getModelManager().getModelFile('io.clause.latedeliveryandpenalty').should.not.be.null;
-            template.getParserManager().getGrammar().should.not.be.null;
+            template.getParserManager().getGrammarAst().should.not.be.null;
             template.getScriptManager().getScripts().length.should.equal(1);
             template.getScriptManager().getLogic().length.should.equal(1);
             template.getMetadata().getREADME().should.not.be.null;
@@ -185,14 +185,14 @@ In case of delayed delivery except for Force Majeure cases, the Seller shall pay
             template.getDescription().should.equal('Late Delivery and Penalty. In case of delayed delivery except for Force Majeure cases, the Seller shall pay to the Buyer for every 9 DAY of delay penalty amounting to 7.0% of the total value of the Equipment whose delivery has been delayed. Any fractional part of a DAY is to be considered a full DAY. The total amount of penalty shall not however, exceed 2.0% of the total value of the Equipment involved in late delivery. If the delay is more than 2 WEEK, the Buyer is entitled to terminate this Contract.');
             template.getVersion().should.equal('0.0.1');
             template.getMetadata().getSample().should.equal('Late Delivery and Penalty.\n\nIn case of delayed delivery except for Force Majeure cases, the Seller shall pay to the Buyer for every 9 days of delay penalty amounting to 7.0% of the total value of the Equipment whose delivery has been delayed. Any fractional part of a days is to be considered a full days. The total amount of penalty shall not however, exceed 2.0% of the total value of the Equipment involved in late delivery. If the delay is more than 2 weeks, the Buyer is entitled to terminate this Contract.\n');
-            template.getHash().should.equal('63ab624b018395b6bb1022957bd49aa23cf7533b7fa0a3e339f60af326acab53');
+            template.getHash().should.equal('87e7201bbbfe6af82bc1703bb853f8b4aabce95d9cb227025cf3351f1b378ce2');
             const buffer = await template.toArchive('ergo');
             buffer.should.not.be.null;
             const template2 = await Template.fromArchive(buffer);
             template2.getIdentifier().should.equal(template.getIdentifier());
             template2.getModelManager().getModelFile('io.clause.latedeliveryandpenalty').should.not.be.null;
-            template2.getParserManager().getGrammar().should.not.be.null;
-            template2.getParserManager().getTemplatizedGrammar().should.equal(template.getParserManager().getTemplatizedGrammar());
+            template2.getParserManager().getGrammarAst().should.not.be.null;
+            template2.getParserManager().getGrammar().should.equal(template.getParserManager().getGrammar());
             template2.getScriptManager().getScripts().length.should.equal(template.getScriptManager().getScripts().length);
             template2.getMetadata().getREADME().should.equal(template.getMetadata().getREADME());
             template2.getMetadata().getKeywords().should.eql(template.getMetadata().getKeywords());
@@ -207,7 +207,7 @@ In case of delayed delivery except for Force Majeure cases, the Seller shall pay
             const template = await Template.fromDirectory('./test/data/latedeliveryandpenalty_js', options);
             template.getIdentifier().should.equal('latedeliveryandpenalty@0.0.1');
             template.getModelManager().getModelFile('io.clause.latedeliveryandpenalty').should.not.be.null;
-            template.getParserManager().getGrammar().should.not.be.null;
+            template.getParserManager().getGrammarAst().should.not.be.null;
             template.getScriptManager().getScripts().length.should.equal(1);
             template.getMetadata().getREADME().should.not.be.null;
             template.getMetadata().getRequest().should.not.be.null;
@@ -216,14 +216,14 @@ In case of delayed delivery except for Force Majeure cases, the Seller shall pay
             template.getDescription().should.equal('Late Delivery and Penalty. In case of delayed delivery except for Force Majeure cases, the Seller shall pay to the Buyer for every 9 DAY of delay penalty amounting to 7% of the total value of the Equipment whose delivery has been delayed. Any fractional part of a DAY is to be considered a full DAY. The total amount of penalty shall not however, exceed 2% of the total value of the Equipment involved in late delivery. If the delay is more than 2 WEEK, the Buyer is entitled to terminate this Contract.');
             template.getVersion().should.equal('0.0.1');
             template.getMetadata().getSample().should.equal('Late Delivery and Penalty. In case of delayed delivery except for Force Majeure cases, the Seller shall pay to the Buyer for every 9 days of delay penalty amounting to 7% of the total value of the Equipment whose delivery has been delayed. Any fractional part of a days is to be considered a full days. The total amount of penalty shall not however, exceed 2% of the total value of the Equipment involved in late delivery. If the delay is more than 2 weeks, the Buyer is entitled to terminate this Contract.');
-            template.getHash().should.equal('4694d158b5e68b2609241229fa20036e20d61edf0b1c53b6b676b76ee9d853a6');
+            template.getHash().should.equal('eab197ebdb29a00bf736fee14c152bca246bd006c930c1e77a4711037f3a966a');
             const buffer = await template.toArchive('cicero');
             buffer.should.not.be.null;
             const template2 = await Template.fromArchive(buffer);
             template2.getIdentifier().should.equal(template.getIdentifier());
             template2.getModelManager().getModelFile('io.clause.latedeliveryandpenalty').should.not.be.null;
-            template2.getParserManager().getGrammar().should.not.be.null;
-            template2.getParserManager().getTemplatizedGrammar().should.equal(template.getParserManager().getTemplatizedGrammar());
+            template2.getParserManager().getGrammarAst().should.not.be.null;
+            template2.getParserManager().getGrammar().should.equal(template.getParserManager().getGrammar());
             template2.getScriptManager().getScripts().length.should.equal(template.getScriptManager().getScripts().length);
             template2.getMetadata().getREADME().should.equal(template.getMetadata().getREADME());
             template2.getMetadata().getKeywords().should.eql(template.getMetadata().getKeywords());
@@ -234,11 +234,11 @@ In case of delayed delivery except for Force Majeure cases, the Seller shall pay
         });
 
         it('should throw an error if multiple template models are found', async () => {
-            return Template.fromDirectory('./test/data/multiple-concepts', options).should.be.rejectedWith('Found multiple instances of org.accordproject.cicero.contract.AccordClause in conga. The model for the template must contain a single asset that extends org.accordproject.cicero.contract.AccordClause.');
+            return Template.fromDirectory('./test/data/multiple-concepts', options).should.be.rejectedWith('Found multiple instances of org.accordproject.cicero.contract.AccordClause. The model for the template must contain a single asset that extends org.accordproject.cicero.contract.AccordClause.');
         });
 
         it('should throw an error if no template models are found', async () => {
-            return Template.fromDirectory('./test/data/no-concepts', options).should.be.rejectedWith('Failed to find an asset that extends org.accordproject.cicero.contract.AccordClause in conga. The model for the template must contain a single asset that extends org.accordproject.cicero.contract.AccordClause.');
+            return Template.fromDirectory('./test/data/no-concepts', options).should.be.rejectedWith('Failed to find an asset that extends org.accordproject.cicero.contract.AccordClause. The model for the template must contain a single asset that extends org.accordproject.cicero.contract.AccordClause.');
         });
 
         it('should throw an error if a package.json file does not exist', async () => {
@@ -281,11 +281,11 @@ In case of delayed delivery except for Force Majeure cases, the Seller shall pay
         });
 
         it('should throw an error for property that is not declared', () => {
-            return Template.fromDirectory('./test/data/bad-property', options).should.be.rejectedWith('Template references a property \'currency\' that is not declared in the template model');
+            return Template.fromDirectory('./test/data/bad-property', options).should.be.rejectedWith('Unknown property currency');
         });
 
         it('should throw an error for clause property that is not declared', () => {
-            return Template.fromDirectory('./test/data/bad-copyright-license', options).should.be.rejectedWith('Template references a property \'badPaymentClause\' that is not declared in the template model');
+            return Template.fromDirectory('./test/data/bad-copyright-license', options).should.be.rejectedWith('Unknown property badPaymentClause');
         });
 
         it('should create an archive for a template with two Ergo modules', async () => {
@@ -307,7 +307,7 @@ In case of delayed delivery except for Force Majeure cases, the Seller shall pay
         it('should throw an error if multiple template models are found', async () => {
             await writeZip('multiple-concepts');
             const buffer = fs.readFileSync('./test/data/archives/multiple-concepts.zip');
-            return Template.fromArchive(buffer).should.be.rejectedWith('Found multiple instances of org.accordproject.cicero.contract.AccordClause in conga. The model for the template must contain a single asset that extends org.accordproject.cicero.contract.AccordClause.');
+            return Template.fromArchive(buffer).should.be.rejectedWith('Found multiple instances of org.accordproject.cicero.contract.AccordClause. The model for the template must contain a single asset that extends org.accordproject.cicero.contract.AccordClause.');
         });
 
         it('should throw an error if a package.json file does not exist', async () => {
@@ -511,7 +511,7 @@ In case of delayed delivery except for Force Majeure cases, the Seller shall pay
     describe('#getHash', () => {
         it('should return a SHA-256 hash', async () => {
             const template = await Template.fromDirectory('./test/data/latedeliveryandpenalty', options);
-            template.getHash().should.equal('f666dbf9759f98e89cf795ab7089f2499948507eb4e8c81032f9d4df39dac83e');
+            template.getHash().should.equal('8bcbeb30b721167a8d2a313131e967dc76f7c19f30d4d1047d0523baeb274db6');
         });
     });
 

@@ -97,7 +97,6 @@ class TemplateLoader extends FileLoader {
 
         // load and add the ergo files
         if(template.getMetadata().getRuntime() === 'ergo') {
-            template.getLogicManager().addTemplateFile(grammar,'text/grammar.tem.md');
             Logger.debug(method, 'Adding Ergo files to script manager');
             const scriptFiles = await TemplateLoader.loadZipFilesContents(zip, /logic[/\\].*\.ergo$/);
             scriptFiles.forEach(function (obj) {
@@ -217,8 +216,6 @@ class TemplateLoader extends FileLoader {
 
         // load and add the ergo files
         if(template.getMetadata().getRuntime() === 'ergo') {
-            // If Ergo then also register the template
-            template.getLogicManager().addTemplateFile(grammar,'text/grammar.tem.md');
             const ergoFiles = await TemplateLoader.loadFilesContents(path, /logic[/\\].*\.ergo$/);
             ergoFiles.forEach((file) => {
                 const resolvedPath = slash(fsPath.resolve(path));
