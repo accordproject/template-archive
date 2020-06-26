@@ -23,6 +23,7 @@ moment.fn.toJSON = Util.momentToJson;
 
 const CommonMarkTransformer = require('@accordproject/markdown-common').CommonMarkTransformer;
 const CiceroMarkTransformer = require('@accordproject/markdown-cicero').CiceroMarkTransformer;
+const SlateTransformer = require('@accordproject/markdown-slate').SlateTransformer;
 const TemplateMarkTransformer = require('@accordproject/markdown-template').TemplateMarkTransformer;
 const HtmlTransformer = require('@accordproject/markdown-html').HtmlTransformer;
 
@@ -176,6 +177,12 @@ class TemplateInstance {
             }
             const htmlTransformer = new HtmlTransformer();
             return htmlTransformer.toHtml(ciceroMark);
+        } else if (format === 'slate'){
+            if (options && options.unquoteVariables) {
+                ciceroMark = this.ciceroMarkTransformer.unquote(ciceroMark);
+            }
+            const slateTransformer = new SlateTransformer();
+            return slateTransformer.fromCiceroMark(ciceroMark);
         } else {
             throw new Error('Unsupported format: ' + format);
         }
