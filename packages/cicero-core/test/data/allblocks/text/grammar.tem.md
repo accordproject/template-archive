@@ -1,7 +1,9 @@
 This is text
 {{#if booleanProperty}}This is optional text{{/if}}
 This is mode text
-{{#ulist addresses}}This is an address: {{city}}, {{country}}{{/ulist}}
+{{#ulist addresses}}
+This is an address: {{city}}, {{country}}
+{{/ulist}}
 
 relationshipProperty:
 {{#with relationshipProperty}}

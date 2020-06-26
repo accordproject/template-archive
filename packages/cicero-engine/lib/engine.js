@@ -86,21 +86,6 @@ class Engine {
     }
 
     /**
-     * Generate Text for a clause
-     * @param {Clause} clause  - the clause
-     * @param {*} [options] text generation options. options.wrapVariables encloses variables
-     * and editable sections in '<variable ...' and '/>'
-     * @param {string} currentTime - the definition of 'now'
-     * @return {Promise} a promise that resolves to a result for the clause initialization
-     */
-    async draft(clause, options, currentTime) {
-        const logicManager = clause.getLogicManager();
-        const clauseId = clause.getIdentifier();
-        const contract = clause.getData();
-        return this.ergoEngine.draft(logicManager,clauseId,contract,{},currentTime, options);
-    }
-
-    /**
      * Provides access to the underlying Ergo engine.
      * @return {ErgoEngine} the Ergo Engine for this Engine
      */

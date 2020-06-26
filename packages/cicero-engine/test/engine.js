@@ -15,7 +15,6 @@
 'use strict';
 
 const Template = require('@accordproject/cicero-core').Template;
-const TemplateLoader = require('@accordproject/cicero-core').TemplateLoader;
 const Clause = require('@accordproject/cicero-core').Clause;
 const Engine = require('../lib/engine');
 
@@ -309,22 +308,6 @@ describe('EngineHelloWorld', () => {
             }
         });
     });
-    describe('#draft', function () {
-
-        it('should generate text for a smart clause', async function () {
-            const result = await engine.draft(clause, null, null);
-            result.should.not.be.null;
-            result.response.should.equal(`Name of the person to greet: "Fred Blogs".
-Thank you!`);
-        });
-
-        it('should generate text for a smart clause, with wrapped variables', async function () {
-            const result = await engine.draft(clause, {wrapVariables:true},null);
-            result.should.not.be.null;
-            result.response.should.equal(`Name of the person to greet: <variable id="name" value="%22Fred%20Blogs%22"/>.
-Thank you!`);
-        });
-    });
 });
 
 describe('EngineHelloModule', () => {
@@ -420,7 +403,7 @@ describe('EngineHelloEmitInit', () => {
     });
 });
 
-describe('EngineSaft', () => {
+describe.skip('EngineSaft', () => {
 
     let engine;
     let clause;
@@ -451,23 +434,6 @@ describe('EngineSaft', () => {
             result.response.tokenAddress.should.equal('Daniel Charles Selman');
         });
     });
-
-    describe('#draft', function () {
-
-        it('should generate text for a smart clause', async function () {
-            const request = {};
-            const NS = 'org.accordproject.saft';
-            request.$class = `${NS}.Launch`;
-            request.exchangeRate = 100;
-            const state = {};
-            state.$class = 'org.accordproject.cicero.contract.AccordContractState';
-            state.stateId = '1';
-            const result = await engine.draft(clause);
-            result.should.not.be.null;
-            result.response.should.equal(TemplateLoader.normalizeText(saftInput));
-        });
-    });
-
 });
 
 describe('BogusClauses', () => {
