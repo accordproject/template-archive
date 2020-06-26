@@ -22,11 +22,9 @@ const moment = require('moment-mini');
 moment.fn.toJSON = Util.momentToJson;
 
 const CommonMarkTransformer = require('@accordproject/markdown-common').CommonMarkTransformer;
-const TemplateMarkTransformer = require('@accordproject/markdown-template').TemplateMarkTransformer;
 const CiceroMarkTransformer = require('@accordproject/markdown-cicero').CiceroMarkTransformer;
+const TemplateMarkTransformer = require('@accordproject/markdown-template').TemplateMarkTransformer;
 const HtmlTransformer = require('@accordproject/markdown-html').HtmlTransformer;
-
-const ErgoEngine = require('@accordproject/ergo-engine/index.browser.js').EvalEngine;
 
 /**
  * A TemplateInstance is an instance of a Clause or Contract template. It is executable business logic, linked to
@@ -51,7 +49,6 @@ class TemplateInstance {
         this.template = template;
         this.data = null;
         this.concertoData = null;
-        this.ergoEngine = new ErgoEngine();
     }
 
     /**
@@ -116,15 +113,15 @@ class TemplateInstance {
         // Setup
         const metadata = this.getTemplate().getMetadata();
         const parserManager = this.getTemplate().getParserManager();
+        const commonMarkTransformer = new CommonMarkTransformer({tagInfo: true});
+        const templateMarkTransformer = new TemplateMarkTransformer();
 
         const templateKind = metadata.getTemplateType() !== 0 ? 'clause' : 'contract';
 
         // Transform text to commonmark
-        const commonMarkTransformer = new CommonMarkTransformer({tagInfo: true});
         const inputCommonMark = commonMarkTransformer.fromMarkdown(input, 'json');
 
         // Parse
-        const templateMarkTransformer = new TemplateMarkTransformer();
         const data = templateMarkTransformer.dataFromCommonMark({ fileName:fileName, content:inputCommonMark }, parserManager, templateKind, {});
         this.setData(data);
     }
@@ -132,31 +129,31 @@ class TemplateInstance {
     /**
      * Generates the natural language text for a contract or clause clause; combining the text from the template
      * and the instance data.
-     * @param {*} [options] text generation options. options.wrapVariables encloses variables
-     * and editable sections in '<variable ...' and '/>'
      * @param {string} currentTime - the definition of 'now' (optional)
+     * @param {*} [options] text generation options.
      * @returns {string} the natural language text for the contract or clause; created by combining the structure of
      * the template with the JSON data for the clause.
      */
-    async draft(options, currentTime) {
+    async draft(currentTime,options) {
         if(!this.concertoData) {
             throw new Error('Data has not been set. Call setData or parse before calling this method.');
         }
 
-        const markdownOptions = {
-            '$class': 'org.accordproject.markdown.MarkdownOptions',
-            'wrapVariables': options && (options.wrapVariables || options.unquoteVariables || options.format === 'html') ? true : false,
-            'template': true
-        };
-        const logicManager = this.getLogicManager();
-        const clauseId = this.getIdentifier();
-        const contract = this.getData();
+        // Setup
+        const metadata = this.getTemplate().getMetadata();
+        const parserManager = this.getTemplate().getParserManager();
+        const commonMarkTransformer = new CommonMarkTransformer({tagInfo: true});
+        const templateMarkTransformer = new TemplateMarkTransformer();
 
-        return logicManager.compileLogic(false).then(async () => {
-            const result = await this.getEngine().draft(logicManager,clauseId,contract,{},currentTime,markdownOptions);
-            // Roundtrip the response through the Commonmark parser
-            return this.formatText(result.response, options);
-        });
+        const templateKind = metadata.getTemplateType() !== 0 ? 'clause' : 'contract';
+
+        // Get the data
+        const data = this.getData();
+
+        // Draft
+        const commonMark = templateMarkTransformer.draftCommonMark(data, parserManager, templateKind, {});
+        const result = commonMarkTransformer.toMarkdown(commonMark, options);
+        return result;
     }
 
     /**
