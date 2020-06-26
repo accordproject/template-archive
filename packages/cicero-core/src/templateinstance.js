@@ -49,6 +49,9 @@ class TemplateInstance {
         this.template = template;
         this.data = null;
         this.concertoData = null;
+        this.commonMarkTransformer = new CommonMarkTransformer();
+        this.ciceroMarkTransformer = new CiceroMarkTransformer();
+        this.templateMarkTransformer = new TemplateMarkTransformer();
     }
 
     /**
@@ -129,12 +132,12 @@ class TemplateInstance {
     /**
      * Generates the natural language text for a contract or clause clause; combining the text from the template
      * and the instance data.
-     * @param {string} currentTime - the definition of 'now' (optional)
      * @param {*} [options] text generation options.
+     * @param {string} currentTime - the definition of 'now' (optional)
      * @returns {string} the natural language text for the contract or clause; created by combining the structure of
      * the template with the JSON data for the clause.
      */
-    async draft(currentTime,options) {
+    async draft(options,currentTime) {
         if(!this.concertoData) {
             throw new Error('Data has not been set. Call setData or parse before calling this method.');
         }
@@ -142,40 +145,37 @@ class TemplateInstance {
         // Setup
         const metadata = this.getTemplate().getMetadata();
         const parserManager = this.getTemplate().getParserManager();
-        const commonMarkTransformer = new CommonMarkTransformer({tagInfo: true});
-        const templateMarkTransformer = new TemplateMarkTransformer();
-
         const templateKind = metadata.getTemplateType() !== 0 ? 'clause' : 'contract';
 
         // Get the data
         const data = this.getData();
 
         // Draft
-        const commonMark = templateMarkTransformer.draftCommonMark(data, parserManager, templateKind, {});
-        const result = commonMarkTransformer.toMarkdown(commonMark, options);
-        return result;
+        const ciceroMark = this.templateMarkTransformer.draftCiceroMark(data, parserManager, templateKind, {});
+        return this.formatCiceroMark(ciceroMark,options);
     }
 
     /**
-     * Format text
-     * @param {string} text - the markdown text
+     * Format CiceroMark
+     * @param {object} ciceroMark - the CiceroMark DOM
      * @param {object} options - parameters to the formatting
      * @param {string} format - to the text generation
      * @return {string} the result of parsing and printing back the text
      */
-    formatText(text,options) {
+    formatCiceroMark(ciceroMark,options) {
         const format = options ? options.format : null;
         if (!format) {
-            let result = text;
             if (options && options.unquoteVariables) {
-                const ciceroMarkTransformer = new CiceroMarkTransformer();
-                result = ciceroMarkTransformer.toMarkdown(ciceroMarkTransformer.fromMarkdown(text,'json',{quoteVariables:false}));
+                ciceroMark = this.ciceroMarkTransformer.unquote(ciceroMark);
             }
-            return result;
+            const commonMark = this.templateMarkTransformer.draftCiceroMarkToCommonMark(ciceroMark);
+            return this.commonMarkTransformer.toMarkdown(commonMark);
         } else if (format === 'html'){
-            const ciceroMarkTransformer = new CiceroMarkTransformer();
+            if (options && options.unquoteVariables) {
+                ciceroMark = this.ciceroMarkTransformer.unquote(ciceroMark);
+            }
             const htmlTransformer = new HtmlTransformer();
-            return htmlTransformer.toHtml(ciceroMarkTransformer.fromMarkdown(text,'json',{quoteVariables:!options.unquoteVariables}));
+            return htmlTransformer.toHtml(ciceroMark);
         } else {
             throw new Error('Unsupported format: ' + format);
         }
