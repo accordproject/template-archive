@@ -403,7 +403,7 @@ describe('EngineHelloEmitInit', () => {
     });
 });
 
-describe.skip('EngineSaft', () => {
+describe('EngineSaft', () => {
 
     let engine;
     let clause;
