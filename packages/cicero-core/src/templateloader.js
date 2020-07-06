@@ -87,11 +87,11 @@ class TemplateLoader extends FileLoader {
         if(!grammar) {
             throw new Error('A template must contain a grammar.tem.md file.');
         } else {
-            template.parserManager.setGrammar(grammar);
+            template.parserManager.setTemplate(grammar);
             const templateKind = template.getMetadata().getTemplateType() !== 0 ? 'clause' : 'contract';
             const templateMarkTransformer = new TemplateMarkTransformer();
             const grammarTemplateMark = templateMarkTransformer.fromMarkdownTemplate({ fileName:'text/grammar.tem.md', content:grammar }, template.getModelManager(), templateKind, {});
-            template.parserManager.setGrammarAst(grammarTemplateMark);
+            template.parserManager.setTemplateMark(grammarTemplateMark);
             template.parserManager.buildParser();
         }
 
@@ -203,11 +203,11 @@ class TemplateLoader extends FileLoader {
         if(!grammar) {
             throw new Error('A template must either contain a grammar.tem.md file.');
         } else {
-            template.parserManager.setGrammar(grammar);
+            template.parserManager.setTemplate(grammar);
             const templateKind = template.getMetadata().getTemplateType() !== 0 ? 'clause' : 'contract';
             const templateMarkTransformer = new TemplateMarkTransformer();
             const grammarTemplateMark = templateMarkTransformer.fromMarkdownTemplate({ fileName:'text/grammar.tem.md', content:grammar }, template.getModelManager(), templateKind, {});
-            template.parserManager.setGrammarAst(grammarTemplateMark);
+            template.parserManager.setTemplateMark(grammarTemplateMark);
             template.parserManager.buildParser();
             Logger.debug(method, 'Loaded grammar.tem.md', grammar);
         }

@@ -144,8 +144,8 @@ class Template {
     getHash() {
         const content = {};
         content.metadata = this.getMetadata().toJSON();
-        if(this.parserManager.getGrammar()) {
-            content.grammar = this.parserManager.getGrammar();
+        if(this.parserManager.getTemplate()) {
+            content.grammar = this.parserManager.getTemplate();
         }
         content.models = {};
         content.scripts = {};
