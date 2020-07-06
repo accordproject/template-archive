@@ -134,7 +134,7 @@ describe('Template', () => {
             template.hasLogic().should.equal(true);
             template.getIdentifier().should.equal('latedeliveryandpenalty@0.0.1');
             template.getModelManager().getModelFile('io.clause.latedeliveryandpenalty').should.not.be.null;
-            template.getParserManager().getGrammarAst().should.not.be.null;
+            template.getParserManager().getTemplateMark().should.not.be.null;
             template.getScriptManager().getScripts().length.should.equal(1);
             template.getScriptManager().getLogic().length.should.equal(1);
             template.getMetadata().getREADME().should.not.be.null;
@@ -157,8 +157,8 @@ In case of delayed delivery except for Force Majeure cases, the Seller shall pay
             const template2 = await Template.fromArchive(buffer);
             template2.getIdentifier().should.equal(template.getIdentifier());
             template2.getModelManager().getModelFile('io.clause.latedeliveryandpenalty').should.not.be.null;
-            template2.getParserManager().getGrammarAst().should.not.be.null;
-            template2.getParserManager().getGrammar().should.equal(template.getParserManager().getGrammar());
+            template2.getParserManager().getTemplateMark().should.not.be.null;
+            template2.getParserManager().getTemplate().should.equal(template.getParserManager().getTemplate());
             template2.getScriptManager().getScripts().length.should.equal(template.getScriptManager().getScripts().length);
             template2.getMetadata().getREADME().should.equal(template.getMetadata().getREADME());
             template2.getMetadata().getKeywords().should.eql(template.getMetadata().getKeywords());
@@ -174,7 +174,7 @@ In case of delayed delivery except for Force Majeure cases, the Seller shall pay
             template.hasLogic().should.equal(true);
             template.getIdentifier().should.equal('latedeliveryandpenalty@0.0.1');
             template.getModelManager().getModelFile('io.clause.latedeliveryandpenalty').should.not.be.null;
-            template.getParserManager().getGrammarAst().should.not.be.null;
+            template.getParserManager().getTemplateMark().should.not.be.null;
             template.getScriptManager().getScripts().length.should.equal(1);
             template.getScriptManager().getLogic().length.should.equal(1);
             template.getMetadata().getREADME().should.not.be.null;
@@ -191,8 +191,8 @@ In case of delayed delivery except for Force Majeure cases, the Seller shall pay
             const template2 = await Template.fromArchive(buffer);
             template2.getIdentifier().should.equal(template.getIdentifier());
             template2.getModelManager().getModelFile('io.clause.latedeliveryandpenalty').should.not.be.null;
-            template2.getParserManager().getGrammarAst().should.not.be.null;
-            template2.getParserManager().getGrammar().should.equal(template.getParserManager().getGrammar());
+            template2.getParserManager().getTemplateMark().should.not.be.null;
+            template2.getParserManager().getTemplate().should.equal(template.getParserManager().getTemplate());
             template2.getScriptManager().getScripts().length.should.equal(template.getScriptManager().getScripts().length);
             template2.getMetadata().getREADME().should.equal(template.getMetadata().getREADME());
             template2.getMetadata().getKeywords().should.eql(template.getMetadata().getKeywords());
@@ -207,7 +207,7 @@ In case of delayed delivery except for Force Majeure cases, the Seller shall pay
             const template = await Template.fromDirectory('./test/data/latedeliveryandpenalty_js', options);
             template.getIdentifier().should.equal('latedeliveryandpenalty@0.0.1');
             template.getModelManager().getModelFile('io.clause.latedeliveryandpenalty').should.not.be.null;
-            template.getParserManager().getGrammarAst().should.not.be.null;
+            template.getParserManager().getTemplateMark().should.not.be.null;
             template.getScriptManager().getScripts().length.should.equal(1);
             template.getMetadata().getREADME().should.not.be.null;
             template.getMetadata().getRequest().should.not.be.null;
@@ -222,8 +222,8 @@ In case of delayed delivery except for Force Majeure cases, the Seller shall pay
             const template2 = await Template.fromArchive(buffer);
             template2.getIdentifier().should.equal(template.getIdentifier());
             template2.getModelManager().getModelFile('io.clause.latedeliveryandpenalty').should.not.be.null;
-            template2.getParserManager().getGrammarAst().should.not.be.null;
-            template2.getParserManager().getGrammar().should.equal(template.getParserManager().getGrammar());
+            template2.getParserManager().getTemplateMark().should.not.be.null;
+            template2.getParserManager().getTemplate().should.equal(template.getParserManager().getTemplate());
             template2.getScriptManager().getScripts().length.should.equal(template.getScriptManager().getScripts().length);
             template2.getMetadata().getREADME().should.equal(template.getMetadata().getREADME());
             template2.getMetadata().getKeywords().should.eql(template.getMetadata().getKeywords());
