@@ -1,1 +1,1 @@
-This is a list: {{#join rates ", "}}{{rate}}%{{/join}} (And more Text)
+This is a list: {{#join rates separator=", "}}{{rate}}%{{/join}} (And more Text)
