@@ -477,9 +477,9 @@ Permissions. Licensor has obtained from all persons and entities who are, or who
 
 Copyright Notices. Licensee shall ensure that its use of the Work is marked with the appropriate copyright notices specified by Licensor in a reasonably prominent position in the order and manner provided by Licensor. Licensee shall abide by the copyright laws and what are considered to be sound practices for copyright notice provisions in the Territory. Licensee shall not use any copyright notices that conflict with, confuse, or negate the notices Licensor provides and requires hereunder.
 
-\`\`\` <clause name="paymentClause"/>
+{{#clause paymentClause}}
 Payment. As consideration in full for the rights granted herein, Licensee shall pay Licensor a one-time fee in the amount of "one hundred US Dollars" (100.0 USD) upon execution of this Agreement, payable as follows: "bank transfer".
-\`\`\`
+{{/clause}}
 
 General.
 
@@ -516,9 +516,9 @@ Permissions. Licensor has obtained from all persons and entities who are, or who
 
 Copyright Notices. Licensee shall ensure that its use of the Work is marked with the appropriate copyright notices specified by Licensor in a reasonably prominent position in the order and manner provided by Licensor. Licensee shall abide by the copyright laws and what are considered to be sound practices for copyright notice provisions in the Territory. Licensee shall not use any copyright notices that conflict with, confuse, or negate the notices Licensor provides and requires hereunder.
 
-\`\`\` <clause name="paymentClause"/>
+{{#clause paymentClause}}
 Payment. As consideration in full for the rights granted herein, Licensee shall pay Licensor a one-time fee in the amount of one hundred US Dollars (100.0 USD) upon execution of this Agreement, payable as follows: bank transfer.
-\`\`\`
+{{/clause}}
 
 General.
 
@@ -753,10 +753,10 @@ This is more text`;
             clause.getData().should.eql(data);
         });
 
-        it('should be able to parse an ergo expressions', async function() {
+        it.skip('should be able to parse an ergo expressions', async function() {
             const template = await Template.fromDirectory('./test/data/block-ergo', options);
             const clause = new Clause(template);
-            clause.parse('This is a list: 3.1%, 3.3%, 2.9% (Average: {{Some text}})');
+            clause.parse('This is a list: 3.1%, 3.3%, 2.9% (Average: {{%Some text%}})');
             const data = {
                 '$class': 'org.accordproject.volumediscountlist.VolumeDiscountContract',
                 'rates': [

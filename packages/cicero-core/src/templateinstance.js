@@ -21,7 +21,6 @@ const moment = require('moment-mini');
 // Make sure Moment serialization preserves utcOffset. See https://momentjs.com/docs/#/displaying/as-json/
 moment.fn.toJSON = Util.momentToJson;
 
-const CommonMarkTransformer = require('@accordproject/markdown-common').CommonMarkTransformer;
 const CiceroMarkTransformer = require('@accordproject/markdown-cicero').CiceroMarkTransformer;
 const SlateTransformer = require('@accordproject/markdown-slate').SlateTransformer;
 const TemplateMarkTransformer = require('@accordproject/markdown-template').TemplateMarkTransformer;
@@ -50,7 +49,6 @@ class TemplateInstance {
         this.template = template;
         this.data = null;
         this.concertoData = null;
-        this.commonMarkTransformer = new CommonMarkTransformer();
         this.ciceroMarkTransformer = new CiceroMarkTransformer();
         this.templateMarkTransformer = new TemplateMarkTransformer();
     }
@@ -117,16 +115,15 @@ class TemplateInstance {
         // Setup
         const metadata = this.getTemplate().getMetadata();
         const parserManager = this.getTemplate().getParserManager();
-        const commonMarkTransformer = new CommonMarkTransformer({tagInfo: true});
         const templateMarkTransformer = new TemplateMarkTransformer();
 
         const templateKind = metadata.getTemplateType() !== 0 ? 'clause' : 'contract';
 
-        // Transform text to commonmark
-        const inputCommonMark = commonMarkTransformer.fromMarkdown(input, 'json');
+        // Transform text to ciceromark
+        const inputCiceroMark = this.ciceroMarkTransformer.fromMarkdownCicero(input);
 
         // Parse
-        const data = templateMarkTransformer.dataFromCommonMark({ fileName:fileName, content:inputCommonMark }, parserManager, templateKind, {});
+        const data = templateMarkTransformer.dataFromCiceroMark({ fileName:fileName, content:inputCiceroMark }, parserManager, templateKind, {});
         this.setData(data);
     }
 
@@ -158,31 +155,31 @@ class TemplateInstance {
 
     /**
      * Format CiceroMark
-     * @param {object} ciceroMark - the CiceroMark DOM
+     * @param {object} ciceroMarkParsed - the parsed CiceroMark DOM
      * @param {object} options - parameters to the formatting
      * @param {string} format - to the text generation
      * @return {string} the result of parsing and printing back the text
      */
-    formatCiceroMark(ciceroMark,options) {
+    formatCiceroMark(ciceroMarkParsed,options) {
         const format = options ? options.format : null;
         if (!format) {
             if (options && options.unquoteVariables) {
-                ciceroMark = this.ciceroMarkTransformer.unquote(ciceroMark);
+                ciceroMarkParsed = this.ciceroMarkTransformer.unquote(ciceroMarkParsed);
             }
-            const commonMark = this.templateMarkTransformer.draftCiceroMarkToCommonMark(ciceroMark);
-            return this.commonMarkTransformer.toMarkdown(commonMark);
+            const ciceroMark = this.ciceroMarkTransformer.toCiceroMarkUnwrapped(ciceroMarkParsed);
+            return this.ciceroMarkTransformer.toMarkdownCicero(ciceroMark);
         } else if (format === 'html'){
             if (options && options.unquoteVariables) {
-                ciceroMark = this.ciceroMarkTransformer.unquote(ciceroMark);
+                ciceroMarkParsed = this.ciceroMarkTransformer.unquote(ciceroMarkParsed);
             }
             const htmlTransformer = new HtmlTransformer();
-            return htmlTransformer.toHtml(ciceroMark);
+            return htmlTransformer.toHtml(ciceroMarkParsed);
         } else if (format === 'slate'){
             if (options && options.unquoteVariables) {
-                ciceroMark = this.ciceroMarkTransformer.unquote(ciceroMark);
+                ciceroMarkParsed = this.ciceroMarkTransformer.unquote(ciceroMarkParsed);
             }
             const slateTransformer = new SlateTransformer();
-            return slateTransformer.fromCiceroMark(ciceroMark);
+            return slateTransformer.fromCiceroMark(ciceroMarkParsed);
         } else {
             throw new Error('Unsupported format: ' + format);
         }
