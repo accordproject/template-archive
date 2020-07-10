@@ -753,7 +753,7 @@ This is more text`;
             clause.getData().should.eql(data);
         });
 
-        it.skip('should be able to parse an ergo expressions', async function() {
+        it('should be able to parse an ergo expressions', async function() {
             const template = await Template.fromDirectory('./test/data/block-ergo', options);
             const clause = new Clause(template);
             clause.parse('This is a list: 3.1%, 3.3%, 2.9% (Average: {{%Some text%}})');
