@@ -62,6 +62,7 @@ const copyrightData = {
     }
 };
 const copyrightSlate = JSON.parse(fs.readFileSync(path.resolve(__dirname, 'data/copyright-license', 'slate.json'), 'utf8'));
+const copyrightCiceroMarkParsed = JSON.parse(fs.readFileSync(path.resolve(__dirname, 'data/copyright-license', 'ciceromark_parsed.json'), 'utf8'));
 
 describe('Clause', () => {
 
@@ -608,6 +609,16 @@ Assignment. Licensee may freely assign or otherwise transfer all or any of its r
             const newText = await clause.draft({format:'slate'});
             // remove the generated clause id
             newText.should.deep.equal(copyrightSlate);
+        });
+
+        it('should be able to draft a copyright license (ciceromark_parsed)', async function() {
+            const template = await Template.fromDirectory('./test/data/copyright-license', options);
+            const clause = new Clause(template);
+            const data = copyrightData;
+            clause.setData(data);
+            const newText = await clause.draft({format:'ciceromark_parsed'});
+            // remove the generated clause id
+            newText.should.deep.equal(copyrightCiceroMarkParsed);
         });
 
         it('should throw when drafting to an unknown format', async function() {
