@@ -38,6 +38,7 @@ const params = path.resolve(__dirname, 'data/latedeliveryandpenalty/', 'params.j
 const state = path.resolve(__dirname, 'data/latedeliveryandpenalty/', 'state.json');
 const dataOut = path.resolve(__dirname, 'data/latedeliveryandpenalty/', 'data_out.json');
 const sampleOut = path.resolve(__dirname, 'data/latedeliveryandpenalty/', 'text/sample_out.md');
+const sampleOutJson = path.resolve(__dirname, 'data/latedeliveryandpenalty/', 'sample_out.json');
 const parseReponse = {
     '$class':'org.accordproject.latedeliveryandpenalty.TemplateModel',
     'forceMajeure':true,
@@ -282,10 +283,22 @@ describe('#draft', () => {
 });
 
 describe('#draft-output', async () => {
-    it('should create the text for a clause using a template and save to a JSON file', async () => {
+    it('should create the text for a clause using a template and save to a file', async () => {
         const result = await Commands.draft(template, data, sampleOut);
         delete result.clauseId;
         result.should.eql(draftResponse);
+    });
+
+    it('should create the slate for a clause using a template and save to a JSON file', async () => {
+        const result = await Commands.draft(template, data, sampleOutJson, null, { format: 'slate' });
+        delete result.clauseId;
+        result.should.not.be.null;
+    });
+
+    it('should create the slate for a ciceromark_parsed using a template and save to a JSON file', async () => {
+        const result = await Commands.draft(template, data, sampleOutJson, null, { format: 'ciceromark_parsed' });
+        delete result.clauseId;
+        result.should.not.be.null;
     });
 });
 

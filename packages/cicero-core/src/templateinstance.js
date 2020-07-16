@@ -168,6 +168,8 @@ class TemplateInstance {
             }
             const ciceroMark = this.ciceroMarkTransformer.toCiceroMarkUnwrapped(ciceroMarkParsed);
             return this.ciceroMarkTransformer.toMarkdownCicero(ciceroMark);
+        } else if (format === 'ciceromark_parsed'){
+            return ciceroMarkParsed;
         } else if (format === 'html'){
             if (options && options.unquoteVariables) {
                 ciceroMarkParsed = this.ciceroMarkTransformer.unquote(ciceroMarkParsed);

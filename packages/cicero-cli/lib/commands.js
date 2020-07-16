@@ -214,12 +214,20 @@ class Commands {
             .then(async function (template) {
                 clause = new Clause(template);
                 clause.setData(dataJson);
-                const text = await clause.draft(options, currentTime);
+                const drafted = await clause.draft(options, currentTime);
                 if (outputPath) {
                     Logger.info('Creating file: ' + outputPath);
+                    let text;
+                    if (options &&
+                        options.format &&
+                        (options.format === 'slate' || options.format === 'ciceromark_parsed')) {
+                        text = JSON.stringify(drafted);
+                    } else {
+                        text = drafted;
+                    }
                     fs.writeFileSync(outputPath, text);
                 }
-                return text;
+                return drafted;
             })
             .catch((err) => {
                 Logger.error(err.message);
