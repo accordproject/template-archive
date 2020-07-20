@@ -15,15 +15,16 @@
 'use strict';
 
 const Logger = require('@accordproject/concerto-core').Logger;
-const ParseException = require('@accordproject/concerto-core').ParseException;
 const crypto = require('crypto');
-const ErrorUtil = require('./errorutil');
 const Util = require('@accordproject/ergo-compiler').Util;
 const moment = require('moment-mini');
 // Make sure Moment serialization preserves utcOffset. See https://momentjs.com/docs/#/displaying/as-json/
 moment.fn.toJSON = Util.momentToJson;
-const TemplateLoader = require('./templateloader');
-const ErgoEngine = require('@accordproject/ergo-engine/index.browser.js').EvalEngine;
+
+const CiceroMarkTransformer = require('@accordproject/markdown-cicero').CiceroMarkTransformer;
+const SlateTransformer = require('@accordproject/markdown-slate').SlateTransformer;
+const TemplateMarkTransformer = require('@accordproject/markdown-template').TemplateMarkTransformer;
+const HtmlTransformer = require('@accordproject/markdown-html').HtmlTransformer;
 
 /**
  * A TemplateInstance is an instance of a Clause or Contract template. It is executable business logic, linked to
@@ -48,7 +49,8 @@ class TemplateInstance {
         this.template = template;
         this.data = null;
         this.concertoData = null;
-        this.ergoEngine = new ErgoEngine();
+        this.ciceroMarkTransformer = new CiceroMarkTransformer();
+        this.templateMarkTransformer = new TemplateMarkTransformer();
     }
 
     /**
@@ -110,121 +112,79 @@ class TemplateInstance {
      * @param {string} [fileName] - the fileName for the text (optional)
      */
     parse(input, currentTime, fileName) {
-        let text = TemplateLoader.normalizeText(input);
-        // Roundtrip the sample through the Commonmark parser
-        text = this.getTemplate().getParserManager().roundtripMarkdown(text);
+        // Setup
+        const metadata = this.getTemplate().getMetadata();
+        const parserManager = this.getTemplate().getParserManager();
+        const templateMarkTransformer = new TemplateMarkTransformer();
 
-        // Set the current time and UTC Offset
-        const now = Util.setCurrentTime(currentTime);
-        const utcOffset = now.utcOffset();
+        const templateKind = metadata.getTemplateType() !== 0 ? 'clause' : 'contract';
 
-        let parser = this.getTemplate().getParserManager().getParser();
-        try {
-            parser.feed(text);
-        } catch(err) {
-            const fileLocation = ErrorUtil.locationOfError(err);
-            throw new ParseException(err.message, fileLocation, fileName, err.message, 'cicero-core');
-        }
-        if (parser.results.length !== 1) {
-            const head = JSON.stringify(parser.results[0]);
+        // Transform text to ciceromark
+        const inputCiceroMark = this.ciceroMarkTransformer.fromMarkdownCicero(input);
 
-            parser.results.forEach(function (element) {
-                if (head !== JSON.stringify(element)) {
-                    const err = `Ambiguous text. Got ${parser.results.length} ASTs for text: ${text}`;
-                    throw new ParseException(err, null, fileName, err, 'cicero-core' );
-                }
-            }, this);
-        }
-        let ast = parser.results[0];
-        Logger.debug('Result of parsing: ' + JSON.stringify(ast));
-
-        if(!ast) {
-            const err = 'Parsing clause text returned a null AST. This may mean the text is valid, but not complete.';
-            throw new ParseException(err, null, fileName, err, 'cicero-core' );
-        }
-
-        ast = TemplateInstance.convertFormattedParsed(ast, utcOffset);
-        this.setData(ast);
-    }
-
-    /**
-     * Recursive function that converts all instances of Formated objects (ParsedDateTime or ParsedMonetaryAmount)
-     * to a Moment.
-     * @param {*} obj the input object
-     * @param {number} utcOffset - the default utcOffset
-     * @returns {*} the converted object
-     */
-    static convertFormattedParsed(obj, utcOffset) {
-        if(obj.$class === 'ParsedDateTime') {
-
-            let instance = null;
-
-            if(obj.timezone) {
-                instance = moment(obj).utcOffset(obj.timezone, true);
-            }
-            else {
-                instance = moment(obj)
-                    .utcOffset(utcOffset, true);
-            }
-
-            if(!instance) {
-                throw new Error(`Failed to handle datetime ${JSON.stringify(obj, null, 4)}`);
-            }
-            const result = instance.format('YYYY-MM-DDTHH:mm:ss.SSSZ');
-            if(result === 'Invalid date') {
-                throw new Error(`Failed to handle datetime ${JSON.stringify(obj, null, 4)}`);
-            }
-            return result;
-        } else if(obj.$class === 'ParsedAmount') {
-            const result = obj.doubleValue;
-            return result;
-        } else if(obj.$class === 'ParsedMonetaryAmount') {
-            if (obj.currencyCode && obj.currencySymbol && obj.currencyCode !== obj.currencySymbol) {
-                throw new Error(`Currency symbol ${obj.currencySymbol} and currency code ${obj.currencyCode} are incompatible`);
-            }
-            const result = {
-                $class : 'org.accordproject.money.MonetaryAmount',
-                doubleValue : obj.doubleValue,
-                currencyCode : obj.currencySymbol ? obj.currencySymbol : obj.currencyCode,
-            };
-            return result;
-        } else if( typeof obj === 'object' && obj !== null) {
-            Object.entries(obj).forEach(
-                ([key, value]) => {obj[key] = TemplateInstance.convertFormattedParsed(value, utcOffset);}
-            );
-        }
-
-        return obj;
+        // Parse
+        const data = templateMarkTransformer.dataFromCiceroMark({ fileName:fileName, content:inputCiceroMark }, parserManager, templateKind, {});
+        this.setData(data);
     }
 
     /**
      * Generates the natural language text for a contract or clause clause; combining the text from the template
      * and the instance data.
-     * @param {*} [options] text generation options. options.wrapVariables encloses variables
-     * and editable sections in '<variable ...' and '/>'
+     * @param {*} [options] text generation options.
      * @param {string} currentTime - the definition of 'now' (optional)
      * @returns {string} the natural language text for the contract or clause; created by combining the structure of
      * the template with the JSON data for the clause.
      */
-    async draft(options, currentTime) {
+    async draft(options,currentTime) {
         if(!this.concertoData) {
             throw new Error('Data has not been set. Call setData or parse before calling this method.');
         }
 
-        const markdownOptions = {
-            '$class': 'org.accordproject.markdown.MarkdownOptions',
-            'wrapVariables': options && (options.wrapVariables || options.unquoteVariables || options.format === 'html') ? true : false,
-            'template': true
-        };
-        const logicManager = this.getLogicManager();
-        const clauseId = this.getIdentifier();
-        const contract = this.getData();
+        // Setup
+        const metadata = this.getTemplate().getMetadata();
+        const parserManager = this.getTemplate().getParserManager();
+        const templateKind = metadata.getTemplateType() !== 0 ? 'clause' : 'contract';
 
-        return logicManager.compileLogic(false).then(async () => {
-            const result = await this.getEngine().draft(logicManager,clauseId,contract,{},currentTime,markdownOptions);
-            // Roundtrip the response through the Commonmark parser
-            return this.getTemplate().getParserManager().formatText(result.response, options);
-        });
+        // Get the data
+        const data = this.getData();
+
+        // Draft
+        const ciceroMark = this.templateMarkTransformer.draftCiceroMark(data, parserManager, templateKind, {});
+        return this.formatCiceroMark(ciceroMark,options);
+    }
+
+    /**
+     * Format CiceroMark
+     * @param {object} ciceroMarkParsed - the parsed CiceroMark DOM
+     * @param {object} options - parameters to the formatting
+     * @param {string} format - to the text generation
+     * @return {string} the result of parsing and printing back the text
+     */
+    formatCiceroMark(ciceroMarkParsed,options) {
+        const format = options ? options.format : null;
+        if (!format) {
+            if (options && options.unquoteVariables) {
+                ciceroMarkParsed = this.ciceroMarkTransformer.unquote(ciceroMarkParsed);
+            }
+            const ciceroMark = this.ciceroMarkTransformer.toCiceroMarkUnwrapped(ciceroMarkParsed);
+            return this.ciceroMarkTransformer.toMarkdownCicero(ciceroMark);
+        } else if (format === 'ciceromark_parsed'){
+            return ciceroMarkParsed;
+        } else if (format === 'html'){
+            if (options && options.unquoteVariables) {
+                ciceroMarkParsed = this.ciceroMarkTransformer.unquote(ciceroMarkParsed);
+            }
+            const htmlTransformer = new HtmlTransformer();
+            return htmlTransformer.toHtml(ciceroMarkParsed);
+        } else if (format === 'slate'){
+            if (options && options.unquoteVariables) {
+                ciceroMarkParsed = this.ciceroMarkTransformer.unquote(ciceroMarkParsed);
+            }
+            const slateTransformer = new SlateTransformer();
+            return slateTransformer.fromCiceroMark(ciceroMarkParsed);
+        } else {
+            throw new Error('Unsupported format: ' + format);
+        }
     }
 
     /**

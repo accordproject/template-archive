@@ -28,6 +28,42 @@ chai.use(require('chai-as-promised'));
 
 const options = { skipUpdateExternalModels: true };
 
+const copyrightData = {
+    '$class': 'org.accordproject.copyrightlicense.CopyrightLicenseContract',
+    'contractId': 'e32a2ca7-78c9-4462-935f-487aad6e9c9b',
+    'effectiveDate': '2018-01-01T00:00:00.000-04:00',
+    'licensee': {
+        '$class': 'org.accordproject.cicero.contract.AccordParty',
+        'partyId': 'Me'
+    },
+    'licenseeState': 'NY',
+    'licenseeEntityType': 'Company',
+    'licenseeAddress': '1 Broadway',
+    'licensor': {
+        '$class': 'org.accordproject.cicero.contract.AccordParty',
+        'partyId': 'Myself'
+    },
+    'licensorState': 'NY',
+    'licensorEntityType': 'Company',
+    'licensorAddress': '2 Broadway',
+    'territory': 'United States',
+    'purposeDescription': 'stuff',
+    'workDescription': 'other stuff',
+    'paymentClause': {
+        '$class': 'org.accordproject.copyrightlicense.PaymentClause',
+        'clauseId': '25298022-2129-412c-ac60-b217ff766cb4',
+        'amountText': 'one hundred US Dollars',
+        'amount': {
+            '$class': 'org.accordproject.money.MonetaryAmount',
+            'doubleValue': 100,
+            'currencyCode': 'USD'
+        },
+        'paymentProcedure': 'bank transfer'
+    }
+};
+const copyrightSlate = JSON.parse(fs.readFileSync(path.resolve(__dirname, 'data/copyright-license', 'slate.json'), 'utf8'));
+const copyrightCiceroMarkParsed = JSON.parse(fs.readFileSync(path.resolve(__dirname, 'data/copyright-license', 'ciceromark_parsed.json'), 'utf8'));
+
 describe('Clause', () => {
 
     const testLatePenaltyInput = fs.readFileSync(path.resolve(__dirname, 'data/latedeliveryandpenalty', 'text/sample.md'), 'utf8');
@@ -59,7 +95,7 @@ describe('Clause', () => {
             try {
                 await Template.fromDirectory('./test/data/bad-binding', options);
             } catch (err) {
-                err.message.should.equal('Template references a property \'articipant\' that is not declared in the template model \'org.accordproject.conga.TemplateModel\' File text/grammar.tem.md line 1 column 3');
+                err.message.should.equal('Unknown property articipant');
             }
         });
 
@@ -247,26 +283,26 @@ describe('Clause', () => {
             clause.parse(testCongaInput);
             const data = {
                 $class: 'org.accordproject.conga.TemplateModel',
-                participant: 'Dan Selman',
+                participant: 'resource:org.accordproject.base.Participant#Dan%20Selman',
                 amount: 100.0,
                 swag: 'penguins',
                 maybeThing: 'thing'
             };
             delete clause.getData().clauseId;
             clause.getData().should.eql(data);
-            clause.getIdentifier().should.equal('conga@0.0.1-6873b1a14258a44df9c96f16b9bdd9d97ecc93040f5ebc8967c7c04c104c2ccb');
+            clause.getIdentifier().should.equal('conga@0.0.1-6d8d5206acdbaba0f50ee2bd4d492be1b61747cd7aaa734abfc401cde5da2bd4');
         });
 
         it('should throw an error for empty text', async function() {
             const template = await Template.fromDirectory('./test/data/conga', options);
             const clause = new Clause(template);
-            (()=> clause.parse('')).should.throw('Parsing clause text returned a null AST. This may mean the text is valid, but not complete.');
+            (()=> clause.parse('')).should.throw('Parse error at line 1 column 1');
         });
 
         it('should throw an error for non-matching text', async function() {
             const template = await Template.fromDirectory('./test/data/conga', options);
             const clause = new Clause(template);
-            (()=> clause.parse(testCongaErr)).should.throw('invalid syntax at line 1 col 16:\n\n  "Dan Selman" agees to spend 100 conga coins on "penguins". "thing"\n                 ^\nUnexpected "e"\n');
+            (()=> clause.parse(testCongaErr)).should.throw('Parse error at line 1 column 13');
         });
 
         it('should be able to set the data for a text-only clause', async function() {
@@ -332,11 +368,10 @@ describe('Clause', () => {
         it('should not be able to parse an if-else block if the text is neither options', async function() {
             const template = await Template.fromDirectory('./test/data/block-ifelse', options);
             const clause = new Clause(template);
-            (()=> clause.parse('I\'m not active')).should.throw(`invalid syntax at line 1 col 5:
-
-  I'm not active
-      ^
-Unexpected "n"`);
+            (()=> clause.parse('I\'m not active')).should.throw(`Parse error at line 1 column 1
+I'm not active
+^^^^^^^^^^^^
+Expected: 'I'm active' or 'I'm inactive'`);
         });
 
         it('should not be able to parse an if-else block on the wrong type (not Boolean)', async function() {
@@ -352,8 +387,8 @@ Unexpected "n"`);
             const clause = new Clause(template);
             clause.parse(`This is a list
 1. 0.0$ million <= Volume < 1.0$ million : 3.1%
-1. 1.0$ million <= Volume < 10.0$ million : 3.1%
-1. 10.0$ million <= Volume < 50.0$ million : 2.9%
+2. 1.0$ million <= Volume < 10.0$ million : 3.1%
+3. 10.0$ million <= Volume < 50.0$ million : 2.9%
 
 This is more text
 `);
@@ -390,8 +425,8 @@ This is more text
             const clause = new Clause(template);
             const text = `This is a list
 1. 0.0$ million <= Volume < 1.0$ million : 3.1%
-1. 1.0$ million <= Volume < 10.0$ million : 3.1%
-1. 10.0$ million <= Volume < 50.0$ million : 2.9%
+2. 1.0$ million <= Volume < 10.0$ million : 3.1%
+3. 10.0$ million <= Volume < 50.0$ million : 2.9%
 
 This is more text`;
             const data = {
@@ -424,54 +459,12 @@ This is more text`;
             newText.should.eql(text);
         });
 
-        it('should be able to draft an olist block (wrapped variables)', async function() {
-            const template = await Template.fromDirectory('./test/data/block-olist', options);
-            const clause = new Clause(template);
-            const text = `This is a list
-
-\`\`\` <list/>
-1. <variable id="volumeAbove" value="0.0"/>$ million <= Volume < <variable id="volumeUpTo" value="1.0"/>$ million : <variable id="rate" value="3.1"/>%
-1. <variable id="volumeAbove" value="1.0"/>$ million <= Volume < <variable id="volumeUpTo" value="10.0"/>$ million : <variable id="rate" value="3.1"/>%
-1. <variable id="volumeAbove" value="10.0"/>$ million <= Volume < <variable id="volumeUpTo" value="50.0"/>$ million : <variable id="rate" value="2.9"/>%
-\`\`\`
-
-This is more text`;
-            const data = {
-                '$class': 'org.accordproject.volumediscountlist.VolumeDiscountContract',
-                'contractId': 'c0884078-882d-42e0-87d6-4cc824b4f194',
-                'rates': [
-                    {
-                        '$class': 'org.accordproject.volumediscountlist.RateRange',
-                        'volumeUpTo': 1,
-                        'volumeAbove': 0,
-                        'rate': 3.1
-                    },
-                    {
-                        '$class': 'org.accordproject.volumediscountlist.RateRange',
-                        'volumeUpTo': 10,
-                        'volumeAbove': 1,
-                        'rate': 3.1
-                    },
-                    {
-                        '$class': 'org.accordproject.volumediscountlist.RateRange',
-                        'volumeUpTo': 50,
-                        'volumeAbove': 10,
-                        'rate': 2.9
-                    }
-                ]
-            };
-            clause.setData(data);
-            const newText = await clause.draft({wrapVariables:true});
-            // remove the generated clause id
-            newText.should.eql(text);
-        });
-
-        it('should be able to draft a copyright license (wrapped variables)', async function() {
+        it('should be able to draft a copyright license', async function() {
             const template = await Template.fromDirectory('./test/data/copyright-license', options);
             const clause = new Clause(template);
             const text = `Copyright License Agreement
 
-This COPYRIGHT LICENSE AGREEMENT (the "Agreement"), dated as of <variable id="effectiveDate" value="01%2F01%2F2018"/> (the "Effective Date"), is made by and between <variable id="licensee" value="%22Me%22"/> ("Licensee"), a <variable id="licenseeState" value="%22NY%22"/> <variable id="licenseeEntityType" value="%22Company%22"/> with offices located at <variable id="licenseeAddress" value="%221%20Broadway%22"/>, and <variable id="licensor" value="%22Myself%22"/> ("Licensor"), a <variable id="licensorState" value="%22NY%22"/> <variable id="licensorEntityType" value="%22Company%22"/> with offices located at <variable id="licensorAddress" value="%222%20Broadway%22"/>.
+This COPYRIGHT LICENSE AGREEMENT (the "Agreement"), dated as of 01/01/2018 (the "Effective Date"), is made by and between "Me" ("Licensee"), a "NY" "Company" with offices located at "1 Broadway", and "Myself" ("Licensor"), a "NY" "Company" with offices located at "2 Broadway".
 
 WHEREAS, Licensor solely and exclusively owns or controls the Work (as defined below) and wishes to grant to Licensee a license to the Work, and Licensee wishes to obtain a license to the Work for the uses and purposes described herein, each subject to the terms and conditions set forth herein.
 
@@ -479,13 +472,15 @@ NOW, THEREFORE, in consideration of the mutual covenants, terms, and conditions 
 
 License.
 
-Grant of Rights. Subject to the terms and conditions of this Agreement, Licensor hereby grants to Licensee and its affiliates during the Term (as defined below) an exclusive, transferable right and license in the <variable id="territory" value="%22United%20States%22"/> (the "Territory"), to reproduce, publicly perform, display, transmit, and distribute the Work, including translate, alter, modify, and create derivative works of the Work, through all media now known or hereinafter developed for purposes of <variable id="purposeDescription" value="%22stuff%22"/>. The "Work" is defined as <variable id="workDescription" value="%22other%20stuff%22"/>.
+Grant of Rights. Subject to the terms and conditions of this Agreement, Licensor hereby grants to Licensee and its affiliates during the Term (as defined below) an exclusive, transferable right and license in the "United States" (the "Territory"), to reproduce, publicly perform, display, transmit, and distribute the Work, including translate, alter, modify, and create derivative works of the Work, through all media now known or hereinafter developed for purposes of "stuff". The "Work" is defined as "other stuff".
 
 Permissions. Licensor has obtained from all persons and entities who are, or whose trademark or other property is, identified, depicted, or otherwise referred to in the Work, such written and signed licenses, permissions, waivers, and consents (collectively, "Permissions" and each, individually, a "Permission"), including those relating to publicity, privacy, and any intellectual property rights, as are or reasonably may be expected to be necessary for Licensee to exercise its rights in the Work as permitted under this Agreement, without incurring any payment or other obligation to, or otherwise violating any right of, any such person or entity.
 
 Copyright Notices. Licensee shall ensure that its use of the Work is marked with the appropriate copyright notices specified by Licensor in a reasonably prominent position in the order and manner provided by Licensor. Licensee shall abide by the copyright laws and what are considered to be sound practices for copyright notice provisions in the Territory. Licensee shall not use any copyright notices that conflict with, confuse, or negate the notices Licensor provides and requires hereunder.
 
-Payment. As consideration in full for the rights granted herein, Licensee shall pay Licensor a one-time fee in the amount of <variable id="amountText" value="%22one%20hundred%20US%20Dollars%22"/> (<variable id="amount" value="100.0%20USD"/>) upon execution of this Agreement, payable as follows: <variable id="paymentProcedure" value="%22bank%20transfer%22"/>.
+{{#clause paymentClause}}
+Payment. As consideration in full for the rights granted herein, Licensee shall pay Licensor a one-time fee in the amount of "one hundred US Dollars" (100.0 USD) upon execution of this Agreement, payable as follows: "bank transfer".
+{{/clause}}
 
 General.
 
@@ -496,41 +491,9 @@ Entire Agreement. This Agreement, including and together with any related attach
 Severability. If any term or provision of this Agreement is invalid, illegal, or unenforceable in any jurisdiction, such invalidity, illegality, or unenforceability will not affect the enforceability of any other term or provision of this Agreement, or invalidate or render unenforceable such term or provision in any other jurisdiction. [Upon a determination that any term or provision is invalid, illegal, or unenforceable, [the parties shall negotiate in good faith to/the court may] modify this Agreement to effect the original intent of the parties as closely as possible in order that the transactions contemplated hereby be consummated as originally contemplated to the greatest extent possible.]
 
 Assignment. Licensee may freely assign or otherwise transfer all or any of its rights, or delegate or otherwise transfer all or any of its obligations or performance, under this Agreement without Licensor's consent. This Agreement is binding upon and inures to the benefit of the parties hereto and their respective permitted successors and assigns.`;
-            const data = {
-                '$class': 'org.accordproject.copyrightlicense.CopyrightLicenseContract',
-                'contractId': 'e32a2ca7-78c9-4462-935f-487aad6e9c9b',
-                'effectiveDate': '2018-01-01T00:00:00.000-04:00',
-                'licensee': {
-                    '$class': 'org.accordproject.cicero.contract.AccordParty',
-                    'partyId': 'Me'
-                },
-                'licenseeState': 'NY',
-                'licenseeEntityType': 'Company',
-                'licenseeAddress': '1 Broadway',
-                'licensor': {
-                    '$class': 'org.accordproject.cicero.contract.AccordParty',
-                    'partyId': 'Myself'
-                },
-                'licensorState': 'NY',
-                'licensorEntityType': 'Company',
-                'licensorAddress': '2 Broadway',
-                'territory': 'United States',
-                'purposeDescription': 'stuff',
-                'workDescription': 'other stuff',
-                'paymentClause': {
-                    '$class': 'org.accordproject.copyrightlicense.PaymentClause',
-                    'clauseId': '25298022-2129-412c-ac60-b217ff766cb4',
-                    'amountText': 'one hundred US Dollars',
-                    'amount': {
-                        '$class': 'org.accordproject.money.MonetaryAmount',
-                        'doubleValue': 100,
-                        'currencyCode': 'USD'
-                    },
-                    'paymentProcedure': 'bank transfer'
-                }
-            };
+            const data = copyrightData;
             clause.setData(data);
-            const newText = await clause.draft({wrapVariables:true});
+            const newText = await clause.draft();
             // remove the generated clause id
             newText.should.eql(text);
         });
@@ -554,7 +517,9 @@ Permissions. Licensor has obtained from all persons and entities who are, or who
 
 Copyright Notices. Licensee shall ensure that its use of the Work is marked with the appropriate copyright notices specified by Licensor in a reasonably prominent position in the order and manner provided by Licensor. Licensee shall abide by the copyright laws and what are considered to be sound practices for copyright notice provisions in the Territory. Licensee shall not use any copyright notices that conflict with, confuse, or negate the notices Licensor provides and requires hereunder.
 
+{{#clause paymentClause}}
 Payment. As consideration in full for the rights granted herein, Licensee shall pay Licensor a one-time fee in the amount of one hundred US Dollars (100.0 USD) upon execution of this Agreement, payable as follows: bank transfer.
+{{/clause}}
 
 General.
 
@@ -618,7 +583,9 @@ Assignment. Licensee may freely assign or otherwise transfer all or any of its r
 <p>Grant of Rights. Subject to the terms and conditions of this Agreement, Licensor hereby grants to Licensee and its affiliates during the Term (as defined below) an exclusive, transferable right and license in the United States (the "Territory"), to reproduce, publicly perform, display, transmit, and distribute the Work, including translate, alter, modify, and create derivative works of the Work, through all media now known or hereinafter developed for purposes of stuff. The "Work" is defined as other stuff.</p>
 <p>Permissions. Licensor has obtained from all persons and entities who are, or whose trademark or other property is, identified, depicted, or otherwise referred to in the Work, such written and signed licenses, permissions, waivers, and consents (collectively, "Permissions" and each, individually, a "Permission"), including those relating to publicity, privacy, and any intellectual property rights, as are or reasonably may be expected to be necessary for Licensee to exercise its rights in the Work as permitted under this Agreement, without incurring any payment or other obligation to, or otherwise violating any right of, any such person or entity.</p>
 <p>Copyright Notices. Licensee shall ensure that its use of the Work is marked with the appropriate copyright notices specified by Licensor in a reasonably prominent position in the order and manner provided by Licensor. Licensee shall abide by the copyright laws and what are considered to be sound practices for copyright notice provisions in the Territory. Licensee shall not use any copyright notices that conflict with, confuse, or negate the notices Licensor provides and requires hereunder.</p>
+<div class="clause" name="paymentClause" elementType="org.accordproject.copyrightlicense.PaymentClause">
 <p>Payment. As consideration in full for the rights granted herein, Licensee shall pay Licensor a one-time fee in the amount of one hundred US Dollars (100.0 USD) upon execution of this Agreement, payable as follows: bank transfer.</p>
+</div>
 <p>General.</p>
 <p>Interpretation. For purposes of this Agreement, (a) the words "include," "includes," and "including" are deemed to be followed by the words "without limitation"; (b) the word "or" is not exclusive; and (c) the words "herein," "hereof," "hereby," "hereto," and "hereunder" refer to this Agreement as a whole. This Agreement is intended to be construed without regard to any presumption or rule requiring construction or interpretation against the party drafting an instrument or causing any instrument to be drafted.</p>
 <p>Entire Agreement. This Agreement, including and together with any related attachments, constitutes the sole and entire agreement of the parties with respect to the subject matter contained herein, and supersedes all prior and contemporaneous understandings, agreements, representations, and warranties, both written and oral, with respect to such subject matter.</p>
@@ -627,43 +594,31 @@ Assignment. Licensee may freely assign or otherwise transfer all or any of its r
 </div>
 </body>
 </html>`;
-            const data = {
-                '$class': 'org.accordproject.copyrightlicense.CopyrightLicenseContract',
-                'contractId': 'e32a2ca7-78c9-4462-935f-487aad6e9c9b',
-                'effectiveDate': '2018-01-01T00:00:00.000-04:00',
-                'licensee': {
-                    '$class': 'org.accordproject.cicero.contract.AccordParty',
-                    'partyId': 'Me'
-                },
-                'licenseeState': 'NY',
-                'licenseeEntityType': 'Company',
-                'licenseeAddress': '1 Broadway',
-                'licensor': {
-                    '$class': 'org.accordproject.cicero.contract.AccordParty',
-                    'partyId': 'Myself'
-                },
-                'licensorState': 'NY',
-                'licensorEntityType': 'Company',
-                'licensorAddress': '2 Broadway',
-                'territory': 'United States',
-                'purposeDescription': 'stuff',
-                'workDescription': 'other stuff',
-                'paymentClause': {
-                    '$class': 'org.accordproject.copyrightlicense.PaymentClause',
-                    'clauseId': '25298022-2129-412c-ac60-b217ff766cb4',
-                    'amountText': 'one hundred US Dollars',
-                    'amount': {
-                        '$class': 'org.accordproject.money.MonetaryAmount',
-                        'doubleValue': 100,
-                        'currencyCode': 'USD'
-                    },
-                    'paymentProcedure': 'bank transfer'
-                }
-            };
+            const data = copyrightData;
             clause.setData(data);
             const newText = await clause.draft({unquoteVariables:true, format:'html'});
             // remove the generated clause id
             newText.should.eql(text);
+        });
+
+        it('should be able to draft a copyright license (slate)', async function() {
+            const template = await Template.fromDirectory('./test/data/copyright-license', options);
+            const clause = new Clause(template);
+            const data = copyrightData;
+            clause.setData(data);
+            const newText = await clause.draft({format:'slate'});
+            // remove the generated clause id
+            newText.should.deep.equal(copyrightSlate);
+        });
+
+        it('should be able to draft a copyright license (ciceromark_parsed)', async function() {
+            const template = await Template.fromDirectory('./test/data/copyright-license', options);
+            const clause = new Clause(template);
+            const data = copyrightData;
+            clause.setData(data);
+            const newText = await clause.draft({format:'ciceromark_parsed'});
+            // remove the generated clause id
+            newText.should.deep.equal(copyrightCiceroMarkParsed);
         });
 
         it('should throw when drafting to an unknown format', async function() {
@@ -783,48 +738,6 @@ This is more text`;
             newText.should.eql(text);
         });
 
-        it('should be able to draft an ulist block (wrapped variables)', async function() {
-            const template = await Template.fromDirectory('./test/data/block-ulist', options);
-            const clause = new Clause(template);
-            const text = `This is a list
-
-\`\`\` <list/>
-- <variable id="volumeAbove" value="0.0"/>$ million <= Volume < <variable id="volumeUpTo" value="1.0"/>$ million : <variable id="rate" value="3.1"/>%
-- <variable id="volumeAbove" value="1.0"/>$ million <= Volume < <variable id="volumeUpTo" value="10.0"/>$ million : <variable id="rate" value="3.1"/>%
-- <variable id="volumeAbove" value="10.0"/>$ million <= Volume < <variable id="volumeUpTo" value="50.0"/>$ million : <variable id="rate" value="2.9"/>%
-\`\`\`
-
-This is more text`;
-            const data = {
-                '$class': 'org.accordproject.volumediscountlist.VolumeDiscountContract',
-                'contractId': 'c0884078-882d-42e0-87d6-4cc824b4f194',
-                'rates': [
-                    {
-                        '$class': 'org.accordproject.volumediscountlist.RateRange',
-                        'volumeUpTo': 1,
-                        'volumeAbove': 0,
-                        'rate': 3.1
-                    },
-                    {
-                        '$class': 'org.accordproject.volumediscountlist.RateRange',
-                        'volumeUpTo': 10,
-                        'volumeAbove': 1,
-                        'rate': 3.1
-                    },
-                    {
-                        '$class': 'org.accordproject.volumediscountlist.RateRange',
-                        'volumeUpTo': 50,
-                        'volumeAbove': 10,
-                        'rate': 2.9
-                    }
-                ]
-            };
-            clause.setData(data);
-            const newText = await clause.draft({wrapVariables:true});
-            // remove the generated clause id
-            newText.should.eql(text);
-        });
-
         it('should be able to parse a join block', async function() {
             const template = await Template.fromDirectory('./test/data/block-join', options);
             const clause = new Clause(template);
@@ -854,7 +767,7 @@ This is more text`;
         it('should be able to parse an ergo expressions', async function() {
             const template = await Template.fromDirectory('./test/data/block-ergo', options);
             const clause = new Clause(template);
-            clause.parse('This is a list: 3.1%, 3.3%, 2.9% (Average: {{Some text}})');
+            clause.parse('This is a list: 3.1%, 3.3%, 2.9% (Average: {{%Some text%}})');
             const data = {
                 '$class': 'org.accordproject.volumediscountlist.VolumeDiscountContract',
                 'rates': [
@@ -889,40 +802,40 @@ This is more text`;
             nl.should.equal(TemplateLoader.normalizeText(testLatePenaltyInput));
         });
 
-        it('should be able to generate natural language text with wrapped variables (conditional true)', async function() {
+        it('should be able to generate natural language text (conditional true)', async function() {
             const template = await Template.fromDirectory('./test/data/latedeliveryandpenalty', options);
             const clause = new Clause(template);
             clause.parse(testLatePenaltyInput);
-            const nl = await clause.draft({ wrapVariables: true });
+            const nl = await clause.draft();
             nl.should.equal(`Late Delivery and Penalty
 ----
 
-In case of delayed delivery<if id="forceMajeure" value="%20except%20for%20Force%20Majeure%20cases%2C" whenTrue="%20except%20for%20Force%20Majeure%20cases%2C" whenFalse=""/> the Seller shall pay to the Buyer for every <variable id="penaltyDuration" value="9%20days"/> of delay penalty amounting to <variable id="penaltyPercentage" value="7.0"/>% of the total value of the Equipment whose delivery has been delayed.
-1. Any fractional part of a <variable id="fractionalPart" value="days"/> is to be considered a full <variable id="fractionalPart" value="days"/>.
-1. The total amount of penalty shall not however, exceed <variable id="capPercentage" value="2.0"/>% of the total value of the Equipment involved in late delivery.
-1. If the delay is more than <variable id="termination" value="2%20weeks"/>, the Buyer is entitled to terminate this Contract.`);
+In case of delayed delivery except for Force Majeure cases, the Seller shall pay to the Buyer for every 9 days of delay penalty amounting to 7.0% of the total value of the Equipment whose delivery has been delayed.
+1. Any fractional part of a days is to be considered a full days.
+2. The total amount of penalty shall not however, exceed 2.0% of the total value of the Equipment involved in late delivery.
+3. If the delay is more than 2 weeks, the Buyer is entitled to terminate this Contract.`);
         });
 
-        it('should be able to generate natural language text with wrapped variables (conditional false)', async function() {
+        it('should be able to generate natural language text (conditional false)', async function() {
             const template = await Template.fromDirectory('./test/data/latedeliveryandpenalty', options);
             const clause = new Clause(template);
             clause.parse(testLatePenaltyInputNoForce);
-            const nl = await clause.draft({ wrapVariables: true });
+            const nl = await clause.draft();
             nl.should.equal(`Late Delivery and Penalty
 ----
 
-In case of delayed delivery<if id="forceMajeure" value="" whenTrue="%20except%20for%20Force%20Majeure%20cases%2C" whenFalse=""/> the Seller shall pay to the Buyer for every <variable id="penaltyDuration" value="9%20days"/> of delay penalty amounting to <variable id="penaltyPercentage" value="7.0"/>% of the total value of the Equipment whose delivery has been delayed.
-1. Any fractional part of a <variable id="fractionalPart" value="days"/> is to be considered a full <variable id="fractionalPart" value="days"/>.
-1. The total amount of penalty shall not however, exceed <variable id="capPercentage" value="2.0"/>% of the total value of the Equipment involved in late delivery.
-1. If the delay is more than <variable id="termination" value="2%20weeks"/>, the Buyer is entitled to terminate this Contract.`);
+In case of delayed delivery the Seller shall pay to the Buyer for every 9 days of delay penalty amounting to 7.0% of the total value of the Equipment whose delivery has been delayed.
+1. Any fractional part of a days is to be considered a full days.
+2. The total amount of penalty shall not however, exceed 2.0% of the total value of the Equipment involved in late delivery.
+3. If the delay is more than 2 weeks, the Buyer is entitled to terminate this Contract.`);
         });
 
-        it('should be able to generate natural language text with wrapped variables (formatted dates)', async function() {
+        it('should be able to generate natural language text (formatted dates)', async function() {
             const template = await Template.fromDirectory('./test/data/formatted-dates-DD_MM_YYYY', options);
             const clause = new Clause(template);
             clause.parse('dateTimeProperty: 01/12/2018');
-            const nl = await clause.draft({ wrapVariables: true });
-            nl.should.equal('dateTimeProperty: <variable id="dateTimeProperty" value="01%2F12%2F2018" format="DD%2FMM%2FYYYY"/>');
+            const nl = await clause.draft();
+            nl.should.equal('dateTimeProperty: 01/12/2018');
         });
 
         it('should be able to roundtrip latedelivery natural language text (with a Period)', async function() {

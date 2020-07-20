@@ -14,28 +14,24 @@
 
 'use strict';
 
+const ErgoEngine = require('@accordproject/ergo-engine/index.browser.js').EvalEngine;
+
 /**
- * Parses a format string
+ * A helper for calculating formulas in template
  * @class
  * @public
+ * @abstract
  */
-class FormatParser {
+class FormulaHelper {
     /**
-     * Given current grammar parts, add necessary grammars parts for the format.
-     * @param {object[]} grammars - the current grammar parts
-     * @param {string} field - grammar field
+     * Create the FormulaHelper
+     * @param {object} logicManager  - the logicManager
      */
-    addGrammars(grammars) {
-    }
-
-    /**
-     * Given a format, returns grammar rules to parse that format
-     * @param {string} format - the format
-     * @param {object[]} - grammar rules for the format
-     */
-    static buildFormatRules(format) {
-        throw new Error('FormatParser: should call buildRules for a specific format');
+    constructor(logicManager) {
+        this.logicManager = logicManager;
+        this.ergoEngine = new ErgoEngine();
+        this.cache = {};
     }
 }
 
-module.exports = FormatParser;
+module.exports = FormulaHelper;

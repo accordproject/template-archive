@@ -27,7 +27,6 @@ describe('Module', () => {
     describe('#exports', () => {
 
         it('should export classes', () => {
-            index.ErrorUtil.should.not.be.null;
             index.Clause.should.not.be.null;
             index.Template.should.not.be.null;
             index.TemplateLibrary.should.not.be.null;
