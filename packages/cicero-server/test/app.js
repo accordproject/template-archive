@@ -146,7 +146,6 @@ Assignment. Licensee may freely assign or otherwise transfer all or any of its r
 describe('cicero-server environment', () => {
     beforeEach(()=>{
         process.env.CICERO_DIR = './test/data1';
-        process.env.CICERO_DATA = './test/data2';
     });
 
     it('/should fail to start the server without CICERO_DIR defined', async () => {
@@ -154,69 +153,17 @@ describe('cicero-server environment', () => {
         (() => require('../app')).should.throw('You must set the CICERO_DIR environment variable.');
         decache('../app');
     });
-
-    it('/should fail to start the server without CICERO_DATA defined', async () => {
-        delete process.env.CICERO_DATA;
-        const server = require('../app');
-        process.env.CICERO_DATA.should.eql(process.env.CICERO_DIR);
-        server.close();
-        decache('../app');
-    });
-
 });
 
 describe('cicero-server', () => {
 
     before(()=>{
         process.env.CICERO_DIR = './test/data';
-        process.env.CICERO_DATA = './test/data';
         server = require('../app');
         request = request(server);
     });
 
-    it('/should (old) trigger a simple stateless request (ergo)', async () => {
-        return request.post('/trigger/latedeliveryandpenalty/data.json')
-            .send(body)
-            .expect(200)
-            .expect('Content-Type',/json/)
-            .then(response => {
-                response.body.response.should.include(responseBody);
-                response.body.should.not.have.property('state');
-            });
-    });
-
-    it('/should (old) trigger a simple stateless request with a sample clause (ergo)', async () => {
-        return request.post('/trigger/latedeliveryandpenalty/text%2Fsample.md')
-            .send(body)
-            .expect(200)
-            .expect('Content-Type',/json/)
-            .then(response => {
-                response.body.response.should.include(responseBody);
-                response.body.should.not.have.property('state');
-            });
-    });
-
-    it('/should fail to (old) trigger a simple stateless request with a bad data file (ergo)', async () => {
-        return request.post('/trigger/latedeliveryandpenalty/bad.txt')
-            .send(body)
-            .expect(500);
-    });
-
-    it('/should (old) trigger a stateful request (ergo)', async () => {
-        return request.post('/trigger/latedeliveryandpenalty/data.json')
-            .send({
-                request: body,
-                state,
-            })
-            .expect(200)
-            .expect('Content-Type',/json/)
-            .then(response => {
-                response.body.response.should.include(responseBody);
-                response.body.state.should.include(state);
-            });
-    });
-
-    it('/should (new) trigger a simple stateless request (ergo)', async () => {
+    it('/should trigger a simple stateless request (ergo)', async () => {
         return request.post('/trigger/latedeliveryandpenalty')
             .send({ 'request' : body, 'data' : triggerData })
             .expect(200)
@@ -227,13 +174,13 @@ describe('cicero-server', () => {
             });
     });
 
-    it('/should fail to (new) trigger without data', async () => {
+    it('/should fail to trigger without data', async () => {
         return request.post('/trigger/latedeliveryandpenalty')
             .send({ 'request' : body })
             .expect(500);
     });
 
-    it('/should (new) trigger a simple stateless request with a sample clause (ergo)', async () => {
+    it('/should trigger a simple stateless request with a sample clause (ergo)', async () => {
         return request.post('/trigger/latedeliveryandpenalty')
             .send({ 'request' : body, 'data' : triggerData })
             .expect(200)
@@ -244,7 +191,7 @@ describe('cicero-server', () => {
             });
     });
 
-    it('/should (new) trigger a stateful request (ergo)', async () => {
+    it('/should trigger a stateful request (ergo)', async () => {
         return request.post('/trigger/latedeliveryandpenalty')
             .send({
                 data: triggerData,

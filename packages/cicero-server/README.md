@@ -19,13 +19,19 @@ npm install -g @accordproject/cicero-server --save
 
 ## Run
 
-Assuming you cloned the [Cicero template library](https://github.com/accordproject/cicero-template-library) in directory `<cicero-template-library-dir>`:
+Assuming you cloned the [Cicero template library](https://github.com/accordproject/cicero-template-library) in directory `<cicero-template-library-dir>`, you can start the server using:
+```
+export CICERO_DIR=<cicero-template-library-dir>/src
+cicero-server
+```
+
+The default port for the server is `6001`. You can set a different port as an environment variable `CICERO_PORT`.
+
+Once the server is started, you can sent requests as follows:
 
 ### Parse request
 
 ```
-export CICERO_DIR=<cicero-template-library-dir>/src
-cicero-server
 curl --request POST \
   --url http://localhost:6001/parse/latedeliveryandpenalty \
   --header 'accept: application/json' \
@@ -38,8 +44,6 @@ curl --request POST \
 ### Draft request
 
 ```
-export CICERO_DIR=<cicero-template-library-dir>/src
-cicero-server
 curl --request POST \
   --url http://localhost:6001/draft/latedeliveryandpenalty \
   --header 'accept: application/json' \
@@ -80,8 +84,6 @@ curl --request POST \
 ### Trigger request
 
 ```
-export CICERO_DIR=<cicero-template-library-dir>/src
-cicero-server
 curl --request POST \
   --url http://localhost:6001/trigger/latedeliveryandpenalty \
   --header 'accept: application/json' \
@@ -131,11 +133,11 @@ curl --request POST \
 
 Only supported for clauses or contracts without references to contract state
 
+If the body contains an object with the properties 'state', then this is used as the contract state.  If no 'state' property exists then no contract state is used.
+
 Assuming you cloned the [Cicero template library](https://github.com/accordproject/cicero-template-library) in directory `<cicero-template-library-dir>`:
 
 ```
-export CICERO_DIR=<cicero-template-dir>
-cicero-server
 curl --request POST \
   --url http://localhost:6001/trigger/latedeliveryandpenalty \
   --header 'accept: application/json' \
