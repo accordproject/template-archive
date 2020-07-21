@@ -16,7 +16,6 @@
 
 'use strict';
 
-const fs = require('fs');
 const app = require('express')();
 const bodyParser = require('body-parser');
 const Template = require('@accordproject/cicero-core').Template;
@@ -25,12 +24,9 @@ const Engine = require('@accordproject/cicero-engine').Engine;
 
 if(!process.env.CICERO_DIR) {
     throw new Error('You must set the CICERO_DIR environment variable.');
-} else if(!process.env.CICERO_DATA) {
-    // CICERO_DATA defaults to CICERO_DIR if absent
-    process.env.CICERO_DATA = process.env.CICERO_DIR;
 }
 
-const PORT = process.env.PORT | 6001;
+const PORT = process.env.CICERO_PORT | 6001;
 
 // to automatically decode JSON POST
 app.use(bodyParser.json());
@@ -39,86 +35,27 @@ app.use(bodyParser.json());
 app.set('port', PORT);
 
 /**
- * Handle POST requests to /trigger/:template/:data
- * The body of the POST should contain the request.
- * The clause is created using the template and the data. If
- * the data ends with .json then setData is called on the Clause,
- * otherwise the contents of the file is parsed.
- *
- * The template parameter is the name of a directory under CICERO_DIR that contains
- * the template to use.
- *
- * The data parameter is either a JSON data file or a TXT file that is used to create
- * the clause from the Template.
- *
- * Stateless execution
- * --------------------
- * The HTTP POST body is the request used for execution of the clause.
- *
- * Stateful execution
- * --------------------
- * If the body contains an object with two properties 'request' and 'state',
- * then 'request' is used as the execution request,
- * 'state' is used as the contract state.
- */
-app.post('/trigger/:template/:data', async function (req, httpResponse, next) {
-    console.log('WARNING: This call is being deprecated, please use /trigger/:template instead');
-    console.log('CICERO_DIR: ' + process.env.CICERO_DIR);
-    console.log('CICERO_DATA: ' + process.env.CICERO_DATA);
-    console.log('Template: ' + req.params.template);
-    console.log('Clause: ' + req.params.data);
-    try {
-        const clause = await initTemplateInstance(req);
-        const data = fs.readFileSync(`${process.env.CICERO_DATA}/${req.params.template}/${req.params.data}`);
-
-        if(req.params.data.endsWith('.json')) {
-            clause.setData(JSON.parse(data.toString()));
-        } else {
-            clause.parse(data.toString());
-        }
-        const engine = new Engine();
-        let result;
-        if(Object.keys(req.body).length === 2 &&
-           Object.prototype.hasOwnProperty.call(req.body,'request') &&
-           Object.prototype.hasOwnProperty.call(req.body,'state')) {
-            result = await engine.trigger(clause, req.body.request, req.body.state);
-        } else {
-            // Add empty state in input, remove it on output
-            const state = { '$class' : 'org.accordproject.cicero.contract.AccordContractState', 'stateId' : 'ehlo' };
-            result = await engine.trigger(clause, req.body, state);
-            delete result.state;
-        }
-        httpResponse.send(result);
-    }
-    catch(err) {
-        return next(err);
-    }
-});
-
-/**
  * Handle POST requests to /trigger/:template
- * The clause is created using the template and the data. If
- * the data ends with .json then setData is called on the Clause,
- * otherwise the contents of the file is parsed.
+ * The clause is created using the template and the data.
  *
+ * Template
+ * ----------
  * The template parameter is the name of a directory under CICERO_DIR that contains
  * the template to use.
  *
- * The data parameter is either a JSON data file or a TXT file that is used to create
- * the clause from the Template.
+ * Request
+ * ----------
+ * The POST body contains three properties:
+ *  - request
+ *  - data
+ *  - state (optional - for stateless execution)
  *
- * Stateless execution
- * --------------------
- * The body of the POST should contain the contract data and the request.
+ * Response
+ * ----------
+ * JSON formated response object
  *
- * Stateful execution
- * --------------------
- * The body of the POST should contain the contract data, the contract state and the request.
  */
 app.post('/trigger/:template', async function (req, httpResponse, next) {
-    console.log('CICERO_DIR: ' + process.env.CICERO_DIR);
-    console.log('CICERO_DATA: ' + process.env.CICERO_DATA);
-    console.log('Template: ' + req.params.template);
     try {
         const clause = await initTemplateInstance(req);
 
@@ -152,15 +89,15 @@ app.post('/trigger/:template', async function (req, httpResponse, next) {
  * The body of the POST should contain the sample text.
  * The clause is created using the template, parsing the text and if parsing succeeds returning the contract data.
  *
+ * Template
+ * ----------
  * The template parameter is the name of a directory under CICERO_DIR that contains
  * the template to use.
  *
- * The data parameter is either a JSON data file or a TXT file that is used to create
- * the clause from the Template.
- *
- * Stateless execution
- * --------------------
- * The HTTP POST body is the request used for execution of the clause.
+ * Request
+ * ----------
+ * The POST body contains three properties:
+ *  - sample
  *
  * Response
  * ----------
@@ -168,9 +105,6 @@ app.post('/trigger/:template', async function (req, httpResponse, next) {
  *
  */
 app.post('/parse/:template', async function (req, httpResponse, next) {
-    console.log('CICERO_DIR: ' + process.env.CICERO_DIR);
-    console.log('CICERO_DATA: ' + process.env.CICERO_DATA);
-    console.log('Template: ' + req.params.template);
     try {
         const clause = await initTemplateInstance(req);
         if(Object.keys(req.body).length === 1 &&
@@ -187,29 +121,27 @@ app.post('/parse/:template', async function (req, httpResponse, next) {
 
 /**
  * Handle POST requests to /draft/:template
- * The body of the POST should contain the request data.
+ * The body of the POST should contain the request data and any options.
  * The clause is created using the template and the data.
  * The call returns the text of the contract.
  *
+ * Template
+ * ----------
  * The template parameter is the name of a directory under CICERO_DIR that contains
  * the template to use.
  *
- * The data parameter is either a JSON data file or a TXT file that is used to create
- * the clause from the Template.
- *
- * Stateless execution
- * --------------------
- * The HTTP POST body is the request used for execution of the clause.
+ * Request
+ * ----------
+ * The POST body contains three properties:
+ *  - data
+ *  - options
  *
  * Response
  * ----------
- * A data string containing the draft output
+ * A string containing the draft output
  *
  */
 app.post('/draft/:template', async function (req, httpResponse, next) {
-    console.log('CICERO_DIR: ' + process.env.CICERO_DIR);
-    console.log('CICERO_DATA: ' + process.env.CICERO_DATA);
-    console.log('Template: ' + req.params.template);
     try {
         const clause = await initTemplateInstance(req);
         if(Object.keys(req.body).length === 1 &&
