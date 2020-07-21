@@ -128,8 +128,10 @@ curl --request POST \
 ```
 
 ### Trigger request - Stateless (legacy)
-
 Only supported for clauses or contracts without references to contract state
+
+If the body contains an object with the properties 'state', then this is used as the contract state.  If no 'state' property exists then no contract state is used.
+ 
 
 Assuming you cloned the [Cicero template library](https://github.com/accordproject/cicero-template-library) in directory `<cicero-template-library-dir>`:
 
