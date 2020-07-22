@@ -16,10 +16,6 @@
 
 const Logger = require('@accordproject/concerto-core').Logger;
 const crypto = require('crypto');
-const Util = require('@accordproject/ergo-compiler').Util;
-const moment = require('moment-mini');
-// Make sure Moment serialization preserves utcOffset. See https://momentjs.com/docs/#/displaying/as-json/
-moment.fn.toJSON = Util.momentToJson;
 
 const CiceroMarkTransformer = require('@accordproject/markdown-cicero').CiceroMarkTransformer;
 const SlateTransformer = require('@accordproject/markdown-slate').SlateTransformer;
@@ -28,8 +24,6 @@ const HtmlTransformer = require('@accordproject/markdown-html').HtmlTransformer;
 
 // For formulas evaluation
 const ErgoEngine = require('@accordproject/ergo-engine/index.browser.js').EvalEngine;
-
-Error.stackTraceLimit = Infinity;
 
 /**
  * A TemplateInstance is an instance of a Clause or Contract template. It is executable business logic, linked to
@@ -128,16 +122,16 @@ class TemplateInstance {
      */
     parse(input, currentTime, fileName) {
         // Setup
-        const metadata = this.getTemplate().getMetadata();
         const templateMarkTransformer = new TemplateMarkTransformer();
-
-        const templateKind = metadata.getTemplateType() !== 0 ? 'clause' : 'contract';
 
         // Transform text to ciceromark
         const inputCiceroMark = this.ciceroMarkTransformer.fromMarkdownCicero(input);
 
+        // Set current time
+        this.parserManager.setCurrentTime(currentTime);
+
         // Parse
-        const data = templateMarkTransformer.dataFromCiceroMark({ fileName:fileName, content:inputCiceroMark }, this.parserManager, templateKind, {});
+        const data = templateMarkTransformer.dataFromCiceroMark({ fileName:fileName, content:inputCiceroMark }, this.parserManager, {});
         this.setData(data);
     }
 
@@ -149,7 +143,7 @@ class TemplateInstance {
      * @returns {string} the natural language text for the contract or clause; created by combining the structure of
      * the template with the JSON data for the clause.
      */
-    async draft(options,currentTime) {
+    draft(options,currentTime) {
         if(!this.concertoData) {
             throw new Error('Data has not been set. Call setData or parse before calling this method.');
         }
@@ -160,6 +154,9 @@ class TemplateInstance {
 
         // Get the data
         const data = this.getData();
+
+        // Set current time
+        this.parserManager.setCurrentTime(currentTime);
 
         // Draft
         const ciceroMark = this.templateMarkTransformer.draftCiceroMark(data, this.parserManager, templateKind, {});
@@ -253,8 +250,7 @@ class TemplateInstance {
      * @return {*} A function from formula code + input data to result
      */
     static ciceroFormulaEval(logicManager,clauseId,ergoEngine,name) {
-        return (code,data) => {
-            const currentTime = moment(); // XXX to be made a parameter
+        return (code,data,currentTime) => {
             const result = ergoEngine.calculate(logicManager, clauseId, name, data, currentTime, {});
             // console.log('Formula result: ' + JSON.stringify(result.response));
             return result.response;

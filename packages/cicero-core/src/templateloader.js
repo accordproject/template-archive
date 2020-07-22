@@ -23,7 +23,6 @@ const languageTagRegex = require('ietf-language-tag-regex');
 const DefaultArchiveLoader = require('./loaders/defaultarchiveloader');
 const FileLoader = require('@accordproject/ergo-compiler').FileLoader;
 const Logger = require('@accordproject/concerto-core').Logger;
-const TemplateMarkTransformer = require('@accordproject/markdown-template').TemplateMarkTransformer;
 
 // Matches 'sample.md' or 'sample_TAG.md' where TAG is an IETF language tag (BCP 47)
 const IETF_REGEXP = languageTagRegex({ exact: false }).toString().slice(1,-2);
@@ -87,11 +86,9 @@ class TemplateLoader extends FileLoader {
         if(!grammar) {
             throw new Error('A template must contain a grammar.tem.md file.');
         } else {
-            template.parserManager.setTemplate(grammar);
             const templateKind = template.getMetadata().getTemplateType() !== 0 ? 'clause' : 'contract';
-            const templateMarkTransformer = new TemplateMarkTransformer();
-            const grammarTemplateMark = templateMarkTransformer.fromMarkdownTemplate({ fileName:'text/grammar.tem.md', content:grammar }, template.getModelManager(), templateKind, {});
-            template.parserManager.setTemplateMark(grammarTemplateMark);
+            template.parserManager.setTemplate(grammar);
+            template.parserManager.setTemplateKind(templateKind);
             template.parserManager.buildParser();
         }
 
@@ -204,11 +201,9 @@ class TemplateLoader extends FileLoader {
         if(!grammar) {
             throw new Error('A template must either contain a grammar.tem.md file.');
         } else {
-            template.parserManager.setTemplate(grammar);
             const templateKind = template.getMetadata().getTemplateType() !== 0 ? 'clause' : 'contract';
-            const templateMarkTransformer = new TemplateMarkTransformer();
-            const grammarTemplateMark = templateMarkTransformer.fromMarkdownTemplate({ fileName:'text/grammar.tem.md', content:grammar }, template.getModelManager(), templateKind, {});
-            template.parserManager.setTemplateMark(grammarTemplateMark);
+            template.parserManager.setTemplate(grammar);
+            template.parserManager.setTemplateKind(templateKind);
             template.parserManager.buildParser();
             Logger.debug(method, 'Loaded grammar.tem.md', grammar);
         }
