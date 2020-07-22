@@ -215,16 +215,12 @@ app.post('/draft/:template', async function (req, httpResponse, next) {
         if(Object.keys(req.body).length === 1 &&
            Object.prototype.hasOwnProperty.call(req.body,'data')) {
             clause.setData(req.body.data);
-            clause.draft().then((result) => {
-                httpResponse.send(result);
-            });
+            httpResponse.send(clause.draft());
         } else if(Object.keys(req.body).length === 2 &&
                   Object.prototype.hasOwnProperty.call(req.body,'data') &&
                   Object.prototype.hasOwnProperty.call(req.body,'options')) {
             clause.setData(req.body.data);
-            clause.draft(req.body.options).then((result) => {
-                httpResponse.send(result);
-            });
+            httpResponse.send(clause.draft(req.body.options));
         } else {
             throw new Error('Missing data or options in /draft body');
         }

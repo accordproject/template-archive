@@ -454,7 +454,7 @@ This is more text`;
                 ]
             };
             clause.setData(data);
-            const newText = await clause.draft();
+            const newText = clause.draft();
             // remove the generated clause id
             newText.should.eql(text);
         });
@@ -493,7 +493,7 @@ Severability. If any term or provision of this Agreement is invalid, illegal, or
 Assignment. Licensee may freely assign or otherwise transfer all or any of its rights, or delegate or otherwise transfer all or any of its obligations or performance, under this Agreement without Licensor's consent. This Agreement is binding upon and inures to the benefit of the parties hereto and their respective permitted successors and assigns.`;
             const data = copyrightData;
             clause.setData(data);
-            const newText = await clause.draft();
+            const newText = clause.draft();
             // remove the generated clause id
             newText.should.eql(text);
         });
@@ -564,7 +564,7 @@ Assignment. Licensee may freely assign or otherwise transfer all or any of its r
                 }
             };
             clause.setData(data);
-            const newText = await clause.draft({unquoteVariables:true});
+            const newText = clause.draft({unquoteVariables:true});
             // remove the generated clause id
             newText.should.eql(text);
         });
@@ -596,7 +596,7 @@ Assignment. Licensee may freely assign or otherwise transfer all or any of its r
 </html>`;
             const data = copyrightData;
             clause.setData(data);
-            const newText = await clause.draft({unquoteVariables:true, format:'html'});
+            const newText = clause.draft({unquoteVariables:true, format:'html'});
             // remove the generated clause id
             newText.should.eql(text);
         });
@@ -606,7 +606,7 @@ Assignment. Licensee may freely assign or otherwise transfer all or any of its r
             const clause = new Clause(template);
             const data = copyrightData;
             clause.setData(data);
-            const newText = await clause.draft({format:'slate'});
+            const newText = clause.draft({format:'slate'});
             // remove the generated clause id
             newText.should.deep.equal(copyrightSlate);
         });
@@ -616,7 +616,7 @@ Assignment. Licensee may freely assign or otherwise transfer all or any of its r
             const clause = new Clause(template);
             const data = copyrightData;
             clause.setData(data);
-            const newText = await clause.draft({format:'ciceromark_parsed'});
+            const newText = clause.draft({format:'ciceromark_parsed'});
             // remove the generated clause id
             newText.should.deep.equal(copyrightCiceroMarkParsed);
         });
@@ -658,7 +658,7 @@ Assignment. Licensee may freely assign or otherwise transfer all or any of its r
                 }
             };
             clause.setData(data);
-            return clause.draft({unquoteVariables:true, format:'foo'}).should.be.rejectedWith('Unsupported format: foo');
+            (() => clause.draft({unquoteVariables:true, format:'foo'})).should.throw('Unsupported format: foo');
         });
 
         it('should be able to parse an ulist block', async function() {
@@ -733,7 +733,7 @@ This is more text`;
                 ]
             };
             clause.setData(data);
-            const newText = await clause.draft();
+            const newText = clause.draft();
             // remove the generated clause id
             newText.should.eql(text);
         });
@@ -804,7 +804,7 @@ at the yearly interest rate of 2.5%
 with a loan term of 15,
 and monthly payments of {{%I'm not sure which amount right now%}}
 `);
-            const nl = await clause.draft();
+            const nl = clause.draft();
             nl.should.equal(TemplateLoader.normalizeText(`Fixed rate loan
 ----
 
@@ -821,7 +821,7 @@ and monthly payments of {{%"£667.00"%}}`));
             const template = await Template.fromDirectory('./test/data/latedeliveryandpenalty', options);
             const clause = new Clause(template);
             clause.parse(testLatePenaltyInput);
-            const nl = await clause.draft();
+            const nl = clause.draft();
             nl.should.equal(TemplateLoader.normalizeText(testLatePenaltyInput));
         });
 
@@ -829,7 +829,7 @@ and monthly payments of {{%"£667.00"%}}`));
             const template = await Template.fromDirectory('./test/data/latedeliveryandpenalty', options);
             const clause = new Clause(template);
             clause.parse(testLatePenaltyInput);
-            const nl = await clause.draft();
+            const nl = clause.draft();
             nl.should.equal(`Late Delivery and Penalty
 ----
 
@@ -843,7 +843,7 @@ In case of delayed delivery except for Force Majeure cases, the Seller shall pay
             const template = await Template.fromDirectory('./test/data/latedeliveryandpenalty', options);
             const clause = new Clause(template);
             clause.parse(testLatePenaltyInputNoForce);
-            const nl = await clause.draft();
+            const nl = clause.draft();
             nl.should.equal(`Late Delivery and Penalty
 ----
 
@@ -857,7 +857,7 @@ In case of delayed delivery the Seller shall pay to the Buyer for every 9 days o
             const template = await Template.fromDirectory('./test/data/formatted-dates-DD_MM_YYYY', options);
             const clause = new Clause(template);
             clause.parse('dateTimeProperty: 01/12/2018');
-            const nl = await clause.draft();
+            const nl = clause.draft();
             nl.should.equal('dateTimeProperty: 01/12/2018');
         });
 
@@ -865,7 +865,7 @@ In case of delayed delivery the Seller shall pay to the Buyer for every 9 days o
             const template = await Template.fromDirectory('./test/data/latedeliveryandpenalty-period', options);
             const clause = new Clause(template);
             clause.parse(testLatePenaltyPeriodInput);
-            const nl = await clause.draft();
+            const nl = clause.draft();
             nl.should.equal(TemplateLoader.normalizeText(testLatePenaltyPeriodInput));
         });
 
@@ -873,7 +873,7 @@ In case of delayed delivery the Seller shall pay to the Buyer for every 9 days o
             const template = await Template.fromDirectory('./test/data/conga', options);
             const clause = new Clause(template);
             clause.parse(testCongaInput);
-            const nl = await clause.draft();
+            const nl = clause.draft();
             nl.should.equal(TemplateLoader.normalizeText(testCongaInput));
         });
 
@@ -881,7 +881,7 @@ In case of delayed delivery the Seller shall pay to the Buyer for every 9 days o
             const template = await Template.fromDirectory('./test/data/alltypes', options);
             const clause = new Clause(template);
             clause.parse(testAllTypesInput);
-            const nl = await clause.draft();
+            const nl = clause.draft();
             nl.should.equal(TemplateLoader.normalizeText(testAllTypesInput));
         });
 
@@ -889,7 +889,7 @@ In case of delayed delivery the Seller shall pay to the Buyer for every 9 days o
             const template = await Template.fromDirectory('./test/data/allblocks', options);
             const clause = new Clause(template);
             clause.parse(testAllBlocksInput);
-            const nl = await clause.draft();
+            const nl = clause.draft();
             nl.should.equal(TemplateLoader.normalizeText(testAllBlocksInput));
         });
     });

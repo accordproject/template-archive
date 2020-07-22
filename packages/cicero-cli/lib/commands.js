@@ -214,7 +214,7 @@ class Commands {
             .then(async function (template) {
                 clause = new Clause(template);
                 clause.setData(dataJson);
-                const drafted = await clause.draft(options, currentTime);
+                const drafted = clause.draft(options, currentTime);
                 if (outputPath) {
                     Logger.info('Creating file: ' + outputPath);
                     let text;
@@ -275,7 +275,7 @@ class Commands {
                     Logger.info('Creating file: ' + outputPath);
                     fs.writeFileSync(outputPath, JSON.stringify(clause.getData(),null,2));
                 }
-                const text = await clause.draft(options, currentTime);
+                const text = clause.draft(options, currentTime);
                 if (outputPath) {
                     Logger.info('Creating file: ' + outputPath);
                     fs.writeFileSync(outputPath, text);
