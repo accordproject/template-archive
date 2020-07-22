@@ -1,0 +1,4 @@
+{
+  "$class": "org.accordproject.interests.Request",
+  "input": "test"
+}

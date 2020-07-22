@@ -47,7 +47,8 @@ class Template {
     constructor(packageJson, readme, samples, request, logo, options) {
         this.metadata = new Metadata(packageJson, readme, samples, request, logo);
         this.logicManager = new LogicManager('cicero', null, options);
-        this.parserManager = new ParserManager(this.getModelManager());
+        const templateKind = this.getMetadata().getTemplateType() !== 0 ? 'clause' : 'contract';
+        this.parserManager = new ParserManager(this.getModelManager(),null,templateKind);
     }
 
     /**

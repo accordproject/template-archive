@@ -111,6 +111,8 @@ class TemplateLoader extends FileLoader {
             });
         }
 
+        TemplateLoader.registerFormulas(template.parserManager,template.getLogicManager());
+
         // check the integrity of the model and logic of the template
         template.validate();
 
@@ -196,7 +198,6 @@ class TemplateLoader extends FileLoader {
             });
         }
 
-
         // load and add the template
         let grammar = await TemplateLoader.loadFileContents(path, 'text/grammar.tem.md', false, false);
 
@@ -234,10 +235,24 @@ class TemplateLoader extends FileLoader {
             });
         }
 
+        TemplateLoader.registerFormulas(template.parserManager,template.getLogicManager());
+
         // check the template
         template.validate();
 
         return template;
+    }
+
+    /**
+     * Prepare the text for parsing (normalizes new lines, etc)
+     * @param {*} parserManager - the parser manager
+     * @param {*} logicManager - the logic manager
+     */
+    static registerFormulas(parserManager,logicManager){
+        const formulas = parserManager.getFormulas();
+        formulas.forEach(x => {
+            logicManager.addTemplateFile(x.code,x.name);
+        });
     }
 
     /**

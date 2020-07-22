@@ -792,6 +792,29 @@ This is more text`;
 
     });
 
+    describe('#draft-formula', () => {
+
+        it('should be able to draft with interest rates formula', async function() {
+            const template = await Template.fromDirectory('./test/data/fixed-interests', options);
+            const clause = new Clause(template);
+            clause.parse(`## Fixed rate loan
+
+This is a _fixed interest_ loan to the amount of £100,000.00
+at the yearly interest rate of 2.5%
+with a loan term of 15,
+and monthly payments of {{%I'm not sure which amount right now%}}
+`);
+            const nl = await clause.draft();
+            nl.should.equal(TemplateLoader.normalizeText(`Fixed rate loan
+----
+
+This is a *fixed interest* loan to the amount of £100,000.00
+at the yearly interest rate of 2.5%
+with a loan term of 15,
+and monthly payments of {{%"£667.00"%}}`));
+        });
+    });
+
     describe('#draft', () => {
 
         it('should be able to roundtrip latedelivery natural language text', async function() {

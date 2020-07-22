@@ -1,0 +1,7 @@
+{
+  "$class": "org.accordproject.interests.TemplateModel",
+  "clauseId": "bbccaa82-12f8-462a-8fc6-2cb734811b47",
+  "loanAmount": 100000,
+  "rate": 2.5,
+  "loanDuration": 15
+}
