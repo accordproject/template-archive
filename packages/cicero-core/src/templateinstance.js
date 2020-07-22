@@ -26,6 +26,11 @@ const SlateTransformer = require('@accordproject/markdown-slate').SlateTransform
 const TemplateMarkTransformer = require('@accordproject/markdown-template').TemplateMarkTransformer;
 const HtmlTransformer = require('@accordproject/markdown-html').HtmlTransformer;
 
+// For formulas evaluation
+const ErgoEngine = require('@accordproject/ergo-engine/index.browser.js').EvalEngine;
+
+Error.stackTraceLimit = Infinity;
+
 /**
  * A TemplateInstance is an instance of a Clause or Contract template. It is executable business logic, linked to
  * a natural language (legally enforceable) template.
@@ -51,6 +56,16 @@ class TemplateInstance {
         this.concertoData = null;
         this.ciceroMarkTransformer = new CiceroMarkTransformer();
         this.templateMarkTransformer = new TemplateMarkTransformer();
+        this.parserManager = this.template.getParserManager();
+        this.ergoEngine = new ErgoEngine();
+
+        // Set formula evaluation in parser manager
+        this.parserManager.setFormulaEval((name) => TemplateInstance.ciceroFormulaEval(
+            this.getLogicManager(),
+            this.getIdentifier(),
+            this.getEngine(),
+            name
+        ));
     }
 
     /**
@@ -114,7 +129,6 @@ class TemplateInstance {
     parse(input, currentTime, fileName) {
         // Setup
         const metadata = this.getTemplate().getMetadata();
-        const parserManager = this.getTemplate().getParserManager();
         const templateMarkTransformer = new TemplateMarkTransformer();
 
         const templateKind = metadata.getTemplateType() !== 0 ? 'clause' : 'contract';
@@ -123,7 +137,7 @@ class TemplateInstance {
         const inputCiceroMark = this.ciceroMarkTransformer.fromMarkdownCicero(input);
 
         // Parse
-        const data = templateMarkTransformer.dataFromCiceroMark({ fileName:fileName, content:inputCiceroMark }, parserManager, templateKind, {});
+        const data = templateMarkTransformer.dataFromCiceroMark({ fileName:fileName, content:inputCiceroMark }, this.parserManager, templateKind, {});
         this.setData(data);
     }
 
@@ -142,14 +156,13 @@ class TemplateInstance {
 
         // Setup
         const metadata = this.getTemplate().getMetadata();
-        const parserManager = this.getTemplate().getParserManager();
         const templateKind = metadata.getTemplateType() !== 0 ? 'clause' : 'contract';
 
         // Get the data
         const data = this.getData();
 
         // Draft
-        const ciceroMark = this.templateMarkTransformer.draftCiceroMark(data, parserManager, templateKind, {});
+        const ciceroMark = this.templateMarkTransformer.draftCiceroMark(data, this.parserManager, templateKind, {});
         return this.formatCiceroMark(ciceroMark,options);
     }
 
@@ -230,6 +243,24 @@ class TemplateInstance {
             data: this.getData()
         };
     }
+
+    /**
+     * Constructs a function for formula evaluation based for this template instance
+     * @param {*} logicManager - the logic manager
+     * @param {string} clauseId - this instance identifier
+     * @param {*} ergoEngine - the evaluation engine
+     * @param {string} name - the name of the formula
+     * @return {*} A function from formula code + input data to result
+     */
+    static ciceroFormulaEval(logicManager,clauseId,ergoEngine,name) {
+        return (code,data) => {
+            const currentTime = moment(); // XXX to be made a parameter
+            const result = ergoEngine.calculate(logicManager, clauseId, name, data, currentTime, {});
+            // console.log('Formula result: ' + JSON.stringify(result.response));
+            return result.response;
+        };
+    }
+
 }
 
 module.exports = TemplateInstance;
