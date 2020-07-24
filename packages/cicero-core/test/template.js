@@ -117,7 +117,7 @@ describe('Template', () => {
         it('should roundtrip a template with a logo', async () => {
             const template = await Template.fromDirectory('./test/data/template-logo', options);
             template.getIdentifier().should.equal('logo@0.0.1');
-            template.getHash().should.be.equal('7aac70fa0d40c977fcbf34a2e1b7e52d0bcfed95d9c764fac7849a40860a42cd');
+            template.getHash().should.be.equal('90b469258a03c8fc7c741dc6aae9dddc73aa41753d79fc250882d7b4a4b61527');
             template.getMetadata().getLogo().should.be.an.instanceof(Buffer);
             template.getMetadata().getSample().should.equal('"Aman" "Sharma" added the support for logo and hence created this template for testing!\n');
             const buffer = await template.toArchive('ergo');
@@ -151,7 +151,7 @@ In case of delayed delivery except for Force Majeure cases, the Seller shall pay
 1. Any fractional part of a days is to be considered a full days.
 2. The total amount of penalty shall not however, exceed 2.0% of the total value of the Equipment involved in late delivery.
 3. If the delay is more than 2 weeks, the Buyer is entitled to terminate this Contract.`);
-            template.getHash().should.equal('6ac687bf5b1d7e026c40bf6db2078c1386aa4fd30a15c98f7d9e3103ae8bd431');
+            template.getHash().should.equal('b82171ca8f995c26f9c48566f8c927e78b97731984e73045851492f803047328');
             const buffer = await template.toArchive('ergo');
             buffer.should.not.be.null;
             const template2 = await Template.fromArchive(buffer);
@@ -185,7 +185,7 @@ In case of delayed delivery except for Force Majeure cases, the Seller shall pay
             template.getDescription().should.equal('Late Delivery and Penalty. In case of delayed delivery except for Force Majeure cases, the Seller shall pay to the Buyer for every 9 DAY of delay penalty amounting to 7.0% of the total value of the Equipment whose delivery has been delayed. Any fractional part of a DAY is to be considered a full DAY. The total amount of penalty shall not however, exceed 2.0% of the total value of the Equipment involved in late delivery. If the delay is more than 2 WEEK, the Buyer is entitled to terminate this Contract.');
             template.getVersion().should.equal('0.0.1');
             template.getMetadata().getSample().should.equal('Late Delivery and Penalty.\n\nIn case of delayed delivery except for Force Majeure cases, the Seller shall pay to the Buyer for every 9 days of delay penalty amounting to 7.0% of the total value of the Equipment whose delivery has been delayed. Any fractional part of a days is to be considered a full days. The total amount of penalty shall not however, exceed 2.0% of the total value of the Equipment involved in late delivery. If the delay is more than 2 weeks, the Buyer is entitled to terminate this Contract.\n');
-            template.getHash().should.equal('87e7201bbbfe6af82bc1703bb853f8b4aabce95d9cb227025cf3351f1b378ce2');
+            template.getHash().should.equal('356b3fa3d3204af794bd03b46eb5429e26b4847ddd0a2506ef0979aafd650f61');
             const buffer = await template.toArchive('ergo');
             buffer.should.not.be.null;
             const template2 = await Template.fromArchive(buffer);
@@ -216,7 +216,7 @@ In case of delayed delivery except for Force Majeure cases, the Seller shall pay
             template.getDescription().should.equal('Late Delivery and Penalty. In case of delayed delivery except for Force Majeure cases, the Seller shall pay to the Buyer for every 9 DAY of delay penalty amounting to 7% of the total value of the Equipment whose delivery has been delayed. Any fractional part of a DAY is to be considered a full DAY. The total amount of penalty shall not however, exceed 2% of the total value of the Equipment involved in late delivery. If the delay is more than 2 WEEK, the Buyer is entitled to terminate this Contract.');
             template.getVersion().should.equal('0.0.1');
             template.getMetadata().getSample().should.equal('Late Delivery and Penalty. In case of delayed delivery except for Force Majeure cases, the Seller shall pay to the Buyer for every 9 days of delay penalty amounting to 7% of the total value of the Equipment whose delivery has been delayed. Any fractional part of a days is to be considered a full days. The total amount of penalty shall not however, exceed 2% of the total value of the Equipment involved in late delivery. If the delay is more than 2 weeks, the Buyer is entitled to terminate this Contract.');
-            template.getHash().should.equal('eab197ebdb29a00bf736fee14c152bca246bd006c930c1e77a4711037f3a966a');
+            template.getHash().should.equal('e1eb41c1c3b158c577108eaefd4178ec00bba1c1ea7a1f074db8d69b13176aca');
             const buffer = await template.toArchive('cicero');
             buffer.should.not.be.null;
             const template2 = await Template.fromArchive(buffer);
@@ -328,7 +328,7 @@ In case of delayed delivery except for Force Majeure cases, the Seller shall pay
         it('should throw an error if an archive loader cannot be found', async () => {
 
             try {
-                await Template.fromUrl('ab://ip-payment@0.9.0#hash', null);
+                await Template.fromUrl('ab://ip-payment@0.10.0#hash', null);
                 assert.isOk(false,'should throw an error if an archive loader cannot be found');
             }
             catch(err) {
@@ -337,18 +337,18 @@ In case of delayed delivery except for Force Majeure cases, the Seller shall pay
         });
 
         it('should create a template from an archive at a given URL', async () => {
-            const url = 'https://templates.accordproject.org/archives/ip-payment@0.12.0.cta';
+            const url = 'https://templates.accordproject.org/archives/ip-payment@0.13.0.cta';
             return Template.fromUrl(url, null).should.be.fulfilled;
         });
 
         it('should create a template from an archive at a given AP URL', async () => {
-            const url = 'ap://ip-payment@0.12.0#hash';
+            const url = 'ap://ip-payment@0.13.0#hash';
             return Template.fromUrl(url, null).should.be.fulfilled;
         });
 
         it('should throw an error if creating a template from a wrongly formed AP URL', async () => {
             try {
-                await Template.fromUrl('ap://ip-payment@0.9.0', null);
+                await Template.fromUrl('ap://ip-payment@0.10.0', null);
                 assert.isOk(false,'should throw an error if creating a template from a wrongly formed AP URL');
             }
             catch(err) {
@@ -356,8 +356,8 @@ In case of delayed delivery except for Force Majeure cases, the Seller shall pay
             }
         });
 
-        it('should create a template from an archive at a given github URL', async () => {
-            const url = 'github://accordproject/cicero-template-library/master/build/archives/ip-payment@0.12.0.cta';
+        it.skip('should create a template from an archive at a given github URL', async () => {
+            const url = 'github://accordproject/cicero-template-library/master/build/archives/ip-payment@0.13.0.cta';
             return Template.fromUrl(url, {'encoding':null,'headers':{'Accept': '*/*','Accept-Encoding': 'deflate, gzip'}}).should.be.fulfilled;
         });
 
@@ -511,7 +511,7 @@ In case of delayed delivery except for Force Majeure cases, the Seller shall pay
     describe('#getHash', () => {
         it('should return a SHA-256 hash', async () => {
             const template = await Template.fromDirectory('./test/data/latedeliveryandpenalty', options);
-            template.getHash().should.equal('6ac687bf5b1d7e026c40bf6db2078c1386aa4fd30a15c98f7d9e3103ae8bd431');
+            template.getHash().should.equal('b82171ca8f995c26f9c48566f8c927e78b97731984e73045851492f803047328');
         });
     });
 
