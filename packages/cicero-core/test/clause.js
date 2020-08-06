@@ -212,7 +212,7 @@ describe('Clause', () => {
                     unit: 'weeks',
                 }
             };
-            // remove the generated clause id
+            // remove the generated id
             delete clause.getData().clauseId;
             clause.getData().should.eql(data);
             clause.getIdentifier().should.equal('latedeliveryandpenalty@0.0.1-0ee76aefdd19d6863f2f1642182f506b1ac8e5c4be2a005c00dd13bbf36fe63c');
@@ -239,7 +239,7 @@ describe('Clause', () => {
                     unit: 'weeks',
                 }
             };
-            // remove the generated clause id
+            // remove the generated id
             delete clause.getData().clauseId;
             clause.getData().should.eql(data);
             clause.getIdentifier().should.equal('latedeliveryandpenalty@0.0.1-0ee76aefdd19d6863f2f1642182f506b1ac8e5c4be2a005c00dd13bbf36fe63c');
@@ -272,7 +272,7 @@ describe('Clause', () => {
                     unit: 'months',
                 }
             };
-            // remove the generated contract id
+            // remove the generated id
             delete clause.getData().contractId;
             clause.getData().should.eql(data);
             clause.getIdentifier().should.equal('simplelatedeliveryandpenalty@0.2.1-708587fe51e93166853ebe13a883209a635c4b4d03bb9d15b27c819c394cb995');
@@ -348,7 +348,7 @@ describe('Clause', () => {
                 '$class': 'org.accordproject.volumediscountlist.VolumeDiscountContract',
                 'isActive': true
             };
-            // remove the generated clause id
+            // remove the generated id
             delete clause.getData().contractId;
             clause.getData().should.eql(data);
         });
@@ -361,7 +361,7 @@ describe('Clause', () => {
                 '$class': 'org.accordproject.volumediscountlist.VolumeDiscountContract',
                 'isActive': false
             };
-            // remove the generated clause id
+            // remove the generated id
             delete clause.getData().contractId;
             clause.getData().should.eql(data);
         });
@@ -416,7 +416,7 @@ This is more text
                     }
                 ]
             };
-            // remove the generated clause id
+            // remove the generated id
             delete clause.getData().contractId;
             clause.getData().should.eql(data);
         });
@@ -456,7 +456,6 @@ This is more text`;
             };
             clause.setData(data);
             const newText = clause.draft();
-            // remove the generated clause id
             newText.should.eql(text);
         });
 
@@ -466,7 +465,6 @@ This is more text`;
             const data = copyrightData;
             clause.setData(data);
             const newText = clause.draft();
-            // remove the generated clause id
             newText.should.eql(copyrightSample);
         });
 
@@ -537,7 +535,6 @@ Assignment. Licensee may freely assign or otherwise transfer all or any of its r
             };
             clause.setData(data);
             const newText = clause.draft({unquoteVariables:true});
-            // remove the generated clause id
             newText.should.eql(text);
         });
 
@@ -569,7 +566,6 @@ Assignment. Licensee may freely assign or otherwise transfer all or any of its r
             const data = copyrightData;
             clause.setData(data);
             const newText = clause.draft({unquoteVariables:true, format:'html'});
-            // remove the generated clause id
             newText.should.eql(text);
         });
 
@@ -579,7 +575,6 @@ Assignment. Licensee may freely assign or otherwise transfer all or any of its r
             const data = copyrightData;
             clause.setData(data);
             const newText = clause.draft({format:'markdown_cicero'});
-            // remove the generated clause id
             newText.should.deep.equal(copyrightSample);
         });
 
@@ -589,7 +584,6 @@ Assignment. Licensee may freely assign or otherwise transfer all or any of its r
             const data = copyrightData;
             clause.setData(data);
             const newText = clause.draft({format:'slate'});
-            // remove the generated clause id
             newText.should.deep.equal(copyrightSlate);
         });
 
@@ -599,7 +593,6 @@ Assignment. Licensee may freely assign or otherwise transfer all or any of its r
             const data = copyrightData;
             clause.setData(data);
             const newText = clause.draft({format:'ciceromark_parsed'});
-            // remove the generated clause id
             newText.should.deep.equal(copyrightCiceroMarkParsed);
         });
 
@@ -676,7 +669,7 @@ This is more text`;
                     }
                 ]
             };
-            // remove the generated clause id
+            // remove the generated id
             delete clause.getData().contractId;
             clause.getData().should.eql(data);
         });
@@ -716,7 +709,6 @@ This is more text`;
             };
             clause.setData(data);
             const newText = clause.draft();
-            // remove the generated clause id
             newText.should.eql(text);
         });
 
@@ -741,7 +733,7 @@ This is more text`;
                     }
                 ]
             };
-            // remove the generated clause id
+            // remove the generated id
             delete clause.getData().contractId;
             clause.getData().should.eql(data);
         });
@@ -767,7 +759,7 @@ This is more text`;
                     }
                 ]
             };
-            // remove the generated clause id
+            // remove the generated id
             delete clause.getData().contractId;
             clause.getData().should.eql(data);
         });
