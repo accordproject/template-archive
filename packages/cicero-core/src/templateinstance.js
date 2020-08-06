@@ -171,8 +171,8 @@ class TemplateInstance {
      * @return {string} the result of parsing and printing back the text
      */
     formatCiceroMark(ciceroMarkParsed,options) {
-        const format = options ? options.format : null;
-        if (!format) {
+        const format = options && options.format ? options.format : 'markdown_cicero';
+        if (format === 'markdown_cicero') {
             if (options && options.unquoteVariables) {
                 ciceroMarkParsed = this.ciceroMarkTransformer.unquote(ciceroMarkParsed);
             }
