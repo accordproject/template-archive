@@ -53,6 +53,7 @@ class Template {
 
     /**
      * Verifies that the template is well formed.
+     * Compiles the Ergo logic.
      * Throws an exception with the details of any validation errors.
      */
     validate() {
