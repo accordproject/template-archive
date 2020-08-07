@@ -803,6 +803,47 @@ describe('#initialize', () => {
     });
 });
 
+describe('#validateCompileArgs', () => {
+    it('no args specified', () => {
+        process.chdir(path.resolve(__dirname, 'data/latedeliveryandpenalty/'));
+        const args  = Commands.validateCompileArgs({
+            _: ['compile'],
+        });
+        args.template.should.match(/cicero-cli[/\\]test[/\\]data[/\\]latedeliveryandpenalty$/);
+    });
+    it('all args specified', () => {
+        process.chdir(path.resolve(__dirname, 'data/latedeliveryandpenalty/'));
+        const args  = Commands.validateCompileArgs({
+            _: ['compile'],
+            template: './',
+            target: 'Go',
+        });
+        args.template.should.match(/cicero-cli[/\\]test[/\\]data[/\\]latedeliveryandpenalty$/);
+        args.target.should.match(/Go$/);
+    });
+    it('all args specified, parent folder', () => {
+        process.chdir(path.resolve(__dirname, 'data/'));
+        const args  = Commands.validateCompileArgs({
+            _: ['compile'],
+            template: 'latedeliveryandpenalty',
+        });
+        args.template.should.match(/cicero-cli[/\\]test[/\\]data[/\\]latedeliveryandpenalty$/);
+    });
+    it('verbose flag specified', () => {
+        process.chdir(path.resolve(__dirname, 'data/latedeliveryandpenalty/'));
+        Commands.validateCompileArgs({
+            _: ['compile'],
+            verbose: true
+        });
+    });
+    it('bad package.json', () => {
+        process.chdir(path.resolve(__dirname, 'data/'));
+        (() => Commands.validateCompileArgs({
+            _: ['compile'],
+        })).should.throw(' not a valid cicero template. Make sure that package.json exists and that it has a cicero entry.');
+    });
+});
+
 describe('#compile', () => {
 
     it('should compile to a Go model', async () => {

@@ -297,7 +297,6 @@ class Commands {
         argv = Commands.validateCommonArgs(argv);
         argv = Commands.setDefaultFileArg(argv, 'sample', 'text/sample.md', ((argv, argDefaultName) => { return path.resolve(argv.template,argDefaultName); }));
         argv = Commands.setDefaultFileArg(argv, 'request', 'request.json', ((argv, argDefaultName) => { return [path.resolve(argv.template,argDefaultName)]; }));
-        //argv = Commands.setDefaultFileArg(argv, 'state', 'state.json', ((argv, argDefaultName) => { return path.resolve(argv.template,argDefaultName); }));
 
         if(argv.verbose) {
             Logger.info(`trigger sample ${argv.sample} using a template ${argv.template} with request ${argv.request} with state ${argv.state}`);
@@ -504,6 +503,23 @@ class Commands {
                 return true;
             });
     }
+
+    /**
+     * Set default params before we compile a template
+     *
+     * @param {object} argv the inbound argument values object
+     * @returns {object} a modfied argument object
+     */
+    static validateCompileArgs(argv) {
+        argv = Commands.validateCommonArgs(argv);
+
+        if(argv.verbose) {
+            Logger.info(`compile using a template ${argv.template}`);
+        }
+
+        return argv;
+    }
+
     /**
      * Compile the template to a given target
      *
