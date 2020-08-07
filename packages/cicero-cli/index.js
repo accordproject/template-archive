@@ -393,7 +393,7 @@ require('yargs')
         }
 
         try {
-            argv = Commands.validateTriggerArgs(argv);
+            argv = Commands.validateCompileArgs(argv);
             const options = {
                 warnings: argv.warnings,
             };
