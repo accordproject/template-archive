@@ -139,12 +139,12 @@ class TemplateLibrary {
         return rp(httpOptions)
             .then((templateIndex) => {
 
-                if(options && options.latestVersion) {
-                    templateIndex = TemplateLibrary.filterTemplateIndexLatestVersion(templateIndex);
-                }
-
                 if(options && options.ciceroVersion) {
                     templateIndex = TemplateLibrary.filterTemplateIndexCiceroVersion(templateIndex, options.ciceroVersion);
+                }
+
+                if(options && options.latestVersion) {
+                    templateIndex = TemplateLibrary.filterTemplateIndexLatestVersion(templateIndex);
                 }
 
                 globalTemplateIndexCache.set(cacheKey, templateIndex);
