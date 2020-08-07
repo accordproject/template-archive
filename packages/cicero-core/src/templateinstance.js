@@ -257,6 +257,44 @@ class TemplateInstance {
         };
     }
 
+    /**
+     * Utility to rebuild a parser when the grammar changes
+     * @param {*} parserManager - the parser manager
+     * @param {*} logicManager - the logic manager
+     * @param {*} ergoEngine - the evaluation engine
+     * @param {string} templateName - this template name
+     * @param {string} grammar - the new grammar
+     */
+    static rebuildParser(parserManager,logicManager,ergoEngine,templateName,grammar) {
+        // Update template in parser manager
+        parserManager.setTemplate(grammar);
+
+        // Rebuild parser
+        parserManager.buildParser();
+
+        // Process formulas
+        const oldFormulas = logicManager.getScriptManager().sourceTemplates;
+        const newFormulas = parserManager.getFormulas();
+
+        if (oldFormulas.length > 0 || newFormulas.length > 0) {
+            // Reset formulas
+            logicManager.getScriptManager().sourceTemplates = [];
+            newFormulas.forEach( (x) => {
+                logicManager.addTemplateFile(x.code, x.name);
+            });
+
+            // Re-set formula evaluation hook
+            parserManager.setFormulaEval((name) => TemplateInstance.ciceroFormulaEval(
+                logicManager,
+                templateName,
+                ergoEngine,
+                name
+            ));
+
+            // Re-compile formulas
+            logicManager.compileLogicSync(true);
+        }
+    }
 }
 
 module.exports = TemplateInstance;

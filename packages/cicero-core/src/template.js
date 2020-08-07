@@ -232,6 +232,7 @@ class Template {
     getParserManager() {
         return this.parserManager;
     }
+
     /**
      * Provides access to the template logic for this template.
      * The template logic encapsulate the code necessary to
