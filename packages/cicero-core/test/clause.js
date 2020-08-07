@@ -15,6 +15,7 @@
 'use strict';
 
 const Template = require('../lib/template');
+const TemplateInstance = require('../lib/templateinstance');
 const TemplateLoader = require('../lib/templateloader');
 const Clause = require('../lib/clause');
 
@@ -69,6 +70,7 @@ describe('Clause', () => {
 
     const testLatePenaltyInput = fs.readFileSync(path.resolve(__dirname, 'data/latedeliveryandpenalty', 'text/sample.md'), 'utf8');
     const testLatePenaltyInputNoForce = fs.readFileSync(path.resolve(__dirname, 'data/latedeliveryandpenalty', 'text/sample-noforce.md'), 'utf8');
+    const testLatePenaltyInputUpdated = fs.readFileSync(path.resolve(__dirname, 'data/latedeliveryandpenalty', 'text/sample-updated.md'), 'utf8');
     const testLatePenaltyPeriodInput = fs.readFileSync(path.resolve(__dirname, 'data/latedeliveryandpenalty-period', 'text/sample.md'), 'utf8');
     const testLatePenaltyCrInput = fs.readFileSync(path.resolve(__dirname, 'data/latedeliveryandpenalty-cr', 'text/sample.md'), 'utf8');
     const testCongaInput = fs.readFileSync(path.resolve(__dirname, 'data/conga', 'text/sample.md'), 'utf8');
@@ -865,6 +867,33 @@ In case of delayed delivery the Seller shall pay to the Buyer for every 9 days o
             clause.parse(testAllBlocksInput);
             const nl = clause.draft();
             nl.should.equal(TemplateLoader.normalizeText(testAllBlocksInput));
+        });
+
+        it('should be able to update the template grammar and draft', async function() {
+            const template = await Template.fromDirectory('./test/data/latedeliveryandpenalty', options);
+            const clause = new Clause(template);
+            const newGrammar = `Late Delivery and Penalty
+====
+In case of delayed delivery{{#if forceMajeure}} except for Force Majeure cases,{{/if}} the Seller shall pay to the Buyer for every {{penaltyDuration}} of delay penalty amounting to {{penaltyPercentage}}% of the total value of the Equipment whose delivery has been delayed. 
+
+- Any fractional part of a {{fractionalPart}} is to be considered a full {{fractionalPart}}. 
+- The total amount of penalty shall not however, exceed {{capPercentage}}% of the total value of the Equipment involved in late delivery. 
+- If the delay is more than {{termination}}, the Buyer is entitled to terminate this Contract.
+
+Adding all precentages in this clause yields: {{% capPercentage + penaltyPercentage %}}.`;
+            // Update the grammar
+            TemplateInstance.rebuildParser(
+                clause.getTemplate().getParserManager(),
+                clause.getTemplate().getLogicManager(),
+                clause.getEngine(),
+                clause.getIdentifier(),
+                newGrammar,
+            );
+            // Parse again
+            clause.parse(testLatePenaltyInputUpdated);
+            // Draft again
+            const nl = clause.draft();
+            nl.should.equal(testLatePenaltyInputUpdated);
         });
     });
 });
