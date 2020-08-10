@@ -20,6 +20,7 @@ const ParserManager = require('@accordproject/markdown-template').ParserManager;
 const crypto = require('crypto');
 const stringify = require('json-stable-stringify');
 const LogicManager = require('@accordproject/ergo-compiler').LogicManager;
+const Script = require('@accordproject/ergo-compiler/lib/script');
 const TemplateLoader = require('./templateloader');
 const TemplateSaver = require('./templatesaver');
 
@@ -59,7 +60,19 @@ class Template {
     validate() {
         this.getModelManager().validateModelFiles();
         this.getTemplateModel();
-        this.getLogicManager().compileLogicSync(true);
+        if (this.getMetadata().getRuntime() === 'ergo') {
+            this.getLogicManager().compileLogicSync(true);
+        } else {
+            // XXX This should be moved to the logic manager -JS
+            const scriptManager = this.getLogicManager().getScriptManager();
+            const mainScript = scriptManager.getCombinedScripts();
+            if (mainScript) {
+                const script = new Script(this.getModelManager(), 'main.js', '.js', mainScript, null);
+                const contractName = script.getContractName();
+                if (contractName) { this.getLogicManager().setContractName(contractName); }
+                scriptManager.compiledScript = script;
+            }
+        }
     }
 
     /**

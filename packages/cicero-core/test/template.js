@@ -323,6 +323,73 @@ In case of delayed delivery except for Force Majeure cases, the Seller shall pay
         });
     });
 
+    describe('#fromCompiledArchive', () => {
+
+        it('should create a template from a compiled archive', async () => {
+            const buffer = fs.readFileSync('./test/data/fixed-interests@0.5.0.cta');
+            return Template.fromArchive(buffer).should.be.fulfilled;
+        });
+
+        it('should create a template from a compiled archive and parse', async () => {
+            const buffer = fs.readFileSync('./test/data/fixed-interests@0.5.0.cta');
+            const template = await Template.fromArchive(buffer);
+
+            const sampleText = `## Fixed rate loan
+
+This is a _fixed interest_ loan to the amount of £100,000.00
+at the yearly interest rate of 2.5%
+with a loan term of 15,
+and monthly payments of {{%I'm not sure which amount right now%}}
+`;
+            const clause = new Clause(template);
+            clause.parse(sampleText);
+            const result = clause.getData();
+            delete result.clauseId;
+
+            const expected = {
+                '$class': 'org.accordproject.interests.TemplateModel',
+                'loanAmount': {
+                    '$class': 'org.accordproject.money.MonetaryAmount',
+                    'doubleValue': 100000,
+                    'currencyCode': 'GBP'
+                },
+                'rate': 2.5,
+                'loanDuration': 15
+            };
+            result.should.deep.equal(expected);
+        });
+
+        it('should create a template from a compiled archive and draft', async () => {
+            const buffer = fs.readFileSync('./test/data/fixed-interests@0.5.0.cta');
+            const template = await Template.fromArchive(buffer);
+
+            const data = {
+                '$class': 'org.accordproject.interests.TemplateModel',
+                'loanAmount': {
+                    '$class': 'org.accordproject.money.MonetaryAmount',
+                    'doubleValue': 100000,
+                    'currencyCode': 'GBP'
+                },
+                'rate': 2.5,
+                'loanDuration': 15,
+                'clauseId': '0bb38858-24b3-4853-b8c2-2fa3b93dce8d'
+            };
+
+            const clause = new Clause(template);
+            clause.setData(data);
+            const result = clause.draft();
+
+            const expected = `Fixed rate loan
+----
+
+This is a *fixed interest* loan to the amount of £100,000.00
+at the yearly interest rate of 2.5%
+with a loan term of 15,
+and monthly payments of {{%"£667.00"%}}`;
+            result.should.equal(expected);
+        });
+    });
+
     describe('#fromUrl', () => {
 
         it('should throw an error if an archive loader cannot be found', async () => {
