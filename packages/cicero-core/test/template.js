@@ -281,11 +281,11 @@ In case of delayed delivery except for Force Majeure cases, the Seller shall pay
         });
 
         it('should throw an error for property that is not declared', () => {
-            return Template.fromDirectory('./test/data/bad-property', options).should.be.rejectedWith('Unknown property currency');
+            return Template.fromDirectory('./test/data/bad-property', options).should.be.rejectedWith('Unknown property: currency');
         });
 
         it('should throw an error for clause property that is not declared', () => {
-            return Template.fromDirectory('./test/data/bad-copyright-license', options).should.be.rejectedWith('Unknown property badPaymentClause');
+            return Template.fromDirectory('./test/data/bad-copyright-license', options).should.be.rejectedWith('Unknown property: badPaymentClause');
         });
 
         it('should create an archive for a template with two Ergo modules', async () => {
