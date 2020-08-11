@@ -98,7 +98,7 @@ describe('Clause', () => {
             try {
                 await Template.fromDirectory('./test/data/bad-binding', options);
             } catch (err) {
-                err.message.should.equal('Unknown property articipant');
+                err.message.should.equal('Unknown property: articipant File text/grammar.tem.md line -1 column -1');
             }
         });
 
@@ -106,7 +106,7 @@ describe('Clause', () => {
             try {
                 await Template.fromDirectory('./test/data/bad-boolean-binding', options);
             } catch (err) {
-                err.message.should.equal('An if block can only be used with a boolean property. Property participant has type Participant File text/grammar.tem.md line 1 column 7');
+                err.message.should.equal('Conditional template not on a boolean property: participant File text/grammar.tem.md line -1 column -1');
             }
         });
 
@@ -381,7 +381,7 @@ Expected: 'I'm active' or 'I'm inactive'`);
             try {
                 await Template.fromDirectory('./test/data/block-ifelse-error', options);
             } catch (err) {
-                err.message.should.eql('An if block can only be used with a boolean property. Property isActive has type Double File text/grammar.tem.md line 1 column 7');
+                err.message.should.eql('Conditional template not on a boolean property: isActive File text/grammar.tem.md line -1 column -1');
             }
         });
 
