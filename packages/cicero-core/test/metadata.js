@@ -489,7 +489,7 @@ describe('Metadata', () => {
             const md = new Metadata({
                 name: 'template',
                 version: '1.0.0',
-                accordproject: {ergo:'0.20.0-alpha.2',cicero:caretRange(ciceroVersion),runtime:'cicero'}
+                accordproject: {ergo:'0.20.0-alpha.2',cicero:caretRange(ciceroVersion),runtime:'es6'}
             }, null, {});
             should.not.exist(md.getAuthor());
         });
@@ -498,7 +498,7 @@ describe('Metadata', () => {
                 name: 'template',
                 version: '1.0.0',
                 author: 'foo',
-                accordproject: {ergo:'0.20.0-alpha.2',cicero:caretRange(ciceroVersion),runtime:'cicero'}
+                accordproject: {ergo:'0.20.0-alpha.2',cicero:caretRange(ciceroVersion),runtime:'es6'}
             }, null, {});
             md.getAuthor().should.equal('foo');
         });

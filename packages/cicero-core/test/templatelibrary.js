@@ -71,11 +71,7 @@ describe('TemplateLibrary', () => {
             templateIndex.should.not.have.property('helloworld@0.2.0');
         });
 
-<<<<<<< HEAD
         it('should retrieve index for cicero version 0.20.0', async function() {
-=======
-        it.skip('should retrieve latest version index for cicero version 0.20.0', async function() {
->>>>>>> 9b7056f... fix(test) Temporarily skip a couple of library tests
             const templateLibrary = new TemplateLibrary();
             const templateIndex = await templateLibrary.getTemplateIndex({ciceroVersion: '0.20.10'});
             templateIndex.should.have.property('acceptance-of-delivery@0.13.0');
