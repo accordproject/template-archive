@@ -19,6 +19,7 @@ const Clause = require('@accordproject/cicero-core').Clause;
 const Engine = require('../lib/engine');
 
 const chai = require('chai');
+const expect = chai.expect;
 
 chai.should();
 chai.use(require('chai-things'));
@@ -450,14 +451,6 @@ describe('BogusClauses', () => {
 
     afterEach(() => {});
 
-    it('should throw error when no __dispatch in JavaScript logic', async () => {
-        const scriptManager = clause.getTemplate().getScriptManager();
-        return (() => scriptManager.hasDispatch()).should.throw('Function __dispatch was not found in logic');
-    });
-    it('should throw error when no __init in JavaScript logic', async () => {
-        const scriptManager = clause.getTemplate().getScriptManager();
-        return (() => scriptManager.hasInit()).should.throw('Function __init was not found in logic');
-    });
     it('should throw an error when JavaScript logic is missing', async function() {
         // Turn all JavaScript logic into something else
         const scriptManager = clause.getTemplate().getScriptManager();
@@ -466,14 +459,14 @@ describe('BogusClauses', () => {
                 element.language = '.ergo';
             }
         }, this);
-        scriptManager.compiledScript = null;
-        (() => engine.getErgoEngine().cacheJsScript(scriptManager)).should.throw('Did not find any compiled JavaScript logic');
+        scriptManager.compiledModule = null;
+        await expect(engine.getErgoEngine().cacheModule(scriptManager)).to.be.rejectedWith('Did not find any compiled logic');
     });
     it('should throw an error when all logic is missing', async function() {
         // Remove all scripts
         const scriptManager = clause.getTemplate().getScriptManager();
         scriptManager.clearScripts();
-        (() => engine.getErgoEngine().cacheJsScript(scriptManager)).should.throw('Did not find any compiled JavaScript logic');
+        await expect(engine.getErgoEngine().cacheModule(scriptManager)).to.be.rejectedWith('Did not find any compiled logic');
     });
 });
 

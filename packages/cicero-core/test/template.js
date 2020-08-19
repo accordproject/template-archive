@@ -96,7 +96,7 @@ describe('Template', () => {
 
         it('should throw an error if archive language is not a valid target', async () => {
             const templatePromise = Template.fromDirectory('./test/data/latedeliveryandpenalty', options);
-            return templatePromise.then((template) => template.toArchive('foo')).should.be.rejectedWith('Unknown target: foo (available: es6,java)');
+            return templatePromise.then((template) => template.toArchive('foo')).should.be.rejectedWith('Unknown target: foo (available: es6,java,wasm)');
         });
 
         it('should throw an error if archive language is is absent', async () => {

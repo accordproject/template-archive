@@ -3703,14 +3703,6 @@ class orgXaccordprojectXlatedeliveryandpenaltyXLateDeliveryAndPenalty{
     }
   }
 }
-function __dispatch(context) {
-  let pcontext = Object.assign(context, { 'request' : context.request });
-  return orgXaccordprojectXlatedeliveryandpenaltyXLateDeliveryAndPenalty.main(pcontext);
-}
-function __init(context) {
-  let pcontext = Object.assign(context, { 'state': { '$class': 'org.accordproject.cicero.contract.AccordContractState', 'stateId' : 'org.accordproject.cicero.contract.AccordContractState#1' } });
-  return new orgXaccordprojectXlatedeliveryandpenaltyXLateDeliveryAndPenalty().init(pcontext);
-}
 /*eslint-enable no-unused-vars*/
 /*eslint-enable no-undef*/
 
@@ -5224,21 +5216,6 @@ function natOfFloat(v) {
     return boxNat(Math.trunc(v));
 }
 
-/* Unwrapping errors on output */
-function unwrapError(result) {
-    if (result.hasOwnProperty('$left')) {
-        return toLeft(result);
-    } else {
-        var failure = toRight(result);
-        var message = "Unknown Ergo Logic Error (Please file a GitHub issue)";
-        if (either(cast(["org.accordproject.ergo.stdlib.ErgoErrorResponse"],failure))) {
-            message = unbrand(toLeft(cast(["org.accordproject.ergo.stdlib.ErgoErrorResponse"],failure))).message;
-        } else {
-            message = JSON.stringify(toRight(cast(["org.accordproject.ergo.stdlib.ErgoErrorResponse"],failure)));
-        }
-        throw new Error("[Ergo] " + message);
-    }
-}
 /*
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.

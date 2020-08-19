@@ -522,7 +522,7 @@ describe('Metadata', () => {
                 accordproject: {ergo:'0.20.0-alpha.2',cicero:caretRange(ciceroVersion),runtime:'foo'}
             }, null, {
                 en: 'sample'
-            })).should.throw('Unknown target: foo (available: es6,java)');
+            })).should.throw('Unknown target: foo (available: es6,java,wasm)');
         });
 
         it('should create a new metadata for the given target runtime', () => {
@@ -546,7 +546,7 @@ describe('Metadata', () => {
             }, null, {
                 en: 'sample'
             });
-            (() => md.createTargetMetadata('foo')).should.throw('Unknown target: foo (available: es6,java)');
+            (() => md.createTargetMetadata('foo')).should.throw('Unknown target: foo (available: es6,java,wasm)');
         });
     });
 

@@ -43,7 +43,7 @@ class Engine {
      * @param {string} currentTime - the definition of 'now'
      * @return {Promise} a promise that resolves to a result for the clause
      */
-    async trigger(clause, request, state, currentTime) {
+    trigger(clause, request, state, currentTime) {
         const logicManager = clause.getLogicManager();
         const clauseId = clause.getIdentifier();
         const contract = clause.getData();
@@ -63,7 +63,7 @@ class Engine {
      * @param {string} currentTime - the definition of 'now'
      * @return {Promise} a promise that resolves to a result for the clause
      */
-    async invoke(clause, clauseName, params, state, currentTime) {
+    invoke(clause, clauseName, params, state, currentTime) {
         const logicManager = clause.getLogicManager();
         const clauseId = clause.getIdentifier();
         const contract = clause.getData();
@@ -77,7 +77,7 @@ class Engine {
      * @param {string} currentTime - the definition of 'now'
      * @return {Promise} a promise that resolves to a result for the clause initialization
      */
-    async init(clause, currentTime) {
+    init(clause, currentTime) {
         const logicManager = clause.getLogicManager();
         const clauseId = clause.getIdentifier();
         const contract = clause.getData();
