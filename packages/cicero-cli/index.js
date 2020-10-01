@@ -87,11 +87,6 @@ require('yargs')
             type: 'string',
             default: null
         });
-        yargs.option('wrapVariables', {
-            describe: 'wrap variables as XML tags',
-            type: 'boolean',
-            default: false
-        });
         yargs.option('format', {
             describe: 'target format',
             type: 'string'
@@ -114,7 +109,6 @@ require('yargs')
         try {
             argv = Commands.validateDraftArgs(argv);
             const options = {
-                wrapVariables: argv.wrapVariables,
                 unquoteVariables: argv.unquoteVariables,
                 warnings: argv.warnings,
                 format: argv.format,
@@ -159,11 +153,6 @@ require('yargs')
             type: 'boolean',
             default: false
         });
-        yargs.option('wrapVariables', {
-            describe: 'wrap variables as XML tags',
-            type: 'boolean',
-            default: false
-        });
         yargs.option('format', {
             describe: 'target format',
             type: 'string'
@@ -181,7 +170,6 @@ require('yargs')
         try {
             argv = Commands.validateNormalizeArgs(argv);
             const options = {
-                wrapVariables: argv.wrapVariables,
                 unquoteVariables: argv.unquoteVariables,
                 warnings: argv.warnings,
                 format: argv.format,
