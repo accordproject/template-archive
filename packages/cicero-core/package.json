@@ -34,7 +34,8 @@
   },
   "repository": {
     "type": "git",
-    "url": "https://github.com/accordproject/cicero.git"
+    "url": "https://github.com/accordproject/cicero.git",
+    "directory": "packages/cicero-core"
   },
   "keywords": [
     "accord",
