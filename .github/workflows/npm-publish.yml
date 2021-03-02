@@ -12,15 +12,13 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2
-      - uses: actions/setup-node@v1
+      - uses: actions/setup-node@v2
         with:
           node-version: 12
-      - run: npm ci
-      - run: npm test
+          registry-url: 'https://registry.npmjs.org'
 
   publish:
     name: Publish to npm
-
     runs-on: ubuntu-latest
 
     outputs:
@@ -33,7 +31,8 @@ jobs:
       - name: build and publish
         run: |
           echo "//registry.npmjs.org/:_authToken=${{ secrets.NPM_AUTH_TOKEN }}" > .npmrc
-          yarn install
+          npm install -g lerna
+          lerna bootstrap
           npm run pkgset ${{ github.event.release.tag_name }}
           lerna exec -- npm publish --tag="${{ github.event.release.tag_name }}" 2>&1
           rm .npmrc
