@@ -11,9 +11,8 @@ jobs:
   publish:
     name: Publish to npm
     runs-on: ubuntu-latest
-
-    outputs:
-      job-status: ${{ job.status }}
+    env:
+      NPM_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
     steps:
       - name: git checkout
@@ -22,12 +21,11 @@ jobs:
       - name: build and publish
         run: |
           echo "//registry.npmjs.org/:_authToken=${{ secrets.NPM_TOKEN }}" > .npmrc
-          cat .npmrc
           npx lerna bootstrap
           npm run pkgset ${{ github.event.release.tag_name }}
           npx lerna exec -- npm publish --tag="unstable" 2>&1
 
-      - name: Create Pull Request
+      - name: create PR to increment version
         id: cpr
         uses: peter-evans/create-pull-request@v3
         with:
