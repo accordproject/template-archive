@@ -12,7 +12,7 @@ jobs:
     name: Publish to npm
     runs-on: ubuntu-latest
     env:
-      NPM_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      NPM_TOKEN_TEST: ${{ secrets.NPM_TOKEN_TEST }}
 
     steps:
       - name: git checkout
@@ -20,7 +20,7 @@ jobs:
 
       - name: build and publish
         run: |
-          echo "//registry.npmjs.org/:_authToken=${{ secrets.NPM_TOKEN }}" > .npmrc
+          echo "//registry.npmjs.org/:_authToken=${{ secrets.NPM_TOKEN_TEST }}" > .npmrc
           npx lerna bootstrap
           npm run pkgset ${{ github.event.release.tag_name }}
           npx lerna exec -- npm publish --tag="unstable" 2>&1
