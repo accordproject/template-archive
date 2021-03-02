@@ -19,6 +19,8 @@ jobs:
         with:
           node-version: 12
           registry-url: 'https://registry.npmjs.org'
+      - run: npm ci
+      - run: npm test
 
   publish:
     name: Publish to npm
@@ -34,6 +36,7 @@ jobs:
       - name: build and publish
         run: |
           echo "//registry.npmjs.org/:_authToken=${{ secrets.NPM_AUTH_TOKEN }}" > .npmrc
+          npx lerna bootstrap
           npm run pkgset ${{ github.event.release.tag_name }}
           npx lerna exec -- npm publish --tag="${{ github.event.release.tag_name }}" 2>&1
           rm .npmrc
