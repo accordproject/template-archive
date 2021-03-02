@@ -21,7 +21,7 @@ jobs:
 
       - name: build and publish
         run: |
-          echo "//registry.npmjs.org/:_authToken=${{ secrets.NPM_AUTH_TOKEN }}" > .npmrc
+          echo "//registry.npmjs.org/:_authToken=${{ secrets.NPM_TOKEN }}" > .npmrc
           cat .npmrc
           npx lerna bootstrap
           npm run pkgset ${{ github.event.release.tag_name }}
