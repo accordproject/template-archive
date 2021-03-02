@@ -38,7 +38,7 @@ jobs:
           echo "//registry.npmjs.org/:_authToken=${{ secrets.NPM_AUTH_TOKEN }}" > .npmrc
           npx lerna bootstrap
           npm run pkgset ${{ github.event.release.tag_name }}
-          npx lerna exec -- npm publish --tag="${{ github.event.release.tag_name }}" 2>&1
+          npx lerna exec -- npm publish --tag=unstable
           rm .npmrc
 
       - name: Create Pull Request
