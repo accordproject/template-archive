@@ -31,8 +31,6 @@ jobs:
       - name: build and publish
         run: |
           echo "//registry.npmjs.org/:_authToken=${{ secrets.NPM_AUTH_TOKEN }}" > .npmrc
-          npm install -g lerna
-          lerna bootstrap
           npm run pkgset ${{ github.event.release.tag_name }}
           lerna exec -- npm publish --tag="${{ github.event.release.tag_name }}" 2>&1
           rm .npmrc
