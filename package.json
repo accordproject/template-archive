@@ -18,8 +18,8 @@
     "event-stream": "4.0.1"
   },
   "engines": {
-    "node": ">=8",
-    "npm": ">=3"
+    "node": ">=12",
+    "npm": ">=5"
   },
   "name": "cicero",
   "description": "You must install [Lerna](https://lernajs.io) to build this multi-package repository.",
