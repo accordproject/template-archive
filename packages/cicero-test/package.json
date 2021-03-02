@@ -23,7 +23,8 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/accordproject/cicero.git"
+    "url": "git+https://github.com/accordproject/cicero.git",
+    "directory": "packages/cicero-test"
   },
   "keywords": [
     "accord",
