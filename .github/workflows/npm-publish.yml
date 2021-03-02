@@ -22,10 +22,10 @@ jobs:
       - name: build and publish
         run: |
           echo "//registry.npmjs.org/:_authToken=${{ secrets.NPM_AUTH_TOKEN }}" > .npmrc
+          cat .npmrc
           npx lerna bootstrap
           npm run pkgset ${{ github.event.release.tag_name }}
           npx lerna exec -- npm publish --tag="unstable" 2>&1
-          rm .npmrc
 
       - name: Create Pull Request
         id: cpr
