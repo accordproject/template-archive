@@ -18,30 +18,42 @@ jobs:
       - run: npm ci
       - run: npm test
 
-  publish-npm:
-    needs: build
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v2
-      - uses: actions/setup-node@v1
-        with:
-          node-version: 12
-          registry-url: https://registry.npmjs.org/
-      - run: npm ci
-      - run: npm publish
-        env:
-          NODE_AUTH_TOKEN: ${{secrets.npm_token}}
+  publish:
+    name: Publish to npm
 
-  publish-gpr:
-    needs: build
     runs-on: ubuntu-latest
+
+    outputs:
+      job-status: ${{ job.status }}
+
     steps:
-      - uses: actions/checkout@v2
-      - uses: actions/setup-node@v1
+      - name: git checkout
+        uses: actions/checkout@v2
+
+      - name: build and publish
+        run: |
+          echo "//registry.npmjs.org/:_authToken=${{ secrets.NPM_AUTH_TOKEN }}" > .npmrc
+          yarn install
+          npm run pkgset ${{ github.event.release.tag_name }}
+          lerna exec -- npm publish --tag="${{ github.event.release.tag_name }}" 2>&1
+          rm .npmrc
+
+      - name: Create Pull Request
+        id: cpr
+        uses: peter-evans/create-pull-request@v3
         with:
-          node-version: 12
-          registry-url: https://npm.pkg.github.com/
-      - run: npm ci
-      - run: npm publish
-        env:
-          NODE_AUTH_TOKEN: ${{secrets.GITHUB_TOKEN}}
+          base: main
+          commit-message: 'chore(actions): publish ${{ github.event.release.tag_name }} to npm'
+          committer: GitHub <noreply@github.com>
+          author: ${{ github.actor }} <${{ github.actor }}@users.noreply.github.com>
+          signoff: false
+          branch: cicero-publish-${{ github.event.release.tag_name }}
+          delete-branch: true
+          title: 'chore(actions): publish ${{ github.event.release.tag_name }} to npm'
+          body: |
+            # NPM Publish
+
+            Publish build to NPM
+          assignees: ${{ github.actor }}
+          reviewers: ${{ github.actor }}
+          draft: false
