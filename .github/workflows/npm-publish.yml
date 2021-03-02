@@ -10,9 +10,12 @@ on:
 jobs:
   build:
     runs-on: ubuntu-latest
+    env:
+      NPM_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
     steps:
       - uses: actions/checkout@v2
-      - uses: actions/setup-node@v2
+      - uses: actions/setup-node@v1
         with:
           node-version: 12
           registry-url: 'https://registry.npmjs.org'
@@ -32,7 +35,7 @@ jobs:
         run: |
           echo "//registry.npmjs.org/:_authToken=${{ secrets.NPM_AUTH_TOKEN }}" > .npmrc
           npm run pkgset ${{ github.event.release.tag_name }}
-          lerna exec -- npm publish --tag="${{ github.event.release.tag_name }}" 2>&1
+          npx lerna exec -- npm publish --tag="${{ github.event.release.tag_name }}" 2>&1
           rm .npmrc
 
       - name: Create Pull Request
