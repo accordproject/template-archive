@@ -30,7 +30,7 @@ jobs:
         id: cpr
         uses: peter-evans/create-pull-request@v3
         with:
-          base: main
+          base: master
           commit-message: 'chore(actions): publish ${{ github.event.release.tag_name }} to npm'
           committer: GitHub <noreply@github.com>
           author: ${{ github.actor }} <${{ github.actor }}@users.noreply.github.com>
