@@ -39,6 +39,7 @@ jobs:
     - run: npm run build --if-present
     - run: npm test
     - run: |
+          npm run pkgstamp
           npm config set //registry.npmjs.org/:_authToken ${NPM_TOKEN}
           npx lerna bootstrap
           npx lerna exec -- npm publish --ignore-scripts --tag=unstable 2>&1
