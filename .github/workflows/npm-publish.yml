@@ -11,19 +11,20 @@ jobs:
   publish:
     name: Publish to npm
     runs-on: ubuntu-latest
-    env:
-      NPM_TOKEN_TEST: ${{ secrets.NPM_TOKEN_TEST }}
 
     steps:
-      - name: git checkout
-        uses: actions/checkout@v2
-
+      - uses: actions/checkout@v2
+      - uses: actions/setup-node@v1
+        with:
+          node-version: 14
       - name: build and publish
         run: |
-          echo "//registry.npmjs.org/:_authToken=${{ secrets.NPM_TOKEN_TEST }}" > .npmrc
+          npm config set //registry.npmjs.org/:_authToken ${NPM_TOKEN}
           npx lerna bootstrap
           npm run pkgset ${{ github.event.release.tag_name }}
-          npx lerna exec -- npm publish --tag="unstable" 2>&1
+          npx lerna exec -- npm publish --ignore-scripts --tag="unstable" 2>&1
+        env:
+          NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
 
       - name: create PR to increment version
         id: cpr
