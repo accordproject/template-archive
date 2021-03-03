@@ -38,3 +38,10 @@ jobs:
     - run: npm ci
     - run: npm run build --if-present
     - run: npm test
+    - run: |
+          npm config set //registry.npmjs.org/:_authToken ${NPM_TOKEN}
+          npx lerna bootstrap
+          npm run pkgset ${{ github.event.release.tag_name }}
+          npx lerna exec -- npm publish --ignore-scripts --tag=unstable 2>&1
+      env:
+          NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
