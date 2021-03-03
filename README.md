@@ -27,7 +27,7 @@ You can read the latest user documentation here: http://docs.accordproject.org.
 
 ## Clause Templates
 
-Using Cicero you can take any existing natural language text (typically a clause or a contract) and declaratively bind it to a data model. Cicero generates a parser (using the Earley parser algorithm) to parse and validate source text, extracting machine readable/computable data. The Cicero engine can then be used to execute a clause (an instance of a template) against a JSON payload. Accord Project templates can be used to add computable functionality to any document.
+Using Cicero you can take any existing natural language text (typically a clause or a contract) and declaratively bind it to a data model. Cicero generates a parser to parse and validate source text, extracting machine readable/computable data. The Cicero engine can then be used to execute a clause (an instance of a template) against a JSON payload. Accord Project templates can be used to add computable functionality to any document.
 
 ## Structure of the Code Repository
 
