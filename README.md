@@ -322,7 +322,6 @@ Copyright 2018-2019 Clause, Inc. All trademarks are the property of their respec
 [apdoc]: https://docs.accordproject.org/
 [apslack]: https://accord-project-slack-signup.herokuapp.com
 
-[docspec]: https://docs.accordproject.org/docs/spec-overview.html
 [docwelcome]: https://docs.accordproject.org/docs/accordproject.html
 [dochighlevel]: https://docs.accordproject.org/docs/spec-concepts.html
 [docergo]: https://docs.accordproject.org/docs/logic-ergo.html
