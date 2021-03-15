@@ -288,6 +288,10 @@ require('yargs')
             describe: 'path to the contract text',
             type: 'string'
         });
+        yargs.option('params', {
+            describe: 'path to the parameters',
+            type: 'string'
+        });
         yargs.option('currentTime', {
             describe: 'initialize with this current time',
             type: 'string',
@@ -305,7 +309,7 @@ require('yargs')
             const options = {
                 warnings: argv.warnings,
             };
-            return Commands.initialize(argv.template, argv.sample, argv.currentTime, options)
+            return Commands.initialize(argv.template, argv.sample, argv.params, argv.currentTime, options)
                 .then((result) => {
                     if(result) {Logger.info(JSON.stringify(result));}
                 })

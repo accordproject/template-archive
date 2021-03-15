@@ -75,14 +75,18 @@ class Engine {
      * Initialize a clause
      * @param {Clause} clause  - the clause
      * @param {string} currentTime - the definition of 'now'
+     * @param {object} params - the clause parameters, a JS object
+     * whose fields that can be deserialized using the Composer
+     * serializer.
      * @return {Promise} a promise that resolves to a result for the clause initialization
      */
-    async init(clause, currentTime) {
+    async init(clause, currentTime, params) {
+        const effectiveParams = params || {};
         const logicManager = clause.getLogicManager();
         const clauseId = clause.getIdentifier();
         const contract = clause.getData();
 
-        return this.ergoEngine.init(logicManager,clauseId,contract,{},currentTime,null);
+        return this.ergoEngine.init(logicManager,clauseId,contract,effectiveParams,currentTime,null);
     }
 
     /**

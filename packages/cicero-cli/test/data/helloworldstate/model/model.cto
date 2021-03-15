@@ -1,0 +1,26 @@
+namespace org.accordproject.helloworldstate
+
+import org.accordproject.cicero.contract.* from https://models.accordproject.org/cicero/contract.cto
+import org.accordproject.cicero.runtime.* from https://models.accordproject.org/cicero/runtime.cto
+
+transaction MyRequest extends Request {
+  o String input
+}
+
+transaction MyResponse extends Response {
+  o String output
+}
+
+asset HelloWorldState extends AccordContractState {
+  o Double counter
+}
+
+/**
+ * The template model
+ */
+asset HelloWorldClause extends AccordClause {
+  /**
+   * The name for the clause
+   */
+  o String name
+}

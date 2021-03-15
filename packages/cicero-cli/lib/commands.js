@@ -437,13 +437,15 @@ class Commands {
      *
      * @param {string} templatePath - path to the template directory or archive
      * @param {string} samplePath - to the sample file
+     * @param {object} paramsPath - the parameters for the initialization
      * @param {string} currentTime - the definition of 'now'
      * @param {Object} [options] - an optional set of options
      * @returns {object} Promise to the result of execution
      */
-    static initialize(templatePath, samplePath, currentTime, options) {
+    static initialize(templatePath, samplePath, paramsPath, currentTime, options) {
         let clause;
         const sampleText = fs.readFileSync(samplePath, 'utf8');
+        const paramsJson = paramsPath ? JSON.parse(fs.readFileSync(paramsPath, 'utf8')) : {};
 
         const engine = new Engine();
         return Commands.loadTemplate(templatePath, options)
@@ -452,7 +454,7 @@ class Commands {
                 clause = new Clause(template);
                 clause.parse(sampleText, currentTime);
 
-                return engine.init(clause, currentTime);
+                return engine.init(clause, currentTime, paramsJson);
             })
             .catch((err) => {
                 Logger.error(err.message);
