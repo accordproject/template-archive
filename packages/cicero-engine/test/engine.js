@@ -310,6 +310,33 @@ describe('EngineHelloWorld', () => {
     });
 });
 
+describe('EngineHelloWorldState', () => {
+
+    let engine;
+    let clause;
+    const helloWorldInput = fs.readFileSync(path.resolve(__dirname, 'data/helloworldstate', 'text/sample.md'), 'utf8');
+
+    beforeEach(async function () {
+        engine = new Engine();
+        const template = await Template.fromDirectory('./test/data/helloworldstate', options);
+        clause = new Clause(template);
+        clause.parse(helloWorldInput);
+    });
+
+    afterEach(() => {});
+
+    describe('#initialize', function () {
+
+        it('should initialize a state with counter set to 2', async function () {
+            const params = { startsAt : 2 };
+            const result = await engine.init(clause, null, params);
+            result.should.not.be.null;
+            result.state.counter.should.equal(2);
+        });
+
+    });
+});
+
 describe('EngineHelloModule', () => {
 
     let engine;
