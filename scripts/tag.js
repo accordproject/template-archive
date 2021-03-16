@@ -15,13 +15,15 @@
 
 'use strict';
 
-const fs = require('fs');
-const path = require('path');
 const semver = require('semver');
+const targetVersion = process.argv[2];
 
-const lernaDirectory = path.resolve('.');
-const lernaConfigFile = path.resolve(lernaDirectory, 'lerna.json');
-const lernaConfig = require(lernaConfigFile);
-const targetVersion = semver.inc(lernaConfig.version, 'patch');
-lernaConfig.version = targetVersion;
-fs.writeFileSync(lernaConfigFile, JSON.stringify(lernaConfig, null, 2), 'utf8');
+if (!semver.valid(targetVersion)) {
+    console.error(`Error: the version "${targetVersion}" is invalid!`);
+    process.exit(1);
+}
+
+const prerelease = semver.prerelease(targetVersion);
+const tag = prerelease ? 'unstable' : 'stable';
+
+console.log(`::set-output name=tag::--tag=${tag}`);
