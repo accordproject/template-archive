@@ -50,6 +50,11 @@ class TemplateSaver {
             dir: true
         }));
 
+        // save the tests
+        zip.file('test/',null, Object.assign({} , options, {
+            dir: true
+        }));
+
         if (template.getParserManager().getTemplate()) {
             zip.file('text/grammar.tem.md', template.getParserManager().getTemplate(), options);
         }
