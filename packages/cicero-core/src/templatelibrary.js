@@ -219,6 +219,11 @@ class TemplateLibrary {
             return result;
         }
 
+        // Set HTTP auth if available
+        if(this.auth && this.auth.type && this.auth.credential) {
+            httpOptions.headers.Authorization = this.auth.type + ' ' + this.auth.credential;
+        }        
+
         const templateUriInfo = TemplateLibrary.parseURI(templateUri);
         const templateIndex = await this.getTemplateIndex();
         const templateMetadata = templateIndex[`${templateUriInfo.templateName}@${templateUriInfo.templateVersion}`];
