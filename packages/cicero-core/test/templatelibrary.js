@@ -17,6 +17,8 @@
 const TemplateLibrary = require('../lib/templatelibrary');
 
 const chai = require('chai');
+const mock = require('mock-require');
+const { expect } = require('chai');
 
 chai.should();
 chai.use(require('chai-things'));
@@ -35,6 +37,29 @@ describe('TemplateLibrary', () => {
             const templateLibrary = new TemplateLibrary('https://foo.org');
             templateLibrary.url.should.equal('https://foo.org');
         });
+
+        it('should create with Basic Auth httpHeader', async function() {
+            const templateLibrary = new TemplateLibrary('https://foo.org', 'Basic someBasicCredential');
+            templateLibrary.url.should.equal('https://foo.org');
+            templateLibrary.httpHeader.should.equal('Basic someBasicCredential');
+        });
+
+        it('should create with Bearer Token httpHeader', async function() {
+            const templateLibrary = new TemplateLibrary('https://foo.org', 'Bearer someBearerToken');
+            templateLibrary.url.should.equal('https://foo.org');
+            templateLibrary.httpHeader.should.equal('Bearer someBearerToken');
+        });
+
+        it('should create with AWS Signature', async function() {
+            const templateLibrary = new TemplateLibrary('https://foo.org', 'AWSAccessKey AWSSecretKey');
+            templateLibrary.url.should.equal('https://foo.org');
+            templateLibrary.httpHeader.should.equal('AWSAccessKey AWSSecretKey');
+        });
+
+        it('should work fine without httpHeader', async function() {
+            const templateLibrary = new TemplateLibrary('https://foo.org');
+            templateLibrary.url.should.equal('https://foo.org');
+        });
     });
 
     describe('#getTemplateIndex', () => {
@@ -43,6 +68,30 @@ describe('TemplateLibrary', () => {
             const templateLibrary = new TemplateLibrary();
             const templateIndex = await templateLibrary.getTemplateIndex();
             templateIndex.should.have.property('helloworld@0.3.0');
+        });
+
+        it('should retrieve index for template library without authentication', async () => {
+            const templateLibrary = new TemplateLibrary();
+            const templateIndex = await templateLibrary.getTemplateIndex();
+            templateIndex.should.have.property('helloworld@0.3.0');
+            // Mocks request-promise library
+            mock('request-promise', { get: () => { return templateLibrary.getHttpOptions();}});
+            const request = require('request-promise');
+            // Calls the mock get function to getHttpOptions
+            let getParams = request.get();
+            expect(getParams.headers.Authorization).to.be.equal(null);
+        });
+
+        it('should retrieve index for template library with authentication', async () => {
+            const templateLibrary = new TemplateLibrary(null,'Bearer someBearerToken');
+            const templateIndex = await templateLibrary.getTemplateIndex();
+            templateIndex.should.have.property('helloworld@0.3.0');
+            // Mocks request-promise library
+            mock('request-promise', { get: () => { return templateLibrary.getHttpOptions();}});
+            const request = require('request-promise');
+            // Calls the mock get function to getHttpOptions
+            let getParams = request.get();
+            expect(getParams.headers.Authorization).to.be.equal('Bearer someBearerToken');
         });
 
         it('should retrieve index from cache', async function() {
@@ -171,6 +220,30 @@ describe('TemplateLibrary', () => {
             const templateLibrary = new TemplateLibrary();
             const template = await templateLibrary.getTemplate('ap://ip-payment@0.13.0#a4b918a2be2d984dbddd5d8b41703b0761d6cd03d1e65ad3d3cd4a11d2bb1ab2');
             template.getIdentifier().should.equal('ip-payment@0.13.0');
+        });
+
+        it('should retrieve a template without authentication', async () => {
+            const templateLibrary = new TemplateLibrary();
+            const template = await templateLibrary.getTemplate('ap://ip-payment@0.13.0#a4b918a2be2d984dbddd5d8b41703b0761d6cd03d1e65ad3d3cd4a11d2bb1ab2');
+            template.getIdentifier().should.equal('ip-payment@0.13.0');
+            // Mocks request-promise library
+            mock('request-promise', { get: () => { return templateLibrary.getHttpOptions();}});
+            const request = require('request-promise');
+            // Calls the mock get function to getHttpOptions
+            let getParams = request.get();
+            expect(getParams.headers.Authorization).to.be.equal(null);
+        });
+
+        it('should retrieve a template without authentication', async () => {
+            const templateLibrary = new TemplateLibrary(null,'Bearer someBearerToken');
+            const template = await templateLibrary.getTemplate('ap://ip-payment@0.13.0#a4b918a2be2d984dbddd5d8b41703b0761d6cd03d1e65ad3d3cd4a11d2bb1ab2');
+            template.getIdentifier().should.equal('ip-payment@0.13.0');
+            // Mocks request-promise library
+            mock('request-promise', { get: () => { return templateLibrary.getHttpOptions();}});
+            const request = require('request-promise');
+            // Calls the mock get function to getHttpOptions
+            let getParams = request.get();
+            expect(getParams.headers.Authorization).to.be.equal('Bearer someBearerToken');
         });
     });
 

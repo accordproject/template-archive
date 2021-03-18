@@ -40,10 +40,17 @@ class TemplateLibrary {
      * Create the Template Library
      * @param {string} url - the url to connect to. Defaults to
      * https://templates.accordproject.org
+     * @param {string} httpHeader - To set the Headers for Authorization
      */
-    constructor(url=null) {
+    constructor(url=null,httpHeader = null) {
         this.url = url || 'https://templates.accordproject.org';
+        this.httpHeader = httpHeader;
         Logger.info('Creating TemplateLibrary for ' + this.url);
+        if (this.httpHeader){
+            Logger.info('TemplateLibrary with authentication');
+        } else {
+            Logger.info('TemplateLibrary without authentication');
+        }
     }
 
     /**
@@ -127,10 +134,17 @@ class TemplateLibrary {
             return Promise.resolve(result);
         }
 
+        if(this.httpHeader) {
+            Logger.info('Authenticated Template Index');
+        } else {
+            Logger.info('Template Index without Authentication and Authorization');
+        }
+
         const httpOptions = {
             uri: `${this.url}/template-library.json`,
             headers: {
                 'User-Agent': 'clause',
+                Authorization: this.httpHeader,
             },
             json: true, // Automatically parses the JSON string in the response
         };
@@ -209,6 +223,12 @@ class TemplateLibrary {
             return result;
         }
 
+        if(this.httpHeader) {
+            Logger.info('Authenticated Template');
+        } else {
+            Logger.info('Template without Authentication and Authorization');
+        }
+
         const templateUriInfo = TemplateLibrary.parseURI(templateUri);
         const templateIndex = await this.getTemplateIndex();
         const templateMetadata = templateIndex[`${templateUriInfo.templateName}@${templateUriInfo.templateVersion}`];
@@ -246,6 +266,19 @@ class TemplateLibrary {
         return `${this.url}/${prefix}template-library.json`;
     }
 
+    /**
+     * @returns {object} the httpOptions of Template Library
+     */
+    getHttpOptions() {
+        return {
+            uri: `${this.url}/template-library.json`,
+            headers: {
+                'User-Agent': 'clause',
+                Authorization: this.httpHeader,
+            },
+            json: true, // Automatically parses the JSON string in the response
+        };
+    }
     /**
    * Returns the cache key used to cache access to a template.
    * @param {string} templateUri the URI for the template
