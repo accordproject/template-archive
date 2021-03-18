@@ -40,10 +40,19 @@ class TemplateLibrary {
      * Create the Template Library
      * @param {string} url - the url to connect to. Defaults to
      * https://templates.accordproject.org
+     * @param {object} auth - authenticate object
+     * @param {object}  auth.type - HTTP Auth type
+     * @param {object} auth.credential - HTTP Auth credential base64 encoded
      */
-    constructor(url=null) {
+    constructor(url=null,auth = null) {
         this.url = url || 'https://templates.accordproject.org';
+        this.auth = auth;
         Logger.info('Creating TemplateLibrary for ' + this.url);
+        if (this.auth && this.auth.type && this.auth.credential){
+            Logger.info('TemplateLibrary with authentication');
+        } else {
+            Logger.info('TemplateLibrary without authentication');
+        }
     }
 
     /**
@@ -135,6 +144,11 @@ class TemplateLibrary {
             json: true, // Automatically parses the JSON string in the response
         };
 
+        // Set HTTP auth if available
+        if(this.auth && this.auth.type && this.auth.credential) {
+            httpOptions.headers.Authorization = this.auth.type + ' ' + this.auth.credential;
+        }
+
         Logger.info('Loading template library from', httpOptions.uri);
         return rp(httpOptions)
             .then((templateIndex) => {
@@ -208,6 +222,11 @@ class TemplateLibrary {
             Logger.info('Returning template from cache', templateUri);
             return result;
         }
+
+        // Set HTTP auth if available
+        if(this.auth && this.auth.type && this.auth.credential) {
+            httpOptions.headers.Authorization = this.auth.type + ' ' + this.auth.credential;
+        }        
 
         const templateUriInfo = TemplateLibrary.parseURI(templateUri);
         const templateIndex = await this.getTemplateIndex();
