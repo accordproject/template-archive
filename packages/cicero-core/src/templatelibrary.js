@@ -134,6 +134,12 @@ class TemplateLibrary {
             return Promise.resolve(result);
         }
 
+        if(this.httpHeader) {
+            Logger.info('TemplateIndex with Authentication');
+        } else {
+            Logger.info('Template Index wwithout Authentication and Authorization');
+        }
+
         const httpOptions = {
             method: 'get',
             url: `${this.url}/template-library.json`,
@@ -219,10 +225,11 @@ class TemplateLibrary {
             return result;
         }
 
-        // Set HTTP auth if available
-        if(this.auth && this.auth.type && this.auth.credential) {
-            httpOptions.headers.Authorization = this.auth.type + ' ' + this.auth.credential;
-        }        
+        if(this.httpHeader) {
+            Logger.info('TemplateIndex with Authentication');
+        } else {
+            Logger.info('Template Index wwithout Authentication and Authorization');
+        }
 
         const templateUriInfo = TemplateLibrary.parseURI(templateUri);
         const templateIndex = await this.getTemplateIndex();
