@@ -31,19 +31,9 @@ jobs:
         with:
           node-version: ${{ matrix.node-version }}
     
-      - name: use cache 
-        uses: actions/cache@v2
-        with:
-          path: |
-            node_modules
-            */*/node_modules
-          key: ${{ matrix.os }}-${{ matrix.node-version }}-${{ hashFiles('**/package-lock.json') }}
-
-      - name: Build
-        run: npx lerna bootstrap
-
-      - name: Run unit tests
-        run: npm test
+      - run: npm ci
+      - run: npm run build --if-present
+      - run: npm test
 
       - name: Calculate code coverage
         run: npm run coverage

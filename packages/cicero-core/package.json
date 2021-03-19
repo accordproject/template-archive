@@ -91,7 +91,7 @@
     "node-cache": "4.2.0",
     "request": "2.88.0",
     "request-promise-native": "1.0.7",
-    "semver": "6.2.0",
+    "semver": "6.3.0",
     "slash": "3.0.0",
     "uuid": "3.3.2",
     "xregexp": "4.2.4"

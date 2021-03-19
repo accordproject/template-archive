@@ -20,8 +20,8 @@ jobs:
         with:
           node-version: 14.x
 
-      - name: lerna install
-        run: npx lerna bootstrap
+      - run: npm ci
+      - run: npm run build --if-present
 
       - name: tag
         id: tag
