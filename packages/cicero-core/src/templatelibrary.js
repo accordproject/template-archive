@@ -225,7 +225,7 @@ class TemplateLibrary {
         if(this.httpHeader) {
             Logger.info('Authenticated Template');
         } else {
-            Logger.info('Template wwithout Authentication and Authorization');
+            Logger.info('Template without Authentication and Authorization');
         }
 
         const templateUriInfo = TemplateLibrary.parseURI(templateUri);
