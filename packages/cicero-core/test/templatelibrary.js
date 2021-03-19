@@ -36,12 +36,28 @@ describe('TemplateLibrary', () => {
             templateLibrary.url.should.equal('https://foo.org');
         });
 
-        it('should create with http auth', async function() {
-            const templateLibrary = new TemplateLibrary('https://foo.org', {type: 'Basic', credential: 'someBasicCredential'});
+        it('should create with Basic Auth httpHeader', async function() {
+            const templateLibrary = new TemplateLibrary('https://foo.org', 'Basic someBasicCredential');
             templateLibrary.url.should.equal('https://foo.org');
-            templateLibrary.auth.type.should.equal('Basic');
-            templateLibrary.auth.credential.should.equal('someBasicCredential');
-        })
+            templateLibrary.httpHeader.should.equal('Basic someBasicCredential');
+        });
+
+        it('should create with Bearer Token httpHeader', async function() {
+            const templateLibrary = new TemplateLibrary('https://foo.org', 'Bearer someBearerToken');
+            templateLibrary.url.should.equal('https://foo.org');
+            templateLibrary.httpHeader.should.equal('Bearer someBearerToken');
+        });
+
+        it('should create with AWS Signature', async function() {
+            const templateLibrary = new TemplateLibrary('https://foo.org', 'AWSAccessKey AWSSecretKey');
+            templateLibrary.url.should.equal('https://foo.org');
+            templateLibrary.httpHeader.should.equal('AWSAccessKey AWSSecretKey');
+        });
+
+        it('should work fine without httpHeader', async function() {
+            const templateLibrary = new TemplateLibrary('https://foo.org');
+            templateLibrary.url.should.equal('https://foo.org');
+        });
     });
 
     describe('#getTemplateIndex', () => {

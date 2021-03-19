@@ -40,15 +40,13 @@ class TemplateLibrary {
      * Create the Template Library
      * @param {string} url - the url to connect to. Defaults to
      * https://templates.accordproject.org
-     * @param {object} auth - authenticate object
-     * @param {object}  auth.type - HTTP Auth type
-     * @param {object} auth.credential - HTTP Auth credential base64 encoded
+     * @param {string} httpHeader - To set the Headers for Authorization
      */
-    constructor(url=null,auth = null) {
+    constructor(url=null,httpHeader = null) {
         this.url = url || 'https://templates.accordproject.org';
-        this.auth = auth;
+        this.httpHeader = httpHeader;
         Logger.info('Creating TemplateLibrary for ' + this.url);
-        if (this.auth && this.auth.type && this.auth.credential){
+        if (this.httpHeader){
             Logger.info('TemplateLibrary with authentication');
         } else {
             Logger.info('TemplateLibrary without authentication');
@@ -136,6 +134,12 @@ class TemplateLibrary {
             return Promise.resolve(result);
         }
 
+        if(this.httpHeader) {
+            Logger.info('TemplateIndex with Authentication');
+        } else {
+            Logger.info('Template Index wwithout Authentication and Authorization');
+        }
+
         const httpOptions = {
             uri: `${this.url}/template-library.json`,
             headers: {
@@ -143,11 +147,6 @@ class TemplateLibrary {
             },
             json: true, // Automatically parses the JSON string in the response
         };
-
-        // Set HTTP auth if available
-        if(this.auth && this.auth.type && this.auth.credential) {
-            httpOptions.headers.Authorization = this.auth.type + ' ' + this.auth.credential;
-        }
 
         Logger.info('Loading template library from', httpOptions.uri);
         return rp(httpOptions)
@@ -223,10 +222,11 @@ class TemplateLibrary {
             return result;
         }
 
-        // Set HTTP auth if available
-        if(this.auth && this.auth.type && this.auth.credential) {
-            httpOptions.headers.Authorization = this.auth.type + ' ' + this.auth.credential;
-        }        
+        if(this.httpHeader) {
+            Logger.info('TemplateIndex with Authentication');
+        } else {
+            Logger.info('Template Index wwithout Authentication and Authorization');
+        }
 
         const templateUriInfo = TemplateLibrary.parseURI(templateUri);
         const templateIndex = await this.getTemplateIndex();
