@@ -135,13 +135,14 @@ class TemplateLibrary {
         }
 
         if(this.httpHeader) {
-            Logger.info('TemplateIndex with Authentication');
+            Logger.info('Authenticated Template Index');
         } else {
-            Logger.info('Template Index wwithout Authentication and Authorization');
+            Logger.info('Template Index without Authentication and Authorization');
         }
 
         const httpOptions = {
             uri: `${this.url}/template-library.json`,
+            httpHeader: this.httpHeader,
             headers: {
                 'User-Agent': 'clause',
             },
