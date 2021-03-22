@@ -142,9 +142,9 @@ class TemplateLibrary {
 
         const httpOptions = {
             uri: `${this.url}/template-library.json`,
-            httpHeader: this.httpHeader,
             headers: {
                 'User-Agent': 'clause',
+                Authorization: this.httpHeader,
             },
             json: true, // Automatically parses the JSON string in the response
         };
