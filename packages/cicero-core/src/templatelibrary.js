@@ -145,6 +145,7 @@ class TemplateLibrary {
             url: `${this.url}/template-library.json`,
             headers: {
                 'User-Agent': 'clause',
+                Authorization: this.httpHeader,
             },
             responseType: 'json'
         };
