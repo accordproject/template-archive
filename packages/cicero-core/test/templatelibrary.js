@@ -14,7 +14,7 @@
 
 'use strict';
 
-let TemplateLibrary = require('../lib/templatelibrary');
+const TemplateLibrary = require('../lib/templatelibrary');
 
 const chai = require('chai');
 const mock = require('mock-require');
@@ -71,14 +71,27 @@ describe('TemplateLibrary', () => {
         });
 
         it('should retrieve index for template library without authentication', async () => {
-            mock('rp', {});
-            TemplateLibrary = mock.reRequire('../lib/templatelibrary');
             const templateLibrary = new TemplateLibrary();
-            rp.get('https://templates.accordproject.org')
-                .then(async () => {
-                    const templateIndex = await templateLibrary.getTemplateIndex();
-                    templateIndex.should.have.property('helloworld@0.3.0');
-                });
+            const templateIndex = await templateLibrary.getTemplateIndex();
+            templateIndex.should.have.property('helloworld@0.3.0');
+            // Mocks request-promise library
+            mock('request-promise', { get: () => { return templateLibrary.getHttpOptions();}});
+            const request = require('request-promise');
+            // Calls the mock get function to getHttpOptions
+            let getParams = request.get();
+            expect(getParams.headers.Authorization).to.be.equal(null);
+        });
+
+        it('should retrieve index for template library with authentication', async () => {
+            const templateLibrary = new TemplateLibrary(null,'Bearer someBearerToken');
+            const templateIndex = await templateLibrary.getTemplateIndex();
+            templateIndex.should.have.property('helloworld@0.3.0');
+            // Mocks request-promise library
+            mock('request-promise', { get: () => { return templateLibrary.getHttpOptions();}});
+            const request = require('request-promise');
+            // Calls the mock get function to getHttpOptions
+            let getParams = request.get();
+            expect(getParams.headers.Authorization).to.be.equal('Bearer someBearerToken');
         });
 
         it('should retrieve index from cache', async function() {
