@@ -14,9 +14,11 @@
 
 'use strict';
 
-const TemplateLibrary = require('../lib/templatelibrary');
+let TemplateLibrary = require('../lib/templatelibrary');
 
 const chai = require('chai');
+const mock = require('mock-require');
+const rp = require('request-promise-native');
 
 chai.should();
 chai.use(require('chai-things'));
@@ -66,6 +68,17 @@ describe('TemplateLibrary', () => {
             const templateLibrary = new TemplateLibrary();
             const templateIndex = await templateLibrary.getTemplateIndex();
             templateIndex.should.have.property('helloworld@0.3.0');
+        });
+
+        it('should retrieve index for template library without authentication', async () => {
+            mock('rp', {});
+            TemplateLibrary = mock.reRequire('../lib/templatelibrary');
+            const templateLibrary = new TemplateLibrary();
+            rp.get('https://templates.accordproject.org')
+                .then(async () => {
+                    const templateIndex = await templateLibrary.getTemplateIndex();
+                    templateIndex.should.have.property('helloworld@0.3.0');
+                });
         });
 
         it('should retrieve index from cache', async function() {
