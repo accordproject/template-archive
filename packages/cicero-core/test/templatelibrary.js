@@ -14,7 +14,7 @@
 
 'use strict';
 
-const TemplateLibrary = require('../lib/templatelibrary');
+let TemplateLibrary = require('../lib/templatelibrary');
 
 const chai = require('chai');
 const mock = require('mock-require');
