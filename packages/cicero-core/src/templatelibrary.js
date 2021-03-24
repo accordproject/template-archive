@@ -267,6 +267,19 @@ class TemplateLibrary {
     }
 
     /**
+     * @returns {object} the httpOptions of Template Library
+     */
+    getHttpOptions() {
+        return {
+            uri: `${this.url}/template-library.json`,
+            headers: {
+                'User-Agent': 'clause',
+                Authorization: this.httpHeader,
+            },
+            json: true, // Automatically parses the JSON string in the response
+        };
+    }
+    /**
    * Returns the cache key used to cache access to a template.
    * @param {string} templateUri the URI for the template
    * @returns {string} the cache key or null if the template should not be cached
