@@ -18,7 +18,6 @@ const TemplateLibrary = require('../lib/templatelibrary');
 
 const chai = require('chai');
 const mock = require('mock-require');
-const { Logger } = require('@accordproject/ergo-compiler');
 const { expect } = require('chai');
 
 chai.should();
@@ -221,6 +220,30 @@ describe('TemplateLibrary', () => {
             const templateLibrary = new TemplateLibrary();
             const template = await templateLibrary.getTemplate('ap://ip-payment@0.13.0#a4b918a2be2d984dbddd5d8b41703b0761d6cd03d1e65ad3d3cd4a11d2bb1ab2');
             template.getIdentifier().should.equal('ip-payment@0.13.0');
+        });
+
+        it('should retrieve a template without authentication', async () => {
+            const templateLibrary = new TemplateLibrary();
+            const template = await templateLibrary.getTemplate('ap://ip-payment@0.13.0#a4b918a2be2d984dbddd5d8b41703b0761d6cd03d1e65ad3d3cd4a11d2bb1ab2');
+            template.getIdentifier().should.equal('ip-payment@0.13.0');
+            // Mocks request-promise library
+            mock('request-promise', { get: () => { return templateLibrary.getHttpOptions();}});
+            const request = require('request-promise');
+            // Calls the mock get function to getHttpOptions
+            let getParams = request.get();
+            expect(getParams.headers.Authorization).to.be.equal(null);
+        });
+
+        it('should retrieve a template without authentication', async () => {
+            const templateLibrary = new TemplateLibrary(null,'Bearer someBearerToken');
+            const template = await templateLibrary.getTemplate('ap://ip-payment@0.13.0#a4b918a2be2d984dbddd5d8b41703b0761d6cd03d1e65ad3d3cd4a11d2bb1ab2');
+            template.getIdentifier().should.equal('ip-payment@0.13.0');
+            // Mocks request-promise library
+            mock('request-promise', { get: () => { return templateLibrary.getHttpOptions();}});
+            const request = require('request-promise');
+            // Calls the mock get function to getHttpOptions
+            let getParams = request.get();
+            expect(getParams.headers.Authorization).to.be.equal('Bearer someBearerToken');
         });
     });
 
