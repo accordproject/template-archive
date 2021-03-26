@@ -86,8 +86,7 @@ jobs:
 
       - name: timestamp
         id: timestamp
-        run: |
-          node ./scripts/timestamp.js
+        run: npm run pkgstamp
 
       - name: build and publish
         run: |

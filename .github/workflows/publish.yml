@@ -26,7 +26,7 @@ jobs:
       - name: tag
         id: tag
         run: |
-          node ./scripts/tag.js ${{ github.event.release.tag_name }}
+          npm run pkgset ${{ github.event.release.tag_name }}
 
       - name: build and publish
         run: |
