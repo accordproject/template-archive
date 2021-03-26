@@ -1,21 +1,19 @@
 {
   "devDependencies": {
-    "colors": "1.3.3",
+    "colors": "1.4.0",
     "concurrently": "4.1.1",
     "coveralls": "3.0.4",
+    "dayjs": "1.10.2",
+    "eslint": "6.0.1",
     "istanbul-combine": "0.3.0",
     "istanbul-merge": "1.1.1",
     "jsdoc": "3.6.3",
     "jsdoc-sphinx": "0.0.6",
-    "lerna": "3.15.0",
-    "license-check": "1.1.5",
-    "moment-mini": "2.22.1",
-    "semver": "6.2.0",
-    "sleep-promise": "8.0.1",
-    "source-map-support": "0.5.12",
-    "licensecheck": "1.3.0",
+    "lerna": "^3.22.1",
     "license-check-and-add": "2.3.6",
-    "event-stream": "4.0.1"
+    "semver": "6.3.0",
+    "sleep-promise": "8.0.1",
+    "source-map-support": "0.5.12"
   },
   "engines": {
     "node": ">=12",
@@ -24,28 +22,20 @@
   "name": "cicero",
   "description": "You must install [Lerna](https://lernajs.io) to build this multi-package repository.",
   "version": "0.21.26",
-  "main": "index.js",
   "private": true,
   "scripts": {
     "doc": "jsdoc -t ./node_modules/jsdoc-sphinx/template/ -c jsdoc.json -r -d ../cicero-docs/docs/api --verbose",
-    "coverage": "istanbul-combine -d coverage -r lcov packages/cicero-cli/coverage/*.json packages/cicero-core/coverage/*.json  packages/cicero-engine/coverage/*.json packages/generator-cicero-template/coverage/*.json packages/cicero-server/coverage/*.json && cat ./coverage/lcov.info | coveralls",
-    "postinstall": "npm run pkgcheck && npm run bootstrap",
+    "coverage": "istanbul-combine -d coverage -r lcov packages/cicero-cli/coverage/*.json packages/cicero-core/coverage/*.json  packages/cicero-engine/coverage/*.json packages/generator-cicero-template/coverage/*.json packages/cicero-server/coverage/*.json && cat ./coverage/lcov.info",
+    "postinstall": "npm run bootstrap",
     "bootstrap": "lerna bootstrap",
     "pretest": "npm run doc && npm run licchk",
     "test": "lerna exec -- npm run test:cov",
-    "test:windows": "lerna exec -- npm run test:windows",
-    "publish": "./scripts/manualrelease.sh",
     "repoclean": "lerna clean",
-    "licchk": "license-check-and-add",
-    "pkgcheck": "node ./scripts/pkgcheck.js",
-    "pkgstamp": "node ./scripts/pkgstamp.js",
-    "pkgbump": "node ./scripts/pkgbump.js && node ./scripts/pkgcheck.js --fix",
-    "pkgset": "node ./scripts/pkgset.js",
-    "depcheck": "node ./scripts/depcheck.js"
+    "licchk": "license-check-and-add"
   },
   "repository": {
     "type": "git",
-    "url": "https://github.com/accordproject/cicero.git"
+    "url": "https://github.com/accordproject/cicero"
   },
   "keywords": [
     "smart",

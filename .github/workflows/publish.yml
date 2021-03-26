@@ -1,0 +1,55 @@
+name: Publish
+
+on:
+  release:
+    types:
+      - released
+
+jobs:
+  publish:
+    name: Publish to npm
+    if: ${{ github.repository_owner == 'accordproject' }}
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: git checkout
+        uses: actions/checkout@v2
+
+      - name: Use Node.js 14.x
+        uses: actions/setup-node@v1
+        with:
+          node-version: 14.x
+
+      - run: npm ci
+      - run: npm run build --if-present
+
+      - name: tag
+        id: tag
+        run: |
+          node ./scripts/tag.js ${{ github.event.release.tag_name }}
+
+      - name: build and publish
+        run: |
+          npm config set //registry.npmjs.org/:_authToken ${{ secrets.NPM_TOKEN }}
+          npm version --no-git-tag-version --yes --exact ${{ github.event.release.tag_name }}
+          npx lerna version --no-git-tag-version --yes --exact ${{ github.event.release.tag_name }}
+          npx lerna exec -- npm publish --access public ${{ steps.tag.outputs.tag }} 2>&1
+
+      - name: Create PR to increment version
+        uses: peter-evans/create-pull-request@v3
+        with:
+          base: master
+          commit-message: 'chore(actions): publish ${{ github.event.release.tag_name }} to npm'
+          committer: GitHub <noreply@github.com>
+          author: ${{ github.actor }} <${{ github.actor }}@users.noreply.github.com>
+          signoff: true
+          branch: ap-publish-${{ github.event.release.tag_name }}
+          delete-branch: true
+          title: 'chore(actions): publish ${{ github.event.release.tag_name }} to npm'
+          body: |
+            # Increment Versions
+
+            Update the package.json version numbers after publishing to NPM.
+          assignees: ${{ github.actor }}
+          reviewers: ${{ github.actor }}
+          draft: false
