@@ -83,8 +83,8 @@ jobs:
     
       - name: build and publish
         run: |
-          npm run pkgstamp
           npm config set //registry.npmjs.org/:_authToken ${NPM_TOKEN}
           npx lerna bootstrap
+          npm run pkgstamp
           npx lerna exec -- npm publish --ignore-scripts --tag=unstable 2>&1
   
