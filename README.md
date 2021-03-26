@@ -5,7 +5,7 @@
 </p>
 
 <p align="center">
-  <a href="https://github.com/accordproject/cicero/actions/workflows/node.js.yml"><img src="https://github.com/accordproject/cicero/actions/workflows/node.js.yml/badge.svg" alt="Build Status"></a>
+  <a href="https://github.com/accordproject/cicero/actions/workflows/build.yml"><img src="https://github.com/accordproject/cicero/actions/workflows/node.js.yml/badge.svg" alt="Build Status"></a>
   <a href="https://coveralls.io/github/accordproject/cicero?branch=master"><img src="https://coveralls.io/repos/github/accordproject/cicero/badge.svg?branch=master" alt="Coverage Status"></a>
   <a href="./LICENSE"><img src="https://img.shields.io/github/license/accordproject/cicero?color=bright-green" alt="GitHub license"></a>
   <a href="https://www.npmjs.com/package/@accordproject/cicero-cli"><img src="https://img.shields.io/npm/dm/@accordproject/cicero-cli" alt="downloads"></a>
