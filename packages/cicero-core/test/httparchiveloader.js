@@ -14,7 +14,7 @@
 
 'use strict';
 
-let HTTPArchiveLoader = require('../../lib/loaders/httparchiveloader');
+let HTTPArchiveLoader = require('../lib/loaders/httparchiveloader');
 
 const chai = require('chai');
 const mock = require('mock-require');
