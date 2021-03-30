@@ -42,9 +42,10 @@ class HTTPArchiveLoader {
     }
 
     /**
-     * Load an arthive from a URL and return it
+     * Load an archive from a URL and return it
      * @param {string} requestUrl - the url to get
-     * @param {object} options - additional options
+     * @param {object} [options] - additional options
+     * @param {string} [options.httpAuthHeader] - The HTTP Authorization header value for URLs that require authentication
      * @return {Promise} a promise to the archive
      */
     load(requestUrl, options) {
