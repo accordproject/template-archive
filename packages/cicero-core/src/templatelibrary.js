@@ -134,18 +134,11 @@ class TemplateLibrary {
             return Promise.resolve(result);
         }
 
-        if(this.httpHeader) {
-            Logger.info('Authenticated Template Index');
-        } else {
-            Logger.info('Template Index without Authentication and Authorization');
-        }
-
         const httpOptions = {
             method: 'get',
             url: `${this.url}/template-library.json`,
             headers: {
                 'User-Agent': 'clause',
-                Authorization: this.httpHeader,
             },
             responseType: 'json'
         };
@@ -224,12 +217,6 @@ class TemplateLibrary {
         if (result) {
             Logger.info('Returning template from cache', templateUri);
             return result;
-        }
-
-        if(this.httpHeader) {
-            Logger.info('Authenticated Template');
-        } else {
-            Logger.info('Template without Authentication and Authorization');
         }
 
         const templateUriInfo = TemplateLibrary.parseURI(templateUri);

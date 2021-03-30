@@ -70,30 +70,6 @@ describe('TemplateLibrary', () => {
             templateIndex.should.have.property('helloworld@0.3.0');
         });
 
-        it('should retrieve index for template library without authentication', async () => {
-            const templateLibrary = new TemplateLibrary();
-            const templateIndex = await templateLibrary.getTemplateIndex();
-            templateIndex.should.have.property('helloworld@0.3.0');
-            // Mocks request-promise library
-            mock('request-promise', { get: () => { return templateLibrary.getHttpOptions();}});
-            const request = require('request-promise');
-            // Calls the mock get function to getHttpOptions
-            let getParams = request.get();
-            expect(getParams.headers.Authorization).to.be.equal(null);
-        });
-
-        it('should retrieve index for template library with authentication', async () => {
-            const templateLibrary = new TemplateLibrary(null,'Bearer someBearerToken');
-            const templateIndex = await templateLibrary.getTemplateIndex();
-            templateIndex.should.have.property('helloworld@0.3.0');
-            // Mocks request-promise library
-            mock('request-promise', { get: () => { return templateLibrary.getHttpOptions();}});
-            const request = require('request-promise');
-            // Calls the mock get function to getHttpOptions
-            let getParams = request.get();
-            expect(getParams.headers.Authorization).to.be.equal('Bearer someBearerToken');
-        });
-
         it('should retrieve index from cache', async function() {
             const templateLibrary = new TemplateLibrary();
             const templateIndex = await templateLibrary.getTemplateIndex();
