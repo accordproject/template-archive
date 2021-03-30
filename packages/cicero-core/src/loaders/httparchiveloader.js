@@ -58,6 +58,11 @@ class HTTPArchiveLoader {
         request.method = 'get';
         request.responseType = 'arraybuffer'; // Necessary for binary archives
         request.timeout = 5000;
+        if (options.httpAuthHeader) {
+            request.headers = {
+                authorization: options.httpAuthHeader,
+            };
+        }
 
         return axios(request)
             .then((response) => {
