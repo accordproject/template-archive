@@ -58,5 +58,24 @@ describe('HTTPArchiveLoader', () => {
 
             mock.stop('axios');
         });
+
+        it('should fail to load an archive from an authenticated URL with an unauthenticated request', async function() {
+            mock('axios', (params) => {
+                axiosParams = params;
+                return Promise.reject({
+                    message: 'Unauthenticated',
+                    reponse: {
+                        data: 'Unauthenticated',
+                        state: 401,
+                    }
+                });
+            });
+            HTTPArchiveLoader = mock.reRequire('../lib/loaders/httparchiveloader');
+            const loader = new HTTPArchiveLoader();
+
+            loader.load('https://templates.accordproject.org/archives/ip-payment@0.13.0.cta').should.be.rejected;
+
+            mock.stop('axios');
+        });
     });
 });
