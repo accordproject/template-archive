@@ -14,9 +14,11 @@
 
 'use strict';
 
-const TemplateLibrary = require('../lib/templatelibrary');
+let TemplateLibrary = require('../lib/templatelibrary');
 
 const chai = require('chai');
+const mock = require('mock-require');
+const { expect } = require('chai');
 
 chai.should();
 chai.use(require('chai-things'));
@@ -32,6 +34,29 @@ describe('TemplateLibrary', () => {
         });
 
         it('should create with custom url', async function() {
+            const templateLibrary = new TemplateLibrary('https://foo.org');
+            templateLibrary.url.should.equal('https://foo.org');
+        });
+
+        it('should create with Basic Auth httpHeader', async function() {
+            const templateLibrary = new TemplateLibrary('https://foo.org', 'Basic someBasicCredential');
+            templateLibrary.url.should.equal('https://foo.org');
+            templateLibrary.httpAuthHeader.should.equal('Basic someBasicCredential');
+        });
+
+        it('should create with Bearer Token httpHeader', async function() {
+            const templateLibrary = new TemplateLibrary('https://foo.org', 'Bearer someBearerToken');
+            templateLibrary.url.should.equal('https://foo.org');
+            templateLibrary.httpAuthHeader.should.equal('Bearer someBearerToken');
+        });
+
+        it('should create with AWS Signature', async function() {
+            const templateLibrary = new TemplateLibrary('https://foo.org', 'AWSAccessKey AWSSecretKey');
+            templateLibrary.url.should.equal('https://foo.org');
+            templateLibrary.httpAuthHeader.should.equal('AWSAccessKey AWSSecretKey');
+        });
+
+        it('should work fine without httpHeader', async function() {
             const templateLibrary = new TemplateLibrary('https://foo.org');
             templateLibrary.url.should.equal('https://foo.org');
         });
@@ -55,7 +80,7 @@ describe('TemplateLibrary', () => {
 
         it('should fail to retrieve index', async function() {
             const templateLibrary = new TemplateLibrary('http://foo.bar');
-            return templateLibrary.getTemplateIndex().should.be.rejectedWith('Error: getaddrinfo ENOTFOUND foo.bar');
+            return templateLibrary.getTemplateIndex().should.be.rejectedWith('getaddrinfo ENOTFOUND foo.bar');
         });
 
         it('should retrieve index for latest versions', async function() {
@@ -166,11 +191,76 @@ describe('TemplateLibrary', () => {
     });
 
     describe('#getTemplate', () => {
+        let axiosParams = {};
+        let fromUrlParams = {};
+
+        // Mock call for Template Index
+        const mockAxios = (params) => {
+            axiosParams = params;
+            return Promise.resolve({
+                data: {
+                    'ip-payment@0.13.0': {
+                        uri: 'ap://ip-payment@0.13.0#a4b918a2be2d984dbddd5d8b41703b0761d6cd03d1e65ad3d3cd4a11d2bb1ab2',
+                        url: 'https://templates.accordproject.org/archives/ip-payment@0.13.0.cta',
+                        ciceroUrl: 'https://templates.accordproject.org/archives/ip-payment@0.13.0-cicero.cta',
+                        name: 'ip-payment',
+                        displayName: 'IP Payment',
+                        description: 'This clause is a payment clause for IP agreements, such as trademark or copyright licenses.',
+                        version: '0.13.0',
+                        ciceroVersion: '^0.21.0',
+                        type: 1,
+                        author: 'Accord Project'
+                    }
+                }
+            });
+        };
+
+        // Mock call to download template archive
+        const mockTemplateInstance = {
+            fromUrl: (_url, options) => {
+                fromUrlParams = options;
+                return Promise.resolve({
+                    getHash: () => 'a4b918a2be2d984dbddd5d8b41703b0761d6cd03d1e65ad3d3cd4a11d2bb1ab2'
+                });
+            },
+        };
 
         it('should retrieve a template', async function() {
             const templateLibrary = new TemplateLibrary();
             const template = await templateLibrary.getTemplate('ap://ip-payment@0.13.0#a4b918a2be2d984dbddd5d8b41703b0761d6cd03d1e65ad3d3cd4a11d2bb1ab2');
             template.getIdentifier().should.equal('ip-payment@0.13.0');
+        });
+
+        it('should retrieve a template without authentication', async () => {
+            mock('axios', mockAxios);
+            mock('../lib/template', mockTemplateInstance);
+            TemplateLibrary = mock.reRequire('../lib/templatelibrary');
+
+            const templateLibrary = new TemplateLibrary();
+            await templateLibrary.getTemplateIndex();
+            expect(axiosParams.headers.authorization).to.be.undefined;
+
+            await templateLibrary.getTemplate('ap://ip-payment@0.13.0#a4b918a2be2d984dbddd5d8b41703b0761d6cd03d1e65ad3d3cd4a11d2bb1ab2');
+            expect(fromUrlParams).to.be.undefined;
+
+            mock.stop('axios');
+            mock.stop('./template');
+        });
+
+        it('should retrieve a template with authentication', async () => {
+            mock('axios', mockAxios);
+            mock('../lib/template', mockTemplateInstance);
+            TemplateLibrary = mock.reRequire('../lib/templatelibrary');
+
+            const templateLibrary = new TemplateLibrary(null, 'Bearer TOKEN');
+            await templateLibrary.getTemplateIndex();
+            expect(axiosParams.headers.authorization).to.equal('Bearer TOKEN');
+
+            await templateLibrary.getTemplate('ap://ip-payment@0.13.0#a4b918a2be2d984dbddd5d8b41703b0761d6cd03d1e65ad3d3cd4a11d2bb1ab2');
+            expect(fromUrlParams.httpAuthHeader).to.equal('Bearer TOKEN');
+
+            mock.stop('axios');
+            mock.stop('./template');
         });
     });
 
