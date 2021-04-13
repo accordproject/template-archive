@@ -56,8 +56,8 @@
     "webpack-cli": "^3.3.5"
   },
   "dependencies": {
-    "@accordproject/concerto-core": "1.0.0-alpha.5",
-    "@accordproject/concerto-tools": "1.0.0-alpha.5"
+    "@accordproject/concerto-core": "1.0.0-alpha.6",
+    "@accordproject/concerto-tools": "1.0.0-alpha.6"
   },
   "license-check-config": {
     "src": [
