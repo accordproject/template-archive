@@ -262,7 +262,7 @@ class Template {
      * @return {Factory} the Factory for this template
      */
     getFactory() {
-        return this.logicManager.getFactory();
+        return this.getModelManager().getFactory();
     }
 
     /**
@@ -271,7 +271,7 @@ class Template {
      * @return {Serializer} the Serializer for this template
      */
     getSerializer() {
-        return this.logicManager.getSerializer();
+        return this.getModelManager().getSerializer();
     }
 
     /**

@@ -250,8 +250,8 @@ class TemplateInstance {
      * @return {*} A function from formula code + input data to result
      */
     static ciceroFormulaEval(logicManager,clauseId,ergoEngine,name) {
-        return (code,data,currentTime) => {
-            const result = ergoEngine.calculate(logicManager, clauseId, name, data, currentTime, {});
+        return (code,data,currentTime,utcOffset) => {
+            const result = ergoEngine.calculate(logicManager, clauseId, name, data, currentTime, utcOffset, null);
             // console.log('Formula result: ' + JSON.stringify(result.response));
             return result.response;
         };
