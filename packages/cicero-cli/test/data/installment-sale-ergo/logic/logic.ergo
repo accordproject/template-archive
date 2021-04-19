@@ -14,12 +14,11 @@
 
 namespace org.accordproject.installmentsale
 
-import org.accordproject.cicero.runtime.*
+import org.accordproject.runtime.*
 
 contract InstallmentSale over InstallmentSaleContract state InstallmentSaleState {
   clause init(request : Request) : Response {
     set state InstallmentSaleState{
-      stateId: "#1",
       status: WaitingForFirstDayOfNextMonth,
       balance_remaining: contract.INITIAL_DUE,
       total_paid: 0.0,

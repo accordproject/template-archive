@@ -81,7 +81,7 @@ class TemplateLoader extends FileLoader {
 
         // add model files
         Logger.debug(method, 'Adding model files to model manager');
-        template.getModelManager().addModelFiles(ctoModelFiles, ctoModelFileNames, true); // validation is disabled
+        template.getLogicManager().addModelFiles(ctoModelFiles, ctoModelFileNames, true); // validation is disabled
 
         Logger.debug(method, 'Setting grammar');
         if(!grammar) {
@@ -185,7 +185,7 @@ class TemplateLoader extends FileLoader {
             modelFiles.push(file.contents);
         });
 
-        template.getModelManager().addModelFiles(modelFiles, modelFileNames, true);
+        template.getLogicManager().addModelFiles(modelFiles, modelFileNames, true);
         if(!options.skipUpdateExternalModels){
             await template.getModelManager().updateExternalModels();
             Logger.debug(method, 'Added model files', modelFiles.length);

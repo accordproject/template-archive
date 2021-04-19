@@ -1,9 +1,10 @@
 namespace org.accordproject.copyrightlicense
 
-import org.accordproject.cicero.contract.* from https://models.accordproject.org/cicero/contract.cto
-import org.accordproject.cicero.runtime.* from https://models.accordproject.org/cicero/runtime.cto
+import org.accordproject.contract.* from https://models.accordproject.org/accordproject/contract.cto
+import org.accordproject.runtime.* from https://models.accordproject.org/accordproject/runtime.cto
+import org.accordproject.obligation.* from https://models.accordproject.org/accordproject/obligation.cto
 
-import org.accordproject.money.MonetaryAmount from https://models.accordproject.org/money.cto
+import org.accordproject.money.MonetaryAmount from https://models.accordproject.org/money@0.2.0.cto
 import org.accordproject.organization.Organization from https://models.accordproject.org/organization.cto
 
 /* Requesting a payment */
@@ -16,18 +17,18 @@ transaction PayOut extends Response {
 }
 
 /* The template model  */
-asset CopyrightLicenseContract extends AccordContract {
+asset CopyrightLicenseContract extends Contract {
   /* the effective date */
   o DateTime effectiveDate
 
   /* licensee */
-  o AccordParty licensee
+  --> Party licensee
   o String licenseeState
   o String licenseeEntityType
   o String licenseeAddress
 
   /* licensor */
-  o AccordParty licensor
+  --> Party licensor
   o String licensorState
   o String licensorEntityType
   o String licensorAddress
@@ -43,8 +44,8 @@ asset CopyrightLicenseContract extends AccordContract {
   o PaymentClause paymentClause
 }
 
-asset PaymentClause extends AccordClause {
+asset PaymentClause extends Clause {
   o String amountText
-	o MonetaryAmount amount
-	o String paymentProcedure
+  o MonetaryAmount amount
+  o String paymentProcedure
 }

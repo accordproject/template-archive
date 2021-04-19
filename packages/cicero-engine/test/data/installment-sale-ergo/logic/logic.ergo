@@ -14,12 +14,11 @@
 
 namespace org.accordproject.installmentsale
 
-import org.accordproject.cicero.runtime.*
+import org.accordproject.runtime.*
 
 contract InstallmentSale over InstallmentSaleContract state InstallmentSaleState {
   clause init(request : Request) : Response {
     set state InstallmentSaleState{
-      stateId: "#1",
       status: WaitingForFirstDayOfNextMonth,
       balance_remaining: contract.INITIAL_DUE,
       total_paid: 0.0,
@@ -33,7 +32,6 @@ contract InstallmentSale over InstallmentSaleContract state InstallmentSaleState
     let balance = before_interest * (1.0 + contract.INTEREST_RATE/100.00);
     let total_paid = state.total_paid + request.amount;
     set state InstallmentSaleState{
-      stateId: "#1",
       status: WaitingForFirstDayOfNextMonth,
       balance_remaining: balance,
       total_paid: total_paid,
@@ -53,7 +51,6 @@ contract InstallmentSale over InstallmentSaleContract state InstallmentSaleState
     let balance = state.balance_remaining + contract.DUE_AT_CLOSING - request.amount;
     let total_paid = state.total_paid + request.amount;
     set state InstallmentSaleState{
-      stateId: "#1",
       status: Fulfilled,
       balance_remaining: balance,
       total_paid: total_paid,

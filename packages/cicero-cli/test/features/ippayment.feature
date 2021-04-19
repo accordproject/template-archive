@@ -7,6 +7,7 @@ Feature: IP Payment Contract
 
   Scenario: Payment of a specified amount should be made
     When the current time is "2019-03-04T16:34:00-05:00"
+    And the UTC offset is -5
     And it receives the request
 """
 {
@@ -27,6 +28,7 @@ Feature: IP Payment Contract
 
 Scenario: Payment of a specified amount should be made
     When the current time is "2019-03-01T16:34:00-02:00"
+    And the UTC offset is -2
     And it receives the request
 """
 {
@@ -47,6 +49,7 @@ Scenario: Payment of a specified amount should be made
 
 Scenario: Payment of a specified amount should be made
     When the current time is "2019-02-14T16:34:00-07:00"
+    And the UTC offset is -7
     And it receives the request
 """
 {

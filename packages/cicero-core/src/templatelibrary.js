@@ -17,7 +17,7 @@
 const NodeCache = require('node-cache');
 const Template = require('./template');
 const Logger = require('@accordproject/concerto-core').Logger;
-const rp = require('request-promise-native');
+const axios = require('axios');
 const crypto = require('crypto');
 const stringify = require('json-stable-stringify');
 const semver = require('semver');
@@ -40,10 +40,17 @@ class TemplateLibrary {
      * Create the Template Library
      * @param {string} url - the url to connect to. Defaults to
      * https://templates.accordproject.org
+     * @param {string} [httpAuthHeader] - A HTTP Authorization header, if required
      */
-    constructor(url=null) {
+    constructor(url = null, httpAuthHeader) {
         this.url = url || 'https://templates.accordproject.org';
+        this.httpAuthHeader = httpAuthHeader;
         Logger.info('Creating TemplateLibrary for ' + this.url);
+        if (this.httpAuthHeader){
+            Logger.debug('Creating TemplateLibrary with authentication');
+        } else {
+            Logger.debug('Creating TemplateLibrary without authentication');
+        }
     }
 
     /**
@@ -128,17 +135,20 @@ class TemplateLibrary {
         }
 
         const httpOptions = {
-            uri: `${this.url}/template-library.json`,
+            method: 'get',
+            url: `${this.url}/template-library.json`,
             headers: {
                 'User-Agent': 'clause',
             },
-            json: true, // Automatically parses the JSON string in the response
+            responseType: 'json'
         };
+        if (this.httpAuthHeader){
+            httpOptions.headers.authorization = this.httpAuthHeader;
+        }
 
-        Logger.info('Loading template library from', httpOptions.uri);
-        return rp(httpOptions)
-            .then((templateIndex) => {
-
+        Logger.info(`Loading template library from ${httpOptions.url}`);
+        return axios(httpOptions)
+            .then(({ data: templateIndex }) => {
                 if(options && options.ciceroVersion) {
                     templateIndex = TemplateLibrary.filterTemplateIndexCiceroVersion(templateIndex, options.ciceroVersion);
                 }
@@ -217,7 +227,8 @@ class TemplateLibrary {
         }
 
         // fetch the template
-        const template = await Template.fromUrl(templateMetadata.url);
+        const options = this.httpAuthHeader ? { httpAuthHeader: this.httpAuthHeader } : undefined;
+        const template = await Template.fromUrl(templateMetadata.url, options);
 
         // check the hash matches
         const templateHash = template.getHash();
@@ -247,10 +258,10 @@ class TemplateLibrary {
     }
 
     /**
-   * Returns the cache key used to cache access to a template.
-   * @param {string} templateUri the URI for the template
-   * @returns {string} the cache key or null if the template should not be cached
-   */
+     * Returns the cache key used to cache access to a template.
+     * @param {string} templateUri the URI for the template
+     * @returns {string} the cache key or null if the template should not be cached
+     */
     getTemplateCacheKey(templateUri) {
         return `${this.url}/${templateUri}`;
     }

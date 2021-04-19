@@ -4,5 +4,6 @@
     "accordproject": {
       "template": "contract",
       "cicero": "^0.21.0"
+      "runtime": "es6"
     }
 }
