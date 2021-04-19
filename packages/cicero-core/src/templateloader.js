@@ -80,7 +80,7 @@ class TemplateLoader extends FileLoader {
 
         // add model files
         Logger.debug(method, 'Adding model files to model manager');
-        template.getModelManager().addAPModelFiles(ctoModelFiles, ctoModelFileNames, true); // validation is disabled
+        template.getModelManager().addAPModelFiles(ctoModelFiles, ctoModelFileNames, true); // always offline
 
         Logger.debug(method, 'Setting grammar');
         if(!grammar) {
@@ -184,12 +184,8 @@ class TemplateLoader extends FileLoader {
             modelFiles.push(file.contents);
         });
 
-        template.getModelManager().addAPModelFiles(modelFiles, modelFileNames, true);
-        if(!options.skipUpdateExternalModels){
-            await template.getModelManager().updateExternalModels();
-            Logger.debug(method, 'Added model files', modelFiles.length);
-
-            const externalModelFiles = template.getModelManager().getModels();
+        const externalModelFiles = await template.getModelManager().addAPModelFiles(modelFiles, modelFileNames, options.offline);
+        if(!options.offline){
             externalModelFiles.forEach(function (file) {
                 fs.writeFileSync(path + '/model/' + file.name, file.content);
             });

@@ -1,7 +1,7 @@
 namespace io.clause.latedeliveryandpenalty
 
-import org.accordproject.time.TemporalUnit from https://models.accordproject.org/time.cto
-import org.accordproject.time.Duration from https://models.accordproject.org/time.cto
+import org.accordproject.time.TemporalUnit from https://models.accordproject.org/time@0.2.0.cto
+import org.accordproject.time.Duration from https://models.accordproject.org/time@0.2.0.cto
 
 import org.accordproject.contract.Clause from https://models.accordproject.org/accordproject/contract.cto
 import org.accordproject.runtime.Request from https://models.accordproject.org/accordproject/runtime.cto
