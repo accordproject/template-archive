@@ -38,10 +38,10 @@ abstract event Obligation identified {
   --> Contract contract
 
   /* The party that is obligated */
-  --> Party promisor optional
+  --> Participant promisor optional
 
   /* The party that receives the performance */
-  --> Party promisee optional
+  --> Participant promisee optional
 
   /* The time before which the obligation is fulfilled */
   o DateTime deadline optional
