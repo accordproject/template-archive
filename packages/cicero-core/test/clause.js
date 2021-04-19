@@ -27,7 +27,7 @@ chai.should();
 chai.use(require('chai-things'));
 chai.use(require('chai-as-promised'));
 
-const options = { skipUpdateExternalModels: true };
+const options = { offline: true };
 
 const copyrightData = {
     '$class': 'org.accordproject.copyrightlicense.CopyrightLicenseContract',

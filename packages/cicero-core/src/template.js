@@ -158,7 +158,7 @@ class Template {
 
         let modelFiles = this.getModelManager().getModels();
         modelFiles.forEach(function (file) {
-            content.models[file.name] = file.content;
+            content.models[file.namespace] = file.content;
         });
 
         let scriptManager = this.getScriptManager();
