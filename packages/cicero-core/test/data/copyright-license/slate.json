@@ -44,8 +44,9 @@
             "object": "inline",
             "type": "variable",
             "data": {
-              "name": "partyId",
-              "elementType": "String"
+              "name": "licensee",
+              "identifiedBy": "partyId",
+              "elementType": "org.accordproject.contract.Party"
             },
             "children": [
               {
@@ -116,8 +117,9 @@
             "object": "inline",
             "type": "variable",
             "data": {
-              "name": "partyId",
-              "elementType": "String"
+              "name": "licensor",
+              "identifiedBy": "partyId",
+              "elementType": "org.accordproject.contract.Party"
             },
             "children": [
               {

@@ -1,8 +1,8 @@
 namespace org.accordproject.installmentsale
 
-import org.accordproject.cicero.contract.* from https://models.accordproject.org/cicero/contract.cto
-import org.accordproject.cicero.runtime.* from https://models.accordproject.org/cicero/runtime.cto
-import org.accordproject.money.MonetaryAmount from https://models.accordproject.org/money.cto
+import org.accordproject.contract.* from https://models.accordproject.org/accordproject/contract.cto
+import org.accordproject.runtime.* from https://models.accordproject.org/accordproject/runtime.cto
+import org.accordproject.money.MonetaryAmount from https://models.accordproject.org/money@0.2.0.cto
 
 transaction Installment extends Request {
   o Double amount
@@ -22,7 +22,22 @@ enum ContractStatus {
   o Fulfilled
 }
 
-asset InstallmentSaleState extends AccordContractState {
+/**
+ * Defines contract obligations
+ */
+concept MyObligation {
+  o String party
+}
+concept PurchaseObligation extends MyObligation {
+  o Double requiredPurchase
+  o Integer year
+  o Integer quarter
+}
+concept MyPaymentObligation extends MyObligation {
+  o Double amount
+}
+
+asset InstallmentSaleState extends State {
   o ContractStatus status
   o Double balance_remaining
   o Integer next_payment_month
@@ -32,9 +47,9 @@ asset InstallmentSaleState extends AccordContractState {
 /**
  * The template model
  */
-asset InstallmentSaleContract extends AccordContract {
-  o AccordParty BUYER
-	o AccordParty SELLER
+asset InstallmentSaleContract extends Contract {
+  o String BUYER
+	o String SELLER
   o Double INITIAL_DUE
   o Double INTEREST_RATE
   o Double TOTAL_DUE_BEFORE_CLOSING

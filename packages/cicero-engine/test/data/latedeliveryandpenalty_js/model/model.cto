@@ -1,7 +1,7 @@
 namespace org.accordproject.latedeliveryandpenalty
 
-import org.accordproject.cicero.contract.* from https://models.accordproject.org/cicero/contract.cto
-import org.accordproject.cicero.runtime.* from https://models.accordproject.org/cicero/runtime.cto
+import org.accordproject.contract.* from https://models.accordproject.org/accordproject/contract.cto
+import org.accordproject.runtime.* from https://models.accordproject.org/accordproject/runtime.cto
 import org.accordproject.time.* from https://models.accordproject.org/time.cto
 
 /**
@@ -9,7 +9,7 @@ import org.accordproject.time.* from https://models.accordproject.org/time.cto
  * This defines the structure of the abstract syntax tree that the parser for the template
  * must generate from input source text.
  */
-asset TemplateModel extends AccordClause {
+asset TemplateModel extends Clause {
   /**
    * Does the clause include a force majeure provision?
    */

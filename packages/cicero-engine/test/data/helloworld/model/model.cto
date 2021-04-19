@@ -1,7 +1,7 @@
 namespace org.accordproject.helloworld
 
-import org.accordproject.cicero.contract.* from https://models.accordproject.org/cicero/contract.cto
-import org.accordproject.cicero.runtime.* from https://models.accordproject.org/cicero/runtime.cto
+import org.accordproject.contract.* from https://models.accordproject.org/accordproject/contract.cto
+import org.accordproject.runtime.* from https://models.accordproject.org/accordproject/runtime.cto
 
 transaction MyRequest extends Request {
   o String input
@@ -14,7 +14,7 @@ transaction MyResponse extends Response {
 /**
  * The template model
  */
-asset TemplateModel extends AccordClause {
+asset TemplateModel extends Clause {
   /**
    * The name for the clause
    */

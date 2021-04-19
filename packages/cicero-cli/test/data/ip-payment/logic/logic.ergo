@@ -14,7 +14,7 @@
 
 namespace org.accordproject.ippayment
 
-import org.accordproject.cicero.runtime.*
+import org.accordproject.runtime.*
 import org.accordproject.time.*
 
 contract IPPayment over IntellectualPropertyPaymentClause {

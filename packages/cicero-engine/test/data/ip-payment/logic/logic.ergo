@@ -14,7 +14,7 @@
 
 namespace org.accordproject.ippayment
 
-import org.accordproject.cicero.runtime.*
+import org.accordproject.runtime.*
 import org.accordproject.time.*
 
 contract IPPayment over IntellectualPropertyPaymentClause {
@@ -32,7 +32,7 @@ contract IPPayment over IntellectualPropertyPaymentClause {
     else 
       return PayOut{
         totalAmount: totalAmount,
-        dueBy: addDuration(endOf(now(), "quarters"), contract.paymentPeriod)
+        dueBy: addDuration(endOf(now(), quarters), contract.paymentPeriod)
       }
   }
 }

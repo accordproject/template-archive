@@ -1,6 +1,6 @@
 namespace io.clause.latedeliveryandpenalty
 
-import org.accordproject.cicero.runtime.*
+import org.accordproject.runtime.*
 import org.accordproject.time.*
 
 /* From template:
@@ -14,7 +14,7 @@ contract LateDeliveryAndPenalty over TemplateModel {
     // Guard against calling late delivery clause too early
     let agreed = request.agreedDelivery;
     enforce isBefore(agreed,now()) else
-    throw ErgoErrorResponse{ message : "Cannot exercise late delivery before delivery date" }
+    throw Error{ message : "Cannot exercise late delivery before delivery date" }
     ;
     // Guard against force majeure
     enforce !contract.forceMajeure or !request.forceMajeure else

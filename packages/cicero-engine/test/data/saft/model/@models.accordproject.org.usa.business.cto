@@ -1,4 +1,21 @@
+/*
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
 namespace org.accordproject.usa.business
+
+import org.accordproject.geo.GeoCoordinates from https://models.accordproject.org/geo.cto
+import org.accordproject.address.PostalAddress from https://models.accordproject.org/address.cto
 
 /**
  * Types of businesses in the USA
@@ -14,4 +31,18 @@ enum BusinessEntity {
   o CORP
   o PC
   o DBA
+}
+
+/**
+ * Based on the state of Delaware API:
+ * https://dev.socrata.com/foundry/data.delaware.gov/5zy2-grhr
+ */
+concept BusinessLicense {
+  o String business_name
+  o String category
+  o DateTime current_license_valid_from
+  o DateTime current_license_valid_to
+  o PostalAddress address
+  o Long license_number
+  o GeoCoordinates geocoded_location
 }
