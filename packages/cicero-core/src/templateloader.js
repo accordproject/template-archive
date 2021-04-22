@@ -80,7 +80,7 @@ class TemplateLoader extends FileLoader {
 
         // add model files
         Logger.debug(method, 'Adding model files to model manager');
-        template.getModelManager().addAPModelFiles(ctoModelFiles, ctoModelFileNames, true); // always offline
+        template.getModelManager().addAPModelFiles(ctoModelFiles, ctoModelFileNames, options && options.offline);
 
         Logger.debug(method, 'Setting grammar');
         if(!grammar) {
@@ -139,10 +139,7 @@ class TemplateLoader extends FileLoader {
      * @param {Object} [options] - an optional set of options to configure the instance.
      * @return {Promise<Template>} a Promise to the instantiated template
      */
-    static async fromDirectory(Template, path, options) {
-        if (!options) {
-            options = {};
-        }
+    static async fromDirectory(Template, path, options = {}) {
         const method = 'fromDirectory';
 
         // grab the README.md
@@ -184,8 +181,8 @@ class TemplateLoader extends FileLoader {
             modelFiles.push(file.contents);
         });
 
-        const externalModelFiles = await template.getModelManager().addAPModelFiles(modelFiles, modelFileNames, options.offline);
-        if(!options.offline){
+        const externalModelFiles = await template.getModelManager().addAPModelFiles(modelFiles, modelFileNames, options && options.offline);
+        if(!options || !options.offline){
             externalModelFiles.forEach(function (file) {
                 fs.writeFileSync(path + '/model/' + file.name, file.content);
             });

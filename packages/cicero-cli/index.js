@@ -42,6 +42,16 @@ require('yargs')
             type: 'string',
             default: null
         });
+        yargs.option('utcOffset', {
+            describe: 'set UTC offset',
+            type: 'number',
+            default: null
+        });
+        yargs.option('offline', {
+            describe: 'do not resolve external models',
+            type: 'boolean',
+            default: false
+        });
         yargs.option('warnings', {
             describe: 'print warnings',
             type: 'boolean',
@@ -55,9 +65,10 @@ require('yargs')
         try {
             argv = Commands.validateParseArgs(argv);
             const options = {
+                offline: argv.offline,
                 warnings: argv.warnings,
             };
-            return Commands.parse(argv.template, argv.sample, argv.output, argv.currentTime, options)
+            return Commands.parse(argv.template, argv.sample, argv.output, argv.currentTime, argv.utcOffset, options)
                 .then((result) => {
                     if(result) {Logger.info(JSON.stringify(result));}
                 })
@@ -87,6 +98,16 @@ require('yargs')
             type: 'string',
             default: null
         });
+        yargs.option('utcOffset', {
+            describe: 'set UTC offset',
+            type: 'number',
+            default: null
+        });
+        yargs.option('offline', {
+            describe: 'do not resolve external models',
+            type: 'boolean',
+            default: false
+        });
         yargs.option('format', {
             describe: 'target format',
             type: 'string'
@@ -109,11 +130,12 @@ require('yargs')
         try {
             argv = Commands.validateDraftArgs(argv);
             const options = {
+                offline: argv.offline,
                 unquoteVariables: argv.unquoteVariables,
                 warnings: argv.warnings,
                 format: argv.format,
             };
-            return Commands.draft(argv.template, argv.data, argv.output, argv.currentTime, options)
+            return Commands.draft(argv.template, argv.data, argv.output, argv.currentTime, argv.utcOffset, options)
                 .then((result) => {
                     if(result) {Logger.info(result);}
                 })
@@ -148,6 +170,16 @@ require('yargs')
             type: 'string',
             default: null
         });
+        yargs.option('utcOffset', {
+            describe: 'set UTC offset',
+            type: 'number',
+            default: null
+        });
+        yargs.option('offline', {
+            describe: 'do not resolve external models',
+            type: 'boolean',
+            default: false
+        });
         yargs.option('warnings', {
             describe: 'print warnings',
             type: 'boolean',
@@ -170,11 +202,12 @@ require('yargs')
         try {
             argv = Commands.validateNormalizeArgs(argv);
             const options = {
+                offline: argv.offline,
                 unquoteVariables: argv.unquoteVariables,
                 warnings: argv.warnings,
                 format: argv.format,
             };
-            return Commands.normalize(argv.template, argv.sample, argv.overwrite, argv.output, argv.currentTime, options)
+            return Commands.normalize(argv.template, argv.sample, argv.overwrite, argv.output, argv.currentTime, argv.utcOffset, options)
                 .then((result) => {
                     if(result) {Logger.info(result);}
                 })
@@ -208,6 +241,16 @@ require('yargs')
             type: 'string',
             default: null
         });
+        yargs.option('utcOffset', {
+            describe: 'set UTC offset',
+            type: 'number',
+            default: null
+        });
+        yargs.option('offline', {
+            describe: 'do not resolve external models',
+            type: 'boolean',
+            default: false
+        });
         yargs.option('warnings', {
             describe: 'print warnings',
             type: 'boolean',
@@ -218,9 +261,10 @@ require('yargs')
         try {
             argv = Commands.validateTriggerArgs(argv);
             const options = {
+                offline: argv.offline,
                 warnings: argv.warnings,
             };
-            return Commands.trigger(argv.template, argv.sample, argv.request, argv.state, argv.currentTime, options)
+            return Commands.trigger(argv.template, argv.sample, argv.request, argv.state, argv.currentTime, argv.utcOffset, options)
                 .then((result) => {
                     if(result) {Logger.info(JSON.stringify(result));}
                 })
@@ -257,6 +301,16 @@ require('yargs')
             type: 'string',
             default: null
         });
+        yargs.option('utcOffset', {
+            describe: 'set UTC offset',
+            type: 'number',
+            default: null
+        });
+        yargs.option('offline', {
+            describe: 'do not resolve external models',
+            type: 'boolean',
+            default: false
+        });
         yargs.option('warnings', {
             describe: 'print warnings',
             type: 'boolean',
@@ -266,9 +320,10 @@ require('yargs')
         try {
             argv = Commands.validateInvokeArgs(argv);
             const options = {
+                offline: argv.offline,
                 warnings: argv.warnings,
             };
-            return Commands.invoke(argv.template, argv.sample, argv.clauseName, argv.params, argv.state, argv.currentTime, options)
+            return Commands.invoke(argv.template, argv.sample, argv.clauseName, argv.params, argv.state, argv.currentTime, argv.utcOffset, options)
                 .then((result) => {
                     if(result) {Logger.info(JSON.stringify(result));}
                 })
@@ -297,6 +352,16 @@ require('yargs')
             type: 'string',
             default: null
         });
+        yargs.option('utcOffset', {
+            describe: 'set UTC offset',
+            type: 'number',
+            default: null
+        });
+        yargs.option('offline', {
+            describe: 'do not resolve external models',
+            type: 'boolean',
+            default: false
+        });
         yargs.option('warnings', {
             describe: 'print warnings',
             type: 'boolean',
@@ -307,9 +372,10 @@ require('yargs')
         try {
             argv = Commands.validateInitializeArgs(argv);
             const options = {
+                offline: argv.offline,
                 warnings: argv.warnings,
             };
-            return Commands.initialize(argv.template, argv.sample, argv.params, argv.currentTime, options)
+            return Commands.initialize(argv.template, argv.sample, argv.params, argv.currentTime, argv.utcOffset, options)
                 .then((result) => {
                     if(result) {Logger.info(JSON.stringify(result));}
                 })

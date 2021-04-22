@@ -117,10 +117,11 @@ class TemplateInstance {
     /**
      * Set the data for the clause by parsing natural language text.
      * @param {string} input - the text for the clause
-     * @param {string} [currentTime] - the definition of 'now' (optional)
+     * @param {string} [currentTime] - the definition of 'now', defaults to current time
+     * @param {number} [utcOffset] - UTC Offset for this execution, defaults to local offset
      * @param {string} [fileName] - the fileName for the text (optional)
      */
-    parse(input, currentTime, fileName) {
+    parse(input, currentTime, utcOffset, fileName) {
         // Setup
         const templateMarkTransformer = new TemplateMarkTransformer();
 
@@ -128,7 +129,7 @@ class TemplateInstance {
         const inputCiceroMark = this.ciceroMarkTransformer.fromMarkdownCicero(input);
 
         // Set current time
-        this.parserManager.setCurrentTime(currentTime);
+        this.parserManager.setCurrentTime(currentTime, utcOffset);
 
         // Parse
         const data = templateMarkTransformer.dataFromCiceroMark({ fileName:fileName, content:inputCiceroMark }, this.parserManager, {});
@@ -139,11 +140,12 @@ class TemplateInstance {
      * Generates the natural language text for a contract or clause clause; combining the text from the template
      * and the instance data.
      * @param {*} [options] text generation options.
-     * @param {string} currentTime - the definition of 'now' (optional)
+     * @param {string} [currentTime] - the definition of 'now', defaults to current time
+     * @param {number} [utcOffset] - UTC Offset for this execution, defaults to local offset
      * @returns {string} the natural language text for the contract or clause; created by combining the structure of
      * the template with the JSON data for the clause.
      */
-    draft(options,currentTime) {
+    draft(options, currentTime, utcOffset) {
         if(!this.concertoData) {
             throw new Error('Data has not been set. Call setData or parse before calling this method.');
         }
@@ -156,7 +158,7 @@ class TemplateInstance {
         const data = this.getData();
 
         // Set current time
-        this.parserManager.setCurrentTime(currentTime);
+        this.parserManager.setCurrentTime(currentTime, utcOffset);
 
         // Draft
         const ciceroMark = this.templateMarkTransformer.draftCiceroMark(data, this.parserManager, templateKind, {});
@@ -249,8 +251,8 @@ class TemplateInstance {
      * @param {string} name - the name of the formula
      * @return {*} A function from formula code + input data to result
      */
-    static ciceroFormulaEval(logicManager,clauseId,ergoEngine,name) {
-        return (code,data,currentTime,utcOffset) => {
+    static ciceroFormulaEval(logicManager, clauseId, ergoEngine, name) {
+        return (code,data, currentTime, utcOffset) => {
             const result = ergoEngine.calculate(logicManager, clauseId, name, data, currentTime, utcOffset, null);
             // console.log('Formula result: ' + JSON.stringify(result.response));
             return result.response;
@@ -265,7 +267,7 @@ class TemplateInstance {
      * @param {string} templateName - this template name
      * @param {string} grammar - the new grammar
      */
-    static rebuildParser(parserManager,logicManager,ergoEngine,templateName,grammar) {
+    static rebuildParser(parserManager, logicManager, ergoEngine, templateName, grammar) {
         // Update template in parser manager
         parserManager.setTemplate(grammar);
 
