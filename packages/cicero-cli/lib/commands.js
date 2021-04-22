@@ -156,18 +156,19 @@ class Commands {
      * @param {string} templatePath - path to the template directory or archive
      * @param {string} samplePath - path to the contract text
      * @param {string} outputPath - to an output file
-     * @param {string} currentTime - the definition of 'now'
+     * @param {string} [currentTime] - the definition of 'now', defaults to current time
+     * @param {number} [utcOffset] - UTC Offset for this execution, defaults to local offset
      * @param {Object} [options] - an optional set of options
      * @returns {object} Promise to the result of parsing
      */
-    static parse(templatePath, samplePath, outputPath, currentTime, options) {
+    static parse(templatePath, samplePath, outputPath, currentTime, utcOffset, options) {
         let clause;
         const sampleText = fs.readFileSync(samplePath, 'utf8');
 
         return Commands.loadTemplate(templatePath, options)
             .then((template) => {
                 clause = new Clause(template);
-                clause.parse(sampleText, currentTime, samplePath);
+                clause.parse(sampleText, currentTime, utcOffset, samplePath);
                 if (outputPath) {
                     Logger.info('Creating file: ' + outputPath);
                     fs.writeFileSync(outputPath, JSON.stringify(clause.getData(),null,2));
@@ -202,11 +203,12 @@ class Commands {
      * @param {string} templatePath - path to the template directory or archive
      * @param {string} dataPath - path to the JSON data
      * @param {string} outputPath - to the contract file
-     * @param {string} currentTime - the definition of 'now'
+     * @param {string} [currentTime] - the definition of 'now', defaults to current time
+     * @param {number} [utcOffset] - UTC Offset for this execution, defaults to local offset
      * @param {Object} [options] - an optional set of options
      * @returns {object} Promise to the result of parsing
      */
-    static draft(templatePath, dataPath, outputPath, currentTime, options) {
+    static draft(templatePath, dataPath, outputPath, currentTime, utcOffset, options) {
         let clause;
         const dataJson = JSON.parse(fs.readFileSync(dataPath, 'utf8'));
 
@@ -214,7 +216,7 @@ class Commands {
             .then(async function (template) {
                 clause = new Clause(template);
                 clause.setData(dataJson);
-                const drafted = clause.draft(options, currentTime);
+                const drafted = clause.draft(options, currentTime, utcOffset);
                 if (outputPath) {
                     Logger.info('Creating file: ' + outputPath);
                     let text;
@@ -259,23 +261,24 @@ class Commands {
      * @param {string} samplePath - to the sample file
      * @param {boolean} overwrite - true if overwriting the sample
      * @param {string} outputPath - to the contract file
-     * @param {string} currentTime - the definition of 'now'
+     * @param {string} [currentTime] - the definition of 'now', defaults to current time
+     * @param {number} [utcOffset] - UTC Offset for this execution, defaults to local offset
      * @param {Object} [options] - an optional set of options
      * @returns {object} Promise to the result of parsing
      */
-    static normalize(templatePath, samplePath, overwrite, outputPath, currentTime, options) {
+    static normalize(templatePath, samplePath, overwrite, outputPath, currentTime, utcOffset, options) {
         let clause;
         const sampleText = fs.readFileSync(samplePath, 'utf8');
 
         return Commands.loadTemplate(templatePath, options)
             .then(async function (template) {
                 clause = new Clause(template);
-                clause.parse(sampleText, currentTime, samplePath);
+                clause.parse(sampleText, currentTime, utcOffset, samplePath);
                 if (outputPath) {
                     Logger.info('Creating file: ' + outputPath);
                     fs.writeFileSync(outputPath, JSON.stringify(clause.getData(),null,2));
                 }
-                const text = clause.draft(options, currentTime);
+                const text = clause.draft(options, currentTime, utcOffset);
                 if (outputPath) {
                     Logger.info('Creating file: ' + outputPath);
                     fs.writeFileSync(outputPath, text);
@@ -312,11 +315,12 @@ class Commands {
      * @param {string} samplePath - to the sample file
      * @param {string[]} requestsPath - to the array of request files
      * @param {string} statePath - to the state file
-     * @param {string} currentTime - the definition of 'now'
+     * @param {string} [currentTime] - the definition of 'now', defaults to current time
+     * @param {number} [utcOffset] - UTC Offset for this execution, defaults to local offset
      * @param {Object} [options] - an optional set of options
      * @returns {object} Promise to the result of execution
      */
-    static trigger(templatePath, samplePath, requestsPath, statePath, currentTime, options) {
+    static trigger(templatePath, samplePath, requestsPath, statePath, currentTime, utcOffset, options) {
         let clause;
         const sampleText = fs.readFileSync(samplePath, 'utf8');
         let requestsJson = [];
@@ -330,12 +334,12 @@ class Commands {
             .then(async (template) => {
                 // Initialize clause
                 clause = new Clause(template);
-                clause.parse(sampleText, currentTime);
+                clause.parse(sampleText, currentTime, utcOffset);
 
                 let stateJson;
                 if(!fs.existsSync(statePath)) {
                     Logger.warn('A state file was not provided, initializing state. Try the --state flag or create a state.json in the root folder of your template.');
-                    const initResult = await engine.init(clause, currentTime);
+                    const initResult = await engine.init(clause, currentTime, utcOffset);
                     stateJson = initResult.state;
                 } else {
                     stateJson = JSON.parse(fs.readFileSync(statePath, 'utf8'));
@@ -343,12 +347,12 @@ class Commands {
 
                 // First execution to get the initial response
                 const firstRequest = requestsJson[0];
-                const initResponse = engine.trigger(clause, firstRequest, stateJson, currentTime);
+                const initResponse = engine.trigger(clause, firstRequest, stateJson, currentTime, utcOffset);
                 // Get all the other requests and chain execution through Promise.reduce()
                 const otherRequests = requestsJson.slice(1, requestsJson.length);
                 return otherRequests.reduce((promise,requestJson) => {
                     return promise.then((result) => {
-                        return engine.trigger(clause, requestJson, result.state);
+                        return engine.trigger(clause, requestJson, result.state, currentTime, utcOffset);
                     });
                 }, initResponse);
             })
@@ -383,11 +387,12 @@ class Commands {
      * @param {string} clauseName the name of the clause to invoke
      * @param {object} paramsPath the parameters for the clause
      * @param {string} statePath - to the state file
-     * @param {string} currentTime - the definition of 'now'
+     * @param {string} [currentTime] - the definition of 'now', defaults to current time
+     * @param {number} [utcOffset] - UTC Offset for this execution, defaults to local offset
      * @param {Object} [options] - an optional set of options
      * @returns {object} Promise to the result of execution
      */
-    static invoke(templatePath, samplePath, clauseName, paramsPath, statePath, currentTime, options) {
+    static invoke(templatePath, samplePath, clauseName, paramsPath, statePath, currentTime, utcOffset, options) {
         let clause;
         const sampleText = fs.readFileSync(samplePath, 'utf8');
         const paramsJson = JSON.parse(fs.readFileSync(paramsPath, 'utf8'));
@@ -397,18 +402,18 @@ class Commands {
             .then(async (template) => {
                 // Initialize clause
                 clause = new Clause(template);
-                clause.parse(sampleText, currentTime);
+                clause.parse(sampleText, currentTime, utcOffset);
 
                 let stateJson;
                 if(!fs.existsSync(statePath)) {
                     Logger.warn('A state file was not provided, initializing state. Try the --state flag or create a state.json in the root folder of your template.');
-                    const initResult = await engine.init(clause, currentTime);
+                    const initResult = await engine.init(clause, currentTime, utcOffset);
                     stateJson = initResult.state;
                 } else {
                     stateJson = JSON.parse(fs.readFileSync(statePath, 'utf8'));
                 }
 
-                return engine.invoke(clause, clauseName, paramsJson, stateJson, currentTime);
+                return engine.invoke(clause, clauseName, paramsJson, stateJson, currentTime, utcOffset);
             })
             .catch((err) => {
                 Logger.error(err.message);
@@ -438,11 +443,12 @@ class Commands {
      * @param {string} templatePath - path to the template directory or archive
      * @param {string} samplePath - to the sample file
      * @param {object} paramsPath - the parameters for the initialization
-     * @param {string} currentTime - the definition of 'now'
+     * @param {string} [currentTime] - the definition of 'now', defaults to current time
+     * @param {number} [utcOffset] - UTC Offset for this execution, defaults to local offset
      * @param {Object} [options] - an optional set of options
      * @returns {object} Promise to the result of execution
      */
-    static initialize(templatePath, samplePath, paramsPath, currentTime, options) {
+    static initialize(templatePath, samplePath, paramsPath, currentTime, utcOffset, options) {
         let clause;
         const sampleText = fs.readFileSync(samplePath, 'utf8');
         const paramsJson = paramsPath ? JSON.parse(fs.readFileSync(paramsPath, 'utf8')) : {};
@@ -452,10 +458,9 @@ class Commands {
             .then((template) => {
                 // Initialize clause
                 clause = new Clause(template);
-                clause.parse(sampleText, currentTime);
+                clause.parse(sampleText, currentTime, utcOffset);
 
-                // XXX Third parameter is utcOffset, should be added to CLI
-                return engine.init(clause, currentTime, null, paramsJson);
+                return engine.init(clause, currentTime, utcOffset, paramsJson);
             })
             .catch((err) => {
                 Logger.error(err.message);

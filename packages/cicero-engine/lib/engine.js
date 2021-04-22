@@ -83,13 +83,12 @@ class Engine {
      * serializer.
      * @return {Promise} a promise that resolves to a result for the clause initialization
      */
-    async init(clause, currentTime, utcOffset, params) {
-        const effectiveParams = params || {};
+    async init(clause, currentTime, utcOffset, params = {}) {
         const logicManager = clause.getLogicManager();
         const clauseId = clause.getIdentifier();
         const contract = clause.getData();
 
-        return this.ergoEngine.init(logicManager,clauseId,contract,effectiveParams,currentTime,utcOffset,null);
+        return this.ergoEngine.init(logicManager, clauseId, contract, params, currentTime, utcOffset, null);
     }
 
     /**
