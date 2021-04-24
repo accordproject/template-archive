@@ -296,14 +296,14 @@ describe('#draft-output', async () => {
     });
 
     it('should create the slate for a clause using a template and save to a JSON file', async () => {
-        const result = await Commands.draft(template, data, sampleOutJson, null, { format: 'slate' });
+        const result = await Commands.draft(template, data, sampleOutJson, null, null, { format: 'slate' });
         delete result.clauseId;
         delete result.$identifier;
         result.should.not.be.null;
     });
 
     it('should create the slate for a ciceromark_parsed using a template and save to a JSON file', async () => {
-        const result = await Commands.draft(template, data, sampleOutJson, null, { format: 'ciceromark_parsed' });
+        const result = await Commands.draft(template, data, sampleOutJson, null, null, { format: 'ciceromark_parsed' });
         delete result.clauseId;
         delete result.$identifier;
         result.should.not.be.null;
