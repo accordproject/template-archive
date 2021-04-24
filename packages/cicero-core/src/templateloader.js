@@ -80,7 +80,7 @@ class TemplateLoader extends FileLoader {
 
         // add model files
         Logger.debug(method, 'Adding model files to model manager');
-        template.getModelManager().addAPModelFiles(ctoModelFiles, ctoModelFileNames, options && options.offline);
+        template.getModelManager().addAPModelFiles(ctoModelFiles, ctoModelFileNames, true); // Archives can always be loaded offline
 
         Logger.debug(method, 'Setting grammar');
         if(!grammar) {
