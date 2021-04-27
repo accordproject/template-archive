@@ -21,7 +21,7 @@
   },
   "name": "cicero",
   "description": "You must install [Lerna](https://lernajs.io) to build this multi-package repository.",
-  "version": "0.22.0-alpha.9",
+  "version": "0.22.0",
   "private": true,
   "scripts": {
     "doc": "jsdoc -t ./node_modules/jsdoc-sphinx/template/ -c jsdoc.json -r -d ../cicero-docs/docs/api --verbose",
