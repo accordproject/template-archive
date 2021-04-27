@@ -206,11 +206,10 @@ describe('TemplateLibrary', () => {
             },
         };
 
-        // XXX Skipped until we publish some valid template for Cicero 0.22
-        it.skip('should retrieve a template', async function() {
+        it('should retrieve a template', async function() {
             const templateLibrary = new TemplateLibrary();
-            const template = await templateLibrary.getTemplate('ap://ip-payment@0.13.0#a4b918a2be2d984dbddd5d8b41703b0761d6cd03d1e65ad3d3cd4a11d2bb1ab2');
-            template.getIdentifier().should.equal('ip-payment@0.13.0');
+            const template = await templateLibrary.getTemplate('ap://ip-payment@0.14.0#b652957cc16e643e4ddcbcf8ad755e14d4320d419e7fb151ee0cbaf0ac17fdd3');
+            template.getIdentifier().should.equal('ip-payment@0.14.0');
         });
 
         it('should retrieve a template without authentication', async () => {

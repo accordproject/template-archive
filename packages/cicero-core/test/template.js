@@ -392,8 +392,7 @@ and monthly payments of {{%"£667.00"%}}`;
         });
     });
 
-    // XXX Skipped until we publish some valid template for Cicero 0.22
-    describe.skip('#fromUrl', () => {
+    describe('#fromUrl', () => {
 
         it('should throw an error if an archive loader cannot be found', async () => {
 
@@ -407,12 +406,12 @@ and monthly payments of {{%"£667.00"%}}`;
         });
 
         it('should create a template from an archive at a given URL', async () => {
-            const url = 'https://templates.accordproject.org/archives/ip-payment@0.13.0.cta';
+            const url = 'https://templates.accordproject.org/archives/ip-payment@0.14.0.cta';
             return Template.fromUrl(url, null).should.be.fulfilled;
         });
 
         it('should create a template from an archive at a given AP URL', async () => {
-            const url = 'ap://ip-payment@0.13.0#hash';
+            const url = 'ap://ip-payment@0.14.0#hash';
             return Template.fromUrl(url, null).should.be.fulfilled;
         });
 
@@ -426,8 +425,8 @@ and monthly payments of {{%"£667.00"%}}`;
             }
         });
 
-        it('should create a template from an archive at a given github URL', async () => {
-            const url = 'github://accordproject/cicero-template-library/master/build/archives/ip-payment@0.13.0.cta';
+        it.skip('should create a template from an archive at a given github URL', async () => {
+            const url = 'github://accordproject/cicero-template-library/master/build/archives/ip-payment@0.14.0.cta';
             return Template.fromUrl(url, {'encoding':null,'headers':{'Accept': '*/*','Accept-Encoding': 'deflate, gzip'}}).should.be.fulfilled;
         });
 
