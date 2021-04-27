@@ -3,6 +3,6 @@
     "version": "0.0.1",
     "accordproject": {
       "template": "contract",
-      "cicero": "^0.21.0"
+      "cicero": "^0.22.0"
     }
 }

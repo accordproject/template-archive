@@ -4,6 +4,6 @@
     "description": "This is the Hello World of Accord Protocol Templates (with two Ergo modules).",
     "accordproject": {
         "template": "clause",
-        "cicero": "^0.21.0"
+        "cicero": "^0.22.0"
     }
 }
