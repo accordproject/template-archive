@@ -4,6 +4,6 @@
     "description": "Test formatted monetary amounts",
     "accordproject": {
       "template": "clause",
-      "cicero": "^0.21.0"
+      "cicero": "^0.22.0"
     }
 }

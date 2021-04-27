@@ -4,6 +4,6 @@
     "description": "\"Dan Selman\" agrees to spend 100.0 conga coins on \"swag\"",
     "accordproject": {
       "template": "clause",
-      "cicero": "^0.21.0"
+      "cicero": "^0.22.0"
     }
 }
