@@ -1,6 +1,7 @@
 namespace org.accordproject.simplelatedeliveryandpenalty
 
 import org.accordproject.contract.* from https://models.accordproject.org/accordproject/contract.cto
+import org.accordproject.party.* from https://models.accordproject.org/accordproject/party.cto
 import org.accordproject.runtime.* from https://models.accordproject.org/accordproject/runtime.cto
 import org.accordproject.time.* from https://models.accordproject.org/time@0.2.0.cto
 

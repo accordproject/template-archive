@@ -12,11 +12,10 @@
  * limitations under the License.
  */
 
-concerto version ">= 1.0.0-alpha.3"
+concerto version ">= 1.0.0"
 
 namespace org.accordproject.runtime
 
-import org.accordproject.contract.Party from https://models.accordproject.org/accordproject/contract.cto
 import org.accordproject.contract.Contract from https://models.accordproject.org/accordproject/contract.cto
 
 /**

@@ -84,7 +84,7 @@ const inheritance=[ {
     "sub": ("org.accordproject.contract.Contract"), 
     "sup": ("concerto.Asset")
   }, {
-    "sub": ("org.accordproject.contract.Party"), 
+    "sub": ("org.accordproject.party.Party"), 
     "sup": ("concerto.Participant")
   } ]
 class orgXaccordprojectXlatedeliveryandpenaltyXLateDeliveryAndPenalty{

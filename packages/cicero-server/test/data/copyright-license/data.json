@@ -3,14 +3,14 @@
   "contractId": "9d5a3934-81f6-48e6-8328-8cd73cf69f2e",
   "effectiveDate": "2018-01-01T00:00:00.000-04:00",
   "licensee": {
-    "$class": "org.accordproject.cicero.contract.AccordParty",
+    "$class": "org.accordproject.party.Party",
     "partyId": "Me"
   },
   "licenseeState": "NY",
   "licenseeEntityType": "Company",
   "licenseeAddress": "1 Broadway",
   "licensor": {
-    "$class": "org.accordproject.cicero.contract.AccordParty",
+    "$class": "org.accordproject.party.Party",
     "partyId": "Myself"
   },
   "licensorState": "NY",

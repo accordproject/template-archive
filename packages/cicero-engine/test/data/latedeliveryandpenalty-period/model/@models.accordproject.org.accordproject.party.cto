@@ -1,4 +1,3 @@
-#!/usr/bin/env node
 /*
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -13,17 +12,11 @@
  * limitations under the License.
  */
 
-'use strict';
+concerto version ">= 1.0.0"
 
-const semver = require('semver');
-const targetVersion = process.argv[2];
+namespace org.accordproject.party
 
-if (!semver.valid(targetVersion)) {
-    console.error(`Error: the version "${targetVersion}" is invalid!`);
-    process.exit(1);
+/* A party to a contract */
+participant Party identified by partyId {
+  o String partyId
 }
-
-const prerelease = semver.prerelease(targetVersion);
-const tag = prerelease ? 'unstable' : 'latest';
-
-console.log(`::set-output name=tag::--tag=${tag}`);
