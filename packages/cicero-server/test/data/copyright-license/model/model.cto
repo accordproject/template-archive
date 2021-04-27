@@ -1,6 +1,7 @@
 namespace org.accordproject.copyrightlicense
 
 import org.accordproject.contract.* from https://models.accordproject.org/accordproject/contract.cto
+import org.accordproject.party.* from https://models.accordproject.org/accordproject/party.cto
 import org.accordproject.runtime.* from https://models.accordproject.org/accordproject/runtime.cto
 import org.accordproject.obligation.* from https://models.accordproject.org/accordproject/obligation.cto
 

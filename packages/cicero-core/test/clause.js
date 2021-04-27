@@ -33,11 +33,11 @@ const copyrightData = {
     '$class': 'org.accordproject.copyrightlicense.CopyrightLicenseContract',
     'contractId': 'e32a2ca7-78c9-4462-935f-487aad6e9c9b',
     'effectiveDate': '2018-01-01T00:00:00.000-04:00',
-    'licensee': 'resource:org.accordproject.contract.Party#Me',
+    'licensee': 'resource:org.accordproject.party.Party#Me',
     'licenseeState': 'NY',
     'licenseeEntityType': 'Company',
     'licenseeAddress': '1 Broadway',
-    'licensor': 'resource:org.accordproject.contract.Party#Myself',
+    'licensor': 'resource:org.accordproject.party.Party#Myself',
     'licensorState': 'NY',
     'licensorEntityType': 'Company',
     'licensorAddress': '2 Broadway',
@@ -249,8 +249,8 @@ describe('Clause', () => {
             clause.parse(testLatePenaltyPeriodInput);
             const data = {
                 $class: 'org.accordproject.simplelatedeliveryandpenalty.SimpleLateDeliveryAndPenaltyContract',
-                buyer: 'resource:org.accordproject.contract.Party#Betty%20Buyer',
-                seller: 'resource:org.accordproject.contract.Party#Steve%20Seller',
+                buyer: 'resource:org.accordproject.party.Party#Betty%20Buyer',
+                seller: 'resource:org.accordproject.party.Party#Steve%20Seller',
                 penaltyPeriod: {
                     $class: 'org.accordproject.time.Period',
                     amount: 6,
@@ -268,7 +268,7 @@ describe('Clause', () => {
             delete clause.getData().contractId;
             delete clause.getData().$identifier;
             clause.getData().should.eql(data);
-            clause.getIdentifier().should.equal('simplelatedeliveryandpenalty@0.2.1-0a67d4eb97267fcfa9403a1fcb057ff6381a5e86189b93b012a149815a8cf1ac');
+            clause.getIdentifier().should.equal('simplelatedeliveryandpenalty@0.2.1-8ece530b6a2794b87d1c7d499cf88fb08c5f8ace4e0e3795b2a330e65b581535');
         });
 
         it('should be able to set the data from conga natural language text', async function() {
@@ -502,11 +502,11 @@ Assignment. Licensee may freely assign or otherwise transfer all or any of its r
                 '$class': 'org.accordproject.copyrightlicense.CopyrightLicenseContract',
                 'contractId': 'e32a2ca7-78c9-4462-935f-487aad6e9c9b',
                 'effectiveDate': '2018-01-01T00:00:00.000-04:00',
-                'licensee': 'resource:org.accordproject.contract.Party#Me',
+                'licensee': 'resource:org.accordproject.party.Party#Me',
                 'licenseeState': 'NY',
                 'licenseeEntityType': 'Company',
                 'licenseeAddress': '1 Broadway',
-                'licensor': 'resource:org.accordproject.contract.Party#Myself',
+                'licensor': 'resource:org.accordproject.party.Party#Myself',
                 'licensorState': 'NY',
                 'licensorEntityType': 'Company',
                 'licensorAddress': '2 Broadway',
@@ -595,11 +595,11 @@ Assignment. Licensee may freely assign or otherwise transfer all or any of its r
                 '$class': 'org.accordproject.copyrightlicense.CopyrightLicenseContract',
                 'contractId': 'e32a2ca7-78c9-4462-935f-487aad6e9c9b',
                 'effectiveDate': '2018-01-01T00:00:00.000-04:00',
-                'licensee': 'resource:org.accordproject.contract.Party#Me',
+                'licensee': 'resource:org.accordproject.party.Party#Me',
                 'licenseeState': 'NY',
                 'licenseeEntityType': 'Company',
                 'licenseeAddress': '1 Broadway',
-                'licensor': 'resource:org.accordproject.contract.Party#Myself',
+                'licensor': 'resource:org.accordproject.party.Party#Myself',
                 'licensorState': 'NY',
                 'licensorEntityType': 'Company',
                 'licensorAddress': '2 Broadway',

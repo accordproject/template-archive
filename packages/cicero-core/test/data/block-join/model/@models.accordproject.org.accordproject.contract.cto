@@ -12,7 +12,7 @@
  * limitations under the License.
  */
 
-concerto version ">= 1.0.0-alpha.3"
+concerto version ">= 1.0.0"
 
 namespace org.accordproject.contract
 
@@ -21,15 +21,9 @@ namespace org.accordproject.contract
  * -- Describes the structure of contracts and clauses
  */
 
-/* A party to a contract */
-participant Party identified by partyId {
-  o String partyId
-}
-
 /* A contract is a asset -- This contains the contract data */
 abstract asset Contract identified by contractId {
   o String contractId
-  --> Party[] parties optional
 }
 
 /* A clause is an asset -- This contains the clause data */

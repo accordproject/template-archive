@@ -117,7 +117,7 @@ describe('Template', () => {
         it('should roundtrip a template with a logo', async () => {
             const template = await Template.fromDirectory('./test/data/template-logo', options);
             template.getIdentifier().should.equal('logo@0.0.1');
-            template.getHash().should.be.equal('f0ce8d76b2b665db8ff3cfa30d6e7f155cf8c81834758a118d70f4ebf0ec9cb0');
+            template.getHash().should.be.equal('dbff6c84d923d9fec3cd0f23dde8d50aaed1c1d229c1e7f670fd4799d59312b8');
             template.getMetadata().getLogo().should.be.an.instanceof(Buffer);
             template.getMetadata().getSample().should.equal('"Aman" "Sharma" added the support for logo and hence created this template for testing!\n');
             const buffer = await template.toArchive('ergo');
@@ -151,7 +151,7 @@ In case of delayed delivery except for Force Majeure cases, the Seller shall pay
 1. Any fractional part of a days is to be considered a full days.
 2. The total amount of penalty shall not however, exceed 2.0% of the total value of the Equipment involved in late delivery.
 3. If the delay is more than 2 weeks, the Buyer is entitled to terminate this Contract.`);
-            template.getHash().should.equal('89b5353dc3a614f8b87e35ddf94f68266fec82963f97f45dd1ae7826b26422e3');
+            template.getHash().should.equal('0c13d4e80e75b7af1c82709763b82cc841fc94f434611eed5daff3c174329a8c');
             const buffer = await template.toArchive('ergo');
             buffer.should.not.be.null;
             const template2 = await Template.fromArchive(buffer);
@@ -185,7 +185,7 @@ In case of delayed delivery except for Force Majeure cases, the Seller shall pay
             template.getDescription().should.equal('Late Delivery and Penalty. In case of delayed delivery except for Force Majeure cases, the Seller shall pay to the Buyer for every 9 DAY of delay penalty amounting to 7.0% of the total value of the Equipment whose delivery has been delayed. Any fractional part of a DAY is to be considered a full DAY. The total amount of penalty shall not however, exceed 2.0% of the total value of the Equipment involved in late delivery. If the delay is more than 2 WEEK, the Buyer is entitled to terminate this Contract.');
             template.getVersion().should.equal('0.0.1');
             template.getMetadata().getSample().should.equal('Late Delivery and Penalty.\n\nIn case of delayed delivery except for Force Majeure cases, the Seller shall pay to the Buyer for every 9 days of delay penalty amounting to 7.0% of the total value of the Equipment whose delivery has been delayed. Any fractional part of a days is to be considered a full days. The total amount of penalty shall not however, exceed 2.0% of the total value of the Equipment involved in late delivery. If the delay is more than 2 weeks, the Buyer is entitled to terminate this Contract.\n');
-            template.getHash().should.equal('484226a02182eb5d1adce10db258737951ba97df91269a988c1f5b892a803d76');
+            template.getHash().should.equal('b127b50a77b58ae44926e39231b40c07f065ea5fc46513be7f792482e68586c2');
             const buffer = await template.toArchive('ergo');
             buffer.should.not.be.null;
             const template2 = await Template.fromArchive(buffer);
@@ -216,7 +216,7 @@ In case of delayed delivery except for Force Majeure cases, the Seller shall pay
             template.getDescription().should.equal('Late Delivery and Penalty. In case of delayed delivery except for Force Majeure cases, the Seller shall pay to the Buyer for every 9 DAY of delay penalty amounting to 7% of the total value of the Equipment whose delivery has been delayed. Any fractional part of a DAY is to be considered a full DAY. The total amount of penalty shall not however, exceed 2% of the total value of the Equipment involved in late delivery. If the delay is more than 2 WEEK, the Buyer is entitled to terminate this Contract.');
             template.getVersion().should.equal('0.0.1');
             template.getMetadata().getSample().should.equal('Late Delivery and Penalty. In case of delayed delivery except for Force Majeure cases, the Seller shall pay to the Buyer for every 9 days of delay penalty amounting to 7% of the total value of the Equipment whose delivery has been delayed. Any fractional part of a days is to be considered a full days. The total amount of penalty shall not however, exceed 2% of the total value of the Equipment involved in late delivery. If the delay is more than 2 weeks, the Buyer is entitled to terminate this Contract.');
-            template.getHash().should.equal('56ec8810dfbca9afa76be98234899f6e986a3d2bd47f4ce0ff8888a969498ade');
+            template.getHash().should.equal('1ad5168d27b2e6dafd03d53ba4fd6aad985aa49b073365e4a623e355efe33a44');
             const buffer = await template.toArchive('es6');
             buffer.should.not.be.null;
             const template2 = await Template.fromArchive(buffer);
@@ -581,7 +581,7 @@ and monthly payments of {{%"£667.00"%}}`;
     describe('#getHash', () => {
         it('should return a SHA-256 hash', async () => {
             const template = await Template.fromDirectory('./test/data/latedeliveryandpenalty', options);
-            template.getHash().should.equal('89b5353dc3a614f8b87e35ddf94f68266fec82963f97f45dd1ae7826b26422e3');
+            template.getHash().should.equal('0c13d4e80e75b7af1c82709763b82cc841fc94f434611eed5daff3c174329a8c');
         });
     });
 
@@ -713,11 +713,11 @@ and monthly payments of {{%"£667.00"%}}`;
 
             const expected = {
                 '$class': 'org.accordproject.copyrightlicense.CopyrightLicenseContract',
-                'licensee': 'resource:org.accordproject.contract.Party#Me',
+                'licensee': 'resource:org.accordproject.party.Party#Me',
                 'licenseeState': 'NY',
                 'licenseeEntityType': 'Company',
                 'licenseeAddress': '1 Broadway',
-                'licensor': 'resource:org.accordproject.contract.Party#Myself',
+                'licensor': 'resource:org.accordproject.party.Party#Myself',
                 'licensorState': 'NY',
                 'licensorEntityType': 'Company',
                 'licensorAddress': '2 Broadway',
