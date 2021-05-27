@@ -425,7 +425,7 @@ and monthly payments of {{%"£667.00"%}}`;
             }
         });
 
-        it.skip('should create a template from an archive at a given github URL', async () => {
+        it('should create a template from an archive at a given github URL', async () => {
             const url = 'github://accordproject/cicero-template-library/master/build/archives/ip-payment@0.14.0.cta';
             return Template.fromUrl(url, {'encoding':null,'headers':{'Accept': '*/*','Accept-Encoding': 'deflate, gzip'}}).should.be.fulfilled;
         });
