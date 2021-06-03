@@ -31,9 +31,12 @@ class TemplateSaver {
      * @param {string} [language] - target language for the archive (should be 'ergo')
      * @param {Object} [options] - JSZip options
      * @param {Buffer} logoBuffer - Bytes data of the PNG file
+     * @param {Object} [signatureObject] - object containing signatures and metadata
      * @return {Promise<Buffer>} the zlib buffer
      */
-    static async toArchive(template, language, options) {
+     static async toArchive(template, language, options, signatureObject) {
+
+        
         if(!language || typeof(language) !== 'string') {
             throw new Error('language is required and must be a string');
         }
@@ -41,6 +44,14 @@ class TemplateSaver {
         const metadata = template.getMetadata().createTargetMetadata(language);
 
         let zip = new JSZip();
+
+        let templateSignatures = {
+            signatures: {
+                templateSignature: signatureObject
+            }
+        };
+        const templateSignString =  JSON.stringify(templateSignatures);
+        zip.file('signatures.json', templateSignString, options);
 
         let packageFileContents = JSON.stringify(metadata.getPackageJson());
         zip.file('package.json', packageFileContents, options);
