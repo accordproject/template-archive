@@ -45,12 +45,14 @@ class Template {
      * @param {object} request - the JS object for the sample request
      * @param {Buffer} logo - the bytes data of logo
      * @param {Object} options  - e.g., { warnings: true }
+     * @param {Object} authorSignature  - object containing template hash, timestamp, author's certificate, signature
      */
-    constructor(packageJson, readme, samples, request, logo, options) {
+    constructor(packageJson, readme, samples, request, logo, options, authorSignature) {
         this.metadata = new Metadata(packageJson, readme, samples, request, logo);
         this.logicManager = new LogicManager('es6', null, options);
         const templateKind = this.getMetadata().getTemplateType() !== 0 ? 'clause' : 'contract';
         this.parserManager = new ParserManager(this.getModelManager(),null,templateKind);
+        this.authorSignature = authorSignature !== undefined ? authorSignature : null;
     }
 
     /**
@@ -155,6 +157,9 @@ class Template {
         if(this.parserManager.getTemplate()) {
             content.grammar = this.parserManager.getTemplate();
         }
+        if(this.authorSignature !== null){
+            content.authorSignature = this.authorSignature;
+        }
         content.models = {};
         content.scripts = {};
 
@@ -179,11 +184,10 @@ class Template {
      * from the keystore
      * @param {string} [path] - path of the keystore to be used
      * @param {string} [password] - password for the keystore file
-     * @return {object} - object containing signatory's metadata, timestamp, signatory's certificate, signature
+     * @return {object} - object containing template hash, timestamp, signatory's certificate, signature
      * @private
      */
-    signTemplate(path, password) {
-        const timeStamp = Date.now();
+    signTemplate(path, password, timeStamp) {
         const templateHash = this.getHash();
         const p12Ffile = fs.readFileSync(path, { encoding: 'base64' });
         // decode p12 from base64
@@ -194,7 +198,6 @@ class Template {
         const p12 = forge.pkcs12.pkcs12FromAsn1(p12Asn1, false, password);
         //X509 cert forge type
         const certificateForge = p12.safeContents[0].safeBags[0].cert;
-        const subjectAttributes = certificateForge.subject.attributes;
         //Private Key forge type
         const privateKeyForge = p12.safeContents[1].safeBags[0].key;
         //convert cert and private key from forge to PEM
@@ -207,7 +210,7 @@ class Template {
         sign.end();
         const signature = sign.sign(privateKey, 'hex');
         const signatureObject = {
-            signatoryInfo: subjectAttributes,
+            templateHash: templateHash,
             timeStamp: timeStamp,
             signatoryCert: certificatePem,
             signature: signature
@@ -220,12 +223,16 @@ class Template {
      * @param {string} [language] - target language for the archive (should be 'ergo')
      * @param {Object} [keyStore] - path for the keystore and password of the keystore
      * @param {Object} [options] - JSZip options
-     * @param {Buffer} logo - Bytes data of the PNG file
      * @return {Promise<Buffer>} the zlib buffer
      */
     async toArchive(language, keyStore, options) {
-        const signatureObject = keyStore !== undefined ? this.signTemplate(keyStore.path, keyStore.password) : undefined;
-        return TemplateSaver.toArchive(this, language, signatureObject, options);
+        if(this.authorSignature === null){
+            const timeStamp = Date.now();
+            this.authorSignature = keyStore !== undefined ? this.signTemplate(keyStore.path, keyStore.password, timeStamp) : null;
+            return TemplateSaver.toArchive(this, language, options);
+        }else{
+            throw new Error('Template is already signed by the author.');
+        }
     }
 
     /**
