@@ -19,6 +19,8 @@ const Clause = require('../lib/clause');
 
 const fs = require('fs');
 const archiver = require('archiver');
+const forge = require('node-forge');
+const crypto = require('crypto');
 
 const chai = require('chai');
 const assert = require('chai').assert;
@@ -32,6 +34,30 @@ function waitForEvent(emitter, eventType) {
     return new Promise((resolve) => {
         emitter.once(eventType, resolve);
     });
+}
+
+function sign(templateHash, timeStamp, path, password){
+    const p12Ffile = fs.readFileSync(path, { encoding: 'base64' });
+    // decode p12 from base64
+    const p12Der = forge.util.decode64(p12Ffile);
+    // get p12 as ASN.1 object
+    const p12Asn1 = forge.asn1.fromDer(p12Der);
+    // decrypt p12 using the password 'password'
+    const p12 = forge.pkcs12.pkcs12FromAsn1(p12Asn1, false, password);
+    //X509 cert forge type
+    const certificateForge = p12.safeContents[0].safeBags[0].cert;
+    //Private Key forge type
+    const privateKeyForge = p12.safeContents[1].safeBags[0].key;
+    //convert cert and private key from forge to PEM
+    const certificatePem = forge.pki.certificateToPem(certificateForge);
+    const privateKeyPem = forge.pki.privateKeyToPem(privateKeyForge);
+    //convert private key in pem to private key type in node
+    const privateKey = crypto.createPrivateKey(privateKeyPem);
+    const sign = crypto.createSign('SHA256');
+    sign.write(templateHash + timeStamp);
+    sign.end();
+    const signature = sign.sign(privateKey, 'hex');
+    return {signature: signature, certificate: certificatePem};
 }
 
 async function writeZip(template){
@@ -65,11 +91,32 @@ async function writeZip(template){
 
     return await waitForEvent(output, 'close');
 }
-/* eslint-enable */
+/* eslint-disable */
 
 const options = { offline: true };
 
 describe('Template', () => {
+
+    describe('#signTemplate', () => {
+
+        it('should sign the cotent hash and timestamp string using the keystore', async() => {
+            const template = await Template.fromDirectory('./test/data/helloworldstate');
+            const timeStamp = Date.now();
+            const templateHash = template.getHash();
+            const signatureData = sign(templateHash, timeStamp, './test/data/keystore.p12', 'password');
+
+            const result = template.signTemplate('./test/data/keystore.p12', 'password', timeStamp);
+
+            const expected = {
+                    templateHash: templateHash,
+                    timeStamp: timeStamp,
+                    signatoryCert: signatureData.certificate,
+                    signature: signatureData.signature
+                }
+
+            result.should.deep.equal(expected);   
+        });
+    });
 
     describe('#fromDirectory', () => {
 
