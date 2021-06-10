@@ -184,6 +184,7 @@ class Template {
      * from the keystore
      * @param {string} [path] - path of the keystore to be used
      * @param {string} [password] - password for the keystore file
+     * @param {string} [timeStamp] - timeStamp of the moment of signature is done
      * @return {object} - object containing template hash, timestamp, signatory's certificate, signature
      * @private
      */
