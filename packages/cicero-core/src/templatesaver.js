@@ -29,12 +29,11 @@ class TemplateSaver {
      * Persists this template to a Cicero Template Archive (cta) file.
      * @param {Template} template - the template to persist
      * @param {string} [language] - target language for the archive (should be 'ergo')
-     * @param {Object} [signatureObject] - object containing signatory's metadata, timestamp, signatory's certificate, signature
      * @param {Object} [options] - JSZip options
      * @param {Buffer} logoBuffer - Bytes data of the PNG file
      * @return {Promise<Buffer>} the zlib buffer
      */
-    static async toArchive(template, language, signatureObject, options) {
+    static async toArchive(template, language, options) {
         if(!language || typeof(language) !== 'string') {
             throw new Error('language is required and must be a string');
         }
@@ -44,9 +43,9 @@ class TemplateSaver {
         let zip = new JSZip();
 
         //save the signature if present
-        if(signatureObject !== undefined){
+        if(template.authorSignature !== null){
             let templateSignatures = {
-                templateSignature: signatureObject
+                templateSignature: template.authorSignature
             };
             const templateSignString =  JSON.stringify(templateSignatures);
             zip.file('signatures.json', templateSignString, options);

@@ -67,6 +67,7 @@ class TemplateLoader extends FileLoader {
         const requestContents = await TemplateLoader.loadZipFileContents(zip, 'request.json', true);
         const packageJsonObject = await TemplateLoader.loadZipFileContents(zip, 'package.json', true, true);
         const grammar = await TemplateLoader.loadZipFileContents(zip, 'text/grammar.tem.md', false, false);
+        const authorSignature = await TemplateLoader.loadZipFileContents(zip, 'signatures.json', true, false);
 
         Logger.debug(method, 'Looking for model files');
         let ctoFiles =  await TemplateLoader.loadZipFilesContents(zip, /model[/\\].*\.cto$/);
@@ -76,7 +77,7 @@ class TemplateLoader extends FileLoader {
         });
 
         // create the template
-        const template = new (Function.prototype.bind.call(Template, null, packageJsonObject, readmeContents, sampleTextFiles, requestContents, logo, options));
+        const template = new (Function.prototype.bind.call(Template, null, packageJsonObject, readmeContents, sampleTextFiles, requestContents, logo, options, authorSignature));
 
         // add model files
         Logger.debug(method, 'Adding model files to model manager');
@@ -171,8 +172,11 @@ class TemplateLoader extends FileLoader {
             sampleTextFiles[locale] = file.contents;
         });
 
+        // grab the signatures.json
+        const authorSignature = await TemplateLoader.loadFileContents(path, 'signatures.json', true, false );
+
         // create the template
-        const template = new (Function.prototype.bind.call(Template, null, packageJsonObject, readmeContents, sampleTextFiles, requestJsonObject, logo, options));
+        const template = new (Function.prototype.bind.call(Template, null, packageJsonObject, readmeContents, sampleTextFiles, requestJsonObject, logo, options, authorSignature));
         const modelFiles = [];
         const modelFileNames = [];
         const ctoFiles = await TemplateLoader.loadFilesContents(path, /model[/\\].*\.cto$/);
