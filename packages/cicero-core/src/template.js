@@ -183,20 +183,19 @@ class Template {
      * signs a string made up of template hash and time stamp using private key derived
      * from the keystore
      * @param {string} [path] - path of the keystore to be used
-     * @param {string} [password] - password for the keystore file
+     * @param {string} [passphrase] - passphrase for the keystore file
      * @param {string} [timeStamp] - timeStamp of the moment of signature is done
-     * @return {object} - object containing template hash, timestamp, signatory's certificate, signature
      * @private
      */
-    signTemplate(path, password, timeStamp) {
+    signTemplate(path, passphrase, timeStamp) {
         const templateHash = this.getHash();
         const p12Ffile = fs.readFileSync(path, { encoding: 'base64' });
         // decode p12 from base64
         const p12Der = forge.util.decode64(p12Ffile);
         // get p12 as ASN.1 object
         const p12Asn1 = forge.asn1.fromDer(p12Der);
-        // decrypt p12 using the password 'password'
-        const p12 = forge.pkcs12.pkcs12FromAsn1(p12Asn1, false, password);
+        // decrypt p12 using the passphrase 'password'
+        const p12 = forge.pkcs12.pkcs12FromAsn1(p12Asn1, false, passphrase);
         //X509 cert forge type
         const certificateForge = p12.safeContents[0].safeBags[0].cert;
         //Private Key forge type
@@ -216,22 +215,23 @@ class Template {
             signatoryCert: certificatePem,
             signature: signature
         };
-        return signatureObject;
+        this.authorSignature = signatureObject;
     }
 
     /**
      * Persists this template to a Cicero Template Archive (cta) file.
      * @param {string} [language] - target language for the archive (should be 'ergo')
-     * @param {Object} [keyStore] - path for the keystore and password of the keystore
-     * @param {Object} [options] - JSZip options
+     * @param {Object} [options] - JSZip options and keystore object containing path and passphrase for the keystore
      * @return {Promise<Buffer>} the zlib buffer
      */
-    async toArchive(language, keyStore, options) {
-        if(this.authorSignature === null){
-            const timeStamp = Date.now();
-            this.authorSignature = keyStore !== undefined ? this.signTemplate(keyStore.path, keyStore.password, timeStamp) : null;
+    async toArchive(language, options) {
+        if (this.authorSignature === null) {
+            if (options.keyStore !== undefined) {
+                const timeStamp = Date.now();
+                this.signTemplate(options.keyStore.path, options.keyStore.passphrase, timeStamp);
+            }
             return TemplateSaver.toArchive(this, language, options);
-        }else{
+        } else {
             throw new Error('Template is already signed by the author.');
         }
     }

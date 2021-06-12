@@ -104,16 +104,14 @@ describe('Template', () => {
             const timeStamp = Date.now();
             const templateHash = template.getHash();
             const signatureData = sign(templateHash, timeStamp, './test/data/keystore.p12', 'password');
-
-            const result = template.signTemplate('./test/data/keystore.p12', 'password', timeStamp);
-
+            template.signTemplate('./test/data/keystore.p12', 'password', timeStamp);
+            const result = template.authorSignature;
             const expected = {
                     templateHash: templateHash,
                     timeStamp: timeStamp,
                     signatoryCert: signatureData.certificate,
                     signature: signatureData.signature
-                }
-
+                };
             result.should.deep.equal(expected);   
         });
     });
