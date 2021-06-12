@@ -44,7 +44,7 @@ class TemplateSaver {
 
         //save the signature if present
         if(template.authorSignature !== null){
-            let templateSignatures = {
+            const templateSignatures = {
                 templateSignature: template.authorSignature
             };
             const templateSignString =  JSON.stringify(templateSignatures);
