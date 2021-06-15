@@ -27,7 +27,7 @@ describe('TemplateInstance', () => {
     describe('#constructor', () => {
 
         it('should fail to instantiate', async function() {
-            (() => new TemplateInstance(null)).should.throw('Abstract class "TemplateInstance" cannot be instantiated directly.');
+            (() => new TemplateInstance()).should.throw('Abstract class "TemplateInstance" cannot be instantiated directly.');
         });
 
     });
