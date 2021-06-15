@@ -25,7 +25,26 @@ const TemplateInstance = require('./templateinstance.js');
  * @class
  */
 class Clause extends TemplateInstance {
+    /**
+     * Create an instance from a Template.
+     * @param {Template} template  - the template for the instance
+     * @return {object} - the clause instance
+     */
+    static fromTemplate(template) {
+        // Setup
+        const metadata = template.getMetadata();
+        const logicManager = template.getLogicManager();
+        const grammar = template.getParserManager().getTemplate();
 
+        return new Clause(
+            metadata.getTemplateType(),
+            metadata.getIdentifier(),
+            logicManager,
+            grammar,
+            metadata.getRuntime(),
+            template,
+        );
+    }
 }
 
 module.exports = Clause;
