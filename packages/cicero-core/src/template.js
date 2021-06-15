@@ -22,6 +22,7 @@ const stringify = require('json-stable-stringify');
 const LogicManager = require('@accordproject/ergo-compiler').LogicManager;
 const TemplateLoader = require('./templateloader');
 const TemplateSaver = require('./templatesaver');
+const Util = require('./util');
 
 /**
  * A template for a legal clause or contract. A Template has a template model, request/response transaction types,
@@ -72,23 +73,7 @@ class Template {
      * @returns {ClassDeclaration} the template model for the template
      */
     getTemplateModel() {
-
-        let modelType = 'org.accordproject.contract.Contract';
-
-        if(this.getMetadata().getTemplateType() !== 0) {
-            modelType = 'org.accordproject.contract.Clause';
-        }
-        const templateModels = this.getIntrospector().getClassDeclarations().filter((item) => {
-            return !item.isAbstract() && Template.instanceOf(item,modelType);
-        });
-
-        if (templateModels.length > 1) {
-            throw new Error(`Found multiple instances of ${modelType} in ${this.metadata.getName()}. The model for the template must contain a single asset that extends ${modelType}.`);
-        } else if (templateModels.length === 0) {
-            throw new Error(`Failed to find an asset that extends ${modelType} in ${this.metadata.getName()}. The model for the template must contain a single asset that extends ${modelType}.`);
-        } else {
-            return templateModels[0];
-        }
+        return Util.getContractModel(this.logicManager, this.getMetadata().getTemplateType());
     }
 
     /**
@@ -131,7 +116,6 @@ class Template {
     getVersion() {
         return this.getMetadata().getVersion();
     }
-
 
     /**
      * Returns the description for this template
@@ -245,15 +229,6 @@ class Template {
      */
     getLogicManager() {
         return this.logicManager;
-    }
-
-    /**
-     * Provides access to the Introspector for this template. The Introspector
-     * is used to reflect on the types defined within this template.
-     * @return {Introspector} the Introspector for this template
-     */
-    getIntrospector() {
-        return this.logicManager.getIntrospector();
     }
 
     /**
@@ -405,30 +380,6 @@ class Template {
         return this.getScriptManager().getAllScripts().length > 0;
     }
 
-    /**
-     * Check to see if a ClassDeclaration is an instance of the specified fully qualified
-     * type name.
-     * @internal
-     * @param {ClassDeclaration} classDeclaration The class to test
-     * @param {String} fqt The fully qualified type name.
-     * @returns {boolean} True if classDeclaration an instance of the specified fully
-     * qualified type name, false otherwise.
-     */
-    static instanceOf(classDeclaration, fqt) {
-        // Check to see if this is an exact instance of the specified type.
-        if (classDeclaration.getFullyQualifiedName() === fqt) {
-            return true;
-        }
-        // Now walk the class hierachy looking to see if it's an instance of the specified type.
-        let superTypeDeclaration = classDeclaration.getSuperTypeDeclaration();
-        while (superTypeDeclaration) {
-            if (superTypeDeclaration.getFullyQualifiedName() === fqt) {
-                return true;
-            }
-            superTypeDeclaration = superTypeDeclaration.getSuperTypeDeclaration();
-        }
-        return false;
-    }
 }
 
 module.exports = Template;

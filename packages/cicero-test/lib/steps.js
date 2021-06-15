@@ -73,7 +73,7 @@ async function trigger(engine,clause,request,state,currentTime,utcOffset) {
  */
 async function loadClause(templateDir) {
     const template = await Template.fromDirectory(templateDir);
-    return new Clause(template);
+    return Clause.fromTemplate(template);
 }
 
 Before(function () {

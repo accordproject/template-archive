@@ -169,7 +169,7 @@ app.post('/draft/:template', async function (req, httpResponse, next) {
  */
 async function initTemplateInstance(req) {
     const template = await Template.fromDirectory(`${process.env.CICERO_DIR}/${req.params.template}`);
-    return new Clause(template);
+    return Clause.fromTemplate(template);
 }
 
 const server = app.listen(app.get('port'), function () {

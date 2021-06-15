@@ -32,7 +32,7 @@ describe('Contract', () => {
     describe('#parse', () => {
         it('should be able to set the data from copyright-license natural language text', async function() {
             const template = await Template.fromDirectory('./test/data/copyright-license', { offline: true });
-            const contract = new Contract(template);
+            const contract = Contract.fromTemplate(template);
             contract.parse(sampleText);
         });
     });
@@ -41,7 +41,7 @@ describe('Contract', () => {
 
         it('should be able to roundtrip copyright-license natural language text', async function() {
             const template = await Template.fromDirectory('./test/data/copyright-license');
-            const contract = new Contract(template);
+            const contract = Contract.fromTemplate(template);
             contract.parse(sampleText);
             const nl = await contract.draft();
             nl.should.equal(TemplateLoader.normalizeText(sampleText));
