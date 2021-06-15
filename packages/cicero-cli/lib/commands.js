@@ -201,7 +201,7 @@ class Commands {
 
         return Commands.loadTemplate(templatePath, options)
             .then((template) => {
-                clause = new Clause(template);
+                clause = Clause.fromTemplate(template);
                 clause.parse(sampleText, currentTime, utcOffset, samplePath);
                 if (outputPath) {
                     Logger.info('Creating file: ' + outputPath);
@@ -248,7 +248,7 @@ class Commands {
 
         return Commands.loadTemplate(templatePath, options)
             .then(async function (template) {
-                clause = new Clause(template);
+                clause = Clause.fromTemplate(template);
                 clause.setData(dataJson);
                 const drafted = clause.draft(options, currentTime, utcOffset);
                 if (outputPath) {
@@ -306,7 +306,7 @@ class Commands {
 
         return Commands.loadTemplate(templatePath, options)
             .then(async function (template) {
-                clause = new Clause(template);
+                clause = Clause.fromTemplate(template);
                 clause.parse(sampleText, currentTime, utcOffset, samplePath);
                 if (outputPath) {
                     Logger.info('Creating file: ' + outputPath);
@@ -384,7 +384,7 @@ class Commands {
         return Commands.loadTemplate(templatePath, options)
             .then(async (template) => {
                 // Initialize clause
-                clause = new Clause(template);
+                clause = Clause.fromTemplate(template);
                 if (sampleText) {
                     clause.parse(sampleText, currentTime, utcOffset);
                 } else {
@@ -494,7 +494,7 @@ class Commands {
         return Commands.loadTemplate(templatePath, options)
             .then(async (template) => {
                 // Initialize clause
-                clause = new Clause(template);
+                clause = Clause.fromTemplate(template);
                 if (sampleText) {
                     clause.parse(sampleText, currentTime, utcOffset);
                 } else {
@@ -571,7 +571,7 @@ class Commands {
         return Commands.loadTemplate(templatePath, options)
             .then((template) => {
                 // Initialize clause
-                clause = new Clause(template);
+                clause = Clause.fromTemplate(template);
                 if (sampleText) {
                     clause.parse(sampleText, currentTime, utcOffset);
                 } else {
@@ -647,6 +647,23 @@ class Commands {
      */
     static validateVerifyArgs(argv) {
         argv = Commands.validateCommonArgs(argv);
+        return argv;
+    }
+
+    /**
+     * Set default params before we create an instance archive
+     *
+     * @param {object} argv the inbound argument values object
+     * @returns {object} a modfied argument object
+     */
+    static validateInstantiateArgs(argv) {
+        argv = Commands.validateCommonArgs(argv);
+
+        if(!argv.target){
+            Logger.info('Using ergo as the default target for the archive.');
+            argv.target = 'ergo';
+        }
+
         return argv;
     }
 

@@ -17,6 +17,7 @@
 const Logger = require('@accordproject/concerto-core').Logger;
 const crypto = require('crypto');
 
+const ParserManager = require('@accordproject/markdown-template').ParserManager;
 const CiceroMarkTransformer = require('@accordproject/markdown-cicero').CiceroMarkTransformer;
 const SlateTransformer = require('@accordproject/markdown-slate').SlateTransformer;
 const TemplateMarkTransformer = require('@accordproject/markdown-template').TemplateMarkTransformer;
@@ -24,6 +25,8 @@ const HtmlTransformer = require('@accordproject/markdown-html').HtmlTransformer;
 
 // For formulas evaluation
 const ErgoEngine = require('@accordproject/ergo-engine/index.browser.js').EvalEngine;
+
+const Util = require('./util');
 
 /**
  * A TemplateInstance is an instance of a Clause or Contract template. It is executable business logic, linked to
@@ -36,49 +39,64 @@ const ErgoEngine = require('@accordproject/ergo-engine/index.browser.js').EvalEn
  * @class
  */
 class TemplateInstance {
-
     /**
-     * Create the Clause and link it to a Template.
-     * @param {Template} template  - the template for the clause
+     * Create an instance
+     * @param {number} instanceKind - the kind of instance (contract or clause)
+     * @param {string} prefix - the instance prefix
+     * @param {number} logicManager - the logic manager
+     * @param {string} grammar - the initial grammar
+     * @param {string} runtime - 'ergo' or 'es6'
+     * @param {Template} [template] - the template for the instance
      */
-    constructor(template) {
+    constructor(instanceKind, prefix, logicManager, grammar, runtime, template) {
         if (this.constructor === TemplateInstance) {
             throw new TypeError('Abstract class "TemplateInstance" cannot be instantiated directly.');
         }
+
+        this.instanceKind = instanceKind;
+        this.prefix = prefix;
+        this.logicManager = logicManager;
+        this.runtime = runtime;
         this.template = template;
-        this.data = null;
-        this.concertoData = null;
+
         this.ciceroMarkTransformer = new CiceroMarkTransformer();
         this.templateMarkTransformer = new TemplateMarkTransformer();
-        this.parserManager = this.template.getParserManager();
+        this.parserManager = new ParserManager(this.logicManager.getModelManager(), null, this.instanceKind);
         this.ergoEngine = new ErgoEngine();
 
-        // Set formula evaluation in parser manager
-        this.parserManager.setFormulaEval((name) => TemplateInstance.ciceroFormulaEval(
-            this.getLogicManager(),
-            this.getIdentifier(),
-            this.getEngine(),
-            name
-        ));
+        this.data = null;
+        this.concertoData = null;
+
+        // Initialize the parser
+        Util.initParser(
+            this.parserManager,
+            this.logicManager,
+            this.ergoEngine,
+            this.prefix,
+            this.instanceKind,
+            grammar,
+            this.runtime,
+        );
     }
 
     /**
-     * Set the data for the clause
+     * Set the data for the instance
      * @param {object} data  - the data for the clause, must be an instance of the
-     * template model for the clause's template. This should be a plain JS object
+     * model. This should be a plain JS object
      * and will be deserialized and validated into the Concerto object before assignment.
      */
     setData(data) {
         // verify that data is an instance of the template model
-        const templateModel = this.getTemplate().getTemplateModel();
+        const contractModel = Util.getContractModel(this.logicManager, this.instanceKind);
 
-        if (data.$class !== templateModel.getFullyQualifiedName()) {
-            throw new Error(`Invalid data, must be a valid instance of the template model ${templateModel.getFullyQualifiedName()} but got: ${JSON.stringify(data)} `);
+        if (data.$class !== contractModel.getFullyQualifiedName()) {
+            throw new Error(`Invalid data, must be a valid instance of the template model ${contractModel.getFullyQualifiedName()} but got: ${JSON.stringify(data)} `);
         }
 
         // downloadExternalDependencies the data using the template model
         Logger.debug('Setting clause data: ' + JSON.stringify(data));
-        const resource = this.getTemplate().getSerializer().fromJSON(data);
+        const serializer = this.logicManager.getModelManager().getSerializer();
+        const resource = serializer.fromJSON(data);
         resource.validate();
 
         // save the data
@@ -150,9 +168,7 @@ class TemplateInstance {
             throw new Error('Data has not been set. Call setData or parse before calling this method.');
         }
 
-        // Setup
-        const metadata = this.getTemplate().getMetadata();
-        const templateKind = metadata.getTemplateType() !== 0 ? 'clause' : 'contract';
+        const kind = this.instanceKind ? 'clause' : 'contract';
 
         // Get the data
         const data = this.getData();
@@ -161,7 +177,7 @@ class TemplateInstance {
         this.parserManager.setCurrentTime(currentTime, utcOffset);
 
         // Draft
-        const ciceroMark = this.templateMarkTransformer.draftCiceroMark(data, this.parserManager, templateKind, {});
+        const ciceroMark = this.templateMarkTransformer.draftCiceroMark(data, this.parserManager, kind, {});
         return this.formatCiceroMark(ciceroMark,options);
     }
 
@@ -200,9 +216,9 @@ class TemplateInstance {
     }
 
     /**
-     * Returns the identifier for this clause. The identifier is the identifier of
-     * the template plus '-' plus a hash of the data for the clause (if set).
-     * @return {String} the identifier of this clause
+     * Returns the identifier for this instance. The identifier is the instance prefix
+     * plus '-' plus a hash of the data for the instance (if set).
+     * @return {String} the identifier of this instance
      */
     getIdentifier() {
         let hash = '';
@@ -213,7 +229,7 @@ class TemplateInstance {
             hasher.update(textToHash);
             hash = '-' + hasher.digest('hex');
         }
-        return this.getTemplate().getIdentifier() + hash;
+        return this.prefix + hash;
     }
 
     /**
@@ -225,77 +241,44 @@ class TemplateInstance {
     }
 
     /**
+     * Returns the instance kind
+     * @return {number} the instance kind
+     */
+    getInstanceKind() {
+        return this.instanceKind;
+    }
+
+    /**
      * Returns the template logic for this clause
      * @return {LogicManager} the template for this clause
      */
     getLogicManager() {
-        return this.template.getLogicManager();
+        return this.logicManager;
     }
 
     /**
-     * Returns a JSON representation of the clause
+     * Returns a JSON representation of the instance
      * @return {object} the JS object for serialization
      */
     toJSON() {
         return {
-            template: this.getTemplate().getIdentifier(),
+            template: this.prefix,
             data: this.getData()
         };
     }
 
     /**
-     * Constructs a function for formula evaluation based for this template instance
-     * @param {*} logicManager - the logic manager
-     * @param {string} clauseId - this instance identifier
-     * @param {*} ergoEngine - the evaluation engine
-     * @param {string} name - the name of the formula
-     * @return {*} A function from formula code + input data to result
-     */
-    static ciceroFormulaEval(logicManager, clauseId, ergoEngine, name) {
-        return (code,data, currentTime, utcOffset) => {
-            const result = ergoEngine.calculate(logicManager, clauseId, name, data, currentTime, utcOffset, null);
-            // console.log('Formula result: ' + JSON.stringify(result.response));
-            return result.response;
-        };
-    }
-
-    /**
-     * Utility to rebuild a parser when the grammar changes
-     * @param {*} parserManager - the parser manager
-     * @param {*} logicManager - the logic manager
-     * @param {*} ergoEngine - the evaluation engine
-     * @param {string} templateName - this template name
+     * To rebuild the parser when the grammar changes
      * @param {string} grammar - the new grammar
      */
-    static rebuildParser(parserManager, logicManager, ergoEngine, templateName, grammar) {
-        // Update template in parser manager
-        parserManager.setTemplate(grammar);
-
-        // Rebuild parser
-        parserManager.buildParser();
-
-        // Process formulas
-        const oldFormulas = logicManager.getScriptManager().sourceTemplates;
-        const newFormulas = parserManager.getFormulas();
-
-        if (oldFormulas.length > 0 || newFormulas.length > 0) {
-            // Reset formulas
-            logicManager.getScriptManager().sourceTemplates = [];
-            newFormulas.forEach( (x) => {
-                logicManager.addTemplateFile(x.code, x.name);
-            });
-
-            // Re-set formula evaluation hook
-            parserManager.setFormulaEval((name) => TemplateInstance.ciceroFormulaEval(
-                logicManager,
-                templateName,
-                ergoEngine,
-                name
-            ));
-
-            // Re-compile formulas
-            logicManager.compileLogicSync(true);
-        }
+    rebuildParser(grammar) {
+        Util.rebuildParser(
+            this.parserManager,
+            this.logicManager,
+            this.ergoEngine,
+            this.prefix,
+            grammar
+        );
     }
 }
 

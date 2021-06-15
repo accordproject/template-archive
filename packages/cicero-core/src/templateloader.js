@@ -23,10 +23,13 @@ const languageTagRegex = require('ietf-language-tag-regex');
 const DefaultArchiveLoader = require('./loaders/defaultarchiveloader');
 const FileLoader = require('@accordproject/ergo-compiler').FileLoader;
 const Logger = require('@accordproject/concerto-core').Logger;
+const ErgoEngine = require('@accordproject/ergo-engine/index.browser.js').EvalEngine;
 
 // Matches 'sample.md' or 'sample_TAG.md' where TAG is an IETF language tag (BCP 47)
 const IETF_REGEXP = languageTagRegex({ exact: false }).toString().slice(1,-2);
 const SAMPLE_FILE_REGEXP = xregexp('text[/\\\\]sample(_(' + IETF_REGEXP + '))?.md$');
+
+const Util = require('./util');
 
 /**
  * A utility class to create templates from data sources.
@@ -86,11 +89,6 @@ class TemplateLoader extends FileLoader {
         Logger.debug(method, 'Setting grammar');
         if(!grammar) {
             throw new Error('A template must contain a grammar.tem.md file.');
-        } else {
-            const templateKind = template.getMetadata().getTemplateType() !== 0 ? 'clause' : 'contract';
-            template.parserManager.setTemplate(grammar);
-            template.parserManager.setTemplateKind(templateKind);
-            template.parserManager.buildParser();
         }
 
         // load and add the ergo files
@@ -109,7 +107,15 @@ class TemplateLoader extends FileLoader {
             });
         }
 
-        TemplateLoader.registerFormulas(template.parserManager,template.getLogicManager());
+        Util.initParser(
+            template.parserManager,
+            template.getLogicManager(),
+            new ErgoEngine(),
+            template.getIdentifier(),
+            template.getMetadata().getTemplateType(),
+            grammar,
+            template.getMetadata().getRuntime() === 'ergo' // Whether to compile or not
+        );
 
         // check the integrity of the model and logic of the template
         authorSignature ? template.validate({verifySignature: true}) : template.validate();
@@ -197,12 +203,6 @@ class TemplateLoader extends FileLoader {
 
         if(!grammar) {
             throw new Error('A template must either contain a grammar.tem.md file.');
-        } else {
-            const templateKind = template.getMetadata().getTemplateType() !== 0 ? 'clause' : 'contract';
-            template.parserManager.setTemplate(grammar);
-            template.parserManager.setTemplateKind(templateKind);
-            template.parserManager.buildParser();
-            Logger.debug(method, 'Loaded grammar.tem.md', grammar);
         }
 
         Logger.debug(method, 'Loaded grammar.tem.md');
@@ -227,24 +227,20 @@ class TemplateLoader extends FileLoader {
             });
         }
 
-        TemplateLoader.registerFormulas(template.parserManager,template.getLogicManager());
+        Util.initParser(
+            template.parserManager,
+            template.getLogicManager(),
+            new ErgoEngine(),
+            template.getIdentifier(),
+            template.getMetadata().getTemplateType(),
+            grammar,
+            template.getMetadata().getRuntime() === 'ergo' // Whether to compile or not
+        );
 
         // check the template
         authorSignature ? template.validate({verifySignature: true}) : template.validate();
 
         return template;
-    }
-
-    /**
-     * Prepare the text for parsing (normalizes new lines, etc)
-     * @param {*} parserManager - the parser manager
-     * @param {*} logicManager - the logic manager
-     */
-    static registerFormulas(parserManager,logicManager){
-        const formulas = parserManager.getFormulas();
-        formulas.forEach(x => {
-            logicManager.addTemplateFile(x.code,x.name);
-        });
     }
 
     /**
