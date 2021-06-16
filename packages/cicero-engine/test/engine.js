@@ -15,7 +15,7 @@
 'use strict';
 
 const Template = require('@accordproject/cicero-core').Template;
-const Clause = require('@accordproject/cicero-core').Clause;
+const ClauseInstance = require('@accordproject/cicero-core').ClauseInstance;
 const Engine = require('../lib/engine');
 
 const chai = require('chai');
@@ -46,9 +46,9 @@ describe('EngineLatePenalty', () => {
 
     beforeEach(async function () {
         engine = new Engine();
-        clause = Clause.fromTemplate(template);
+        clause = ClauseInstance.fromTemplate(template);
         clause.parse(testLatePenaltyInput);
-        clause2 = Clause.fromTemplate(template2);
+        clause2 = ClauseInstance.fromTemplate(template2);
         clause2.parse(testLatePenaltyPeriodInput);
     });
 
@@ -174,7 +174,7 @@ describe('EngineLatePenalty (JavaScript)', () => {
     beforeEach(async function () {
         engine = new Engine();
         const template = await Template.fromDirectory('./test/data/latedeliveryandpenalty_js', options);
-        clause = Clause.fromTemplate(template);
+        clause = ClauseInstance.fromTemplate(template);
         clause.parse(testLatePenaltyInput);
     });
 
@@ -232,7 +232,7 @@ describe('EngineHelloWorld', () => {
     beforeEach(async function () {
         engine = new Engine();
         const template = await Template.fromDirectory('./test/data/helloworld', options);
-        clause = Clause.fromTemplate(template);
+        clause = ClauseInstance.fromTemplate(template);
         clause.parse(helloWorldInput);
     });
 
@@ -294,7 +294,7 @@ describe('EngineHelloWorldState', () => {
     beforeEach(async function () {
         engine = new Engine();
         const template = await Template.fromDirectory('./test/data/helloworldstate', options);
-        clause = Clause.fromTemplate(template);
+        clause = ClauseInstance.fromTemplate(template);
         clause.parse(helloWorldInput);
     });
 
@@ -321,7 +321,7 @@ describe('EngineHelloModule', () => {
     beforeEach(async function () {
         engine = new Engine();
         const template = await Template.fromDirectory('./test/data/hellomodule', options);
-        clause = Clause.fromTemplate(template);
+        clause = ClauseInstance.fromTemplate(template);
         clause.parse(helloWorldInput);
     });
 
@@ -352,7 +352,7 @@ describe('EngineHelloEmit', () => {
     beforeEach(async function () {
         engine = new Engine();
         const template = await Template.fromDirectory('./test/data/helloemit', options);
-        clause = Clause.fromTemplate(template);
+        clause = ClauseInstance.fromTemplate(template);
         clause.parse(helloEmitInput);
     });
 
@@ -385,7 +385,7 @@ describe('EngineHelloEmitInit', () => {
     beforeEach(async function () {
         engine = new Engine();
         const template = await Template.fromDirectory('./test/data/helloemitinit', options);
-        clause = Clause.fromTemplate(template);
+        clause = ClauseInstance.fromTemplate(template);
         clause.parse(helloEmitInitInput);
     });
 
@@ -412,7 +412,7 @@ describe('EngineSaft', () => {
     beforeEach(async function () {
         engine = new Engine();
         const template = await Template.fromDirectory('./test/data/saft', options);
-        clause = Clause.fromTemplate(template);
+        clause = ClauseInstance.fromTemplate(template);
         clause.parse(saftInput);
     });
 
@@ -443,7 +443,7 @@ describe('BogusClauses', () => {
     beforeEach(async function () {
         engine = new Engine();
         const template = await Template.fromDirectory('./test/data/no-logic', options);
-        clause = Clause.fromTemplate(template);
+        clause = ClauseInstance.fromTemplate(template);
         clause.parse(testNoLogic);
     });
 
@@ -485,7 +485,7 @@ describe('EngineInstallmentSaleErgo', () => {
     beforeEach(async function () {
         engine = new Engine();
         const template = await Template.fromDirectory('./test/data/installment-sale-ergo', options);
-        clause = Clause.fromTemplate(template);
+        clause = ClauseInstance.fromTemplate(template);
         clause.parse(testLatePenaltyInput);
     });
 

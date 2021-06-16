@@ -15,7 +15,7 @@
 'use strict';
 
 const Template = require('../lib/template');
-const Clause = require('../lib/clause');
+const ClauseInstance = require('../lib/clauseinstance');
 
 const fs = require('fs');
 const archiver = require('archiver');
@@ -341,7 +341,7 @@ at the yearly interest rate of 2.5%
 with a loan term of 15,
 and monthly payments of {{%I'm not sure which amount right now%}}
 `;
-            const clause = Clause.fromTemplate(template);
+            const clause = ClauseInstance.fromTemplate(template);
             clause.parse(sampleText);
             const result = clause.getData();
             delete result.clauseId;
@@ -377,7 +377,7 @@ and monthly payments of {{%I'm not sure which amount right now%}}
                 'clauseId': '0bb38858-24b3-4853-b8c2-2fa3b93dce8d'
             };
 
-            const clause = Clause.fromTemplate(template);
+            const clause = ClauseInstance.fromTemplate(template);
             clause.setData(data);
             const result = clause.draft();
 
@@ -670,7 +670,7 @@ and monthly payments of {{%"£667.00"%}}`;
             template.getParserManager().getParser().should.not.be.null;
 
             const sampleText = fs.readFileSync('./test/data/latedeliveryandpenalty/text/sample.md', 'utf8');
-            const clause = Clause.fromTemplate(template);
+            const clause = ClauseInstance.fromTemplate(template);
             clause.parse(sampleText);
             const result = clause.getData();
             delete result.clauseId;
@@ -701,7 +701,7 @@ and monthly payments of {{%"£667.00"%}}`;
             template.getParserManager().getParser().should.not.be.null;
 
             const sampleText = fs.readFileSync('./test/data/copyright-license/text/sample.md', 'utf8');
-            const clause = Clause.fromTemplate(template);
+            const clause = ClauseInstance.fromTemplate(template);
             clause.parse(sampleText);
             const result = clause.getData();
             delete result.contractId;

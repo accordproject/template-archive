@@ -48,8 +48,6 @@ class TemplateLoader extends FileLoader {
     static async fromArchive(Template, buffer, options) {
         const method = 'fromArchive';
         const zip = await JSZip.loadAsync(buffer);
-        // const allFiles = await TemplateLoader.loadZipFilesContents(zip, /.*/);
-        // console.log(allFiles);
         const ctoModelFiles = [];
         const ctoModelFileNames = [];
         const sampleTextFiles = {};
