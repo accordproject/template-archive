@@ -19,7 +19,8 @@
  * @module cicero-core
  */
 
-module.exports.Clause = require('./lib/clause');
+module.exports.ClauseInstance = require('./lib/clauseinstance');
+module.exports.ContractInstance = require('./lib/contractinstance');
 module.exports.Template = require('./lib/template');
 module.exports.TemplateLoader = require('./lib/templateloader');
 module.exports.TemplateLibrary = require('./lib/templatelibrary');

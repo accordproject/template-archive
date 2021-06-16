@@ -20,7 +20,7 @@ const Chai = require('chai');
 const expect = Chai.expect;
 
 const Template = require('@accordproject/cicero-core').Template;
-const Clause = require('@accordproject/cicero-core').Clause;
+const ClauseInstance = require('@accordproject/cicero-core').ClauseInstance;
 const Engine = require('@accordproject/cicero-engine').Engine;
 const Util = require('@accordproject/ergo-test/lib/util');
 
@@ -73,7 +73,7 @@ async function trigger(engine,clause,request,state,currentTime,utcOffset) {
  */
 async function loadClause(templateDir) {
     const template = await Template.fromDirectory(templateDir);
-    return Clause.fromTemplate(template);
+    return ClauseInstance.fromTemplate(template);
 }
 
 Before(function () {
