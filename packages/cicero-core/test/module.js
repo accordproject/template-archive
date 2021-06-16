@@ -27,7 +27,8 @@ describe('Module', () => {
     describe('#exports', () => {
 
         it('should export classes', () => {
-            index.Clause.should.not.be.null;
+            index.ClauseInstance.should.not.be.null;
+            index.ContractInstance.should.not.be.null;
             index.Template.should.not.be.null;
             index.TemplateLibrary.should.not.be.null;
             index.version.should.not.be.null;

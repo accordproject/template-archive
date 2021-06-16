@@ -14,7 +14,7 @@
 
 'use strict';
 
-const TemplateInstance = require('../lib/templateinstance');
+const Instance = require('../lib/instance');
 
 const chai = require('chai');
 
@@ -22,12 +22,12 @@ chai.should();
 chai.use(require('chai-things'));
 chai.use(require('chai-as-promised'));
 
-describe('TemplateInstance', () => {
+describe('Instance', () => {
 
     describe('#constructor', () => {
 
         it('should fail to instantiate', async function() {
-            (() => new TemplateInstance()).should.throw('Abstract class "TemplateInstance" cannot be instantiated directly.');
+            (() => new Instance()).should.throw('Abstract class "Instance" cannot be instantiated directly.');
         });
 
     });
