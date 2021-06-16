@@ -29,16 +29,16 @@ const ErgoEngine = require('@accordproject/ergo-engine/index.browser.js').EvalEn
 const Util = require('./util');
 
 /**
- * A TemplateInstance is an instance of a Clause or Contract template. It is executable business logic, linked to
+ * A Instance is an instance of a Clause or Contract template. It is executable business logic, linked to
  * a natural language (legally enforceable) template.
- * A TemplateInstance must be constructed with a template and then prior to execution the data for the clause must be set.
- * Set the data for the TemplateInstance by either calling the setData method or by
+ * A Instance must be constructed with a template and then prior to execution the data for the clause must be set.
+ * Set the data for the Instance by either calling the setData method or by
  * calling the parse method and passing in natural language text that conforms to the template grammar.
  * @public
  * @abstract
  * @class
  */
-class TemplateInstance {
+class Instance {
     /**
      * Create an instance
      * @param {number} instanceKind - the kind of instance (contract or clause)
@@ -49,8 +49,8 @@ class TemplateInstance {
      * @param {Template} [template] - the template for the instance
      */
     constructor(instanceKind, prefix, logicManager, grammar, runtime, template) {
-        if (this.constructor === TemplateInstance) {
-            throw new TypeError('Abstract class "TemplateInstance" cannot be instantiated directly.');
+        if (this.constructor === Instance) {
+            throw new TypeError('Abstract class "Instance" cannot be instantiated directly.');
         }
 
         this.instanceKind = instanceKind;
@@ -282,4 +282,4 @@ class TemplateInstance {
     }
 }
 
-module.exports = TemplateInstance;
+module.exports = Instance;

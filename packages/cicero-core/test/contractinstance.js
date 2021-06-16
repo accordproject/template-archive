@@ -16,7 +16,7 @@
 
 const Template = require('../lib/template');
 const TemplateLoader = require('../lib/templateloader');
-const Contract = require('../lib/contract');
+const ContractInstance = require('../lib/contractinstance');
 
 const chai = require('chai');
 const fs = require('fs');
@@ -26,13 +26,13 @@ chai.should();
 chai.use(require('chai-things'));
 chai.use(require('chai-as-promised'));
 
-describe('Contract', () => {
+describe('ContractInstance', () => {
     const sampleText = fs.readFileSync(path.resolve(__dirname, 'data/copyright-license', 'text/sample.md'), 'utf8');
 
     describe('#parse', () => {
         it('should be able to set the data from copyright-license natural language text', async function() {
             const template = await Template.fromDirectory('./test/data/copyright-license', { offline: true });
-            const contract = Contract.fromTemplate(template);
+            const contract = ContractInstance.fromTemplate(template);
             contract.parse(sampleText);
         });
     });
@@ -41,7 +41,7 @@ describe('Contract', () => {
 
         it('should be able to roundtrip copyright-license natural language text', async function() {
             const template = await Template.fromDirectory('./test/data/copyright-license');
-            const contract = Contract.fromTemplate(template);
+            const contract = ContractInstance.fromTemplate(template);
             contract.parse(sampleText);
             const nl = await contract.draft();
             nl.should.equal(TemplateLoader.normalizeText(sampleText));

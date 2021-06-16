@@ -16,7 +16,7 @@
 
 const Logger = require('@accordproject/concerto-core').Logger;
 const Template = require('@accordproject/cicero-core').Template;
-const Clause = require('@accordproject/cicero-core').Clause;
+const ClauseInstance = require('@accordproject/cicero-core').ClauseInstance;
 const Engine = require('@accordproject/cicero-engine').Engine;
 const CodeGen = require('@accordproject/cicero-tools').CodeGen;
 const FileWriter = CodeGen.FileWriter;
@@ -201,7 +201,7 @@ class Commands {
 
         return Commands.loadTemplate(templatePath, options)
             .then((template) => {
-                clause = Clause.fromTemplate(template);
+                clause = ClauseInstance.fromTemplate(template);
                 clause.parse(sampleText, currentTime, utcOffset, samplePath);
                 if (outputPath) {
                     Logger.info('Creating file: ' + outputPath);
@@ -248,7 +248,7 @@ class Commands {
 
         return Commands.loadTemplate(templatePath, options)
             .then(async function (template) {
-                clause = Clause.fromTemplate(template);
+                clause = ClauseInstance.fromTemplate(template);
                 clause.setData(dataJson);
                 const drafted = clause.draft(options, currentTime, utcOffset);
                 if (outputPath) {
@@ -306,7 +306,7 @@ class Commands {
 
         return Commands.loadTemplate(templatePath, options)
             .then(async function (template) {
-                clause = Clause.fromTemplate(template);
+                clause = ClauseInstance.fromTemplate(template);
                 clause.parse(sampleText, currentTime, utcOffset, samplePath);
                 if (outputPath) {
                     Logger.info('Creating file: ' + outputPath);
@@ -384,7 +384,7 @@ class Commands {
         return Commands.loadTemplate(templatePath, options)
             .then(async (template) => {
                 // Initialize clause
-                clause = Clause.fromTemplate(template);
+                clause = ClauseInstance.fromTemplate(template);
                 if (sampleText) {
                     clause.parse(sampleText, currentTime, utcOffset);
                 } else {
@@ -494,7 +494,7 @@ class Commands {
         return Commands.loadTemplate(templatePath, options)
             .then(async (template) => {
                 // Initialize clause
-                clause = Clause.fromTemplate(template);
+                clause = ClauseInstance.fromTemplate(template);
                 if (sampleText) {
                     clause.parse(sampleText, currentTime, utcOffset);
                 } else {
@@ -571,7 +571,7 @@ class Commands {
         return Commands.loadTemplate(templatePath, options)
             .then((template) => {
                 // Initialize clause
-                clause = Clause.fromTemplate(template);
+                clause = ClauseInstance.fromTemplate(template);
                 if (sampleText) {
                     clause.parse(sampleText, currentTime, utcOffset);
                 } else {

@@ -19,7 +19,7 @@
 const app = require('express')();
 const bodyParser = require('body-parser');
 const Template = require('@accordproject/cicero-core').Template;
-const Clause = require('@accordproject/cicero-core').Clause;
+const ClauseInstance = require('@accordproject/cicero-core').ClauseInstance;
 const Engine = require('@accordproject/cicero-engine').Engine;
 
 if(!process.env.CICERO_DIR) {
@@ -169,7 +169,7 @@ app.post('/draft/:template', async function (req, httpResponse, next) {
  */
 async function initTemplateInstance(req) {
     const template = await Template.fromDirectory(`${process.env.CICERO_DIR}/${req.params.template}`);
-    return Clause.fromTemplate(template);
+    return ClauseInstance.fromTemplate(template);
 }
 
 const server = app.listen(app.get('port'), function () {
