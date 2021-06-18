@@ -187,6 +187,10 @@ class Template {
      * @private
      */
     signTemplate(p12File, passphrase, timestamp) {
+        if (typeof(p12File) !== 'string') {throw new Error('p12File should be of type String!');}
+        if (typeof(passphrase) !== 'string') {throw new Error('passphrase should be of type String!');}
+        if (typeof(timestamp) !== 'number') {throw new Error('timeStamp should be of type Number!');}
+
         const templateHash = this.getHash();
         // decode p12 from base64
         const p12Der = forge.util.decode64(p12File);
