@@ -407,12 +407,12 @@ require('yargs')
             default: false
         });
         yargs.option('keystore', {
-            describe: 'p12 key store path',
+            describe: 'p12 keystore path',
             type: 'string',
             default: null
         });
         yargs.option('passphrase', {
-            describe: 'p12 key store passphrase',
+            describe: 'p12 keystore passphrase',
             type: 'string',
             default: null
         });
@@ -427,7 +427,7 @@ require('yargs')
                 warnings: argv.warnings,
                 keystore: {
                     path: argv.keystore,
-                    passPhrase: argv.passphrase
+                    passphrase: argv.passphrase
                 }
             };
             return Commands.archive(argv.template, argv.target, argv.output, options)
