@@ -184,7 +184,7 @@ class Template {
      * from the keystore
      * @param {string} [path] - path of the keystore to be used
      * @param {string} [passphrase] - passphrase for the keystore file
-     * @param {string} [timeStamp] - timeStamp of the moment of signature is done
+     * @param {Number} [timeStamp] - timeStamp of the moment of signature is done
      * @private
      */
     signTemplate(path, passphrase, timeStamp) {
