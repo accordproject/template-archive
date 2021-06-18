@@ -614,13 +614,13 @@ class Commands {
     static archive(templatePath, target, outputPath, options) {
         return Commands.loadTemplate(templatePath, options)
             .then(async (template) => {
-                const keyStore = {};
-                if (options.keyStore) {
-                    const p12File = fs.readFileSync(options.keyStore.path, { encoding: 'base64' });
-                    keyStore.p12File = p12File;
-                    keyStore.passPhrase = options.keyStore.passPhrase;
+                const keystore = {};
+                if (options.keystore) {
+                    const p12File = fs.readFileSync(options.keystore.path, { encoding: 'base64' });
+                    keystore.p12File = p12File;
+                    keystore.passphrase = options.keystore.passphrase;
                 }
-                const archive = await template.toArchive(target, {keyStore});
+                const archive = await template.toArchive(target, {keystore});
                 let file;
                 if (outputPath) {
                     file = outputPath;

@@ -183,10 +183,10 @@ class Template {
      * from the keystore
      * @param {String} [p12File] - encoded string of p12 keystore file
      * @param {String} [passphrase] - passphrase for the keystore file
-     * @param {Number} [timeStamp] - timeStamp of the moment of signature is done
+     * @param {Number} [timestamp] - timestamp of the moment of signature is done
      * @private
      */
-    signTemplate(p12File, passphrase, timeStamp) {
+    signTemplate(p12File, passphrase, timestamp) {
         const templateHash = this.getHash();
         // decode p12 from base64
         const p12Der = forge.util.decode64(p12File);
@@ -204,12 +204,12 @@ class Template {
         //convert private key in pem to private key type in node
         const privateKey = crypto.createPrivateKey(privateKeyPem);
         const sign = crypto.createSign('SHA256');
-        sign.write(templateHash + timeStamp);
+        sign.write(templateHash + timestamp);
         sign.end();
         const signature = sign.sign(privateKey, 'hex');
         const signatureObject = {
             templateHash: templateHash,
-            timeStamp: timeStamp,
+            timestamp: timestamp,
             signatoryCert: certificatePem,
             signature: signature
         };
@@ -224,9 +224,9 @@ class Template {
      */
     async toArchive(language, options) {
         if (!this.authorSignature) {
-            if (options.keyStore) {
-                const timeStamp = Date.now();
-                this.signTemplate(options.keyStore.p12File, options.keyStore.passphrase, timeStamp);
+            if (options.keystore) {
+                const timestamp = Date.now();
+                this.signTemplate(options.keystore.p12File, options.keystore.passphrase, timestamp);
             }
             return TemplateSaver.toArchive(this, language, options);
         } else {
