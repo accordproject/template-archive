@@ -18,7 +18,6 @@ const Metadata = require('./metadata');
 const Logger = require('@accordproject/concerto-core').Logger;
 const ParserManager = require('@accordproject/markdown-template').ParserManager;
 const crypto = require('crypto');
-const fs = require('fs');
 const forge = require('node-forge');
 const stringify = require('json-stable-stringify');
 const LogicManager = require('@accordproject/ergo-compiler').LogicManager;
@@ -182,8 +181,8 @@ class Template {
     /**
      * signs a string made up of template hash and time stamp using private key derived
      * from the keystore
-     * @param {string} [path] - path of the keystore to be used
-     * @param {string} [passphrase] - passphrase for the keystore file
+     * @param {String} [p12File] - encoded string of p12 keystore file
+     * @param {String} [passphrase] - passphrase for the keystore file
      * @param {Number} [timeStamp] - timeStamp of the moment of signature is done
      * @private
      */
