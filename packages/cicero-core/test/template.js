@@ -30,20 +30,21 @@ chai.use(require('chai-things'));
 chai.use(require('chai-as-promised'));
 
 /* eslint-disable */
+
 function waitForEvent(emitter, eventType) {
     return new Promise((resolve) => {
         emitter.once(eventType, resolve);
     });
 }
 
-function sign(templateHash, timeStamp, path, password){
+function sign(templateHash, timeStamp, path, passPhrase){
     const p12Ffile = fs.readFileSync(path, { encoding: 'base64' });
     // decode p12 from base64
     const p12Der = forge.util.decode64(p12Ffile);
     // get p12 as ASN.1 object
     const p12Asn1 = forge.asn1.fromDer(p12Der);
-    // decrypt p12 using the password 'password'
-    const p12 = forge.pkcs12.pkcs12FromAsn1(p12Asn1, false, password);
+    // decrypt p12 using the passPhrase 'password'
+    const p12 = forge.pkcs12.pkcs12FromAsn1(p12Asn1, false, passPhrase);
     //X509 cert forge type
     const certificateForge = p12.safeContents[0].safeBags[0].cert;
     //Private Key forge type
@@ -64,7 +65,9 @@ async function writeZip(template){
     try {
         fs.mkdirSync('./test/data/archives');
     } catch (err) {
-        if (err.code !== 'EEXIST') throw err;
+        if (err.code !== 'EEXIST') {
+            throw err;
+        }
     }
     let output = fs.createWriteStream(`./test/data/archives/${template}.zip`);
     let archive = archiver('zip', {
@@ -91,7 +94,7 @@ async function writeZip(template){
 
     return await waitForEvent(output, 'close');
 }
-/* eslint-disable */
+/* eslint-enable */
 
 const options = { offline: true };
 
@@ -107,12 +110,12 @@ describe('Template', () => {
             template.signTemplate('./test/data/keystore.p12', 'password', timeStamp);
             const result = template.authorSignature;
             const expected = {
-                    templateHash: templateHash,
-                    timeStamp: timeStamp,
-                    signatoryCert: signatureData.certificate,
-                    signature: signatureData.signature
-                };
-            result.should.deep.equal(expected);   
+                templateHash: templateHash,
+                timeStamp: timeStamp,
+                signatoryCert: signatureData.certificate,
+                signature: signatureData.signature
+            };
+            result.should.deep.equal(expected);
         });
     });
 
