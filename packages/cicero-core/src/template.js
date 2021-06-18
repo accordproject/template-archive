@@ -225,8 +225,8 @@ class Template {
      * @return {Promise<Buffer>} the zlib buffer
      */
     async toArchive(language, options) {
-        if (this.authorSignature === null) {
-            if (options.keyStore !== undefined) {
+        if (this.authorSignature) {
+            if (!options.keyStore) {
                 const timeStamp = Date.now();
                 this.signTemplate(options.keyStore.path, options.keyStore.passphrase, timeStamp);
             }
