@@ -37,14 +37,13 @@ function waitForEvent(emitter, eventType) {
     });
 }
 
-function sign(templateHash, timeStamp, path, passPhrase){
-    const p12Ffile = fs.readFileSync(path, { encoding: 'base64' });
+function sign(templateHash, timestamp, p12File, passphrase){
     // decode p12 from base64
-    const p12Der = forge.util.decode64(p12Ffile);
+    const p12Der = forge.util.decode64(p12File);
     // get p12 as ASN.1 object
     const p12Asn1 = forge.asn1.fromDer(p12Der);
-    // decrypt p12 using the passPhrase 'password'
-    const p12 = forge.pkcs12.pkcs12FromAsn1(p12Asn1, false, passPhrase);
+    // decrypt p12 using the passphrase 'password'
+    const p12 = forge.pkcs12.pkcs12FromAsn1(p12Asn1, false, passphrase);
     //X509 cert forge type
     const certificateForge = p12.safeContents[0].safeBags[0].cert;
     //Private Key forge type
@@ -55,7 +54,7 @@ function sign(templateHash, timeStamp, path, passPhrase){
     //convert private key in pem to private key type in node
     const privateKey = crypto.createPrivateKey(privateKeyPem);
     const sign = crypto.createSign('SHA256');
-    sign.write(templateHash + timeStamp);
+    sign.write(templateHash + timestamp);
     sign.end();
     const signature = sign.sign(privateKey, 'hex');
     return {signature: signature, certificate: certificatePem};
@@ -102,16 +101,17 @@ describe('Template', () => {
 
     describe('#signTemplate', () => {
 
-        it('should sign the cotent hash and timestamp string using the keystore', async() => {
+        it('should sign the content hash and timestamp string using the keystore', async() => {
             const template = await Template.fromDirectory('./test/data/helloworldstate');
-            const timeStamp = Date.now();
+            const timestamp = Date.now();
             const templateHash = template.getHash();
-            const signatureData = sign(templateHash, timeStamp, './test/data/keystore.p12', 'password');
-            template.signTemplate('./test/data/keystore.p12', 'password', timeStamp);
+            const p12File = fs.readFileSync('./test/data/keystore.p12', { encoding: 'base64' });
+            const signatureData = sign(templateHash, timestamp, p12File, 'password');
+            template.signTemplate(p12File, 'password', timestamp);
             const result = template.authorSignature;
             const expected = {
                 templateHash: templateHash,
-                timeStamp: timeStamp,
+                timestamp: timestamp,
                 signatoryCert: signatureData.certificate,
                 signature: signatureData.signature
             };
