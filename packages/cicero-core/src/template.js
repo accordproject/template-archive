@@ -187,11 +187,10 @@ class Template {
      * @param {Number} [timeStamp] - timeStamp of the moment of signature is done
      * @private
      */
-    signTemplate(path, passphrase, timeStamp) {
+    signTemplate(p12File, passphrase, timeStamp) {
         const templateHash = this.getHash();
-        const p12Ffile = fs.readFileSync(path, { encoding: 'base64' });
         // decode p12 from base64
-        const p12Der = forge.util.decode64(p12Ffile);
+        const p12Der = forge.util.decode64(p12File);
         // get p12 as ASN.1 object
         const p12Asn1 = forge.asn1.fromDer(p12Der);
         // decrypt p12 using the passphrase 'password'
@@ -225,10 +224,10 @@ class Template {
      * @return {Promise<Buffer>} the zlib buffer
      */
     async toArchive(language, options) {
-        if (this.authorSignature) {
-            if (!options.keyStore) {
+        if (!this.authorSignature) {
+            if (options.keyStore) {
                 const timeStamp = Date.now();
-                this.signTemplate(options.keyStore.path, options.keyStore.passphrase, timeStamp);
+                this.signTemplate(options.keyStore.p12File, options.keyStore.passphrase, timeStamp);
             }
             return TemplateSaver.toArchive(this, language, options);
         } else {

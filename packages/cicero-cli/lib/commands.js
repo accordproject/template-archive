@@ -614,7 +614,13 @@ class Commands {
     static archive(templatePath, target, outputPath, options) {
         return Commands.loadTemplate(templatePath, options)
             .then(async (template) => {
-                const archive = await template.toArchive(target);
+                const keyStore = {};
+                if (options.keyStore) {
+                    const p12File = fs.readFileSync(options.keyStore.path, { encoding: 'base64' });
+                    keyStore.p12File = p12File;
+                    keyStore.passPhrase = options.keyStore.passPhrase;
+                }
+                const archive = await template.toArchive(target, {keyStore});
                 let file;
                 if (outputPath) {
                     file = outputPath;
