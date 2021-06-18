@@ -110,8 +110,8 @@ describe('Template', () => {
             template.signTemplate(p12File, 'password', timestamp);
             const result = template.authorSignature;
             const expected = {
-                templateHash: templateHash,
-                timestamp: timestamp,
+                templateHash,
+                timestamp,
                 signatoryCert: signatureData.certificate,
                 signature: signatureData.signature
             };

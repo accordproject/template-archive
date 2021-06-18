@@ -208,10 +208,10 @@ class Template {
         sign.end();
         const signature = sign.sign(privateKey, 'hex');
         const signatureObject = {
-            templateHash: templateHash,
-            timestamp: timestamp,
+            templateHash,
+            timestamp,
             signatoryCert: certificatePem,
-            signature: signature
+            signature
         };
         this.authorSignature = signatureObject;
     }
