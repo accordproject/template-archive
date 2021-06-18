@@ -424,6 +424,16 @@ require('yargs')
             type: 'boolean',
             default: false
         });
+        yargs.option('keystore', {
+            describe: 'p12 key store path',
+            type: 'string',
+            default: null
+        });
+        yargs.option('passphrase', {
+            describe: 'p12 key store passphrase',
+            type: 'string',
+            default: null
+        });
     }, (argv) => {
         if (argv.verbose) {
             Logger.info(`create an archive for ${argv.template}`);
@@ -433,6 +443,10 @@ require('yargs')
             argv = Commands.validateArchiveArgs(argv);
             const options = {
                 warnings: argv.warnings,
+                keystore: {
+                    path: argv.keystore,
+                    passPhrase: argv.passphrase
+                }
             };
             return Commands.archive(argv.template, argv.target, argv.output, options)
                 .catch((err) => {
