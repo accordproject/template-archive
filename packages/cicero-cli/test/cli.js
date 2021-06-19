@@ -1211,6 +1211,63 @@ describe('#archive', async () => {
 
 });
 
+describe('#validateInstantiateArgs', () => {
+    it('no args specified', () => {
+        process.chdir(path.resolve(__dirname, 'data/latedeliveryandpenalty/'));
+        const args  = Commands.validateInstantiateArgs({
+            _: ['instantiate']
+        });
+        args.template.should.match(/cicero-cli[/\\]test[/\\]data[/\\]latedeliveryandpenalty$/);
+        args.target.should.match(/ergo/);
+    });
+    it('only target arg specified', () => {
+        process.chdir(path.resolve(__dirname, 'data/latedeliveryandpenalty/'));
+        const args  = Commands.validateInstantiateArgs({
+            _: ['instantiate'],
+            target: 'ergo'
+        });
+        args.template.should.match(/cicero-cli[/\\]test[/\\]data[/\\]latedeliveryandpenalty$/);
+        args.target.should.match(/ergo/);
+    });
+    it('template arg specified', () => {
+        process.chdir(path.resolve(__dirname));
+        const args  = Commands.validateInstantiateArgs({
+            _: ['instantiate', 'data/latedeliveryandpenalty/']
+        });
+        args.template.should.match(/cicero-cli[/\\]test[/\\]data[/\\]latedeliveryandpenalty$/);
+        args.target.should.match(/ergo/);
+    });
+    it('verbose flag specified', () => {
+        process.chdir(path.resolve(__dirname, 'data/latedeliveryandpenalty/'));
+        Commands.validateInstantiateArgs({
+            _: ['instantiate'],
+            verbose: true
+        });
+    });
+    it('bad package.json', () => {
+        process.chdir(path.resolve(__dirname, 'data/'));
+        (() => Commands.validateInstantiateArgs({
+            _: ['archive']
+        })).should.throw(' not a valid cicero template. Make sure that package.json exists and that it has a cicero entry.');
+    });
+});
+
+describe('#instantiate', async () => {
+    it('should create a valid slc archive', async () => {
+        const archiveName = 'test.slc';
+        const result = await Commands.instantiate(template, data, 'ergo', archiveName);
+        result.should.eql(true);
+        fs.unlinkSync(archiveName);
+    });
+
+    it('should create a valid slc archive with a default name', async () => {
+        const archiveName = 'latedeliveryandpenalty@0.0.1-ee84023d6c9670a97617db4d4f9aa3bdbf247a478cd3258471c23336445e3248.slc';
+        const result = await Commands.instantiate(template, data, 'ergo', null);
+        result.should.eql(true);
+        fs.unlinkSync(archiveName);
+    });
+});
+
 describe('#validateGetArgs', () => {
     it('no args specified', () => {
         process.chdir(path.resolve(__dirname, 'data/latedeliveryandpenalty/'));
