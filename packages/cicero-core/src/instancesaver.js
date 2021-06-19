@@ -37,12 +37,18 @@ class InstanceSaver {
             throw new Error('runtime is required and must be a string');
         }
 
-        const metadata = instance.getMetadata().createTargetMetadata(runtime);
-
         let zip = new JSZip();
+
+        // save the metadata
+        const metadata = instance.getMetadata().createTargetMetadata(runtime);
 
         let packageFileContents = JSON.stringify(metadata.getPackageJson());
         zip.file('package.json', packageFileContents, options);
+
+        // save the contract data
+        const dataContents = JSON.stringify(instance.getData());
+
+        zip.file('data.json', dataContents, options);
 
         // save the grammar
         zip.file('text/', null, Object.assign({}, options, {
