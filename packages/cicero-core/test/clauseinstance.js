@@ -113,7 +113,6 @@ describe('ClauseInstance', () => {
     });
 
     describe('#setData', () => {
-
         it('should be able to set data', async function() {
             const template = await Template.fromDirectory('./test/data/latedeliveryandpenalty', options);
             const clause = ClauseInstance.fromTemplate(template);

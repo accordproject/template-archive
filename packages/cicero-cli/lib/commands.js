@@ -17,6 +17,7 @@
 const Logger = require('@accordproject/concerto-core').Logger;
 const Template = require('@accordproject/cicero-core').Template;
 const ClauseInstance = require('@accordproject/cicero-core').ClauseInstance;
+const ContractInstance = require('@accordproject/cicero-core').ContractInstance;
 const Engine = require('@accordproject/cicero-engine').Engine;
 const CodeGen = require('@accordproject/cicero-tools').CodeGen;
 const FileWriter = CodeGen.FileWriter;
@@ -37,12 +38,12 @@ const TypescriptVisitor = CodeGen.TypescriptVisitor;
  */
 class Commands {
     /**
-     * Whether the template path is to a file (template archive)
-     * @param {string} templatePath - path to the template directory or archive
+     * Whether the path is to a file (archive) or a directory
+     * @param {string} path - file system path
      * @return {boolean} true if the path is to a file, false otherwise
      */
-    static isTemplateArchive(templatePath) {
-        return fs.lstatSync(templatePath).isFile();
+    static isArchive(path) {
+        return fs.lstatSync(path).isFile();
     }
 
     /**
@@ -52,7 +53,7 @@ class Commands {
      * @return {Promise<Template>} a Promise to the instantiated template
      */
     static loadTemplate(templatePath, options) {
-        if (Commands.isTemplateArchive(templatePath)) {
+        if (Commands.isArchive(templatePath)) {
             const buffer = fs.readFileSync(templatePath);
             return Template.fromArchive(buffer, options);
         } else {
@@ -79,7 +80,7 @@ class Commands {
 
         argv.template = path.resolve(argv.template);
 
-        if (!Commands.isTemplateArchive(argv.template)) {
+        if (!Commands.isArchive(argv.template)) {
             const packageJsonExists = fs.existsSync(path.resolve(argv.template,'package.json'));
             let isAPTemplate = false;
             if(packageJsonExists){
@@ -488,7 +489,7 @@ class Commands {
      * Create an archive using a template
      *
      * @param {string} templatePath - path to the template directory or archive
-     * @param {string} target - target language for the archive (should be either 'ergo' or 'cicero')
+     * @param {string} target - target language for the archive (should be either 'ergo' or 'es6')
      * @param {string} outputPath - to the archive file
      * @param {Object} [options] - an optional set of options
      * @returns {object} Promise to the code creating an archive
@@ -505,6 +506,54 @@ class Commands {
                     const templateName = template.getMetadata().getName();
                     const templateVersion = template.getMetadata().getVersion();
                     file = `${templateName}@${templateVersion}.cta`;
+                }
+                Logger.info('Creating archive: ' + file);
+                fs.writeFileSync(file, archive);
+                return true;
+            });
+    }
+
+    /**
+     * Set default params before we create an instance archive
+     *
+     * @param {object} argv the inbound argument values object
+     * @returns {object} a modfied argument object
+     */
+    static validateInstantiateArgs(argv) {
+        argv = Commands.validateCommonArgs(argv);
+
+        if(!argv.target){
+            Logger.info('Using ergo as the default target for the archive.');
+            argv.target = 'ergo';
+        }
+
+        return argv;
+    }
+
+    /**
+     * Create an instance archive from a template
+     *
+     * @param {string} templatePath - path to the template directory or archive
+     * @param {string} dataPath - path to the JSON data
+     * @param {string} target - target language for the archive (should be either 'ergo' or 'es6')
+     * @param {string} outputPath - to the archive file
+     * @param {Object} [options] - an optional set of options
+     * @returns {object} Promise to the code creating an archive
+     */
+    static instantiate(templatePath, dataPath, target, outputPath, options) {
+        const dataJson = JSON.parse(fs.readFileSync(dataPath, 'utf8'));
+
+        return Commands.loadTemplate(templatePath, options)
+            .then(async (template) => {
+                const instance = ContractInstance.fromTemplateWithData(template, dataJson);
+                const archive = await instance.toArchive(target);
+                let file;
+                if (outputPath) {
+                    file = outputPath;
+                }
+                else {
+                    const instanceName = instance.getIdentifier();
+                    file = `${instanceName}.slc`;
                 }
                 Logger.info('Creating archive: ' + file);
                 fs.writeFileSync(file, archive);
@@ -585,7 +634,7 @@ class Commands {
     static validateGetArgs(argv) {
         argv = Commands.validateCommonArgs(argv);
         if (!argv.output) {
-            if (Commands.isTemplateArchive(argv.template)) {
+            if (Commands.isArchive(argv.template)) {
                 argv.output = './model';
             } else {
                 argv.output = path.resolve(argv.template,'model');
