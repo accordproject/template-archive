@@ -41,22 +41,20 @@ const Util = require('./util');
 class Instance {
     /**
      * Create an instance
-     * @param {number} instanceKind - the kind of instance (contract or clause)
-     * @param {string} prefix - the instance prefix
+     * @param {object} metadata - the metadata object
      * @param {number} logicManager - the logic manager
      * @param {string} grammar - the initial grammar
-     * @param {string} runtime - 'ergo' or 'es6'
      * @param {Template} [template] - the template for the instance
      */
-    constructor(instanceKind, prefix, logicManager, grammar, runtime, template) {
+    constructor(metadata, logicManager, grammar, template) {
         if (this.constructor === Instance) {
             throw new TypeError('Abstract class "Instance" cannot be instantiated directly.');
         }
 
-        this.instanceKind = instanceKind;
-        this.prefix = prefix;
+        this.instanceKind = metadata.getTemplateType();
+        this.prefix = metadata.getIdentifier();
         this.logicManager = logicManager;
-        this.runtime = runtime;
+        this.runtime = metadata.getRuntime();
         this.template = template;
 
         this.ciceroMarkTransformer = new CiceroMarkTransformer();
@@ -280,6 +278,17 @@ class Instance {
             grammar
         );
     }
+
+    /**
+     * Provides access to the parser manager for this instance.
+     * The parser manager can convert instance data to and from
+     * natural language text.
+     * @return {ParserManager} the ParserManager for this instance
+     */
+    getParserManager() {
+        return this.parserManager;
+    }
+
 }
 
 module.exports = Instance;
