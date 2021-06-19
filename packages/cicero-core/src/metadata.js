@@ -26,7 +26,6 @@ const templateTypes = {
     CLAUSE: 1
 };
 
-
 const IMAGE_SIZE = {
     width: 128,
     height: 128,
