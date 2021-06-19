@@ -37,11 +37,9 @@ class ClauseInstance extends Instance {
         const grammar = template.getParserManager().getTemplate();
 
         return new ClauseInstance(
-            metadata.getTemplateType(),
-            metadata.getIdentifier(),
+            metadata,
             logicManager,
             grammar,
-            metadata.getRuntime(),
             template,
         );
     }
