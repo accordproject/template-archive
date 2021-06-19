@@ -51,6 +51,7 @@ class Instance {
             throw new TypeError('Abstract class "Instance" cannot be instantiated directly.');
         }
 
+        this.metadata = metadata;
         this.instanceKind = metadata.getTemplateType();
         this.prefix = metadata.getIdentifier();
         this.logicManager = logicManager;
@@ -138,17 +139,17 @@ class Instance {
      * @param {string} [fileName] - the fileName for the text (optional)
      */
     parse(input, currentTime, utcOffset, fileName) {
-        // Setup
-        const templateMarkTransformer = new TemplateMarkTransformer();
-
-        // Transform text to ciceromark
-        const inputCiceroMark = this.ciceroMarkTransformer.fromMarkdownCicero(input);
-
-        // Set current time
-        this.parserManager.setCurrentTime(currentTime, utcOffset);
-
         // Parse
-        const data = templateMarkTransformer.dataFromCiceroMark({ fileName:fileName, content:inputCiceroMark }, this.parserManager, {});
+        const data = Util.parseText(
+            this.parserManager,
+            this.ciceroMarkTransformer,
+            input,
+            currentTime,
+            utcOffset,
+            fileName,
+        );
+
+        // Set the data
         this.setData(data);
     }
 
@@ -287,6 +288,34 @@ class Instance {
      */
     getParserManager() {
         return this.parserManager;
+    }
+
+    /**
+     * Returns the metadata for this instance
+     * @return {Metadata} the metadata for this instance
+     */
+    getMetadata() {
+        return this.metadata;
+    }
+
+    /**
+     * Provides access to the ModelManager for this instance. The ModelManager
+     * manage access to the models that have been defined within this instance.
+     * @return {ModelManager} the ModelManager for this instance
+     * @private
+     */
+    getModelManager() {
+        return this.logicManager.getModelManager();
+    }
+
+    /**
+     * Provides access to the ScriptManager for this insttance. The ScriptManager
+     * manage access to the scripts that have been defined within this instance.
+     * @return {ScriptManager} the ScriptManager for this instance
+     * @private
+     */
+    getScriptManager() {
+        return this.logicManager.getScriptManager();
     }
 
 }
