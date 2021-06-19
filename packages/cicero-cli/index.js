@@ -499,6 +499,49 @@ require('yargs')
             return;
         }
     })
+    .command('instantiate', 'create a smart legal contract instance', (yargs) => {
+        yargs.option('template', {
+            describe: 'path to the template',
+            type: 'string'
+        });
+        yargs.option('data', {
+            describe: 'path to the contract data',
+            type: 'string'
+        });
+        yargs.option('target', {
+            describe: 'the target language of the archive',
+            type: 'string',
+            default: 'ergo'
+        });
+        yargs.option('output', {
+            describe: 'file name for new archive',
+            type: 'string',
+            default: null
+        });
+        yargs.option('warnings', {
+            describe: 'print warnings',
+            type: 'boolean',
+            default: false
+        });
+    }, (argv) => {
+        if (argv.verbose) {
+            Logger.info(`create an archive for ${argv.template}`);
+        }
+
+        try {
+            argv = Commands.validateInstantiateArgs(argv);
+            const options = {
+                warnings: argv.warnings,
+            };
+            return Commands.instantiate(argv.template, argv.data, argv.target, argv.output, options)
+                .catch((err) => {
+                    Logger.error(err.message);
+                });
+        } catch (err){
+            Logger.error(err.message);
+            return;
+        }
+    })
     .command('compile', 'generate code for a target platform', (yargs) => {
         yargs.option('template', {
             describe: 'path to the template',

@@ -14,7 +14,8 @@
 
 'use strict';
 
-const Instance = require('./instance.js');
+const Instance = require('./instance');
+const InstanceLoader = require('./instanceloader');
 
 /**
  * A Clause is executable business logic, linked to a natural language (legally enforceable) template.
@@ -31,17 +32,7 @@ class ClauseInstance extends Instance {
      * @return {object} - the clause instance
      */
     static fromTemplate(template) {
-        // Setup
-        const metadata = template.getMetadata();
-        const logicManager = template.getLogicManager();
-        const grammar = template.getParserManager().getTemplate();
-
-        return new ClauseInstance(
-            metadata,
-            logicManager,
-            grammar,
-            template,
-        );
+        return InstanceLoader.fromTemplate(ClauseInstance, template);
     }
 }
 

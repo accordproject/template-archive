@@ -14,6 +14,8 @@
 
 'use strict';
 
+const TemplateMarkTransformer = require('@accordproject/markdown-template').TemplateMarkTransformer;
+
 /**
  * Check to see if a ClassDeclaration is an instance of the specified fully qualified
  * type name.
@@ -154,4 +156,29 @@ function rebuildParser(parserManager, logicManager, ergoEngine, templateName, gr
     }
 }
 
-module.exports = { getContractModel, ciceroFormulaEval, initParser, rebuildParser };
+/**
+ * Parses natural language text and if successful returns the contract or clause data
+ * @param {*} parserManager - the parser manager
+ * @param {*} ciceroMarkTransformer - the parser manager
+ * @param {string} input - the text for the clause or contract
+ * @param {string} [currentTime] - the definition of 'now', defaults to current time
+ * @param {number} [utcOffset] - UTC Offset for this execution, defaults to local offset
+ * @param {string} [fileName] - the fileName for the text (optional)
+ * @return {object} the contract or clause data
+ */
+function parseText(parserManager, ciceroMarkTransformer, input, currentTime, utcOffset, fileName) {
+    // Setup
+    const templateMarkTransformer = new TemplateMarkTransformer();
+
+    // Transform text to ciceromark
+    const inputCiceroMark = ciceroMarkTransformer.fromMarkdownCicero(input);
+
+    // Set current time
+    parserManager.setCurrentTime(currentTime, utcOffset);
+
+    // Parse
+    const data = templateMarkTransformer.dataFromCiceroMark({ fileName:fileName, content:inputCiceroMark }, parserManager, {});
+    return data;
+}
+
+module.exports = { getContractModel, ciceroFormulaEval, initParser, rebuildParser, parseText };

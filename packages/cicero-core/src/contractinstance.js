@@ -14,7 +14,9 @@
 
 'use strict';
 
-const Instance = require('./instance.js');
+const Instance = require('./instance');
+const InstanceLoader = require('./instanceloader');
+const InstanceSaver = require('./instancesaver');
 
 /**
  * A Contract is executable business logic, linked to a natural language (legally enforceable) template.
@@ -28,20 +30,30 @@ class ContractInstance extends Instance {
     /**
      * Create an instance from a Template.
      * @param {Template} template  - the template for the instance
-     * @return {object} - the contract instance
+     * @return {object} - the clause instance
      */
     static fromTemplate(template) {
-        // Setup
-        const metadata = template.getMetadata();
-        const logicManager = template.getLogicManager();
-        const grammar = template.getParserManager().getTemplate();
+        return InstanceLoader.fromTemplate(ContractInstance, template);
+    }
 
-        return new ContractInstance(
-            metadata,
-            logicManager,
-            grammar,
-            template,
-        );
+    /**
+     * Create an instance from a Template with data.
+     * @param {Template} template  - the template for the instance
+     * @param {object} data - the contract data
+     * @return {object} - the clause instance
+     */
+    static fromTemplateWithData(template, data) {
+        return InstanceLoader.fromTemplateWithData(ContractInstance, template, data);
+    }
+
+    /**
+     * Create a smart legal contract archive
+     * @param {string} runtime - the target runtime
+     * @param {object} options - JSZip options
+     * @return {Promise<Buffer>} the zlib buffer
+     */
+    toArchive(runtime, options) {
+        return InstanceSaver.toArchive(this, runtime, options);
     }
 }
 
