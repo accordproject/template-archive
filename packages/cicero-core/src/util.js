@@ -16,6 +16,18 @@
 
 const TemplateMarkTransformer = require('@accordproject/markdown-template').TemplateMarkTransformer;
 
+const getMimeType = require('./mimetype');
+
+const IMAGE_SIZE = {
+    width: 128,
+    height: 128,
+};
+
+const templateTypes = {
+    CONTRACT: 0,
+    CLAUSE: 1
+};
+
 /**
  * Check to see if a ClassDeclaration is an instance of the specified fully qualified
  * type name.
@@ -181,4 +193,60 @@ function parseText(parserManager, ciceroMarkTransformer, input, currentTime, utc
     return data;
 }
 
-module.exports = { getContractModel, ciceroFormulaEval, initParser, rebuildParser, parseText };
+/**
+ * Checks if dimensions for the image are correct.
+ * @param {Buffer} buffer the buffer object
+ * @param {string} mimeType the mime type of the object
+ */
+function checkImageDimensions(buffer, mimeType) {
+    let height;
+    let width;
+    if(mimeType === 'image/png') {
+        try {
+            height = buffer.readUInt32BE(20);
+            width = buffer.readUInt32BE(16);
+        } catch (err) {
+            throw new Error('not a valid png file');
+        }
+    } else {
+        throw new Error('dimension calculation not supported for this file');
+    }
+
+    if (height === IMAGE_SIZE.height && width === IMAGE_SIZE.width) {
+        return;
+    } else {
+        throw new Error(`logo should be ${IMAGE_SIZE.height}x${IMAGE_SIZE.width}`);
+    }
+}
+
+/**
+ * Check the buffer is a png file with the right size
+ * @param {Buffer} buffer the buffer object
+ */
+function checkImage(buffer) {
+    const mimeType = getMimeType(buffer).mime;
+    checkImageDimensions(buffer, mimeType);
+}
+
+/**
+ * check to see if it is a valid name. for some reason regex is not working when this executes
+ * inside the chaincode runtime, which is why regex hasn't been used.
+ *
+ * @param {string} name the template name to check
+ * @returns {boolean} true if valid, false otherwise
+ *
+ * @private
+ */
+function isValidName(name) {
+    const validChars = ['a','b','c','d','e','f','g','h','i','j','k','l','m','n','o','p','q','r','s','t','u','v','w','x','y','z',
+        '0','1','2','3','4','5','6','7','8','9','-','_'];
+    for (let i = 0; i<name.length; i++){
+        const strChar = name.charAt(i);
+        if ( validChars.indexOf(strChar) === -1 ) {
+            return false;
+        }
+    }
+    return true;
+}
+
+module.exports = { getContractModel, ciceroFormulaEval, initParser, rebuildParser, parseText, checkImage, isValidName, templateTypes };
