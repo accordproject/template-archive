@@ -14,11 +14,16 @@
 
 'use strict';
 
+const JSZip = require('jszip');
+
+const Logger = require('@accordproject/concerto-core').Logger;
 const FileLoader = require('@accordproject/ergo-compiler').FileLoader;
+const LogicManager = require('@accordproject/ergo-compiler').LogicManager;
 const ParserManager = require('@accordproject/markdown-template').ParserManager;
 const CiceroMarkTransformer = require('@accordproject/markdown-cicero').CiceroMarkTransformer;
 const ErgoEngine = require('@accordproject/ergo-engine/index.browser.js').EvalEngine;
 
+const InstanceMetadata = require('./instancemetadata');
 const Util = require('./util');
 
 /**
@@ -36,7 +41,7 @@ class InstanceLoader extends FileLoader {
      * @return {object} - the contract instance
      */
     static fromTemplateWithData(Instance, template, data) {
-        const metadata = template.getMetadata();
+        const metadata = InstanceMetadata.createMetadataFromTemplate(template.getMetadata());
         const logicManager = template.getLogicManager();
         const grammar = template.getParserManager().getTemplate();
 
@@ -61,12 +66,12 @@ class InstanceLoader extends FileLoader {
      * @return {object} - the contract instance
      */
     static fromTemplate(Instance, template) {
-        const metadata = template.getMetadata();
+        const templateMetadata = template.getMetadata();
         const logicManager = template.getLogicManager();
         const parserManager = new ParserManager(logicManager.getModelManager(), null, this.instanceKind);
         const ciceroMarkTransformer = new CiceroMarkTransformer();
         const ergoEngine = new ErgoEngine();
-        const input = metadata.getSample();
+        const input = templateMetadata.getSample();
         const grammar = template.getParserManager().getTemplate();
 
         // Initialize the parser
@@ -74,14 +79,82 @@ class InstanceLoader extends FileLoader {
             parserManager,
             logicManager,
             ergoEngine,
-            metadata.getIdentifier(),
-            metadata.getTemplateType(),
+            templateMetadata.getIdentifier(),
+            templateMetadata.getTemplateType(),
             grammar,
-            metadata.getRuntime(),
+            templateMetadata.getRuntime(),
         );
 
         const data = Util.parseText(parserManager, ciceroMarkTransformer, input, null, null, 'text/sample.md');
         return InstanceLoader.fromTemplateWithData(Instance, template, data);
+    }
+
+    /**
+     * Create an instance from an archive
+     * @param {*} Instance - the type to construct
+     * @param {Buffer} buffer  - the buffer to a Smart Legal Contract (slc) file
+     * @param {object} options - additional options
+     * @return {Promise<Instance>} a Promise to the instance
+     */
+    static async fromArchive(Instance, buffer, options) {
+        const logicManager = new LogicManager('es6', null, options);
+
+        const method = 'fromArchive';
+        const zip = await JSZip.loadAsync(buffer);
+        const ctoModelFiles = [];
+        const ctoModelFileNames = [];
+
+        // add metadata
+        const packageJsonObject = await InstanceLoader.loadZipFileContents(zip, 'package.json', true, true);
+        // XXX likely we will need to discuss what metadata is relevant / needed for instances
+        // XXX For now hijack the the template metadata
+        const metadata = new InstanceMetadata(
+            packageJsonObject,
+        );
+
+        // add contract data
+        const data = await InstanceLoader.loadZipFileContents(zip, 'data.json', true, true);
+
+        // add template grammar (.md form)
+        const grammar = await InstanceLoader.loadZipFileContents(zip, 'text/grammar.tem.md', false, false);
+
+        // add model files
+        Logger.debug(method, 'Looking for model files');
+        let ctoFiles =  await InstanceLoader.loadZipFilesContents(zip, /model[/\\].*\.cto$/);
+        ctoFiles.forEach(async (file) => {
+            ctoModelFileNames.push(file.name);
+            ctoModelFiles.push(file.contents);
+        });
+        logicManager.getModelManager().addAPModelFiles(ctoModelFiles, ctoModelFileNames, true); // Archives can always be loaded offline
+
+        // load and add the ergo files
+        if(metadata.getRuntime() === 'ergo') {
+            Logger.debug(method, 'Adding Ergo files to script manager');
+            const scriptFiles = await InstanceLoader.loadZipFilesContents(zip, /logic[/\\].*\.ergo$/);
+            scriptFiles.forEach(function (obj) {
+                logicManager.addLogicFile(obj.contents, obj.name);
+            });
+        } else {
+            // load and add compiled JS files - we assume all runtimes are JS based (review!)
+            Logger.debug(method, 'Adding JS files to script manager');
+            const scriptFiles = await InstanceLoader.loadZipFilesContents(zip, /logic[/\\].*\.js$/);
+            scriptFiles.forEach(function (obj) {
+                logicManager.addLogicFile(obj.contents, obj.name);
+            });
+        }
+
+        // create the instance
+        const instance = new (Function.prototype.bind.call(
+            Instance,
+            null,
+            metadata,
+            logicManager,
+            grammar,
+            null, // XXX No template reference here for now
+        ));
+
+        instance.setData(data);
+        return instance;
     }
 }
 

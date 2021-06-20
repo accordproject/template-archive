@@ -19,25 +19,14 @@ const ErgoCompiler = require('@accordproject/ergo-compiler').Compiler;
 const ciceroVersion = require('../package.json').version;
 const semver = require('semver');
 
-const getMimeType = require('./mimetype');
-
-const templateTypes = {
-    CONTRACT: 0,
-    CLAUSE: 1
-};
-
-const IMAGE_SIZE = {
-    width: 128,
-    height: 128,
-};
+const Util = require('./util');
 
 /**
- * Defines the metadata for a Template, including the name, version, README markdown.
+ * Defines a metadata object, including the name, version, author, etc.
  * @class
  * @public
  */
 class Metadata {
-
     /**
      * Create the Metadata.
      * <p>
@@ -45,33 +34,19 @@ class Metadata {
      * retrieve instances from {@link Template}</strong>
      * </p>
      * @param {object} packageJson  - the JS object for package.json (required)
-     * @param {String} readme  - the README.md for the template (may be null)
-     * @param {object} samples - the sample markdown for the template in different locales,
-     * @param {object} request - the JS object for the sample request
-     * @param {Buffer} logo - the bytes data for the image
-     * represented as an object whose keys are the locales and whose values are the sample markdown.
-     * For example:
-     *  {
-     *      default: 'default sample markdown',
-     *      en: 'sample text in english',
-     *      fr: 'exemple de texte français'
-     *  }
-     * Locale keys (with the exception of default) conform to the IETF Language Tag specification (BCP 47).
-     * THe `default` key represents sample template text in a non-specified language, stored in a file called `sample.md`.
      */
-    constructor(packageJson, readme, samples, request, logo) {
+    constructor(packageJson) {
         // name of the runtime that this template targets (if the template contains compiled code)
         this.runtime = null;
 
         // the version of Cicero that this template is compatible with
         this.ciceroVersion = null;
 
-        // the logo
-        this.logo = null;
-
         if(!packageJson || typeof(packageJson) !== 'object') {
             throw new Error('package.json is required and must be an object');
         }
+
+        this.packageJson = packageJson;
 
         if(!packageJson.accordproject) {
             // Catches the previous format for the package.json with `cicero`
@@ -111,81 +86,36 @@ class Metadata {
         }
         this.runtime = packageJson.accordproject.runtime;
 
-        if(!samples || typeof(samples) !== 'object') {
-            throw new Error('sample.md is required');
-        }
-
-        if(request && typeof(request) !== 'object') {
-            throw new Error('request.json must be an object');
-        }
-
-        if (!packageJson.name || !this._validName(packageJson.name)) {
+        if (!this.packageJson.name || !Util.isValidName(this.packageJson.name)) {
             throw new Error ('template name can only contain lowercase alphanumerics, _ or -');
         }
 
-        this.packageJson = packageJson;
-
-        if(readme && typeof(readme) !== 'string') {
-            throw new Error('README must be a string');
-        }
-
-        if(!packageJson.keywords) {
-            packageJson.keywords = [];
-        }
-
-        if(packageJson.keywords && !Array.isArray(packageJson.keywords)) {
+        if(this.packageJson.keywords && !Array.isArray(this.packageJson.keywords)) {
             throw new Error('keywords property in package.json must be an array.');
         }
 
-        if(packageJson.displayName && packageJson.displayName.length > 214){
+        if(!this.packageJson.keywords) {
+            this.packageJson.keywords = [];
+        }
+
+        if(this.packageJson.displayName && this.packageJson.displayName.length > 214){
             throw new Error('The template displayName property is limited to a maximum of 214 characters.');
         }
 
-        if(logo && logo instanceof Buffer) {
-            Metadata.checkImage(logo);
-        } else if(logo && !(logo instanceof Buffer)) {
-            throw new Error ('logo must be a Buffer');
-        }
-
-        this.readme = readme;
-        this.logo = logo;
-        this.samples = samples;
-        this.request = request;
-
-        this.type = templateTypes.CONTRACT;
-        if (packageJson.accordproject && packageJson.accordproject.template) {
-            if(packageJson.accordproject.template !== 'contract' &&
-            packageJson.accordproject.template !== 'clause'){
+        // The template type
+        this.type = Util.templateTypes.CONTRACT; // Defaults to contract
+        if (this.packageJson.accordproject && this.packageJson.accordproject.template) {
+            if(this.packageJson.accordproject.template !== 'contract' &&
+            this.packageJson.accordproject.template !== 'clause'){
                 throw new Error('A cicero template must be either a "contract" or a "clause".');
             }
 
-            if(packageJson.accordproject.template === 'clause'){
-                this.type = templateTypes.CLAUSE;
+            if(this.packageJson.accordproject.template === 'clause'){
+                this.type = Util.templateTypes.CLAUSE;
             }
         } else {
             Logger.warn('No cicero template type specified. Assuming that this is a contract template');
         }
-    }
-
-    /**
-     * check to see if it is a valid name. for some reason regex is not working when this executes
-     * inside the chaincode runtime, which is why regex hasn't been used.
-     *
-     * @param {string} name the template name to check
-     * @returns {boolean} true if valid, false otherwise
-     *
-     * @private
-     */
-    _validName(name) {
-        const validChars = ['a','b','c','d','e','f','g','h','i','j','k','l','m','n','o','p','q','r','s','t','u','v','w','x','y','z',
-            '0','1','2','3','4','5','6','7','8','9','-','_'];
-        for (let i = 0; i<name.length; i++){
-            const strChar = name.charAt(i);
-            if ( validChars.indexOf(strChar) === -1 ) {
-                return false;
-            }
-        }
-        return true;
     }
 
     /**
@@ -194,14 +124,6 @@ class Metadata {
      */
     getTemplateType(){
         return this.type;
-    }
-
-    /**
-     * Returns the logo at the root of the template
-     * @returns {Buffer} the bytes data of logo
-     */
-    getLogo(){
-        return this.logo;
     }
 
     /**
@@ -242,47 +164,6 @@ class Metadata {
      */
     satisfiesCiceroVersion(version){
         return semver.satisfies(version, this.getCiceroVersion(), { includePrerelease: true });
-    }
-
-    /**
-     * Returns the samples for this template.
-     * @return {object} the sample files for the template
-     */
-    getSamples() {
-        return this.samples;
-    }
-
-    /**
-     * Returns the sample request for this template.
-     * @return {object} the sample request for the template
-     */
-    getRequest() {
-        return this.request;
-    }
-
-    /**
-     * Returns the sample for this template in the given locale. This may be null.
-     * If no locale is specified returns the default sample if it has been specified.
-     *
-     * @param {string} locale the IETF language code for the language.
-     * @return {string} the sample file for the template in the given locale or null
-     */
-    getSample(locale=null) {
-        if(!locale && 'default' in this.samples){
-            return this.samples.default;
-        } else if (locale && locale in this.samples){
-            return this.samples[locale];
-        } else {
-            return null;
-        }
-    }
-
-    /**
-     * Returns the README.md for this template. This may be null if the template does not have a README.md
-     * @return {String} the README.md file for the template or null
-     */
-    getREADME() {
-        return this.readme;
     }
 
     /**
@@ -352,66 +233,6 @@ class Metadata {
      */
     getIdentifier() {
         return this.packageJson.name + '@' + this.packageJson.version;
-    }
-
-    /**
-     * Check the buffer is a png file with the right size
-     * @param {Buffer} buffer the buffer object
-     */
-    static checkImage(buffer) {
-        const mimeType = getMimeType(buffer).mime;
-        Metadata.checkImageDimensions(buffer, mimeType);
-    }
-
-    /**
-     * Checks if dimensions for the image are correct.
-     * @param {Buffer} buffer the buffer object
-     * @param {string} mimeType the mime type of the object
-     */
-    static checkImageDimensions(buffer, mimeType) {
-        let height;
-        let width;
-        if(mimeType === 'image/png') {
-            try {
-                height = buffer.readUInt32BE(20);
-                width = buffer.readUInt32BE(16);
-            } catch (err) {
-                throw new Error('not a valid png file');
-            }
-        } else {
-            throw new Error('dimension calculation not supported for this file');
-        }
-
-        if (height === IMAGE_SIZE.height && width === IMAGE_SIZE.width) {
-            return;
-        } else {
-            throw new Error(`logo should be ${IMAGE_SIZE.height}x${IMAGE_SIZE.width}`);
-        }
-    }
-
-    /**
-     * Return new Metadata for a target runtime
-     * @param {string} runtimeName - the target runtime name
-     * @return {object} the new Metadata
-     */
-    createTargetMetadata(runtimeName) {
-        const packageJson = JSON.parse(JSON.stringify(this.packageJson));
-        packageJson.accordproject.runtime = runtimeName;
-        return new Metadata(packageJson, this.readme, this.samples, this.request, this.logo);
-    }
-
-    /**
-     * Return the whole metadata content, for hashing
-     * @return {object} the content of the metadata object
-     */
-    toJSON() {
-        return {
-            'packageJson' : this.getPackageJson(),
-            'readme' : this.getREADME(),
-            'samples' : this.getSamples(),
-            'request' : this.getRequest(),
-            'logo' : this.getLogo() ? this.getLogo().toString('base64') : null,
-        };
     }
 }
 
