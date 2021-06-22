@@ -291,6 +291,22 @@ class Instance {
     }
 
     /**
+     * Provides access to the grammar for this instance
+     * @return {string} the grammar for this instance
+     */
+    getGrammar() {
+        return this.parserManager.getTemplate();
+    }
+
+    /**
+     * Provides access to the TemplateMark for this instance
+     * @return {object} the grammar for this instance
+     */
+    getTemplateMark() {
+        return this.parserManager.getTemplateMark();
+    }
+
+    /**
      * Returns the metadata for this instance
      * @return {Metadata} the metadata for this instance
      */
