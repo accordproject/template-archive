@@ -456,24 +456,7 @@ class Commands {
         if (!argv.clauseName) {
             throw new Error('No clause name provided. Try the --clauseName flag to provide a clause to be invoked.');
         }
-
-        if (argv.params) {
-            if (!fs.existsSync(argv.params)) {
-                throw new Error(`A params file was specified as "${argv.params}" but does not exist at this location.`);
-            }
-        } else {
-            argv.params = defaultParams;
-            Logger.warn(`A params file was not provided. Loading params from default "${defaultParams}" file.`);
-        }
-
-        if (argv.state) {
-            if (!fs.existsSync(argv.state)) {
-                throw new Error(`A state file was specified as "${argv.state}" but does not exist at this location.`);
-            }
-        } else {
-            argv.state = defaultState;
-            Logger.warn(`A state file was not provided. Loading state from default "${defaultState}" file.`);
-        }
+        argv = Commands.setDefaultFileArg(argv, 'params', 'params.json', ((argv, argDefaultName) => { return [path.resolve(argv.template,argDefaultName)]; }));
 
         if(argv.verbose) {
             if (argv.sample) {
@@ -520,7 +503,7 @@ class Commands {
                     stateJson = JSON.parse(fs.readFileSync(statePath, 'utf8'));
                 }
 
-                return engine.invoke(clause, clauseName, paramsJson, stateJson, currentTime, utcOffset);
+                return engine.invoke(instance, clauseName, paramsJson, stateJson, currentTime, utcOffset);
             })
             .catch((err) => {
                 Logger.error(err.message);
