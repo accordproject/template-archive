@@ -401,7 +401,9 @@ class Commands {
      */
     static validateInvokeArgs(argv) {
         argv = Commands.validateCommonArgs(argv);
-        argv = Commands.setDefaultFileArg(argv, 'sample', 'text/sample.md', ((argv, argDefaultName) => { return path.resolve(argv.template,argDefaultName); }));
+        if (argv.template) {
+            argv = Commands.setDefaultFileArg(argv, 'sample', 'text/sample.md', ((argv, argDefaultName) => { return path.resolve(argv.template,argDefaultName); }));
+        }
         argv = Commands.setDefaultFileArg(argv, 'params', 'params.json', ((argv, argDefaultName) => { return [path.resolve(argv.template,argDefaultName)]; }));
 
         if(argv.verbose) {
@@ -415,6 +417,7 @@ class Commands {
      * Invoke a sample text using a template
      *
      * @param {string} templatePath - path to the template directory or archive
+     * @param {string} slcPath - path to the smart legal contract archive
      * @param {string} samplePath - to the sample file
      * @param {string} clauseName the name of the clause to invoke
      * @param {object} paramsPath the parameters for the clause
@@ -424,28 +427,22 @@ class Commands {
      * @param {Object} [options] - an optional set of options
      * @returns {object} Promise to the result of execution
      */
-    static invoke(templatePath, samplePath, clauseName, paramsPath, statePath, currentTime, utcOffset, options) {
-        let clause;
-        const sampleText = fs.readFileSync(samplePath, 'utf8');
+    static invoke(templatePath, slcPath, samplePath, clauseName, paramsPath, statePath, currentTime, utcOffset, options) {
         const paramsJson = JSON.parse(fs.readFileSync(paramsPath, 'utf8'));
 
         const engine = new Engine();
-        return Commands.loadTemplate(templatePath, options)
-            .then(async (template) => {
-                // Initialize clause
-                clause = ClauseInstance.fromTemplate(template);
-                clause.parse(sampleText, currentTime, utcOffset);
-
+        return Commands.loadInstance(templatePath, slcPath, samplePath, currentTime, utcOffset, options)
+            .then(async (instance) => {
                 let stateJson;
                 if(!fs.existsSync(statePath)) {
                     Logger.warn('A state file was not provided, initializing state. Try the --state flag or create a state.json in the root folder of your template.');
-                    const initResult = await engine.init(clause, currentTime, utcOffset);
+                    const initResult = await engine.init(instance, currentTime, utcOffset);
                     stateJson = initResult.state;
                 } else {
                     stateJson = JSON.parse(fs.readFileSync(statePath, 'utf8'));
                 }
 
-                return engine.invoke(clause, clauseName, paramsJson, stateJson, currentTime, utcOffset);
+                return engine.invoke(instance, clauseName, paramsJson, stateJson, currentTime, utcOffset);
             })
             .catch((err) => {
                 Logger.error(err.message);
@@ -460,7 +457,9 @@ class Commands {
      */
     static validateInitializeArgs(argv) {
         argv = Commands.validateCommonArgs(argv);
-        argv = Commands.setDefaultFileArg(argv, 'sample', 'text/sample.md', ((argv, argDefaultName) => { return path.resolve(argv.template,argDefaultName); }));
+        if (argv.template) {
+            argv = Commands.setDefaultFileArg(argv, 'sample', 'text/sample.md', ((argv, argDefaultName) => { return path.resolve(argv.template,argDefaultName); }));
+        }
 
         if(argv.verbose) {
             Logger.info(`initialize sample ${argv.sample} using a template ${argv.template}`);
@@ -473,6 +472,7 @@ class Commands {
      * Initializes a sample text using a template
      *
      * @param {string} templatePath - path to the template directory or archive
+     * @param {string} slcPath - path to the smart legal contract archive
      * @param {string} samplePath - to the sample file
      * @param {object} paramsPath - the parameters for the initialization
      * @param {string} [currentTime] - the definition of 'now', defaults to current time
@@ -480,19 +480,13 @@ class Commands {
      * @param {Object} [options] - an optional set of options
      * @returns {object} Promise to the result of execution
      */
-    static initialize(templatePath, samplePath, paramsPath, currentTime, utcOffset, options) {
-        let clause;
-        const sampleText = fs.readFileSync(samplePath, 'utf8');
+    static initialize(templatePath, slcPath, samplePath, paramsPath, currentTime, utcOffset, options) {
         const paramsJson = paramsPath ? JSON.parse(fs.readFileSync(paramsPath, 'utf8')) : {};
 
         const engine = new Engine();
-        return Commands.loadTemplate(templatePath, options)
-            .then((template) => {
-                // Initialize clause
-                clause = ClauseInstance.fromTemplate(template);
-                clause.parse(sampleText, currentTime, utcOffset);
-
-                return engine.init(clause, currentTime, utcOffset, paramsJson);
+        return Commands.loadInstance(templatePath, slcPath, samplePath, currentTime, utcOffset, options)
+            .then(async (instance) => {
+                return engine.init(instance, currentTime, utcOffset, paramsJson);
             })
             .catch((err) => {
                 Logger.error(err.message);
