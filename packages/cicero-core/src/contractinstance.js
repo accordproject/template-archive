@@ -55,6 +55,16 @@ class ContractInstance extends Instance {
     toArchive(runtime, options) {
         return InstanceSaver.toArchive(this, runtime, options);
     }
+
+    /**
+     * Create a smart legal contract instance from an archive.
+     * @param {Buffer} buffer  - the buffer to a Smart Legal Contract (slc) file
+     * @param {object} options - additional options
+     * @return {Promise<ContractInstance>} a Promise to the instance
+     */
+    fromArchive(buffer, options) {
+        return InstanceLoader.fromArchive(ContractInstance, buffer, options);
+    }
 }
 
 module.exports = ContractInstance;
