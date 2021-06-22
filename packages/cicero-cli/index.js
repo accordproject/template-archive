@@ -221,7 +221,11 @@ require('yargs')
     })
     .command('trigger', 'send a request to the contract', (yargs) => {
         yargs.option('template', {
-            describe: 'path to the template',
+            describe: 'path to a template',
+            type: 'string'
+        });
+        yargs.option('contract', {
+            describe: 'path to a smart legal contract',
             type: 'string'
         });
         yargs.option('sample', {
@@ -270,7 +274,7 @@ require('yargs')
                 offline: argv.offline,
                 warnings: argv.warnings,
             };
-            return Commands.trigger(argv.template, argv.sample, argv.data, argv.request, argv.state, argv.currentTime, argv.utcOffset, options)
+            return Commands.trigger(argv.template, argv.contract, argv.sample, argv.data, argv.request, argv.state, argv.currentTime, argv.utcOffset, options)
                 .then((result) => {
                     if(result) {Logger.info(JSON.stringify(result));}
                 })
@@ -284,6 +288,10 @@ require('yargs')
     .command('invoke', 'invoke a clause of the contract', (yargs) => {
         yargs.option('template', {
             describe: 'path to the template',
+            type: 'string'
+        });
+        yargs.option('contract', {
+            describe: 'path to a smart legal contract',
             type: 'string'
         });
         yargs.option('sample', {
@@ -335,7 +343,7 @@ require('yargs')
                 offline: argv.offline,
                 warnings: argv.warnings,
             };
-            return Commands.invoke(argv.template, argv.sample, argv.data, argv.clauseName, argv.params, argv.state, argv.currentTime, argv.utcOffset, options)
+            return Commands.invoke(argv.template, argv.contract, argv.sample, argv.data, argv.clauseName, argv.params, argv.state, argv.currentTime, argv.utcOffset, options)
                 .then((result) => {
                     if(result) {Logger.info(JSON.stringify(result));}
                 })
@@ -349,6 +357,10 @@ require('yargs')
     .command('initialize', 'initialize a clause', (yargs) => {
         yargs.option('template', {
             describe: 'path to the template',
+            type: 'string'
+        });
+        yargs.option('contract', {
+            describe: 'path to a smart legal contract',
             type: 'string'
         });
         yargs.option('sample', {
@@ -393,7 +405,7 @@ require('yargs')
                 offline: argv.offline,
                 warnings: argv.warnings,
             };
-            return Commands.initialize(argv.template, argv.sample, argv.data, argv.params, argv.currentTime, argv.utcOffset, options)
+            return Commands.initialize(argv.template, argv.contract, argv.sample, argv.data, argv.params, argv.currentTime, argv.utcOffset, options)
                 .then((result) => {
                     if(result) {Logger.info(JSON.stringify(result));}
                 })
