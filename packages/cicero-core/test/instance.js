@@ -43,7 +43,7 @@ describe('Instance', () => {
             const buffer = await instance.toArchive('ergo');
             buffer.should.not.be.null;
 
-            const instance2 = await instance.fromArchive(buffer);
+            const instance2 = await ContractInstance.fromArchive(buffer);
             instance2.getIdentifier().should.equal(instance.getIdentifier());
             instance2.getData().should.deep.equal(instance.getData());
             instance2.getGrammar().should.equal(instance.getGrammar());
