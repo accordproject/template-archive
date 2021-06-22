@@ -66,6 +66,7 @@ const paramsErr = path.resolve(__dirname, 'data/latedeliveryandpenalty/', 'param
 
 const slcArchive = path.resolve(__dirname, 'data/installment-sale@0.1.0-316a9177c6d52bfd4e1df6d543ddab775cc217cdb44f92120e2f24bd11f8381b.slc');
 const slcRequest = path.resolve(__dirname, 'data/installment-sale-ergo/', 'request.json');
+const slcParams = path.resolve(__dirname, 'data/installment-sale-ergo/', 'params.json');
 const slcState = path.resolve(__dirname, 'data/installment-sale-ergo/', 'state.json');
 
 describe('#validateParseArgs', () => {
@@ -872,32 +873,40 @@ describe('#validateInvokeArgs', () => {
             params: 'params1.json'
         })).should.throw('A params file was specified as "params1.json" but does not exist at this location.');
     });
+    it('all args specified, slc archive, no sample', () => {
+        process.chdir(path.resolve(__dirname, 'data'));
+        const args  = Commands.validateInvokeArgs({
+            _: ['trigger'],
+            contract: 'installment-sale@0.1.0-316a9177c6d52bfd4e1df6d543ddab775cc217cdb44f92120e2f24bd11f8381b.slc',
+            params: ['installment-sale-ergo/params.json']
+        });
+        args.contract.should.match(/.slc$/);
+    });
 });
 
 describe('#invoke', () => {
     it('should invoke a clause using a template and sample', async () => {
-        const response = await Commands.invoke(template, sample, null, 'latedeliveryandpenalty', params, state);
+        const response = await Commands.invoke(template, null, sample, null, 'latedeliveryandpenalty', params, state);
         response.response.$class.should.be.equal('org.accordproject.latedeliveryandpenalty.LateDeliveryAndPenaltyResponse');
         response.response.penalty.should.be.equal(4);
         response.response.buyerMayTerminate.should.be.equal(true);
     });
 
     it('should invoke a clause using a template and data', async () => {
-        const response = await Commands.invoke(template, null, data, 'latedeliveryandpenalty', params, state);
+        const response = await Commands.invoke(template, null, null, data, 'latedeliveryandpenalty', params, state);
         response.response.$class.should.be.equal('org.accordproject.latedeliveryandpenalty.LateDeliveryAndPenaltyResponse');
         response.response.penalty.should.be.equal(4);
         response.response.buyerMayTerminate.should.be.equal(true);
     });
 
     it('should invoke a clause using a template archive and sample', async () => {
-        const response = await Commands.invoke(templateArchive, sample, null, 'latedeliveryandpenalty', params, state);
         response.response.$class.should.be.equal('org.accordproject.latedeliveryandpenalty.LateDeliveryAndPenaltyResponse');
         response.response.penalty.should.be.equal(4);
         response.response.buyerMayTerminate.should.be.equal(true);
     });
 
     it('should invoke a clause using a template archive and data', async () => {
-        const response = await Commands.invoke(templateArchive, null, data, 'latedeliveryandpenalty', params, state);
+        const response = await Commands.invoke(templateArchive, null, null, data, 'latedeliveryandpenalty', params, state);
         response.response.$class.should.be.equal('org.accordproject.latedeliveryandpenalty.LateDeliveryAndPenaltyResponse');
         response.response.penalty.should.be.equal(4);
         response.response.buyerMayTerminate.should.be.equal(true);
@@ -923,15 +932,24 @@ describe('#invoke', () => {
     });
 
     it('should fail invoke on a bogus request', async () => {
-        const response = await Commands.invoke(template, sample, data, paramsErr, state);
+        const response = await Commands.invoke(template, null, sample, data, paramsErr, state);
         should.equal(response,undefined);
     });
 
     it('should invoke a clause using a template (with currentTime set)', async () => {
-        const response = await Commands.invoke(template, sample, data,'latedeliveryandpenalty', params, state, '2017-12-19T17:38:01Z');
+        const response = await Commands.invoke(template, null, sample, data,'latedeliveryandpenalty', params, state, '2017-12-19T17:38:01Z');
         response.response.$class.should.be.equal('org.accordproject.latedeliveryandpenalty.LateDeliveryAndPenaltyResponse');
         response.response.penalty.should.be.equal(3.1111111111111107);
         response.response.buyerMayTerminate.should.be.equal(false);
+    });
+});
+
+describe('#invoke-slc', () => {
+    it('should invoke a smart legal contract in ergo', async () => {
+        const response = await Commands.invoke(undefined, slcArchive, null, 'PayInstallment', slcParams, slcState, '2017-12-19T17:38:01Z');
+        response.response.$class.should.be.equal('org.accordproject.installmentsale.Balance');
+        response.response.balance.should.be.equal(7612.499999999999);
+        response.state.$class.should.be.equal('org.accordproject.installmentsale.InstallmentSaleState');
     });
 });
 
@@ -1022,16 +1040,29 @@ describe('#validateInitializeArgs', () => {
             sample: 'text/sample_en.md'
         })).should.throw('A sample file was specified as "text/sample_en.md" but does not exist at this location.');
     });
+    it('all args specified, slc archive, no sample', () => {
+        process.chdir(path.resolve(__dirname, 'data'));
+        const args  = Commands.validateInitializeArgs({
+            _: ['trigger'],
+            contract: 'installment-sale@0.1.0-316a9177c6d52bfd4e1df6d543ddab775cc217cdb44f92120e2f24bd11f8381b.slc'
+        });
+        args.contract.should.match(/.slc$/);
+    });
 });
 
 describe('#initialize', () => {
     it('should initialize a clause using a template with sample', async () => {
-        const response = await Commands.initialize(template, sample);
+        const response = await Commands.initialize(template, null, sample, null);
         response.state.$class.should.be.equal('org.accordproject.runtime.State');
     });
 
-    it('should initialize a clause using a template with sample and params', async () => {
-        const response = await Commands.initialize(template, sample, null, params);
+    it('should initialize a clause using a template', async () => {
+        const response = await Commands.initialize(template, null, sample, null);
+        response.state.$class.should.be.equal('org.accordproject.runtime.State');
+    });
+
+    it('should initialize a clause using a template archive', async () => {
+        const response = await Commands.initialize(templateArchive, null, sample, null);
         response.state.$class.should.be.equal('org.accordproject.runtime.State');
         response.params.request.$class.should.be.equal('org.accordproject.latedeliveryandpenalty.LateDeliveryAndPenaltyRequest');
     });
@@ -1064,8 +1095,18 @@ describe('#initialize', () => {
         response.params.request.$class.should.be.equal('org.accordproject.latedeliveryandpenalty.LateDeliveryAndPenaltyRequest');
     });
     it('should fail to initialize on a bogus sample', async () => {
-        const response = await Commands.initialize(template, sampleErr);
+        const response = await Commands.initialize(template, null, sampleErr);
         should.equal(response,undefined);
+    });
+});
+
+describe('#intialize-slc', () => {
+    it('should intialize a smart legal contract in ergo', async () => {
+        const response = await Commands.initialize(undefined, slcArchive, null);
+        console.log(`RESP ${JSON.stringify(response)}`);
+        response.response.$class.should.be.equal('org.accordproject.runtime.Response');
+        response.state.$class.should.be.equal('org.accordproject.installmentsale.InstallmentSaleState');
+        response.state.balance_remaining.should.be.equal(10000);
     });
 });
 
