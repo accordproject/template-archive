@@ -31,7 +31,7 @@ const data = path.resolve(__dirname, 'data/helloworldstate/', 'data.json');
 
 describe('#initializeWithParameters', () => {
     it('should initialize with some parameters', async () => {
-        const response = await Commands.initialize(template, sample, data, params);
+        const response = await Commands.initialize(template, null, sample, data, params);
         response.state.$class.should.be.equal('org.accordproject.helloworldstate.HelloWorldState');
         response.state.counter.should.be.equal(2);
     });
