@@ -221,7 +221,11 @@ require('yargs')
     })
     .command('trigger', 'send a request to the contract', (yargs) => {
         yargs.option('template', {
-            describe: 'path to the template',
+            describe: 'path to a template',
+            type: 'string'
+        });
+        yargs.option('contract', {
+            describe: 'path to a smart legal contract',
             type: 'string'
         });
         yargs.option('sample', {
@@ -264,7 +268,7 @@ require('yargs')
                 offline: argv.offline,
                 warnings: argv.warnings,
             };
-            return Commands.trigger(argv.template, argv.sample, argv.request, argv.state, argv.currentTime, argv.utcOffset, options)
+            return Commands.trigger(argv.template, argv.contract, argv.sample, argv.request, argv.state, argv.currentTime, argv.utcOffset, options)
                 .then((result) => {
                     if(result) {Logger.info(JSON.stringify(result));}
                 })

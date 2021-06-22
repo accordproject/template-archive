@@ -62,7 +62,7 @@ class ContractInstance extends Instance {
      * @param {object} options - additional options
      * @return {Promise<ContractInstance>} a Promise to the instance
      */
-    fromArchive(buffer, options) {
+    static fromArchive(buffer, options) {
         return InstanceLoader.fromArchive(ContractInstance, buffer, options);
     }
 }

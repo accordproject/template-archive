@@ -64,6 +64,10 @@ const stateErr = path.resolve(__dirname, 'data/latedeliveryandpenalty/', 'state_
 const requestErr = path.resolve(__dirname, 'data/latedeliveryandpenalty/', 'request_err.json');
 const paramsErr = path.resolve(__dirname, 'data/latedeliveryandpenalty/', 'params_err.json');
 
+const slcArchive = path.resolve(__dirname, 'data/installment-sale@0.1.0-316a9177c6d52bfd4e1df6d543ddab775cc217cdb44f92120e2f24bd11f8381b.slc');
+const slcRequest = path.resolve(__dirname, 'data/installment-sale-ergo/', 'request.json');
+const slcState = path.resolve(__dirname, 'data/installment-sale-ergo/', 'state.json');
+
 describe('#validateParseArgs', () => {
     it('no args specified', () => {
         process.chdir(path.resolve(__dirname, 'data/latedeliveryandpenalty/'));
@@ -461,6 +465,14 @@ describe('#validateTriggerArgs', () => {
         args.template.should.match(/cicero-cli[/\\]test[/\\]data[/\\]latedeliveryandpenalty$/);
         args.sample.should.match(/text[/\\]sample.md$/);
     });
+    it('neither template nor contract specified', () => {
+        process.chdir(path.resolve(__dirname, 'data/latedeliveryandpenalty/'));
+        const args  = Commands.validateTriggerArgs({
+            _: ['trigger'],
+        });
+        args.template.should.match(/cicero-cli[/\\]test[/\\]data[/\\]latedeliveryandpenalty$/);
+        args.sample.should.match(/text[/\\]sample.md$/);
+    });
     it('all args specified', () => {
         process.chdir(path.resolve(__dirname, 'data/latedeliveryandpenalty/'));
         const args  = Commands.validateTriggerArgs({
@@ -535,44 +547,53 @@ describe('#validateTriggerArgs', () => {
             request: ['request1.json']
         })).should.throw('A request.json file is required. Try the --request flag or create a request.json in your template.');
     });
+    it('all args specified, slc archive, no sample', () => {
+        process.chdir(path.resolve(__dirname, 'data'));
+        const args  = Commands.validateTriggerArgs({
+            _: ['trigger'],
+            contract: 'installment-sale@0.1.0-316a9177c6d52bfd4e1df6d543ddab775cc217cdb44f92120e2f24bd11f8381b.slc',
+            request: ['installment-sale-ergo/request.json']
+        });
+        args.contract.should.match(/.slc$/);
+    });
 });
 
 describe('#trigger', () => {
     it('should trigger a clause using a template', async () => {
-        const response = await Commands.trigger(template, sample, [request], state);
+        const response = await Commands.trigger(template, undefined, sample, [request], state);
         response.response.$class.should.be.equal('org.accordproject.latedeliveryandpenalty.LateDeliveryAndPenaltyResponse');
         response.response.penalty.should.be.equal(4);
         response.response.buyerMayTerminate.should.be.equal(true);
     });
 
     it('should trigger a clause using a template archive', async () => {
-        const response = await Commands.trigger(templateArchive, sample, [request], state);
+        const response = await Commands.trigger(templateArchive, undefined, sample, [request], state);
         response.response.$class.should.be.equal('org.accordproject.latedeliveryandpenalty.LateDeliveryAndPenaltyResponse');
         response.response.penalty.should.be.equal(4);
         response.response.buyerMayTerminate.should.be.equal(true);
     });
 
     it('should trigger with default state when state is not found', async () => {
-        const response = await Commands.trigger(template, sample, [request], stateErr);
+        const response = await Commands.trigger(template, undefined, sample, [request], stateErr);
         response.response.$class.should.be.equal('org.accordproject.latedeliveryandpenalty.LateDeliveryAndPenaltyResponse');
         response.response.penalty.should.be.equal(4);
         response.response.buyerMayTerminate.should.be.equal(true);
     });
 
     it('should trigger with more than one request', async () => {
-        const response = await Commands.trigger(template, sample, [request,request], state);
+        const response = await Commands.trigger(template, undefined, sample, [request,request], state);
         response.response.$class.should.be.equal('org.accordproject.latedeliveryandpenalty.LateDeliveryAndPenaltyResponse');
         response.response.penalty.should.be.equal(4);
         response.response.buyerMayTerminate.should.be.equal(true);
     });
 
     it('should fail trigger on a bogus request', async () => {
-        const response = await Commands.trigger(template, sample, [requestErr], state);
+        const response = await Commands.trigger(template, undefined, sample, [requestErr], state);
         should.equal(response,undefined);
     });
 
     it('should trigger a clause using a template (with currentTime set)', async () => {
-        const response = await Commands.trigger(template, sample, [request], state, '2017-12-19T17:38:01Z');
+        const response = await Commands.trigger(template, undefined, sample, [request], state, '2017-12-19T17:38:01Z');
         response.response.$class.should.be.equal('org.accordproject.latedeliveryandpenalty.LateDeliveryAndPenaltyResponse');
         response.response.penalty.should.be.equal(3.1111111111111107);
         response.response.buyerMayTerminate.should.be.equal(false);
@@ -581,7 +602,7 @@ describe('#trigger', () => {
 
 describe('#trigger-ergo', () => {
     it('should trigger a clause in ergo using a template', async () => {
-        const response = await Commands.trigger(template, sample, [request], state);
+        const response = await Commands.trigger(template, undefined, sample, [request], state);
         response.response.$class.should.be.equal('org.accordproject.latedeliveryandpenalty.LateDeliveryAndPenaltyResponse');
         response.response.penalty.should.be.equal(4);
         response.response.buyerMayTerminate.should.be.equal(true);
@@ -590,10 +611,19 @@ describe('#trigger-ergo', () => {
 
 describe('#trigger-javascript', () => {
     it('should trigger a clause in ergo using a template', async () => {
-        const response = await Commands.trigger(templateJs, sample, [request], state);
+        const response = await Commands.trigger(templateJs, undefined, sample, [request], state);
         response.response.$class.should.be.equal('org.accordproject.latedeliveryandpenalty.LateDeliveryAndPenaltyResponse');
         response.response.penalty.should.be.equal(4);
         response.response.buyerMayTerminate.should.be.equal(true);
+    });
+});
+
+describe('#trigger-slc', () => {
+    it('should trigger a smart legal contract in ergo', async () => {
+        const response = await Commands.trigger(undefined, slcArchive, null, [slcRequest], slcState);
+        response.response.$class.should.be.equal('org.accordproject.installmentsale.Balance');
+        response.response.balance.should.be.equal(7612.499999999999);
+        response.state.$class.should.be.equal('org.accordproject.installmentsale.InstallmentSaleState');
     });
 });
 
