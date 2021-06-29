@@ -615,7 +615,7 @@ class Commands {
         return Commands.loadTemplate(templatePath, options)
             .then(async (template) => {
                 const keystore = {};
-                if (options.keystore) {
+                if (options.keystore.path) {
                     const p12File = fs.readFileSync(options.keystore.path, { encoding: 'base64' });
                     keystore.p12File = p12File;
                     keystore.passphrase = options.keystore.passphrase;

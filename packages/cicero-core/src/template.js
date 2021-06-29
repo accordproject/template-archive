@@ -58,8 +58,12 @@ class Template {
      * Verifies that the template is well formed.
      * Compiles the Ergo logic.
      * Throws an exception with the details of any validation errors.
+     * @param {Object} options  - e.g., { verify: true }
      */
-    validate() {
+    validate(options = {}) {
+        if (options.verify) {
+            this.verifyTemplateSignature();
+        }
         this.getModelManager().validateModelFiles();
         this.getTemplateModel();
         if (this.getMetadata().getRuntime() === 'ergo') {
@@ -176,6 +180,34 @@ class Template {
     }
 
     /**
+     * verifies the signature stored in the template object using the template hash and timestamp
+     * @private
+     */
+    verifyTemplateSignature() {
+        const templateHash = this.getHash();
+        if (this.authorSignature === null) {throw new Error('The template is missing author signature!');}
+        const signature = this.authorSignature.templateSignature.signature;
+        const timeStamp = this.authorSignature.templateSignature.timestamp;
+        const signatoryCert = this.authorSignature.templateSignature.signatoryCert;
+        //X509 cert converted from PEM to forge type
+        const certificateForge = forge.pki.certificateFromPem(signatoryCert);
+        //public key in forge typenode index.js sign acme 123 helloworldstate
+        const publicKeyForge = certificateForge.publicKey;
+        //convert public key from forge to pem
+        const publicKeyPem = forge.pki.publicKeyToPem(publicKeyForge);
+        //convert public key in pem to public key type in node.
+        const publicKey = crypto.createPublicKey(publicKeyPem);
+        //signature verification process
+        const verify = crypto.createVerify('SHA256');
+        verify.write(templateHash + timeStamp);
+        verify.end();
+        const result = verify.verify(publicKey, signature, 'hex');
+        if (!result) {
+            throw new Error('Template\'s author signature is invalid!');
+        }
+    }
+
+    /**
      * signs a string made up of template hash and time stamp using private key derived
      * from the keystore
      * @param {String} [p12File] - encoded string of p12 keystore file
@@ -224,7 +256,7 @@ class Template {
      * @return {Promise<Buffer>} the zlib buffer
      */
     async toArchive(language, options) {
-        if (options.keystore) {
+        if (options.keystore.p12File) {
             const timestamp = Date.now();
             this.signTemplate(options.keystore.p12File, options.keystore.passphrase, timestamp);
         }
