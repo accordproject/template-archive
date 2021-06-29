@@ -112,7 +112,7 @@ class TemplateLoader extends FileLoader {
         TemplateLoader.registerFormulas(template.parserManager,template.getLogicManager());
 
         // check the integrity of the model and logic of the template
-        template.validate();
+        authorSignature ? template.validate({verify: true}) : template.validate();
 
         return template; // Returns template
     }
@@ -230,7 +230,7 @@ class TemplateLoader extends FileLoader {
         TemplateLoader.registerFormulas(template.parserManager,template.getLogicManager());
 
         // check the template
-        template.validate();
+        authorSignature ? template.validate({verify: true}) : template.validate();
 
         return template;
     }
