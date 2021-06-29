@@ -227,15 +227,11 @@ class Template {
      * @return {Promise<Buffer>} the zlib buffer
      */
     async toArchive(language, options) {
-        if (!this.authorSignature) {
-            if (options.keystore) {
-                const timestamp = Date.now();
-                this.signTemplate(options.keystore.p12File, options.keystore.passphrase, timestamp);
-            }
-            return TemplateSaver.toArchive(this, language, options);
-        } else {
-            throw new Error('Template is already signed by the author.');
+        if (options.keystore) {
+            const timestamp = Date.now();
+            this.signTemplate(options.keystore.p12File, options.keystore.passphrase, timestamp);
         }
+        return TemplateSaver.toArchive(this, language, options);
     }
 
     /**
