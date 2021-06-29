@@ -156,9 +156,6 @@ class Template {
         if(this.parserManager.getTemplate()) {
             content.grammar = this.parserManager.getTemplate();
         }
-        if(this.authorSignature !== null){
-            content.authorSignature = this.authorSignature;
-        }
         content.models = {};
         content.scripts = {};
 
