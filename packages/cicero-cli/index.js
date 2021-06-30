@@ -222,12 +222,12 @@ require('yargs')
         }
     })
     .command('trigger', 'send a request to the contract', (yargs) => {
-        yargs.option('contract', {
-            describe: 'path to a smart legal contract',
-            type: 'string'
-        });
         yargs.option('template', {
             describe: 'path to a template',
+            type: 'string'
+        });
+        yargs.option('contract', {
+            describe: 'path to a smart legal contract',
             type: 'string'
         });
         yargs.option('sample', {
@@ -288,10 +288,6 @@ require('yargs')
         }
     })
     .command('invoke', 'invoke a clause of the contract', (yargs) => {
-        yargs.option('contract', {
-            describe: 'path to a smart legal contract',
-            type: 'string'
-        });
         yargs.option('template', {
             describe: 'path to the template',
             type: 'string'
@@ -349,11 +345,7 @@ require('yargs')
                 offline: argv.offline,
                 warnings: argv.warnings,
             };
-<<<<<<< HEAD
             return Commands.invoke(argv.template, argv.contract, argv.sample, argv.data, argv.clauseName, argv.params, argv.state, argv.currentTime, argv.utcOffset, options)
-=======
-            return Commands.invoke(argv.template, argv.contract, argv.sample, argv.clauseName, argv.params, argv.state, argv.currentTime, argv.utcOffset, options)
->>>>>>> 76169ba (feature(slc) Add invoke and initialization support for smart legal contracts)
                 .then((result) => {
                     if(result) {Logger.info(JSON.stringify(result));}
                 })
@@ -365,10 +357,6 @@ require('yargs')
         }
     })
     .command('initialize', 'initialize a clause', (yargs) => {
-        yargs.option('contract', {
-            describe: 'path to a smart legal contract',
-            type: 'string'
-        });
         yargs.option('template', {
             describe: 'path to the template',
             type: 'string'
@@ -419,11 +407,7 @@ require('yargs')
                 offline: argv.offline,
                 warnings: argv.warnings,
             };
-<<<<<<< HEAD
             return Commands.initialize(argv.template, argv.contract, argv.sample, argv.data, argv.params, argv.currentTime, argv.utcOffset, options)
-=======
-            return Commands.initialize(argv.template, argv.contract, argv.sample, argv.params, argv.currentTime, argv.utcOffset, options)
->>>>>>> 76169ba (feature(slc) Add invoke and initialization support for smart legal contracts)
                 .then((result) => {
                     if(result) {Logger.info(JSON.stringify(result));}
                 })

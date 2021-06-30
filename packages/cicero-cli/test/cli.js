@@ -173,7 +173,7 @@ describe('#parse', () => {
 
     it('should fail parsing a clause using a template', async () => {
         const result = await Commands.parse(template, sampleErr, null);
-        should.equal(result,undefined);
+        should.equal(result, undefined);
     });
 });
 
@@ -289,7 +289,7 @@ describe('#draft', () => {
 
     it('should fail drafting the text for a clause using a template', async () => {
         const result = await Commands.draft(template, dataErr, null);
-        should.equal(result,undefined);
+        should.equal(result, undefined);
     });
 });
 
@@ -447,7 +447,7 @@ describe('#normalize', () => {
 
     it('should fail normalizing a clause using a template', async () => {
         const result = await Commands.normalize(template, sampleErr, false, null);
-        should.equal(result,undefined);
+        should.equal(result, undefined);
     });
 });
 
@@ -596,68 +596,68 @@ describe('#validateTriggerArgs', () => {
 
 describe('#trigger', () => {
     it('should trigger a clause using a template and sample', async () => {
-        const response = await Commands.trigger(template, undefined, sample, null, [request], state);
+        const response = await Commands.trigger(template, null, sample, null, [request], state);
         response.response.$class.should.be.equal('org.accordproject.latedeliveryandpenalty.LateDeliveryAndPenaltyResponse');
         response.response.penalty.should.be.equal(4);
         response.response.buyerMayTerminate.should.be.equal(true);
     });
 
     it('should trigger a clause using a template and data', async () => {
-        const response = await Commands.trigger(template, undefined, null, data, [request], state);
+        const response = await Commands.trigger(template, null, null, data, [request], state);
         response.response.$class.should.be.equal('org.accordproject.latedeliveryandpenalty.LateDeliveryAndPenaltyResponse');
         response.response.penalty.should.be.equal(4);
         response.response.buyerMayTerminate.should.be.equal(true);
     });
 
     it('should trigger a clause using a template archive and sample', async () => {
-        const response = await Commands.trigger(templateArchive, undefined, sample, null, [request], state);
+        const response = await Commands.trigger(templateArchive, null, sample, null, [request], state);
         response.response.$class.should.be.equal('org.accordproject.latedeliveryandpenalty.LateDeliveryAndPenaltyResponse');
         response.response.penalty.should.be.equal(4);
         response.response.buyerMayTerminate.should.be.equal(true);
     });
 
     it('should trigger a clause using a template archive and data', async () => {
-        const response = await Commands.trigger(templateArchive, null, data, [request], state);
+        const response = await Commands.trigger(templateArchive, null, null, data, [request], state);
         response.response.$class.should.be.equal('org.accordproject.latedeliveryandpenalty.LateDeliveryAndPenaltyResponse');
         response.response.penalty.should.be.equal(4);
         response.response.buyerMayTerminate.should.be.equal(true);
     });
 
     it('should trigger with default state when state is not found with sample', async () => {
-        const response = await Commands.trigger(template, sample, null, [request], stateErr);
+        const response = await Commands.trigger(template, null, sample, null, [request], stateErr);
         response.response.$class.should.be.equal('org.accordproject.latedeliveryandpenalty.LateDeliveryAndPenaltyResponse');
         response.response.penalty.should.be.equal(4);
         response.response.buyerMayTerminate.should.be.equal(true);
     });
 
     it('should trigger with default state when state is not found with data', async () => {
-        const response = await Commands.trigger(template, null, data, [request], stateErr);
+        const response = await Commands.trigger(template, null, null, data, [request], stateErr);
         response.response.$class.should.be.equal('org.accordproject.latedeliveryandpenalty.LateDeliveryAndPenaltyResponse');
         response.response.penalty.should.be.equal(4);
         response.response.buyerMayTerminate.should.be.equal(true);
     });
 
     it('should trigger with more than one request with sample', async () => {
-        const response = await Commands.trigger(template, sample, null, [request,request], state);
+        const response = await Commands.trigger(template, null, sample, null, [request,request], state);
         response.response.$class.should.be.equal('org.accordproject.latedeliveryandpenalty.LateDeliveryAndPenaltyResponse');
         response.response.penalty.should.be.equal(4);
         response.response.buyerMayTerminate.should.be.equal(true);
     });
 
     it('should trigger with more than one request with data', async () => {
-        const response = await Commands.trigger(template, undefined null, data, [request,request], state);
+        const response = await Commands.trigger(template, null, null, data, [request,request], state);
         response.response.$class.should.be.equal('org.accordproject.latedeliveryandpenalty.LateDeliveryAndPenaltyResponse');
         response.response.penalty.should.be.equal(4);
         response.response.buyerMayTerminate.should.be.equal(true);
     });
 
     it('should fail trigger on a bogus request', async () => {
-        const response = await Commands.trigger(template, undefined, sample, data, [requestErr], state);
+        const response = await Commands.trigger(template, null, sample, data, [requestErr], state);
         should.equal(response,undefined);
     });
 
     it('should trigger a clause using a template (with currentTime set)', async () => {
-        const response = await Commands.trigger(template, undefinedm sample, data, [request], state, '2017-12-19T17:38:01Z');
+        const response = await Commands.trigger(template, null, sample, data, [request], state, '2017-12-19T17:38:01Z');
         response.response.$class.should.be.equal('org.accordproject.latedeliveryandpenalty.LateDeliveryAndPenaltyResponse');
         response.response.penalty.should.be.equal(3.1111111111111107);
         response.response.buyerMayTerminate.should.be.equal(false);
@@ -666,7 +666,7 @@ describe('#trigger', () => {
 
 describe('#trigger-ergo', () => {
     it('should trigger a clause in ergo using a template', async () => {
-        const response = await Commands.trigger(template, undefined, sample, data, [request], state);
+        const response = await Commands.trigger(template, null, sample, data, [request], state);
         response.response.$class.should.be.equal('org.accordproject.latedeliveryandpenalty.LateDeliveryAndPenaltyResponse');
         response.response.penalty.should.be.equal(4);
         response.response.buyerMayTerminate.should.be.equal(true);
@@ -675,7 +675,7 @@ describe('#trigger-ergo', () => {
 
 describe('#trigger-javascript', () => {
     it('should trigger a clause in ergo using a template', async () => {
-        const response = await Commands.trigger(templateJs, undefined, sample, data, [request], state);
+        const response = await Commands.trigger(templateJs, null, sample, data, [request], state);
         response.response.$class.should.be.equal('org.accordproject.latedeliveryandpenalty.LateDeliveryAndPenaltyResponse');
         response.response.penalty.should.be.equal(4);
         response.response.buyerMayTerminate.should.be.equal(true);
@@ -684,7 +684,7 @@ describe('#trigger-javascript', () => {
 
 describe('#trigger-slc', () => {
     it('should trigger a smart legal contract in ergo', async () => {
-        const response = await Commands.trigger(undefined, slcArchive, null, [slcRequest], slcState);
+        const response = await Commands.trigger(null, slcArchive, null, null, [slcRequest], slcState);
         response.response.$class.should.be.equal('org.accordproject.installmentsale.Balance');
         response.response.balance.should.be.equal(7612.499999999999);
         response.state.$class.should.be.equal('org.accordproject.installmentsale.InstallmentSaleState');
@@ -879,7 +879,8 @@ describe('#validateInvokeArgs', () => {
         const args  = Commands.validateInvokeArgs({
             _: ['trigger'],
             contract: 'installment-sale@0.1.0-316a9177c6d52bfd4e1df6d543ddab775cc217cdb44f92120e2f24bd11f8381b.slc',
-            params: ['installment-sale-ergo/params.json']
+            clauseName: 'latedeliveryandpenalty',
+            params: 'installment-sale-ergo/params.json'
         });
         args.contract.should.match(/.slc$/);
     });
@@ -901,6 +902,7 @@ describe('#invoke', () => {
     });
 
     it('should invoke a clause using a template archive and sample', async () => {
+        const response = await Commands.invoke(template, null, sample, null, 'latedeliveryandpenalty', params, state);
         response.response.$class.should.be.equal('org.accordproject.latedeliveryandpenalty.LateDeliveryAndPenaltyResponse');
         response.response.penalty.should.be.equal(4);
         response.response.buyerMayTerminate.should.be.equal(true);
@@ -914,14 +916,14 @@ describe('#invoke', () => {
     });
 
     it('should invoke with default state when state is not found with sample', async () => {
-        const response = await Commands.invoke(template, sample, null, 'latedeliveryandpenalty', params, stateErr);
+        const response = await Commands.invoke(template, null, sample, null, 'latedeliveryandpenalty', params, stateErr);
         response.response.$class.should.be.equal('org.accordproject.latedeliveryandpenalty.LateDeliveryAndPenaltyResponse');
         response.response.penalty.should.be.equal(4);
         response.response.buyerMayTerminate.should.be.equal(true);
     });
 
     it('should invoke with default state when state is not found with data', async () => {
-        const response = await Commands.invoke(template, null, data, 'latedeliveryandpenalty', params, stateErr);
+        const response = await Commands.invoke(template, null, null, data, 'latedeliveryandpenalty', params, stateErr);
         response.response.$class.should.be.equal('org.accordproject.latedeliveryandpenalty.LateDeliveryAndPenaltyResponse');
         response.response.penalty.should.be.equal(4);
         response.response.buyerMayTerminate.should.be.equal(true);
@@ -929,12 +931,12 @@ describe('#invoke', () => {
 
     it('should get null response when params not found', async () => {
         const response = await Commands.invoke(template, sample, data, 'latedeliveryandpenalty', paramsErr, state);
-        should.equal(response,undefined);
+        should.equal(response, undefined);
     });
 
     it('should fail invoke on a bogus request', async () => {
         const response = await Commands.invoke(template, null, sample, data, paramsErr, state);
-        should.equal(response,undefined);
+        should.equal(response, undefined);
     });
 
     it('should invoke a clause using a template (with currentTime set)', async () => {
@@ -947,7 +949,7 @@ describe('#invoke', () => {
 
 describe('#invoke-slc', () => {
     it('should invoke a smart legal contract in ergo', async () => {
-        const response = await Commands.invoke(undefined, slcArchive, null, 'PayInstallment', slcParams, slcState, '2017-12-19T17:38:01Z');
+        const response = await Commands.invoke(null, slcArchive, null, null, 'PayInstallment', slcParams, slcState, '2017-12-19T17:38:01Z');
         response.response.$class.should.be.equal('org.accordproject.installmentsale.Balance');
         response.response.balance.should.be.equal(7612.499999999999);
         response.state.$class.should.be.equal('org.accordproject.installmentsale.InstallmentSaleState');
@@ -1063,35 +1065,35 @@ describe('#initialize', () => {
     });
 
     it('should initialize a clause using a template archive', async () => {
-        const response = await Commands.initialize(templateArchive, null, sample, null);
+        const response = await Commands.initialize(templateArchive, null, sample, null, params);
         response.state.$class.should.be.equal('org.accordproject.runtime.State');
         response.params.request.$class.should.be.equal('org.accordproject.latedeliveryandpenalty.LateDeliveryAndPenaltyRequest');
     });
 
     it('should initialize a clause using a template archive with sample', async () => {
-        const response = await Commands.initialize(templateArchive, sample);
+        const response = await Commands.initialize(templateArchive, null, sample);
         response.state.$class.should.be.equal('org.accordproject.runtime.State');
     });
     it('should initialize a clause using a template archive with sample and params', async () => {
-        const response = await Commands.initialize(templateArchive, sample, null, params);
+        const response = await Commands.initialize(templateArchive, null, sample, null, params);
         response.state.$class.should.be.equal('org.accordproject.runtime.State');
         response.params.request.$class.should.be.equal('org.accordproject.latedeliveryandpenalty.LateDeliveryAndPenaltyRequest');
     });
     it('should initialize a clause using a template with data', async () => {
-        const response = await Commands.initialize(template, null, data);
+        const response = await Commands.initialize(template, null, null, data);
         response.state.$class.should.be.equal('org.accordproject.runtime.State');
     });
     it('should initialize a clause using a template with data and params', async () => {
-        const response = await Commands.initialize(template, null, data, params);
+        const response = await Commands.initialize(template, null, null, data, params);
         response.state.$class.should.be.equal('org.accordproject.runtime.State');
         response.params.request.$class.should.be.equal('org.accordproject.latedeliveryandpenalty.LateDeliveryAndPenaltyRequest');
     });
     it('should initialize a clause using a template archive with data', async () => {
-        const response = await Commands.initialize(templateArchive, null, data);
+        const response = await Commands.initialize(templateArchive, null, null, data);
         response.state.$class.should.be.equal('org.accordproject.runtime.State');
     });
     it('should initialize a clause using a template archive with data and params', async () => {
-        const response = await Commands.initialize(templateArchive, null, data, params);
+        const response = await Commands.initialize(templateArchive, null, null, data, params);
         response.state.$class.should.be.equal('org.accordproject.runtime.State');
         response.params.request.$class.should.be.equal('org.accordproject.latedeliveryandpenalty.LateDeliveryAndPenaltyRequest');
     });
@@ -1103,8 +1105,7 @@ describe('#initialize', () => {
 
 describe('#intialize-slc', () => {
     it('should intialize a smart legal contract in ergo', async () => {
-        const response = await Commands.initialize(undefined, slcArchive, null);
-        console.log(`RESP ${JSON.stringify(response)}`);
+        const response = await Commands.initialize(null, slcArchive, null);
         response.response.$class.should.be.equal('org.accordproject.runtime.Response');
         response.state.$class.should.be.equal('org.accordproject.installmentsale.InstallmentSaleState');
         response.state.balance_remaining.should.be.equal(10000);
