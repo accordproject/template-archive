@@ -1,0 +1,103 @@
+{
+  "name": "@accordproject/cicero-transform",
+  "version": "0.22.2",
+  "description": "Cicero Core - Import and export between other formats",
+  "engines": {
+    "node": ">=12",
+    "npm": ">=5"
+  },
+  "publishConfig": {
+    "access": "public"
+  },
+  "files": [
+    "lib",
+    "umd"
+  ],
+  "main": "index.js",
+  "scripts": {
+    "pretest": "npm run lint",
+    "lint": "eslint .",
+    "postlint": "npm run licchk",
+    "licchk": "license-check",
+    "test:mocha": "mocha",
+    "test:windows": "npm run test:mocha",
+    "test": "npm run test:mocha",
+    "test:cov": "nyc npm run test",
+    "jsdoc": "jsdoc -c jsdoc.json package.json",
+    "typescript": "jsdoc -t node_modules/tsd-jsdoc/dist -r ./lib/"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/accordproject/cicero.git",
+    "directory": "packages/cicero-core"
+  },
+  "keywords": [
+    "accord",
+    "cicero",
+    "smart",
+    "contract"
+  ],
+  "author": "accordproject.org",
+  "license": "Apache-2.0",
+  "bugs": {
+    "url": "https://github.com/accordproject/cicero/issues"
+  },
+  "homepage": "https://github.com/accordproject/cicero",
+  "devDependencies": {
+    "@istanbuljs/nyc-config-babel": "2.1.1",
+    "chai": "4.2.0",
+    "chai-as-promised": "7.1.1",
+    "chai-things": "0.2.0",
+    "eslint": "6.0.1",
+    "jsdoc": "3.6.3",
+    "license-check": "1.1.5",
+    "mocha": "6.1.4",
+    "mock-require": "^3.0.3",
+    "nyc": "14.1.1",
+    "tsd-jsdoc": "^2.3.0"
+  },
+  "dependencies": {
+    "@accordproject/cicero-core": "0.22.2",
+    "@accordproject/concerto-core": "1.2.1",
+    "@accordproject/markdown-transform": "0.14.1-20210629165557",
+    "uuid": "3.3.2",
+    "xregexp": "4.2.4"
+  },
+  "license-check-config": {
+    "src": [
+      "**/*.js",
+      "!./test/data/**/*",
+      "!./coverage/**/*",
+      "!./node_modules/**/*",
+      "!./out/**/*"
+    ],
+    "path": "header.txt",
+    "blocking": true,
+    "logInfo": false,
+    "logError": true
+  },
+  "nyc": {
+    "produce-source-map": "true",
+    "sourceMap": "inline",
+    "reporter": [
+      "lcov",
+      "text",
+      "text-summary",
+      "html",
+      "json"
+    ],
+    "include": [
+      "lib/**/*.js"
+    ],
+    "exclude": [
+      "lib/tdl.js",
+      "lib/compiled_template.js"
+    ],
+    "all": true,
+    "check-coverage": true,
+    "statements": 88,
+    "branches": 76,
+    "functions": 84,
+    "lines": 88
+  }
+}
