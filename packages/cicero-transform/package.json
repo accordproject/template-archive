@@ -1,7 +1,7 @@
 {
-  "name": "@accordproject/cicero-core",
+  "name": "@accordproject/cicero-transform",
   "version": "0.22.1",
-  "description": "Cicero Core - Implementation of Accord Protocol Template Specification",
+  "description": "Cicero Core - Import and export between other formats",
   "engines": {
     "node": ">=12",
     "npm": ">=5"
@@ -15,13 +15,7 @@
   ],
   "main": "index.js",
   "scripts": {
-    "webpack": "webpack --config webpack.config.js --mode production",
-    "build": "babel src -d lib --copy-files",
-    "build:dist": "NODE_ENV=production babel src -d lib --copy-files",
-    "build:watch": "babel src -d lib --copy-files --watch",
-    "prepublishOnly": "npm run build:dist && npm run webpack",
-    "prepare": "npm run build",
-    "pretest": "npm run lint && npm run build",
+    "pretest": "npm run lint",
     "lint": "eslint .",
     "postlint": "npm run licchk",
     "licchk": "license-check",
@@ -30,7 +24,7 @@
     "test": "npm run test:mocha",
     "test:cov": "nyc npm run test",
     "jsdoc": "jsdoc -c jsdoc.json package.json",
-    "typescript": "jsdoc -t node_modules/tsd-jsdoc/dist -r ./src/"
+    "typescript": "jsdoc -t node_modules/tsd-jsdoc/dist -r ./lib/"
   },
   "repository": {
     "type": "git",
@@ -50,16 +44,7 @@
   },
   "homepage": "https://github.com/accordproject/cicero",
   "devDependencies": {
-    "@babel/cli": "7.4.4",
-    "@babel/core": "7.4.5",
-    "@babel/preset-env": "7.4.5",
-    "@babel/register": "7.4.4",
     "@istanbuljs/nyc-config-babel": "2.1.1",
-    "archiver": "3.0.0",
-    "babel-core": "7.0.0-bridge.0",
-    "babel-loader": "8.0.6",
-    "babel-plugin-istanbul": "5.1.4",
-    "babel-preset-env": "1.7.0",
     "chai": "4.2.0",
     "chai-as-promised": "7.1.1",
     "chai-things": "0.2.0",
@@ -69,30 +54,12 @@
     "mocha": "6.1.4",
     "mock-require": "^3.0.3",
     "nyc": "14.1.1",
-    "raw-loader": "^3.0.0",
-    "tsd-jsdoc": "^2.3.0",
-    "webpack": "^4.35.0",
-    "webpack-cli": "^3.3.5"
+    "tsd-jsdoc": "^2.3.0"
   },
   "dependencies": {
+    "@accordproject/cicero-core": "0.22.1",
     "@accordproject/concerto-core": "1.0.2",
-    "@accordproject/ergo-compiler": "0.22.1",
-    "@accordproject/ergo-engine": "0.22.1",
-    "@accordproject/markdown-cicero": "0.14.1-20210629165557",
-    "@accordproject/markdown-common": "0.14.1-20210629165557",
-    "@accordproject/markdown-html": "0.14.1-20210629165557",
-    "@accordproject/markdown-slate": "0.14.1-20210629165557",
-    "@accordproject/markdown-template": "0.14.1-20210629165557",
-    "axios": "0.21.1",
-    "debug": "4.1.0",
-    "ietf-language-tag-regex": "0.0.5",
-    "json-stable-stringify": "1.0.1",
-    "jszip": "3.7.0",
-    "node-cache": "4.2.0",
-    "node-forge": "^0.10.0",
-    "request": "2.88.0",
-    "semver": "6.3.0",
-    "slash": "3.0.0",
+    "@accordproject/markdown-transform": "0.14.1-20210629165557",
     "uuid": "3.3.2",
     "xregexp": "4.2.4"
   },
@@ -102,9 +69,7 @@
       "!./test/data/**/*",
       "!./coverage/**/*",
       "!./node_modules/**/*",
-      "!./out/**/*",
-      "!./lib/**/*",
-      "!./umd/cicero.js"
+      "!./out/**/*"
     ],
     "path": "header.txt",
     "blocking": true,
@@ -122,7 +87,7 @@
       "json"
     ],
     "include": [
-      "src/**/*.js"
+      "lib/**/*.js"
     ],
     "exclude": [
       "lib/tdl.js",
@@ -134,6 +99,5 @@
     "branches": 76,
     "functions": 84,
     "lines": 88
-  },
-  "gitHead": "514fd02f46752e018aedb77e1716a212ef4a59e5"
+  }
 }
