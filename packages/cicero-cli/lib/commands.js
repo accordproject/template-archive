@@ -19,6 +19,7 @@ const Template = require('@accordproject/cicero-core').Template;
 const ClauseInstance = require('@accordproject/cicero-core').ClauseInstance;
 const ContractInstance = require('@accordproject/cicero-core').ContractInstance;
 const Engine = require('@accordproject/cicero-engine').Engine;
+const Export = require('@accordproject/cicero-transform').Export;
 const CodeGen = require('@accordproject/cicero-tools').CodeGen;
 const FileWriter = CodeGen.FileWriter;
 const fs = require('fs');
@@ -753,6 +754,80 @@ class Commands {
                 return `Loaded external models in '${output}'.`;
             });
     }
+
+    /**
+     * Set default params before we export a contract
+     *
+     * @param {object} argv - the inbound argument values object
+     * @returns {object} a modfied argument object
+     */
+    static validateExportArgs(argv) {
+        argv = Commands.validateCommonArgs(argv);
+
+        if(argv.verbose) {
+            Logger.info(`export contract to format ${argv.format}`);
+        }
+
+        return argv;
+    }
+
+    /**
+     * Export a contract to a given format
+     *
+     * @param {string} slcPath - path to the smart legal contract archive
+     * @param {string} outputPath - to the contract file
+     * @param {string} [currentTime] - the definition of 'now', defaults to current time
+     * @param {number} [utcOffset] - UTC Offset for this execution, defaults to local offset
+     * @param {Object} [options] - an optional set of options
+     * @returns {object} Promise to the result of parsing
+     */
+    static async export(slcPath, outputPath, currentTime, utcOffset, options) {
+        return Commands.loadInstance(null, slcPath, null, currentTime, utcOffset, options)
+            .then(async function (instance) {
+                const format = options.format;
+                const result = await Export.toFormat(instance, format, utcOffset, options);
+                const destinationFormat = Export.formatDescriptor(format);
+                if (destinationFormat.fileFormat !== 'binary') {
+                    Logger.info('\n'+result);
+                } else {
+                    Logger.info(`\n<binary ${format} data>`);
+                }
+                if (outputPath) {
+                    Commands.printFormatToFile(result, format, outputPath);
+                }
+                return result;
+            })
+            .catch((err) => {
+                Logger.error(err.message);
+            });
+    }
+
+    /**
+     * Prints a format to string
+     * @param {*} input the input
+     * @param {string} format the format
+     * @returns {string} the string representation
+     */
+    static printFormatToString(input, format) {
+        const fileFormat = Export.formatDescriptor(format).fileFormat;
+        if (fileFormat === 'json') {
+            return JSON.stringify(input);
+        } else {
+            return input;
+        }
+    }
+
+    /**
+     * Prints a format to file
+     * @param {*} input the input
+     * @param {string} format the format
+     * @param {string} filePath the file name
+     */
+    static printFormatToFile(input, format, filePath) {
+        Logger.info('Creating file: ' + filePath);
+        fs.writeFileSync(filePath, Commands.printFormatToString(input,format));
+    }
+
 }
 
 module.exports = Commands;
