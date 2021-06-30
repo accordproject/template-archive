@@ -110,7 +110,8 @@ require('yargs')
         });
         yargs.option('format', {
             describe: 'target format',
-            type: 'string'
+            type: 'string',
+            default: 'markdown'
         });
         yargs.option('unquoteVariables', {
             describe: 'remove variables quoting',
@@ -187,7 +188,8 @@ require('yargs')
         });
         yargs.option('format', {
             describe: 'target format',
-            type: 'string'
+            type: 'string',
+            default: 'markdown'
         });
         yargs.option('unquoteVariables', {
             describe: 'remove variables quoting',
@@ -541,6 +543,59 @@ require('yargs')
             return Commands.get(argv.template, argv.output)
                 .then((result) => {
                     Logger.info(result);
+                })
+                .catch((err) => {
+                    Logger.error(err.message);
+                });
+        } catch (err){
+            Logger.error(err.message);
+            return;
+        }
+    })
+    .command('export', 'export smart legal contract to a different format', (yargs) => {
+        yargs.option('contract', {
+            describe: 'path to a smart legal contract',
+            type: 'string'
+        });
+        yargs.option('output', {
+            describe: 'path to the output file',
+            type: 'string'
+        });
+        yargs.option('currentTime', {
+            describe: 'set current time',
+            type: 'string',
+            default: null
+        });
+        yargs.option('utcOffset', {
+            describe: 'set UTC offset',
+            type: 'number',
+            default: null
+        });
+        yargs.option('format', {
+            describe: 'target format',
+            type: 'string',
+            default: 'markdown'
+        });
+        yargs.option('warnings', {
+            describe: 'print warnings',
+            type: 'boolean',
+            default: false
+        });
+    }, (argv) => {
+        if (argv.verbose) {
+            Logger.info(`export contract to format ${argv.format}`);
+        }
+
+        try {
+            argv = Commands.validateExportArgs(argv);
+            const options = {
+                offline: true,
+                unquoteVariables: true,
+                warnings: argv.warnings,
+                format: argv.format,
+            };
+            return Commands.export(argv.contract, argv.output, argv.currentTime, argv.utcOffset, options)
+                .then((result) => {
                 })
                 .catch((err) => {
                     Logger.error(err.message);

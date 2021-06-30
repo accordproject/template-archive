@@ -22,6 +22,7 @@ const should = require('chai').should();
 
 const Template = require('@accordproject/cicero-core').Template;
 
+const expect = chai.expect;
 chai.should();
 chai.use(require('chai-things'));
 chai.use(require('chai-as-promised'));
@@ -1165,3 +1166,62 @@ describe('#get', async () => {
     });
 });
 
+describe('#validateExportArgs', () => {
+    it('all args specified', () => {
+        process.chdir(path.resolve(__dirname, 'data'));
+        const args  = Commands.validateExportArgs({
+            _: ['export'],
+            contract: 'installment-sale@0.1.0-316a9177c6d52bfd4e1df6d543ddab775cc217cdb44f92120e2f24bd11f8381b.slc',
+            format: 'pdf'
+        });
+        args.contract.should.match(/.slc$/);
+    });
+
+    it('all args specified (verbose)', () => {
+        process.chdir(path.resolve(__dirname, 'data'));
+        const args  = Commands.validateExportArgs({
+            _: ['export'],
+            contract: 'installment-sale@0.1.0-316a9177c6d52bfd4e1df6d543ddab775cc217cdb44f92120e2f24bd11f8381b.slc',
+            format: 'pdf',
+            verbose: true,
+        });
+        args.contract.should.match(/.slc$/);
+    });
+});
+
+describe('#export', async () => {
+    it('should export a smart legal contract to markdown', async () => {
+        const result = await Commands.export(slcArchive, null, null, null, { format: 'markdown' });
+        result.should.equal('"Dan" agrees to pay to "Ned" the total sum e10000.0, in the manner following:\n\nE500.0 is to be paid at closing, and the remaining balance of E9500.0 shall be paid as follows:\n\nE500.0 or more per month on the first day of each and every month, and continuing until the entire balance, including both principal and interest, shall be paid in full -- provided, however, that the entire balance due plus accrued interest and any other amounts due here-under shall be paid in full on or before 24 months.\n\nMonthly payments, which shall start on month 3, include both principal and interest with interest at the rate of 1.5%, computed monthly on the remaining balance from time to time unpaid.');
+    });
+
+    it('should export a smart legal contract to ciceromark', async () => {
+        const result = await Commands.export(slcArchive, null, null, null, { format: 'ciceromark' });
+        result.$class.should.equal('org.accordproject.commonmark.Document');
+    });
+
+    it('should export a smart legal contract to ciceromark (output file)', async () => {
+        const tmpFile = await tmp.file();
+        const tmpJson = tmpFile.path + '.json';
+        const result = await Commands.export(slcArchive, tmpJson, null, null, { format: 'ciceromark' });
+        result.$class.should.equal('org.accordproject.commonmark.Document');
+        tmpFile.cleanup();
+    });
+
+    it('should export a smart legal contract to pdf', async () => {
+        const result = await Commands.export(slcArchive, null, null, null, { format: 'pdf' });
+        result.should.not.be.null;
+    });
+
+    it('should export a smart legal contract to pdf (output file)', async () => {
+        const tmpFile = await tmp.file();
+        const tmpPdf = tmpFile.path + '.pdf';
+        const result = await Commands.export(slcArchive, tmpPdf, null, null, { format: 'pdf' });
+        result.should.not.be.null;
+        tmpFile.cleanup();
+    });
+
+    it('should throw for an unknown format', async () => {
+        expect(await Commands.export(slcArchive, null, null, null, { format: 'foobar' })).to.be.undefined;
+    });
+});
