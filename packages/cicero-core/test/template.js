@@ -157,6 +157,14 @@ describe('Template', () => {
 
     describe('#fromDirectory', () => {
 
+        it('should create a template from a directory with signatures of the template developer', () => {
+            return Template.fromDirectory('./test/data/verifying-template-signature/helloworldstateSigned', options).should.be.fulfilled;
+        });
+
+        it('should create a template from a directory without signatures of the template developer', () => {
+            return Template.fromDirectory('./test/data/verifying-template-signature/helloworldstateUnsigned', options).should.be.fulfilled;
+        });
+
         it('should create a template from a directory with no @ClauseDataLogic in logic', () => {
             return Template.fromDirectory('./test/data/no-logic', options).should.be.fulfilled;
         });
@@ -172,6 +180,14 @@ describe('Template', () => {
 
         it('should create a template from a directory', () => {
             return Template.fromDirectory('./test/data/latedeliveryandpenalty', options).should.be.fulfilled;
+        });
+
+        it('should throw error when date of the signature is tampered', async () => {
+            return Template.fromDirectory('./test/data/verifying-template-signature/helloworldstateTamperDate', options).should.be.rejectedWith('Template\'s author signature is invalid!');
+        });
+
+        it('should throw error when the template signature is tampered', async () => {
+            return Template.fromDirectory('./test/data/verifying-template-signature/helloworldstateTamperSign', options).should.be.rejectedWith('Template\'s author signature is invalid!');
         });
 
         it('should throw error when Ergo logic does not parse', async () => {
@@ -382,6 +398,11 @@ In case of delayed delivery except for Force Majeure cases, the Seller shall pay
     });
 
     describe('#fromArchive', () => {
+
+        it('should create a template from a signed template archive', () => {
+            const buffer = fs.readFileSync('./test/data/verifying-template-signature/archiveSigned.cta');
+            return Template.fromArchive(buffer).should.be.fulfilled;
+        });
 
         it('should create a template from an archive', async () => {
             const buffer = fs.readFileSync('./test/data/latedeliveryandpenalty.cta');
