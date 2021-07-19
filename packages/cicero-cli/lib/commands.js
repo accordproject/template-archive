@@ -614,11 +614,14 @@ class Commands {
     static archive(templatePath, target, outputPath, options) {
         return Commands.loadTemplate(templatePath, options)
             .then(async (template) => {
-                const keystore = {};
+                let keystore = null;
                 if (options.keystore.path) {
                     const p12File = fs.readFileSync(options.keystore.path, { encoding: 'base64' });
-                    keystore.p12File = p12File;
-                    keystore.passphrase = options.keystore.passphrase;
+                    const inputKeystore = {
+                        p12File: p12File,
+                        passphrase: options.keystore.passphrase
+                    };
+                    keystore = inputKeystore;
                 }
                 const archive = await template.toArchive(target, {keystore});
                 let file;
