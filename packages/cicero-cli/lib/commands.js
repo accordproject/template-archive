@@ -68,11 +68,11 @@ class Commands {
      */
     static validateCommonArgs(argv) {
         // the user typed 'cicero [command] [template]'
-        if(argv._.length === 2){
+        if (argv._.length === 2) {
             argv.template = argv._[1];
         }
 
-        if(!argv.template){
+        if (!argv.template) {
             Logger.info('Using current directory as template folder');
             argv.template = '.';
         }
@@ -80,15 +80,20 @@ class Commands {
         argv.template = path.resolve(argv.template);
 
         if (!Commands.isTemplateArchive(argv.template)) {
-            const packageJsonExists = fs.existsSync(path.resolve(argv.template,'package.json'));
+            const packageJsonExists = fs.existsSync(path.resolve(argv.template, 'package.json'));
             let isAPTemplate = false;
-            if(packageJsonExists){
-                let packageJsonContents = JSON.parse(fs.readFileSync(path.resolve(argv.template,'package.json')),'utf8');
+            if (packageJsonExists) {
+                let packageJsonContents = JSON.parse(
+                    fs.readFileSync(path.resolve(argv.template, 'package.json')),
+                    'utf8'
+                );
                 isAPTemplate = packageJsonContents.accordproject;
             }
 
-            if(!packageJsonExists || !isAPTemplate){
-                throw new Error(`${argv.template} is not a valid cicero template. Make sure that package.json exists and that it has a cicero entry.`);
+            if (!packageJsonExists || !isAPTemplate) {
+                throw new Error(
+                    `${argv.template} is not a valid cicero template. Make sure that package.json exists and that it has a cicero entry.`
+                );
             }
         }
 
@@ -106,7 +111,7 @@ class Commands {
      * @returns {object} a modified argument object
      */
     static setDefaultFileArg(argv, argName, argDefaultName, argDefaultFun) {
-        if(!argv[argName]){
+        if (!argv[argName]) {
             Logger.info(`Loading a default ${argDefaultName} file.`);
             argv[argName] = argDefaultFun(argv, argDefaultName);
         }
@@ -126,8 +131,10 @@ class Commands {
             argExists = fs.existsSync(argv[argName]);
         }
 
-        if (!argExists){
-            throw new Error(`A ${argDefaultName} file is required. Try the --${argName} flag or create a ${argDefaultName} in your template.`);
+        if (!argExists) {
+            throw new Error(
+                `A ${argDefaultName} file is required. Try the --${argName} flag or create a ${argDefaultName} in your template.`
+            );
         } else {
             return argv;
         }
@@ -141,9 +148,11 @@ class Commands {
      */
     static validateParseArgs(argv) {
         argv = Commands.validateCommonArgs(argv);
-        argv = Commands.setDefaultFileArg(argv, 'sample', 'text/sample.md', ((argv, argDefaultName) => { return path.resolve(argv.template,argDefaultName); }));
+        argv = Commands.setDefaultFileArg(argv, 'sample', 'text/sample.md', (argv, argDefaultName) => {
+            return path.resolve(argv.template, argDefaultName);
+        });
 
-        if(argv.verbose) {
+        if (argv.verbose) {
             Logger.info(`parse sample ${argv.sample} using a template ${argv.template}`);
         }
 
@@ -171,7 +180,7 @@ class Commands {
                 clause.parse(sampleText, currentTime, utcOffset, samplePath);
                 if (outputPath) {
                     Logger.info('Creating file: ' + outputPath);
-                    fs.writeFileSync(outputPath, JSON.stringify(clause.getData(),null,2));
+                    fs.writeFileSync(outputPath, JSON.stringify(clause.getData(), null, 2));
                 }
                 return clause.getData();
             })
@@ -188,9 +197,11 @@ class Commands {
      */
     static validateDraftArgs(argv) {
         argv = Commands.validateCommonArgs(argv);
-        argv = Commands.setDefaultFileArg(argv, 'data', 'data.json', ((argv, argDefaultName) => { return path.resolve(argv.template,argDefaultName); }));
+        argv = Commands.setDefaultFileArg(argv, 'data', 'data.json', (argv, argDefaultName) => {
+            return path.resolve(argv.template, argDefaultName);
+        });
 
-        if(argv.verbose) {
+        if (argv.verbose) {
             Logger.info(`draft text from data ${argv.data} using a template ${argv.template}`);
         }
 
@@ -220,9 +231,11 @@ class Commands {
                 if (outputPath) {
                     Logger.info('Creating file: ' + outputPath);
                     let text;
-                    if (options &&
+                    if (
+                        options &&
                         options.format &&
-                        (options.format === 'slate' || options.format === 'ciceromark_parsed')) {
+                        (options.format === 'slate' || options.format === 'ciceromark_parsed')
+                    ) {
                         text = JSON.stringify(drafted);
                     } else {
                         text = drafted;
@@ -276,7 +289,7 @@ class Commands {
                 clause.parse(sampleText, currentTime, utcOffset, samplePath);
                 if (outputPath) {
                     Logger.info('Creating file: ' + outputPath);
-                    fs.writeFileSync(outputPath, JSON.stringify(clause.getData(),null,2));
+                    fs.writeFileSync(outputPath, JSON.stringify(clause.getData(), null, 2));
                 }
                 const text = clause.draft(options, currentTime, utcOffset);
                 if (outputPath) {
@@ -298,13 +311,39 @@ class Commands {
      */
     static validateTriggerArgs(argv) {
         argv = Commands.validateCommonArgs(argv);
-        argv = Commands.setDefaultFileArg(argv, 'sample', 'text/sample.md', ((argv, argDefaultName) => { return path.resolve(argv.template,argDefaultName); }));
-        argv = Commands.setDefaultFileArg(argv, 'request', 'request.json', ((argv, argDefaultName) => { return [path.resolve(argv.template,argDefaultName)]; }));
 
-        if(argv.verbose) {
-            Logger.info(`trigger sample ${argv.sample} using a template ${argv.template} with request ${argv.request} with state ${argv.state}`);
+        // Trigger command must receive data either via --sample arg or --data arg.
+        // At least one must be specified.
+        // If both specified then defaults to --sample arg data.
+        if (argv.sample) {
+            argv = Commands.setDefaultFileArg(argv, 'sample', 'text/sample.md', (argv, argDefaultName) => {
+                return path.resolve(argv.template, argDefaultName);
+            });
+        } else if (argv.data) {
+            argv = Commands.setDefaultFileArg(argv, 'data', './data.json', (argv, argDefaultName) => {
+                return path.resolve(argv.template, argDefaultName);
+            });
+        } else {
+            Logger.error(
+                'No data was provided. Try the --sample flag to provide data in markdown format or the --data flag to provide data in JSON format.'
+            );
         }
 
+        argv = Commands.setDefaultFileArg(argv, 'request', 'request.json', (argv, argDefaultName) => {
+            return [path.resolve(argv.template, argDefaultName)];
+        });
+
+        if (argv.verbose) {
+            if (argv.sample) {
+                Logger.info(
+                    `trigger: \n - Sample: ${argv.sample} \n - Template: ${argv.template} \n - Request: ${argv.request} \n - State: ${argv.state}`
+                );
+            } else if (argv.data) {
+                Logger.info(
+                    `trigger: \n - Data: ${argv.data} \n - Template: ${argv.template} \n - Request: ${argv.request} \n - State: ${argv.state}`
+                );
+            }
+        }
         return argv;
     }
 
@@ -313,6 +352,7 @@ class Commands {
      *
      * @param {string} templatePath - path to the template directory or archive
      * @param {string} samplePath - to the sample file
+     * @param {string} dataPath - to the data file
      * @param {string[]} requestsPath - to the array of request files
      * @param {string} statePath - to the state file
      * @param {string} [currentTime] - the definition of 'now', defaults to current time
@@ -320,11 +360,22 @@ class Commands {
      * @param {Object} [options] - an optional set of options
      * @returns {object} Promise to the result of execution
      */
-    static trigger(templatePath, samplePath, requestsPath, statePath, currentTime, utcOffset, options) {
+    static trigger(templatePath, samplePath, dataPath, requestsPath, statePath, currentTime, utcOffset, options) {
         let clause;
-        const sampleText = fs.readFileSync(samplePath, 'utf8');
-        let requestsJson = [];
+        let sampleText;
+        let dataJson;
 
+        if (samplePath) {
+            sampleText = fs.readFileSync(samplePath, 'utf8');
+        } else if (dataPath) {
+            dataJson = JSON.parse(fs.readFileSync(dataPath, 'utf8'));
+        } else {
+            Logger.error(
+                'No data was provided. Try the --sample flag to provide data in markdown format or the --data flag to provide data in JSON format.'
+            );
+        }
+
+        let requestsJson = [];
         for (let i = 0; i < requestsPath.length; i++) {
             requestsJson.push(JSON.parse(fs.readFileSync(requestsPath[i], 'utf8')));
         }
@@ -334,11 +385,21 @@ class Commands {
             .then(async (template) => {
                 // Initialize clause
                 clause = new Clause(template);
-                clause.parse(sampleText, currentTime, utcOffset);
+                if (sampleText) {
+                    clause.parse(sampleText, currentTime, utcOffset);
+                } else if (dataJson) {
+                    clause.setData(dataJson);
+                } else {
+                    Logger.warn(
+                        'No data was provided. Try the --sample flag to provide data in markdown format or the --data flag to provide data in JSON format.'
+                    );
+                }
 
                 let stateJson;
-                if(!fs.existsSync(statePath)) {
-                    Logger.warn('A state file was not provided, initializing state. Try the --state flag or create a state.json in the root folder of your template.');
+                if (!fs.existsSync(statePath)) {
+                    Logger.warn(
+                        'A state file was not provided, initializing state. Try the --state flag or create a state.json in the root folder of your template.'
+                    );
                     const initResult = await engine.init(clause, currentTime, utcOffset);
                     stateJson = initResult.state;
                 } else {
@@ -350,7 +411,7 @@ class Commands {
                 const initResponse = engine.trigger(clause, firstRequest, stateJson, currentTime, utcOffset);
                 // Get all the other requests and chain execution through Promise.reduce()
                 const otherRequests = requestsJson.slice(1, requestsJson.length);
-                return otherRequests.reduce((promise,requestJson) => {
+                return otherRequests.reduce((promise, requestJson) => {
                     return promise.then((result) => {
                         return engine.trigger(clause, requestJson, result.state, currentTime, utcOffset);
                     });
@@ -369,10 +430,14 @@ class Commands {
      */
     static validateInvokeArgs(argv) {
         argv = Commands.validateCommonArgs(argv);
-        argv = Commands.setDefaultFileArg(argv, 'sample', 'text/sample.md', ((argv, argDefaultName) => { return path.resolve(argv.template,argDefaultName); }));
-        argv = Commands.setDefaultFileArg(argv, 'params', 'params.json', ((argv, argDefaultName) => { return [path.resolve(argv.template,argDefaultName)]; }));
+        argv = Commands.setDefaultFileArg(argv, 'sample', 'text/sample.md', (argv, argDefaultName) => {
+            return path.resolve(argv.template, argDefaultName);
+        });
+        argv = Commands.setDefaultFileArg(argv, 'params', 'params.json', (argv, argDefaultName) => {
+            return [path.resolve(argv.template, argDefaultName)];
+        });
 
-        if(argv.verbose) {
+        if (argv.verbose) {
             Logger.info(`initialize sample ${argv.sample} using a template ${argv.template}`);
         }
 
@@ -405,8 +470,10 @@ class Commands {
                 clause.parse(sampleText, currentTime, utcOffset);
 
                 let stateJson;
-                if(!fs.existsSync(statePath)) {
-                    Logger.warn('A state file was not provided, initializing state. Try the --state flag or create a state.json in the root folder of your template.');
+                if (!fs.existsSync(statePath)) {
+                    Logger.warn(
+                        'A state file was not provided, initializing state. Try the --state flag or create a state.json in the root folder of your template.'
+                    );
                     const initResult = await engine.init(clause, currentTime, utcOffset);
                     stateJson = initResult.state;
                 } else {
@@ -428,9 +495,11 @@ class Commands {
      */
     static validateInitializeArgs(argv) {
         argv = Commands.validateCommonArgs(argv);
-        argv = Commands.setDefaultFileArg(argv, 'sample', 'text/sample.md', ((argv, argDefaultName) => { return path.resolve(argv.template,argDefaultName); }));
+        argv = Commands.setDefaultFileArg(argv, 'sample', 'text/sample.md', (argv, argDefaultName) => {
+            return path.resolve(argv.template, argDefaultName);
+        });
 
-        if(argv.verbose) {
+        if (argv.verbose) {
             Logger.info(`initialize sample ${argv.sample} using a template ${argv.template}`);
         }
 
@@ -476,7 +545,7 @@ class Commands {
     static validateArchiveArgs(argv) {
         argv = Commands.validateCommonArgs(argv);
 
-        if(!argv.target){
+        if (!argv.target) {
             Logger.info('Using ergo as the default target for the archive.');
             argv.target = 'ergo';
         }
@@ -494,22 +563,20 @@ class Commands {
      * @returns {object} Promise to the code creating an archive
      */
     static archive(templatePath, target, outputPath, options) {
-        return Commands.loadTemplate(templatePath, options)
-            .then(async (template) => {
-                const archive = await template.toArchive(target);
-                let file;
-                if (outputPath) {
-                    file = outputPath;
-                }
-                else {
-                    const templateName = template.getMetadata().getName();
-                    const templateVersion = template.getMetadata().getVersion();
-                    file = `${templateName}@${templateVersion}.cta`;
-                }
-                Logger.info('Creating archive: ' + file);
-                fs.writeFileSync(file, archive);
-                return true;
-            });
+        return Commands.loadTemplate(templatePath, options).then(async (template) => {
+            const archive = await template.toArchive(target);
+            let file;
+            if (outputPath) {
+                file = outputPath;
+            } else {
+                const templateName = template.getMetadata().getName();
+                const templateVersion = template.getMetadata().getVersion();
+                file = `${templateName}@${templateVersion}.cta`;
+            }
+            Logger.info('Creating archive: ' + file);
+            fs.writeFileSync(file, archive);
+            return true;
+        });
     }
 
     /**
@@ -521,7 +588,7 @@ class Commands {
     static validateCompileArgs(argv) {
         argv = Commands.validateCommonArgs(argv);
 
-        if(argv.verbose) {
+        if (argv.verbose) {
             Logger.info(`compile using a template ${argv.template}`);
         }
 
@@ -538,13 +605,11 @@ class Commands {
      * @returns {object} Promise to the result of code generation
      */
     static compile(templatePath, target, outputPath, options) {
-
         return Commands.loadTemplate(templatePath, options)
             .then((template) => {
-
                 let visitor = null;
 
-                switch(target) {
+                switch (target) {
                 case 'Go':
                     visitor = new GoLangVisitor();
                     break;
@@ -564,7 +629,7 @@ class Commands {
                     visitor = new JSONSchemaVisitor();
                     break;
                 default:
-                    throw new Error ('Unrecognized code generator: ' + target);
+                    throw new Error('Unrecognized code generator: ' + target);
                 }
 
                 let parameters = {};
@@ -588,7 +653,7 @@ class Commands {
             if (Commands.isTemplateArchive(argv.template)) {
                 argv.output = './model';
             } else {
-                argv.output = path.resolve(argv.template,'model');
+                argv.output = path.resolve(argv.template, 'model');
             }
         }
         return argv;
@@ -603,13 +668,12 @@ class Commands {
      * @return {string} message
      */
     static async get(templatePath, output) {
-        return Commands.loadTemplate(templatePath, {})
-            .then((template) => {
-                const modelManager = template.getModelManager();
-                mkdirp.sync(output);
-                modelManager.writeModelsToFileSystem(output);
-                return `Loaded external models in '${output}'.`;
-            });
+        return Commands.loadTemplate(templatePath, {}).then((template) => {
+            const modelManager = template.getModelManager();
+            mkdirp.sync(output);
+            modelManager.writeModelsToFileSystem(output);
+            return `Loaded external models in '${output}'.`;
+        });
     }
 }
 

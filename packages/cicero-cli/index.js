@@ -226,7 +226,13 @@ require('yargs')
         });
         yargs.option('sample', {
             describe: 'path to the contract text',
-            type: 'string'
+            type: 'string',
+            default: null
+        });
+        yargs.option('data', {
+            describe: 'path to JSON data',
+            type: 'string',
+            default: null
         });
         yargs.option('request', {
             describe: 'path to the JSON request',
@@ -264,7 +270,7 @@ require('yargs')
                 offline: argv.offline,
                 warnings: argv.warnings,
             };
-            return Commands.trigger(argv.template, argv.sample, argv.request, argv.state, argv.currentTime, argv.utcOffset, options)
+            return Commands.trigger(argv.template, argv.sample, argv.data, argv.request, argv.state, argv.currentTime, argv.utcOffset, options)
                 .then((result) => {
                     if(result) {Logger.info(JSON.stringify(result));}
                 })
