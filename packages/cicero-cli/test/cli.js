@@ -459,9 +459,32 @@ describe('#validateTriggerArgs', () => {
             _: ['trigger'],
         });
         args.template.should.match(/cicero-cli[/\\]test[/\\]data[/\\]latedeliveryandpenalty$/);
-        args.sample.should.match(/text[/\\]sample.md$/);
     });
     it('all args specified', () => {
+        process.chdir(path.resolve(__dirname, 'data/latedeliveryandpenalty/'));
+        const args  = Commands.validateTriggerArgs({
+            _: ['trigger'],
+            template: './',
+            sample: 'text/sample.md',
+            data: 'data.json',
+            state: 'state.json'
+        });
+        args.template.should.match(/cicero-cli[/\\]test[/\\]data[/\\]latedeliveryandpenalty$/);
+        args.sample.should.match(/text[/\\]sample.md$/);
+        args.data.should.match(/data.json$/);
+    });
+    it('all args specified except sample', () => {
+        process.chdir(path.resolve(__dirname, 'data/latedeliveryandpenalty/'));
+        const args  = Commands.validateTriggerArgs({
+            _: ['trigger'],
+            template: './',
+            data: 'data.json',
+            state: 'state.json'
+        });
+        args.template.should.match(/cicero-cli[/\\]test[/\\]data[/\\]latedeliveryandpenalty$/);
+        args.data.should.match(/data.json$/);
+    });
+    it('all args specified except data', () => {
         process.chdir(path.resolve(__dirname, 'data/latedeliveryandpenalty/'));
         const args  = Commands.validateTriggerArgs({
             _: ['trigger'],
@@ -478,35 +501,32 @@ describe('#validateTriggerArgs', () => {
             _: ['trigger'],
             template: 'latedeliveryandpenalty',
             sample: 'latedeliveryandpenalty/text/sample.md',
+            data: 'data.json',
             state: 'latedeliveryandpenalty/state.json'
         });
         args.template.should.match(/cicero-cli[/\\]test[/\\]data[/\\]latedeliveryandpenalty$/);
-        args.sample.should.match(/text[/\\]sample.md$/);
     });
-    it('all args specified, parent folder, no sample, no state', () => {
+    it('all args specified, parent folder, no sample, no data, no state', () => {
         process.chdir(path.resolve(__dirname, 'data/'));
         const args  = Commands.validateTriggerArgs({
             _: ['trigger'],
             template: 'latedeliveryandpenalty',
         });
         args.template.should.match(/cicero-cli[/\\]test[/\\]data[/\\]latedeliveryandpenalty$/);
-        args.sample.should.match(/text[/\\]sample.md$/);
     });
-    it('all args specified, child folder, no sample', () => {
+    it('all args specified, child folder, no sample, no data', () => {
         process.chdir(path.resolve(__dirname, 'data/latedeliveryandpenalty/text'));
         const args  = Commands.validateTriggerArgs({
             _: ['trigger'],
             template: '../',
         });
         args.template.should.match(/cicero-cli[/\\]test[/\\]data[/\\]latedeliveryandpenalty$/);
-        args.sample.should.match(/text[/\\]sample.md$/);
     });
     it('no flags specified', () => {
         const args  = Commands.validateTriggerArgs({
             _: ['trigger', path.resolve(__dirname, 'data/latedeliveryandpenalty/')],
         });
         args.template.should.match(/cicero-cli[/\\]test[/\\]data[/\\]latedeliveryandpenalty$/);
-        args.sample.should.match(/text[/\\]sample.md$/);
     });
     it('verbose flag specified', () => {
         process.chdir(path.resolve(__dirname, 'data/latedeliveryandpenalty/'));
@@ -528,6 +548,13 @@ describe('#validateTriggerArgs', () => {
             sample: 'text/sample_en.md'
         })).should.throw('A text/sample.md file is required. Try the --sample flag or create a text/sample.md in your template.');
     });
+    it('bad data.json', () => {
+        process.chdir(path.resolve(__dirname, 'data/latedeliveryandpenalty/'));
+        (() => Commands.validateTriggerArgs({
+            _: ['trigger'],
+            data: 'data_en.md'
+        })).should.throw('A ./data.json file is required. Try the --data flag or create a ./data.json in your template.');
+    });
     it('bad requestjson', () => {
         process.chdir(path.resolve(__dirname, 'data/latedeliveryandpenalty/'));
         (() => Commands.validateTriggerArgs({
@@ -539,40 +566,40 @@ describe('#validateTriggerArgs', () => {
 
 describe('#trigger', () => {
     it('should trigger a clause using a template', async () => {
-        const response = await Commands.trigger(template, sample, [request], state);
+        const response = await Commands.trigger(template, sample, data, [request], state);
         response.response.$class.should.be.equal('org.accordproject.latedeliveryandpenalty.LateDeliveryAndPenaltyResponse');
         response.response.penalty.should.be.equal(4);
         response.response.buyerMayTerminate.should.be.equal(true);
     });
 
     it('should trigger a clause using a template archive', async () => {
-        const response = await Commands.trigger(templateArchive, sample, [request], state);
+        const response = await Commands.trigger(templateArchive, sample, data, [request], state);
         response.response.$class.should.be.equal('org.accordproject.latedeliveryandpenalty.LateDeliveryAndPenaltyResponse');
         response.response.penalty.should.be.equal(4);
         response.response.buyerMayTerminate.should.be.equal(true);
     });
 
     it('should trigger with default state when state is not found', async () => {
-        const response = await Commands.trigger(template, sample, [request], stateErr);
+        const response = await Commands.trigger(template, sample, data, [request], stateErr);
         response.response.$class.should.be.equal('org.accordproject.latedeliveryandpenalty.LateDeliveryAndPenaltyResponse');
         response.response.penalty.should.be.equal(4);
         response.response.buyerMayTerminate.should.be.equal(true);
     });
 
     it('should trigger with more than one request', async () => {
-        const response = await Commands.trigger(template, sample, [request,request], state);
+        const response = await Commands.trigger(template, sample, data, [request,request], state);
         response.response.$class.should.be.equal('org.accordproject.latedeliveryandpenalty.LateDeliveryAndPenaltyResponse');
         response.response.penalty.should.be.equal(4);
         response.response.buyerMayTerminate.should.be.equal(true);
     });
 
     it('should fail trigger on a bogus request', async () => {
-        const response = await Commands.trigger(template, sample, [requestErr], state);
+        const response = await Commands.trigger(template, sample, data, [requestErr], state);
         should.equal(response,undefined);
     });
 
     it('should trigger a clause using a template (with currentTime set)', async () => {
-        const response = await Commands.trigger(template, sample, [request], state, '2017-12-19T17:38:01Z');
+        const response = await Commands.trigger(template, sample, data, [request], state, '2017-12-19T17:38:01Z');
         response.response.$class.should.be.equal('org.accordproject.latedeliveryandpenalty.LateDeliveryAndPenaltyResponse');
         response.response.penalty.should.be.equal(3.1111111111111107);
         response.response.buyerMayTerminate.should.be.equal(false);
@@ -581,7 +608,7 @@ describe('#trigger', () => {
 
 describe('#trigger-ergo', () => {
     it('should trigger a clause in ergo using a template', async () => {
-        const response = await Commands.trigger(template, sample, [request], state);
+        const response = await Commands.trigger(template, sample, data, [request], state);
         response.response.$class.should.be.equal('org.accordproject.latedeliveryandpenalty.LateDeliveryAndPenaltyResponse');
         response.response.penalty.should.be.equal(4);
         response.response.buyerMayTerminate.should.be.equal(true);
@@ -590,7 +617,7 @@ describe('#trigger-ergo', () => {
 
 describe('#trigger-javascript', () => {
     it('should trigger a clause in ergo using a template', async () => {
-        const response = await Commands.trigger(templateJs, sample, [request], state);
+        const response = await Commands.trigger(templateJs, sample, data, [request], state);
         response.response.$class.should.be.equal('org.accordproject.latedeliveryandpenalty.LateDeliveryAndPenaltyResponse');
         response.response.penalty.should.be.equal(4);
         response.response.buyerMayTerminate.should.be.equal(true);

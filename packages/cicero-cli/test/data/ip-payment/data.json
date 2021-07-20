@@ -1,0 +1,19 @@
+{
+  "$class": "org.accordproject.ippayment.IntellectualPropertyPaymentClause",
+  "royaltyText": "four point five",
+  "royaltyRate": 4.5,
+  "sublicensingRoyaltyText": "five point two",
+  "sublicensingRoyaltyRate": 5.2,
+  "paymentPeriod": {
+    "$class": "org.accordproject.time.Duration",
+    "amount": 10,
+    "unit": "days"
+  },
+  "paymentPeriodWithPermission": {
+    "$class": "org.accordproject.time.Duration",
+    "amount": 7,
+    "unit": "days"
+  },
+  "clauseId": "bef1e63e-df8b-4841-83fb-1358e8d804ee",
+  "$identifier": "bef1e63e-df8b-4841-83fb-1358e8d804ee"
+}

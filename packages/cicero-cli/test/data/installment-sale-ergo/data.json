@@ -1,0 +1,13 @@
+{
+  "$class": "org.accordproject.installmentsale.InstallmentSaleContract",
+  "BUYER": "Dan",
+  "SELLER": "Ned",
+  "INITIAL_DUE": 10000,
+  "INTEREST_RATE": 1.5,
+  "TOTAL_DUE_BEFORE_CLOSING": 9500,
+  "MIN_PAYMENT": 500,
+  "DUE_AT_CLOSING": 500,
+  "FIRST_MONTH": 3,
+  "contractId": "8887d0be-fcfa-46aa-9e35-491f70650dd7",
+  "$identifier": "8887d0be-fcfa-46aa-9e35-491f70650dd7"
+}
