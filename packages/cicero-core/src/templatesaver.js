@@ -48,7 +48,7 @@ class TemplateSaver {
                 templateSignature: template.authorSignature
             };
             const templateSignString =  JSON.stringify(templateSignatures);
-            zip.file('signatures.json', templateSignString, options);
+            zip.file('signature.json', templateSignString, options);
         }
 
         let packageFileContents = JSON.stringify(metadata.getPackageJson());
