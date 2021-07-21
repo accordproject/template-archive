@@ -263,20 +263,23 @@ require('yargs')
             default: false
         });
     }, (argv) => {
-
         try {
-            argv = Commands.validateTriggerArgs(argv);
-            const options = {
-                offline: argv.offline,
-                warnings: argv.warnings,
-            };
-            return Commands.trigger(argv.template, argv.sample, argv.data, argv.request, argv.state, argv.currentTime, argv.utcOffset, options)
-                .then((result) => {
-                    if(result) {Logger.info(JSON.stringify(result));}
-                })
-                .catch((err) => {
-                    Logger.error(err.message);
-                });
+            if (argv = Commands.validateTriggerArgs(argv)) {
+                const options = {
+                    offline: argv.offline,
+                    warnings: argv.warnings,
+                };
+                return Commands.trigger(argv.template, argv.sample, argv.data, argv.request, argv.state, argv.currentTime, argv.utcOffset, options)
+                    .then((result) => {
+                        if(result) {Logger.info(JSON.stringify(result));}
+                    })
+                    .catch((err) => {
+                        Logger.error(err.message);
+                    });
+            } else {
+                return;
+            }
+
         } catch (err){
             Logger.error(err.message);
         }

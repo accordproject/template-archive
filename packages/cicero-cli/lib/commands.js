@@ -327,6 +327,7 @@ class Commands {
             Logger.error(
                 'No data was provided. Try the --sample flag to provide data in markdown format or the --data flag to provide data in JSON format.'
             );
+            return;
         }
 
         argv = Commands.setDefaultFileArg(argv, 'request', 'request.json', (argv, argDefaultName) => {
@@ -398,7 +399,7 @@ class Commands {
                 let stateJson;
                 if (!fs.existsSync(statePath)) {
                     Logger.warn(
-                        'A state file was not provided, initializing state. Try the --state flag or create a state.json in the root folder of your template.'
+                        'A state file was not provided, initializing state. Try the --state flag or create a state.json in the root folder of your template. (trigger.2)'
                     );
                     const initResult = await engine.init(clause, currentTime, utcOffset);
                     stateJson = initResult.state;
