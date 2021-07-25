@@ -29,6 +29,9 @@ const CordaVisitor = CodeGen.CordaVisitor;
 const JSONSchemaVisitor = CodeGen.JSONSchemaVisitor;
 const PlantUMLVisitor = CodeGen.PlantUMLVisitor;
 const TypescriptVisitor = CodeGen.TypescriptVisitor;
+const defaultSamplePath = 'text/sample.md';
+const defaultDataPath = 'data.json';
+const defaultParams = 'params.json';
 
 /**
  * Utility class that implements the commands exposed by the Cicero CLI.
@@ -101,6 +104,39 @@ class Commands {
     }
 
     /**
+     * Check data params used by initialize, invoke and trigger commands.
+     * Data must be provided to these commands either via a "sample.md" file or via a "data.json" file.
+     * Function checks if params exist, if not then attempts to locate default "./text/sample.md" or "./data.json" files.
+     * If neither found then throws exception.
+     *
+     * @param {object} argv - the inbound argument values object
+     * @returns {object} a modfied argument object
+     */
+    static validateDataArgs(argv) {
+        if (argv.sample) {
+            if (!fs.existsSync(argv.sample)) {
+                throw new Error(`A sample file was specified as "${argv.sample}" but does not exist at this location.`);
+            }
+        } else if (argv.data) {
+            if (!fs.existsSync(argv.data)) {
+                throw new Error(`A data file was specified as "${argv.data}" but does not exist at this location.`);
+            }
+        } else {
+            if (fs.existsSync(defaultSamplePath)) {
+                argv.sample = defaultSamplePath;
+                Logger.warn('A data file was not provided. Loading data from default "/text/sample.md" file.');
+            } else if (fs.existsSync(defaultDataPath)) {
+                argv.data = defaultDataPath;
+                Logger.warn('A data file was not provided. Loading data from default "data.json" file.');
+            } else {
+                throw new Error('A data file was not provided. Try the --sample flag to provide a data file in markdown format or the --data flag to provide a data file in JSON format.');
+            }
+        }
+
+        return argv;
+    }
+
+    /**
      * Set a default for a file argument
      *
      * @param {object} argv - the inbound argument values object
@@ -112,7 +148,6 @@ class Commands {
      */
     static setDefaultFileArg(argv, argName, argDefaultName, argDefaultFun) {
         if (!argv[argName]) {
-            Logger.info(`Loading a default ${argDefaultName} file.`);
             argv[argName] = argDefaultFun(argv, argDefaultName);
         }
 
@@ -148,7 +183,7 @@ class Commands {
      */
     static validateParseArgs(argv) {
         argv = Commands.validateCommonArgs(argv);
-        argv = Commands.setDefaultFileArg(argv, 'sample', 'text/sample.md', (argv, argDefaultName) => {
+        argv = Commands.setDefaultFileArg(argv, 'sample', defaultSamplePath, (argv, argDefaultName) => {
             return path.resolve(argv.template, argDefaultName);
         });
 
@@ -197,7 +232,7 @@ class Commands {
      */
     static validateDraftArgs(argv) {
         argv = Commands.validateCommonArgs(argv);
-        argv = Commands.setDefaultFileArg(argv, 'data', 'data.json', (argv, argDefaultName) => {
+        argv = Commands.setDefaultFileArg(argv, 'data', defaultDataPath, (argv, argDefaultName) => {
             return path.resolve(argv.template, argDefaultName);
         });
 
@@ -311,25 +346,7 @@ class Commands {
      */
     static validateTriggerArgs(argv) {
         argv = Commands.validateCommonArgs(argv);
-
-        // Trigger command must receive data either via --sample arg or --data arg.
-        // At least one must be specified.
-        // If both specified then defaults to --sample arg data.
-        if (argv.sample) {
-            argv = Commands.setDefaultFileArg(argv, 'sample', 'text/sample.md', (argv, argDefaultName) => {
-                return path.resolve(argv.template, argDefaultName);
-            });
-        } else if (argv.data) {
-            argv = Commands.setDefaultFileArg(argv, 'data', './data.json', (argv, argDefaultName) => {
-                return path.resolve(argv.template, argDefaultName);
-            });
-        } else {
-            Logger.error(
-                'No data was provided. Try the --sample flag to provide data in markdown format or the --data flag to provide data in JSON format.'
-            );
-            return;
-        }
-
+        argv = Commands.validateDataArgs(argv);
         argv = Commands.setDefaultFileArg(argv, 'request', 'request.json', (argv, argDefaultName) => {
             return [path.resolve(argv.template, argDefaultName)];
         });
@@ -372,8 +389,9 @@ class Commands {
             dataJson = JSON.parse(fs.readFileSync(dataPath, 'utf8'));
         } else {
             Logger.error(
-                'No data was provided. Try the --sample flag to provide data in markdown format or the --data flag to provide data in JSON format.'
+                'A data file was not provided. Try the --sample flag to provide a data file in markdown format or the --data flag to provide a data file in JSON format.'
             );
+            return;
         }
 
         let requestsJson = [];
@@ -391,15 +409,16 @@ class Commands {
                 } else if (dataJson) {
                     clause.setData(dataJson);
                 } else {
-                    Logger.warn(
-                        'No data was provided. Try the --sample flag to provide data in markdown format or the --data flag to provide data in JSON format.'
+                    Logger.error(
+                        'A data file was not provided. Try the --sample flag to provide a data file in markdown format or the --data flag to provide a data file in JSON format.'
                     );
+                    return;
                 }
 
                 let stateJson;
                 if (!fs.existsSync(statePath)) {
                     Logger.warn(
-                        'A state file was not provided, initializing state. Try the --state flag or create a state.json in the root folder of your template. (trigger.2)'
+                        'A state file was not provided, initializing state. Try the --state flag or create a state.json in the root folder of your template.'
                     );
                     const initResult = await engine.init(clause, currentTime, utcOffset);
                     stateJson = initResult.state;
@@ -431,17 +450,34 @@ class Commands {
      */
     static validateInvokeArgs(argv) {
         argv = Commands.validateCommonArgs(argv);
-        argv = Commands.setDefaultFileArg(argv, 'sample', 'text/sample.md', (argv, argDefaultName) => {
-            return path.resolve(argv.template, argDefaultName);
-        });
-        argv = Commands.setDefaultFileArg(argv, 'params', 'params.json', (argv, argDefaultName) => {
-            return [path.resolve(argv.template, argDefaultName)];
-        });
+        argv = Commands.validateDataArgs(argv);
 
-        if (argv.verbose) {
-            Logger.info(`initialize sample ${argv.sample} using a template ${argv.template}`);
+        if (!argv.clauseName) {
+            Logger.error('No clause name provided. Try the --clauseName flag to provide a clause to be invoked.');
+            return;
         }
 
+        if (!argv.params) {
+            if (fs.existsSync(defaultParams)) {
+                argv.params = defaultParams;
+                Logger.warn('A params file was not provided. Loading params from default "params.json" file.');
+            } else {
+                Logger.error('No params provided. Try the --params flag to provide params in JSON format.');
+                return;
+            }
+        }
+
+        if (argv.verbose) {
+            if (argv.sample) {
+                Logger.info(
+                    `invoke: \n - Sample: ${argv.sample} \n - Template: ${argv.template} \n Clause: ${argv.clauseName} \n Params: ${argv.paramsPath}`
+                );
+            } else if (argv.data) {
+                Logger.info(
+                    `invoke: \n - Data: ${argv.data} \n - Template: ${argv.template} \n Clause: ${argv.clauseName} \n Params: ${argv.paramsPath}`
+                );
+            }
+        }
         return argv;
     }
 
@@ -450,6 +486,7 @@ class Commands {
      *
      * @param {string} templatePath - path to the template directory or archive
      * @param {string} samplePath - to the sample file
+     * @param {string} dataPath - to the data file
      * @param {string} clauseName the name of the clause to invoke
      * @param {object} paramsPath the parameters for the clause
      * @param {string} statePath - to the state file
@@ -458,9 +495,32 @@ class Commands {
      * @param {Object} [options] - an optional set of options
      * @returns {object} Promise to the result of execution
      */
-    static invoke(templatePath, samplePath, clauseName, paramsPath, statePath, currentTime, utcOffset, options) {
+    static invoke(
+        templatePath,
+        samplePath,
+        dataPath,
+        clauseName,
+        paramsPath,
+        statePath,
+        currentTime,
+        utcOffset,
+        options
+    ) {
         let clause;
-        const sampleText = fs.readFileSync(samplePath, 'utf8');
+        let sampleText;
+        let dataJson;
+
+        if (samplePath) {
+            sampleText = fs.readFileSync(samplePath, 'utf8');
+        } else if (dataPath) {
+            dataJson = JSON.parse(fs.readFileSync(dataPath, 'utf8'));
+        } else {
+            Logger.error(
+                'A data file was not provided. Try the --sample flag to provide a data file in markdown format or the --data flag to provide a data file in JSON format.'
+            );
+            return;
+        }
+
         const paramsJson = JSON.parse(fs.readFileSync(paramsPath, 'utf8'));
 
         const engine = new Engine();
@@ -468,12 +528,21 @@ class Commands {
             .then(async (template) => {
                 // Initialize clause
                 clause = new Clause(template);
-                clause.parse(sampleText, currentTime, utcOffset);
+                if (sampleText) {
+                    clause.parse(sampleText, currentTime, utcOffset);
+                } else if (dataJson) {
+                    clause.setData(dataJson);
+                } else {
+                    Logger.error(
+                        'A data file was not provided. Try the --sample flag to provide a data file in markdown format or the --data flag to provide a data file in JSON format.'
+                    );
+                    return;
+                }
 
                 let stateJson;
                 if (!fs.existsSync(statePath)) {
                     Logger.warn(
-                        'A state file was not provided, initializing state. Try the --state flag or create a state.json in the root folder of your template.'
+                        'A state file was not provided. Initializing state. Try the --state flag or create a state.json in the root folder of your template.'
                     );
                     const initResult = await engine.init(clause, currentTime, utcOffset);
                     stateJson = initResult.state;
@@ -496,14 +565,19 @@ class Commands {
      */
     static validateInitializeArgs(argv) {
         argv = Commands.validateCommonArgs(argv);
-        argv = Commands.setDefaultFileArg(argv, 'sample', 'text/sample.md', (argv, argDefaultName) => {
-            return path.resolve(argv.template, argDefaultName);
-        });
+        argv = Commands.validateDataArgs(argv);
 
         if (argv.verbose) {
-            Logger.info(`initialize sample ${argv.sample} using a template ${argv.template}`);
+            if (argv.sample) {
+                Logger.info(
+                    `initialize: \n - Sample: ${argv.sample} \n - Template: ${argv.template} \n - Request: ${argv.request} \n - State: ${argv.state}`
+                );
+            } else if (argv.data) {
+                Logger.info(
+                    `initialize: \n - Data: ${argv.data} \n - Template: ${argv.template} \n - Request: ${argv.request} \n - State: ${argv.state}`
+                );
+            }
         }
-
         return argv;
     }
 
@@ -512,15 +586,29 @@ class Commands {
      *
      * @param {string} templatePath - path to the template directory or archive
      * @param {string} samplePath - to the sample file
+     * @param {string} dataPath - to the data file
      * @param {object} paramsPath - the parameters for the initialization
      * @param {string} [currentTime] - the definition of 'now', defaults to current time
      * @param {number} [utcOffset] - UTC Offset for this execution, defaults to local offset
      * @param {Object} [options] - an optional set of options
      * @returns {object} Promise to the result of execution
      */
-    static initialize(templatePath, samplePath, paramsPath, currentTime, utcOffset, options) {
+    static initialize(templatePath, samplePath, dataPath, paramsPath, currentTime, utcOffset, options) {
         let clause;
-        const sampleText = fs.readFileSync(samplePath, 'utf8');
+        let sampleText;
+        let dataJson;
+
+        if (samplePath) {
+            sampleText = fs.readFileSync(samplePath, 'utf8');
+        } else if (dataPath) {
+            dataJson = JSON.parse(fs.readFileSync(dataPath, 'utf8'));
+        } else {
+            Logger.error(
+                'A data file was not provided. Try the --sample flag to provide a data file in markdown format or the --data flag to provide a data file in JSON format.'
+            );
+            return;
+        }
+
         const paramsJson = paramsPath ? JSON.parse(fs.readFileSync(paramsPath, 'utf8')) : {};
 
         const engine = new Engine();
@@ -528,7 +616,16 @@ class Commands {
             .then((template) => {
                 // Initialize clause
                 clause = new Clause(template);
-                clause.parse(sampleText, currentTime, utcOffset);
+                if (sampleText) {
+                    clause.parse(sampleText, currentTime, utcOffset);
+                } else if (dataJson) {
+                    clause.setData(dataJson);
+                } else {
+                    Logger.error(
+                        'A data file was not provided. Try the --sample flag to provide a data file in markdown format or the --data flag to provide a data file in JSON format.'
+                    );
+                    return;
+                }
 
                 return engine.init(clause, currentTime, utcOffset, paramsJson);
             })
