@@ -27,10 +27,11 @@ const Commands = require('../lib/commands');
 const template = path.resolve(__dirname, 'data/helloworldstate/');
 const sample = path.resolve(__dirname, 'data/helloworldstate/', 'text/sample.md');
 const params = path.resolve(__dirname, 'data/helloworldstate/', 'params.json');
+const data = path.resolve(__dirname, 'data/helloworldstate/', 'data.json');
 
 describe('#initializeWithParameters', () => {
     it('should initialize with some parameters', async () => {
-        const response = await Commands.initialize(template, sample, params);
+        const response = await Commands.initialize(template, sample, data, params);
         response.state.$class.should.be.equal('org.accordproject.helloworldstate.HelloWorldState');
         response.state.counter.should.be.equal(2);
     });

@@ -411,6 +411,7 @@ require('yargs')
                     .catch((err) => {
                         Logger.error(err.message);
                     });
+
             } catch (err) {
                 Logger.error(err.message);
             }

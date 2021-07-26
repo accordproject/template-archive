@@ -32,6 +32,7 @@ const TypescriptVisitor = CodeGen.TypescriptVisitor;
 const defaultSamplePath = 'text/sample.md';
 const defaultDataPath = 'data.json';
 const defaultParams = 'params.json';
+const defaultState = 'state.json';
 
 /**
  * Utility class that implements the commands exposed by the Cicero CLI.
@@ -453,18 +454,36 @@ class Commands {
         argv = Commands.validateDataArgs(argv);
 
         if (!argv.clauseName) {
-            Logger.error('No clause name provided. Try the --clauseName flag to provide a clause to be invoked.');
-            return;
+            throw new Error('No clause name provided. Try the --clauseName flag to provide a clause to be invoked.');
         }
 
-        if (!argv.params) {
+        if (argv.params) {
+            if (!fs.existsSync(argv.params)) {
+                throw new Error(`A params file was specified as "${argv.params}" but does not exist at this location.`);
+            }
+        } else {
+
             if (fs.existsSync(defaultParams)) {
                 argv.params = defaultParams;
-                Logger.warn('A params file was not provided. Loading params from default "params.json" file.');
+                Logger.warn(`A params file was not provided. Loading params from default "${defaultParams}" file.`);
             } else {
-                Logger.error('No params provided. Try the --params flag to provide params in JSON format.');
-                return;
+                throw new Error('No params provided. Try the --params flag to provide params in JSON format.');
             }
+        }
+
+        if (argv.state) {
+            if (!fs.existsSync(argv.state)) {
+                throw new Error(`A state file was specified as "${argv.state}" but does not exist at this location.`);
+            }
+        } else {
+
+            if (fs.existsSync(defaultState)) {
+                argv.state = defaultState;
+                Logger.warn(`A state file was not provided. Loading state from default "${defaultState}" file.`);
+            } else {
+                throw new Error('No state provided. Try the --state flag to provide state in JSON format.');
+            }
+
         }
 
         if (argv.verbose) {
