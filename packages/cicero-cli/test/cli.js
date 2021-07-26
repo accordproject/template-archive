@@ -1168,9 +1168,34 @@ describe('#validateArchiveArgs', () => {
 });
 
 describe('#archive', async () => {
+    it('should create signed archive', async () => {
+        const archiveName = 'test.cta';
+        const p12path = path.resolve(__dirname, 'data/keystore.p12');
+        const p12File = fs.readFileSync(p12path, { encoding: 'base64' });
+        const keystore = {
+            p12File: p12File,
+            passphrase: 'password'
+        };
+        const options = {
+            keystore: keystore
+        };
+        const result = await Commands.archive(template, 'ergo', archiveName, options);
+        result.should.eql(true);
+        const newTemplate = await Template.fromArchive(fs.readFileSync(archiveName));
+        newTemplate.should.not.be.null;
+        newTemplate.should.have.own.property('authorSignature');
+        fs.unlinkSync(archiveName);
+    });
+
     it('should create a valid ergo archive', async () => {
         const archiveName = 'test.cta';
-        const result = await Commands.archive(template, 'ergo', archiveName);
+        const options = {
+            keystore: {
+                path: null,
+                passphrase: null
+            }
+        };
+        const result = await Commands.archive(template, 'ergo', archiveName, options);
         result.should.eql(true);
         const newTemplate = await Template.fromArchive(fs.readFileSync(archiveName));
         newTemplate.should.not.be.null;
@@ -1180,7 +1205,13 @@ describe('#archive', async () => {
 
     it('should create a valid ergo archive with a default name', async () => {
         const archiveName = 'latedeliveryandpenalty@0.0.1.cta';
-        const result = await Commands.archive(template, 'ergo', null);
+        const options = {
+            keystore: {
+                path: null,
+                passphrase: null
+            }
+        };
+        const result = await Commands.archive(template, 'ergo', null, options);
         result.should.eql(true);
         const newTemplate = await Template.fromArchive(fs.readFileSync(archiveName));
         newTemplate.should.not.be.null;
@@ -1191,21 +1222,42 @@ describe('#archive', async () => {
     it('should create an Ergo archive', async () => {
         const tmpFile = await tmp.file();
         const tmpArchive = tmpFile.path + '.cta';
-        await Commands.archive(template, 'ergo', tmpArchive, false);
+        const options = {
+            warnings: false,
+            keystore: {
+                path: null,
+                passphrase: null
+            }
+        };
+        await Commands.archive(template, 'ergo', tmpArchive, options);
         fs.readFileSync(tmpArchive).length.should.be.above(0);
         tmpFile.cleanup();
     });
     it('should create a JavaScript archive', async () => {
         const tmpFile = await tmp.file();
         const tmpArchive = tmpFile.path + '.cta';
-        await Commands.archive(template, 'es6', tmpArchive, false);
+        const options = {
+            warnings: false,
+            keystore: {
+                path: null,
+                passphrase: null
+            }
+        };
+        await Commands.archive(template, 'es6', tmpArchive, options);
         fs.readFileSync(tmpArchive).length.should.be.above(0);
         tmpFile.cleanup();
     });
     it('should not create an unknown archive', async () => {
         const tmpFile = await tmp.file();
         const tmpArchive = tmpFile.path + '.cta';
-        return Commands.archive(template, 'foo', tmpArchive, false)
+        const options = {
+            warnings: false,
+            keystore: {
+                path: null,
+                passphrase: null
+            }
+        };
+        return Commands.archive(template, 'foo', tmpArchive, options)
             .should.be.rejectedWith('Unknown target: foo (available: es6,java)');
     });
 
