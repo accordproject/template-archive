@@ -29,8 +29,8 @@ const CordaVisitor = CodeGen.CordaVisitor;
 const JSONSchemaVisitor = CodeGen.JSONSchemaVisitor;
 const PlantUMLVisitor = CodeGen.PlantUMLVisitor;
 const TypescriptVisitor = CodeGen.TypescriptVisitor;
-const defaultSamplePath = 'text/sample.md';
-const defaultDataPath = 'data.json';
+const defaultSample = 'text/sample.md';
+const defaultData = 'data.json';
 const defaultParams = 'params.json';
 const defaultState = 'state.json';
 
@@ -123,11 +123,11 @@ class Commands {
                 throw new Error(`A data file was specified as "${argv.data}" but does not exist at this location.`);
             }
         } else {
-            if (fs.existsSync(defaultSamplePath)) {
-                argv.sample = defaultSamplePath;
+            if (fs.existsSync(defaultSample)) {
+                argv.sample = defaultSample;
                 Logger.warn('A data file was not provided. Loading data from default "/text/sample.md" file.');
-            } else if (fs.existsSync(defaultDataPath)) {
-                argv.data = defaultDataPath;
+            } else if (fs.existsSync(defaultData)) {
+                argv.data = defaultData;
                 Logger.warn('A data file was not provided. Loading data from default "data.json" file.');
             } else {
                 throw new Error('A data file was not provided. Try the --sample flag to provide a data file in markdown format or the --data flag to provide a data file in JSON format.');
@@ -184,7 +184,7 @@ class Commands {
      */
     static validateParseArgs(argv) {
         argv = Commands.validateCommonArgs(argv);
-        argv = Commands.setDefaultFileArg(argv, 'sample', defaultSamplePath, (argv, argDefaultName) => {
+        argv = Commands.setDefaultFileArg(argv, 'sample', defaultSample, (argv, argDefaultName) => {
             return path.resolve(argv.template, argDefaultName);
         });
 
@@ -233,7 +233,7 @@ class Commands {
      */
     static validateDraftArgs(argv) {
         argv = Commands.validateCommonArgs(argv);
-        argv = Commands.setDefaultFileArg(argv, 'data', defaultDataPath, (argv, argDefaultName) => {
+        argv = Commands.setDefaultFileArg(argv, 'data', defaultData, (argv, argDefaultName) => {
             return path.resolve(argv.template, argDefaultName);
         });
 
