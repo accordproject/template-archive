@@ -460,18 +460,17 @@ describe('#validateTriggerArgs', () => {
         });
         args.template.should.match(/cicero-cli[/\\]test[/\\]data[/\\]latedeliveryandpenalty$/);
     });
-    it('all args specified', () => {
+    it('all args specified except data', () => {
         process.chdir(path.resolve(__dirname, 'data/latedeliveryandpenalty/'));
         const args  = Commands.validateTriggerArgs({
             _: ['trigger'],
             template: './',
             sample: 'text/sample.md',
-            data: 'data.json',
             state: 'state.json'
         });
         args.template.should.match(/cicero-cli[/\\]test[/\\]data[/\\]latedeliveryandpenalty$/);
         args.sample.should.match(/text[/\\]sample.md$/);
-        args.data.should.match(/data.json$/);
+        args.state.should.match(/state.json$/);
     });
     it('all args specified except sample', () => {
         process.chdir(path.resolve(__dirname, 'data/latedeliveryandpenalty/'));
@@ -483,28 +482,19 @@ describe('#validateTriggerArgs', () => {
         });
         args.template.should.match(/cicero-cli[/\\]test[/\\]data[/\\]latedeliveryandpenalty$/);
         args.data.should.match(/data.json$/);
+        args.state.should.match(/state.json$/);
     });
-    it('all args specified except data', () => {
-        process.chdir(path.resolve(__dirname, 'data/latedeliveryandpenalty/'));
-        const args  = Commands.validateTriggerArgs({
-            _: ['trigger'],
-            template: './',
-            sample: 'text/sample.md',
-            state: 'state.json'
-        });
-        args.template.should.match(/cicero-cli[/\\]test[/\\]data[/\\]latedeliveryandpenalty$/);
-        args.sample.should.match(/text[/\\]sample.md$/);
-    });
-    it('all args specified, parent folder', () => {
+    it('all args specified except data, parent folder', () => {
         process.chdir(path.resolve(__dirname, 'data/'));
         const args  = Commands.validateTriggerArgs({
             _: ['trigger'],
             template: 'latedeliveryandpenalty',
             sample: 'latedeliveryandpenalty/text/sample.md',
-            data: 'data.json',
             state: 'latedeliveryandpenalty/state.json'
         });
         args.template.should.match(/cicero-cli[/\\]test[/\\]data[/\\]latedeliveryandpenalty$/);
+        args.sample.should.match(/latedeliveryandpenalty[/\\]text[/\\]sample.md$/);
+        args.state.should.match(/latedeliveryandpenalty[/\\]state.json$/);
     });
     it('all args specified, parent folder, no sample, no data, no state', () => {
         process.chdir(path.resolve(__dirname, 'data/'));
@@ -513,7 +503,7 @@ describe('#validateTriggerArgs', () => {
             template: 'latedeliveryandpenalty',
         })).should.throw('A data file was not provided. Try the --sample flag to provide a data file in markdown format or the --data flag to provide a data file in JSON format.');
     });
-    it('all args specified, child folder, no sample, no data', () => {
+    it('all args specified, child folder, no sample, no data, no state', () => {
         process.chdir(path.resolve(__dirname, 'data/latedeliveryandpenalty/text'));
         (() => Commands.validateTriggerArgs({
             _: ['trigger'],
@@ -562,29 +552,57 @@ describe('#validateTriggerArgs', () => {
 });
 
 describe('#trigger', () => {
-    it('should trigger a clause using a template', async () => {
-        const response = await Commands.trigger(template, sample, data, [request], state);
+    it('should trigger a clause using a template and sample', async () => {
+        const response = await Commands.trigger(template, sample, null, [request], state);
         response.response.$class.should.be.equal('org.accordproject.latedeliveryandpenalty.LateDeliveryAndPenaltyResponse');
         response.response.penalty.should.be.equal(4);
         response.response.buyerMayTerminate.should.be.equal(true);
     });
 
-    it('should trigger a clause using a template archive', async () => {
-        const response = await Commands.trigger(templateArchive, sample, data, [request], state);
+    it('should trigger a clause using a template and data', async () => {
+        const response = await Commands.trigger(template, null, data, [request], state);
         response.response.$class.should.be.equal('org.accordproject.latedeliveryandpenalty.LateDeliveryAndPenaltyResponse');
         response.response.penalty.should.be.equal(4);
         response.response.buyerMayTerminate.should.be.equal(true);
     });
 
-    it('should trigger with default state when state is not found', async () => {
-        const response = await Commands.trigger(template, sample, data, [request], stateErr);
+    it('should trigger a clause using a template archive and sample', async () => {
+        const response = await Commands.trigger(templateArchive, sample, null, [request], state);
         response.response.$class.should.be.equal('org.accordproject.latedeliveryandpenalty.LateDeliveryAndPenaltyResponse');
         response.response.penalty.should.be.equal(4);
         response.response.buyerMayTerminate.should.be.equal(true);
     });
 
-    it('should trigger with more than one request', async () => {
-        const response = await Commands.trigger(template, sample, data, [request,request], state);
+    it('should trigger a clause using a template archive and data', async () => {
+        const response = await Commands.trigger(templateArchive, null, data, [request], state);
+        response.response.$class.should.be.equal('org.accordproject.latedeliveryandpenalty.LateDeliveryAndPenaltyResponse');
+        response.response.penalty.should.be.equal(4);
+        response.response.buyerMayTerminate.should.be.equal(true);
+    });
+
+    it('should trigger with default state when state is not found with sample', async () => {
+        const response = await Commands.trigger(template, sample, null, [request], stateErr);
+        response.response.$class.should.be.equal('org.accordproject.latedeliveryandpenalty.LateDeliveryAndPenaltyResponse');
+        response.response.penalty.should.be.equal(4);
+        response.response.buyerMayTerminate.should.be.equal(true);
+    });
+
+    it('should trigger with default state when state is not found with data', async () => {
+        const response = await Commands.trigger(template, null, data, [request], stateErr);
+        response.response.$class.should.be.equal('org.accordproject.latedeliveryandpenalty.LateDeliveryAndPenaltyResponse');
+        response.response.penalty.should.be.equal(4);
+        response.response.buyerMayTerminate.should.be.equal(true);
+    });
+
+    it('should trigger with more than one request with sample', async () => {
+        const response = await Commands.trigger(template, sample, null, [request,request], state);
+        response.response.$class.should.be.equal('org.accordproject.latedeliveryandpenalty.LateDeliveryAndPenaltyResponse');
+        response.response.penalty.should.be.equal(4);
+        response.response.buyerMayTerminate.should.be.equal(true);
+    });
+
+    it('should trigger with more than one request with data', async () => {
+        const response = await Commands.trigger(template, null, data, [request,request], state);
         response.response.$class.should.be.equal('org.accordproject.latedeliveryandpenalty.LateDeliveryAndPenaltyResponse');
         response.response.penalty.should.be.equal(4);
         response.response.buyerMayTerminate.should.be.equal(true);
@@ -634,6 +652,7 @@ describe('#validateInvokeArgs', () => {
             _: ['invoke'],
             template: './',
             sample: 'text/sample.md',
+            data: 'data.json',
             clauseName: 'latedeliveryandpenalty',
             state: 'state.json',
             params: 'params.json'
@@ -644,18 +663,99 @@ describe('#validateInvokeArgs', () => {
         args.clauseName.should.match(/latedeliveryandpenalty$/);
         args.params.should.match(/params.json$/);
     });
-    it('all args specified, parent folder', () => {
-        process.chdir(path.resolve(__dirname, 'data/'));
+    it('all args specified using sample only', () => {
+        process.chdir(path.resolve(__dirname, 'data/latedeliveryandpenalty/'));
         const args  = Commands.validateInvokeArgs({
             _: ['invoke'],
-            template: 'latedeliveryandpenalty',
-            sample: 'latedeliveryandpenalty/text/sample.md',
+            template: './',
+            sample: 'text/sample.md',
             clauseName: 'latedeliveryandpenalty',
-            state: 'latedeliveryandpenalty/state.json',
-            params: 'latedeliveryandpenalty/params.json'
+            state: 'state.json',
+            params: 'params.json'
         });
         args.template.should.match(/cicero-cli[/\\]test[/\\]data[/\\]latedeliveryandpenalty$/);
         args.sample.should.match(/text[/\\]sample.md$/);
+        args.state.should.match(/state.json$/);
+        args.clauseName.should.match(/latedeliveryandpenalty$/);
+        args.params.should.match(/params.json$/);
+    });
+    it('all args specified using sample only, no clauseName', () => {
+        process.chdir(path.resolve(__dirname, 'data/latedeliveryandpenalty/'));
+        (() => Commands.validateInvokeArgs({
+            _: ['invoke'],
+            template: './',
+            sample: 'text/sample.md',
+            state: 'state.json',
+            params: 'params.json'
+        })).should.throw('No clause name provided. Try the --clauseName flag to provide a clause to be invoked.');
+    });
+    it('all args specified using sample only, no params', () => {
+        process.chdir(path.resolve(__dirname, 'data/latedeliveryandpenalty/'));
+        const args  = Commands.validateInvokeArgs({
+            _: ['invoke'],
+            template: './',
+            sample: 'text/sample.md',
+            state: 'state.json',
+            clauseName: 'latedeliveryandpenalty',
+        });
+        args.template.should.match(/cicero-cli[/\\]test[/\\]data[/\\]latedeliveryandpenalty$/);
+        args.sample.should.match(/text[/\\]sample.md$/);
+        args.state.should.match(/state.json$/);
+        args.clauseName.should.match(/latedeliveryandpenalty$/);
+        args.params.should.match(/params.json$/);
+    });
+    it('all args specified using sample only, bad params', () => {
+        process.chdir(path.resolve(__dirname, 'data/latedeliveryandpenalty/'));
+        (() => Commands.validateInvokeArgs({
+            _: ['invoke'],
+            template: './',
+            sample: 'text/sample.md',
+            clauseName: 'latedeliveryandpenalty',
+            state: 'state.json',
+            params: 'foobar.json'
+        })).should.throw('A params file was specified as "foobar.json" but does not exist at this location.');
+    });
+    it('all args specified using sample only, no state', () => {
+        process.chdir(path.resolve(__dirname, 'data/latedeliveryandpenalty/'));
+        const args  = Commands.validateInvokeArgs({
+            _: ['invoke'],
+            template: './',
+            sample: 'text/sample.md',
+            clauseName: 'latedeliveryandpenalty',
+            params: 'params.json'
+        });
+        args.template.should.match(/cicero-cli[/\\]test[/\\]data[/\\]latedeliveryandpenalty$/);
+        args.sample.should.match(/text[/\\]sample.md$/);
+        args.state.should.match(/state.json$/);
+        args.clauseName.should.match(/latedeliveryandpenalty$/);
+        args.params.should.match(/params.json$/);
+    });
+    it('all args specified using sample only, bad state', () => {
+        process.chdir(path.resolve(__dirname, 'data/latedeliveryandpenalty/'));
+        (() => Commands.validateInvokeArgs({
+            _: ['invoke'],
+            template: './',
+            sample: 'text/sample.md',
+            clauseName: 'latedeliveryandpenalty',
+            state: 'foobar.json',
+            params: 'params.json'
+        })).should.throw('A state file was specified as "foobar.json" but does not exist at this location.');
+    });
+    it('all args specified using data only', () => {
+        process.chdir(path.resolve(__dirname, 'data/latedeliveryandpenalty/'));
+        const args  = Commands.validateInvokeArgs({
+            _: ['invoke'],
+            template: './',
+            clauseName: 'latedeliveryandpenalty',
+            data: 'data.json',
+            state: 'state.json',
+            params: 'params.json'
+        });
+        args.template.should.match(/cicero-cli[/\\]test[/\\]data[/\\]latedeliveryandpenalty$/);
+        args.data.should.match(/data.json$/);
+        args.state.should.match(/state.json$/);
+        args.clauseName.should.match(/latedeliveryandpenalty$/);
+        args.params.should.match(/params.json$/);
     });
     it('all args specified, parent folder, no sample, no state, no params, no clauseName', () => {
         process.chdir(path.resolve(__dirname, 'data/'));
@@ -732,6 +832,11 @@ describe('#invoke', () => {
         response.response.$class.should.be.equal('org.accordproject.latedeliveryandpenalty.LateDeliveryAndPenaltyResponse');
         response.response.penalty.should.be.equal(4);
         response.response.buyerMayTerminate.should.be.equal(true);
+    });
+
+    it('should get null response when params not found', async () => {
+        const response = await Commands.invoke(template, sample, data, 'latedeliveryandpenalty', paramsErr, state);
+        should.equal(response,undefined);
     });
 
     it('should fail invoke on a bogus request', async () => {
@@ -819,20 +924,55 @@ describe('#validateInitializeArgs', () => {
 });
 
 describe('#initialize', () => {
-    it('should initialize a clause using a template', async () => {
+    it('should initialize a clause using a template with sample', async () => {
         const response = await Commands.initialize(template, sample);
         response.state.$class.should.be.equal('org.accordproject.runtime.State');
     });
 
-    it('should initialize a clause using a template archive', async () => {
+    it('should initialize a clause using a template with sample and params', async () => {
+        const response = await Commands.initialize(template, sample, null, params);
+        response.state.$class.should.be.equal('org.accordproject.runtime.State');
+        response.params.request.$class.should.be.equal('org.accordproject.latedeliveryandpenalty.LateDeliveryAndPenaltyRequest');
+    });
+
+    it('should initialize a clause using a template archive with sample', async () => {
         const response = await Commands.initialize(templateArchive, sample);
         response.state.$class.should.be.equal('org.accordproject.runtime.State');
+    });
+
+    it('should initialize a clause using a template archive with sample and params', async () => {
+        const response = await Commands.initialize(templateArchive, sample, null, params);
+        response.state.$class.should.be.equal('org.accordproject.runtime.State');
+        response.params.request.$class.should.be.equal('org.accordproject.latedeliveryandpenalty.LateDeliveryAndPenaltyRequest');
+    });
+
+    it('should initialize a clause using a template with data', async () => {
+        const response = await Commands.initialize(template, null, data);
+        response.state.$class.should.be.equal('org.accordproject.runtime.State');
+    });
+
+    it('should initialize a clause using a template with data and params', async () => {
+        const response = await Commands.initialize(template, null, data, params);
+        response.state.$class.should.be.equal('org.accordproject.runtime.State');
+        response.params.request.$class.should.be.equal('org.accordproject.latedeliveryandpenalty.LateDeliveryAndPenaltyRequest');
+    });
+
+    it('should initialize a clause using a template archive with data', async () => {
+        const response = await Commands.initialize(templateArchive, null, data);
+        response.state.$class.should.be.equal('org.accordproject.runtime.State');
+    });
+
+    it('should initialize a clause using a template archive with data and params', async () => {
+        const response = await Commands.initialize(templateArchive, null, data, params);
+        response.state.$class.should.be.equal('org.accordproject.runtime.State');
+        response.params.request.$class.should.be.equal('org.accordproject.latedeliveryandpenalty.LateDeliveryAndPenaltyRequest');
     });
 
     it('should fail to initialize on a bogus sample', async () => {
         const response = await Commands.initialize(template, sampleErr);
         should.equal(response,undefined);
     });
+
 });
 
 describe('#validateCompileArgs', () => {
