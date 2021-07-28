@@ -126,9 +126,6 @@ class Commands {
             if (fs.existsSync(defaultSample)) {
                 argv.sample = defaultSample;
                 Logger.warn('A data file was not provided. Loading data from default "/text/sample.md" file.');
-            } else if (fs.existsSync(defaultData)) {
-                argv.data = defaultData;
-                Logger.warn('A data file was not provided. Loading data from default "data.json" file.');
             } else {
                 throw new Error('A data file was not provided. Try the --sample flag to provide a data file in markdown format or the --data flag to provide a data file in JSON format.');
             }
@@ -357,7 +354,7 @@ class Commands {
                 Logger.info(
                     `trigger: \n - Sample: ${argv.sample} \n - Template: ${argv.template} \n - Request: ${argv.request} \n - State: ${argv.state}`
                 );
-            } else if (argv.data) {
+            } else {
                 Logger.info(
                     `trigger: \n - Data: ${argv.data} \n - Template: ${argv.template} \n - Request: ${argv.request} \n - State: ${argv.state}`
                 );
@@ -386,13 +383,8 @@ class Commands {
 
         if (samplePath) {
             sampleText = fs.readFileSync(samplePath, 'utf8');
-        } else if (dataPath) {
-            dataJson = JSON.parse(fs.readFileSync(dataPath, 'utf8'));
         } else {
-            Logger.error(
-                'A data file was not provided. Try the --sample flag to provide a data file in markdown format or the --data flag to provide a data file in JSON format.'
-            );
-            return;
+            dataJson = JSON.parse(fs.readFileSync(dataPath, 'utf8'));
         }
 
         let requestsJson = [];
@@ -407,13 +399,8 @@ class Commands {
                 clause = new Clause(template);
                 if (sampleText) {
                     clause.parse(sampleText, currentTime, utcOffset);
-                } else if (dataJson) {
-                    clause.setData(dataJson);
                 } else {
-                    Logger.error(
-                        'A data file was not provided. Try the --sample flag to provide a data file in markdown format or the --data flag to provide a data file in JSON format.'
-                    );
-                    return;
+                    clause.setData(dataJson);
                 }
 
                 let stateJson;
@@ -457,41 +444,27 @@ class Commands {
             throw new Error('No clause name provided. Try the --clauseName flag to provide a clause to be invoked.');
         }
 
-        if (argv.params) {
-            if (!fs.existsSync(argv.params)) {
-                throw new Error(`A params file was specified as "${argv.params}" but does not exist at this location.`);
-            }
+        if (argv.params && !fs.existsSync(argv.params)) {
+            throw new Error(`A params file was specified as "${argv.params}" but does not exist at this location.`);
         } else {
+            argv.params = defaultParams;
+            Logger.warn(`A params file was not provided. Loading params from default "${defaultParams}" file.`);
+        } 
 
-            if (fs.existsSync(defaultParams)) {
-                argv.params = defaultParams;
-                Logger.warn(`A params file was not provided. Loading params from default "${defaultParams}" file.`);
-            } else {
-                throw new Error('No params provided. Try the --params flag to provide params in JSON format.');
-            }
-        }
-
-        if (argv.state) {
-            if (!fs.existsSync(argv.state)) {
-                throw new Error(`A state file was specified as "${argv.state}" but does not exist at this location.`);
-            }
+        if (argv.state && !fs.existsSync(argv.state)) {
+            throw new Error(`A state file was specified as "${argv.state}" but does not exist at this location.`);
         } else {
-
-            if (fs.existsSync(defaultState)) {
-                argv.state = defaultState;
-                Logger.warn(`A state file was not provided. Loading state from default "${defaultState}" file.`);
-            } else {
-                throw new Error('No state provided. Try the --state flag to provide state in JSON format.');
-            }
-
-        }
+            argv.state = defaultState;
+            Logger.warn(`A state file was not provided. Loading state from default "${defaultState}" file.`);
+        } 
+        
 
         if (argv.verbose) {
             if (argv.sample) {
                 Logger.info(
                     `invoke: \n - Sample: ${argv.sample} \n - Template: ${argv.template} \n Clause: ${argv.clauseName} \n Params: ${argv.paramsPath}`
                 );
-            } else if (argv.data) {
+            } else {
                 Logger.info(
                     `invoke: \n - Data: ${argv.data} \n - Template: ${argv.template} \n Clause: ${argv.clauseName} \n Params: ${argv.paramsPath}`
                 );
@@ -531,13 +504,8 @@ class Commands {
 
         if (samplePath) {
             sampleText = fs.readFileSync(samplePath, 'utf8');
-        } else if (dataPath) {
-            dataJson = JSON.parse(fs.readFileSync(dataPath, 'utf8'));
         } else {
-            Logger.error(
-                'A data file was not provided. Try the --sample flag to provide a data file in markdown format or the --data flag to provide a data file in JSON format.'
-            );
-            return;
+            dataJson = JSON.parse(fs.readFileSync(dataPath, 'utf8'));
         }
 
         const paramsJson = JSON.parse(fs.readFileSync(paramsPath, 'utf8'));
@@ -549,13 +517,8 @@ class Commands {
                 clause = new Clause(template);
                 if (sampleText) {
                     clause.parse(sampleText, currentTime, utcOffset);
-                } else if (dataJson) {
-                    clause.setData(dataJson);
                 } else {
-                    Logger.error(
-                        'A data file was not provided. Try the --sample flag to provide a data file in markdown format or the --data flag to provide a data file in JSON format.'
-                    );
-                    return;
+                    clause.setData(dataJson);
                 }
 
                 let stateJson;
@@ -591,7 +554,7 @@ class Commands {
                 Logger.info(
                     `initialize: \n - Sample: ${argv.sample} \n - Template: ${argv.template} \n - Request: ${argv.request} \n - State: ${argv.state}`
                 );
-            } else if (argv.data) {
+            } else {
                 Logger.info(
                     `initialize: \n - Data: ${argv.data} \n - Template: ${argv.template} \n - Request: ${argv.request} \n - State: ${argv.state}`
                 );
@@ -619,13 +582,8 @@ class Commands {
 
         if (samplePath) {
             sampleText = fs.readFileSync(samplePath, 'utf8');
-        } else if (dataPath) {
-            dataJson = JSON.parse(fs.readFileSync(dataPath, 'utf8'));
         } else {
-            Logger.error(
-                'A data file was not provided. Try the --sample flag to provide a data file in markdown format or the --data flag to provide a data file in JSON format.'
-            );
-            return;
+            dataJson = JSON.parse(fs.readFileSync(dataPath, 'utf8'));
         }
 
         const paramsJson = paramsPath ? JSON.parse(fs.readFileSync(paramsPath, 'utf8')) : {};
@@ -637,13 +595,8 @@ class Commands {
                 clause = new Clause(template);
                 if (sampleText) {
                     clause.parse(sampleText, currentTime, utcOffset);
-                } else if (dataJson) {
-                    clause.setData(dataJson);
                 } else {
-                    Logger.error(
-                        'A data file was not provided. Try the --sample flag to provide a data file in markdown format or the --data flag to provide a data file in JSON format.'
-                    );
-                    return;
+                    clause.setData(dataJson);
                 }
 
                 return engine.init(clause, currentTime, utcOffset, paramsJson);

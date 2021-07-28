@@ -522,6 +522,26 @@ describe('#validateTriggerArgs', () => {
             verbose: true
         });
     });
+    it('verbose flag specified with sample option', () => {
+        process.chdir(path.resolve(__dirname, 'data/latedeliveryandpenalty/'));
+        Commands.validateTriggerArgs({
+            _: ['trigger'],
+            template: './',
+            sample: 'text/sample.md',
+            state: 'state.json',
+            verbose: true
+        });
+    });
+    it('verbose flag specified with data option', () => {
+        process.chdir(path.resolve(__dirname, 'data/latedeliveryandpenalty/'));
+        Commands.validateTriggerArgs({
+            _: ['trigger'],
+            template: './',
+            data: 'data.json',
+            state: 'state.json',
+            verbose: true
+        });
+    });
     it('bad package.json', () => {
         process.chdir(path.resolve(__dirname, 'data/'));
         (() => Commands.validateTriggerArgs({
@@ -776,12 +796,24 @@ describe('#validateInvokeArgs', () => {
             _: ['invoke', path.resolve(__dirname, 'data/latedeliveryandpenalty/')],
         })).should.throw('A data file was not provided. Try the --sample flag to provide a data file in markdown format or the --data flag to provide a data file in JSON format.');
     });
-    it('verbose flag specified', () => {
+    it('verbose flag specified with sample option', () => {
         process.chdir(path.resolve(__dirname, 'data/latedeliveryandpenalty/'));
         Commands.validateInvokeArgs({
             _: ['invoke'],
             template: './',
             sample: 'text/sample.md',
+            clauseName: 'latedeliveryandpenalty',
+            state: 'state.json',
+            params: 'params.json',
+            verbose: true
+        });
+    });
+    it('verbose flag specified with data option', () => {
+        process.chdir(path.resolve(__dirname, 'data/latedeliveryandpenalty/'));
+        Commands.validateInvokeArgs({
+            _: ['invoke'],
+            template: './',
+            data: 'data.json',
             clauseName: 'latedeliveryandpenalty',
             state: 'state.json',
             params: 'params.json',
@@ -813,22 +845,43 @@ describe('#validateInvokeArgs', () => {
 });
 
 describe('#invoke', () => {
-    it('should invoke a clause using a template', async () => {
-        const response = await Commands.invoke(template, sample, data, 'latedeliveryandpenalty', params, state);
+    it('should invoke a clause using a template and sample', async () => {
+        const response = await Commands.invoke(template, sample, null, 'latedeliveryandpenalty', params, state);
         response.response.$class.should.be.equal('org.accordproject.latedeliveryandpenalty.LateDeliveryAndPenaltyResponse');
         response.response.penalty.should.be.equal(4);
         response.response.buyerMayTerminate.should.be.equal(true);
     });
 
-    it('should invoke a clause using a template archive', async () => {
-        const response = await Commands.invoke(templateArchive, sample, data, 'latedeliveryandpenalty', params, state);
+    it('should invoke a clause using a template and data', async () => {
+        const response = await Commands.invoke(template, null, data, 'latedeliveryandpenalty', params, state);
         response.response.$class.should.be.equal('org.accordproject.latedeliveryandpenalty.LateDeliveryAndPenaltyResponse');
         response.response.penalty.should.be.equal(4);
         response.response.buyerMayTerminate.should.be.equal(true);
     });
 
-    it('should invoke with default state when state is not found', async () => {
-        const response = await Commands.invoke(template, sample, data, 'latedeliveryandpenalty', params, stateErr);
+    it('should invoke a clause using a template archive and sample', async () => {
+        const response = await Commands.invoke(templateArchive, sample, null, 'latedeliveryandpenalty', params, state);
+        response.response.$class.should.be.equal('org.accordproject.latedeliveryandpenalty.LateDeliveryAndPenaltyResponse');
+        response.response.penalty.should.be.equal(4);
+        response.response.buyerMayTerminate.should.be.equal(true);
+    });
+
+    it('should invoke a clause using a template archive and data', async () => {
+        const response = await Commands.invoke(templateArchive, null, data, 'latedeliveryandpenalty', params, state);
+        response.response.$class.should.be.equal('org.accordproject.latedeliveryandpenalty.LateDeliveryAndPenaltyResponse');
+        response.response.penalty.should.be.equal(4);
+        response.response.buyerMayTerminate.should.be.equal(true);
+    });
+
+    it('should invoke with default state when state is not found with sample', async () => {
+        const response = await Commands.invoke(template, sample, null, 'latedeliveryandpenalty', params, stateErr);
+        response.response.$class.should.be.equal('org.accordproject.latedeliveryandpenalty.LateDeliveryAndPenaltyResponse');
+        response.response.penalty.should.be.equal(4);
+        response.response.buyerMayTerminate.should.be.equal(true);
+    });
+
+    it('should invoke with default state when state is not found with data', async () => {
+        const response = await Commands.invoke(template, null, data, 'latedeliveryandpenalty', params, stateErr);
         response.response.$class.should.be.equal('org.accordproject.latedeliveryandpenalty.LateDeliveryAndPenaltyResponse');
         response.response.penalty.should.be.equal(4);
         response.response.buyerMayTerminate.should.be.equal(true);
@@ -905,6 +958,24 @@ describe('#validateInitializeArgs', () => {
         process.chdir(path.resolve(__dirname, 'data/latedeliveryandpenalty/'));
         Commands.validateInitializeArgs({
             _: ['initialize'],
+            verbose: true
+        });
+    });
+    it('verbose flag specified with sample option', () => {
+        process.chdir(path.resolve(__dirname, 'data/latedeliveryandpenalty/'));
+        Commands.validateInitializeArgs({
+            _: ['invoke'],
+            template: './',
+            sample: 'text/sample.md',
+            verbose: true
+        });
+    });
+    it('verbose flag specified with data option', () => {
+        process.chdir(path.resolve(__dirname, 'data/latedeliveryandpenalty/'));
+        Commands.validateInitializeArgs({
+            _: ['invoke'],
+            template: './',
+            data: 'data.json',
             verbose: true
         });
     });
