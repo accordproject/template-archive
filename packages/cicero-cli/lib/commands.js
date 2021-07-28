@@ -449,15 +449,14 @@ class Commands {
         } else {
             argv.params = defaultParams;
             Logger.warn(`A params file was not provided. Loading params from default "${defaultParams}" file.`);
-        } 
+        }
 
         if (argv.state && !fs.existsSync(argv.state)) {
             throw new Error(`A state file was specified as "${argv.state}" but does not exist at this location.`);
         } else {
             argv.state = defaultState;
             Logger.warn(`A state file was not provided. Loading state from default "${defaultState}" file.`);
-        } 
-        
+        }
 
         if (argv.verbose) {
             if (argv.sample) {
