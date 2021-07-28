@@ -109,6 +109,7 @@ describe('Template', () => {
             fs.writeFileSync('./test/data/signing-template/unsignedArchive.cta', archiveBuffer);
             const archivePath = path.join(__dirname,'data', 'signing-template', 'unsignedArchive.cta');
             archivePath.should.be.a.file().and.not.empty;
+            fs.unlinkSync(archivePath);
         });
 
         it('should create the archive with signing it', async() => {
@@ -122,6 +123,7 @@ describe('Template', () => {
             fs.writeFileSync('./test/data/signing-template/signedArchive.cta', archiveBuffer);
             const archivePath = path.join(__dirname,'data', 'signing-template', 'signedArchive.cta');
             archivePath.should.be.a.file().and.not.empty;
+            fs.unlinkSync(archivePath);
         });
 
         it('should throw an error if passphrase of the keystore is wrong', async() => {
