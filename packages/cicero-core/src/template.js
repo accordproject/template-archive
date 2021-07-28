@@ -181,7 +181,7 @@ class Template {
 
     /**
      * verifies the signature stored in the template object using the template hash and timestamp
-     * @private
+     * @return {boolean} true if signature is valid else false
      */
     verifyTemplateSignature() {
         const templateHash = this.getHash();
@@ -204,15 +204,17 @@ class Template {
         const result = verify.verify(publicKey, signature, 'hex');
         if (!result) {
             throw new Error('Template\'s author signature is invalid!');
+        }else{
+            return result;
         }
     }
 
     /**
      * signs a string made up of template hash and time stamp using private key derived
      * from the keystore
-     * @param {String} [p12File] - encoded string of p12 keystore file
-     * @param {String} [passphrase] - passphrase for the keystore file
-     * @param {Number} [timestamp] - timestamp of the moment of signature is done
+     * @param {String} p12File - encoded string of p12 keystore file
+     * @param {String} passphrase - passphrase for the keystore file
+     * @param {Number} timestamp - timestamp of the moment of signature is done
      * @private
      */
     signTemplate(p12File, passphrase, timestamp) {
