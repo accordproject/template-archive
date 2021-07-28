@@ -147,6 +147,40 @@ require('yargs')
             return;
         }
     })
+
+    .command('verify', 'verify the template signatures of the template author/developer', (yargs) => {
+        yargs.option('template', {
+            describe: 'path to the template',
+            type: 'string'
+        });
+        yargs.option('warnings', {
+            describe: 'print warnings',
+            type: 'boolean',
+            default: false
+        });
+    }, (argv) => {
+        if (argv.verbose) {
+            Logger.info(`verify the signature of author/developer of ${argv.template} template`);
+        }
+
+        try {
+            argv = Commands.validateVerifyArgs(argv);
+            const options = {
+                warnings: argv.warnings,
+            };
+            return Commands.verify(argv.template, options)
+                .then((result) => {
+                    if(result) {Logger.info(`Author/developer's signature for ${argv.template} template is verified`);}
+                })
+                .catch((err) => {
+                    Logger.error(err.message);
+                });
+        } catch (err){
+            Logger.error(err.message);
+            return;
+        }
+    })
+
     .command('normalize', 'normalize markdown (parse & redraft)', (yargs) => {
         yargs.option('template', {
             describe: 'path to the template',

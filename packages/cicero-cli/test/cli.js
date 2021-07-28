@@ -1321,3 +1321,52 @@ describe('#get', async () => {
     });
 });
 
+describe('#validateVerfiyArgs', () => {
+    it('no args specified', () => {
+        process.chdir(path.resolve(__dirname, 'data/signedArchive/'));
+        const args  = Commands.validateArchiveArgs({
+            _: ['verify']
+        });
+        args.template.should.match(/cicero-cli[/\\]test[/\\]data[/\\]signedArchive$/);
+        args.target.should.match(/ergo/);
+    });
+    it('only target arg specified', () => {
+        process.chdir(path.resolve(__dirname, 'data/signedArchive/'));
+        const args  = Commands.validateArchiveArgs({
+            _: ['verify'],
+            target: 'ergo'
+        });
+        args.template.should.match(/cicero-cli[/\\]test[/\\]data[/\\]signedArchive$/);
+        args.target.should.match(/ergo/);
+    });
+    it('template arg specified', () => {
+        process.chdir(path.resolve(__dirname));
+        const args  = Commands.validateArchiveArgs({
+            _: ['verify', 'data/signedArchive/']
+        });
+        args.template.should.match(/cicero-cli[/\\]test[/\\]data[/\\]signedArchive$/);
+        args.target.should.match(/ergo/);
+    });
+    it('verbose flag specified', () => {
+        process.chdir(path.resolve(__dirname, 'data/latedeliveryandpenalty/'));
+        Commands.validateArchiveArgs({
+            _: ['archive'],
+            verbose: true
+        });
+    });
+    it('bad package.json', () => {
+        process.chdir(path.resolve(__dirname, 'data/'));
+        (() => Commands.validateArchiveArgs({
+            _: ['verify']
+        })).should.throw(' not a valid cicero template. Make sure that package.json exists and that it has a cicero entry.');
+    });
+});
+
+describe('#verify', async () => {
+    it('should verify the signature of the template author/developer', async () => {
+        const templatePath = path.resolve(__dirname, 'data/signedArchive/');
+        const result = await Commands.verify(templatePath);
+        result.should.not.be.null;
+        result.should.be.true;
+    });
+});

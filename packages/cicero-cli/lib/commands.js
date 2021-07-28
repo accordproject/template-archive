@@ -640,6 +640,37 @@ class Commands {
     }
 
     /**
+     * Set default params before we verify signatures of template author/developer
+     *
+     * @param {object} argv the inbound argument values object
+     * @returns {object} a modfied argument object
+     */
+    static validateVerifyArgs(argv) {
+        argv = Commands.validateCommonArgs(argv);
+
+        if(!argv.target){
+            Logger.info('Using ergo as the default target for the archive.');
+            argv.target = 'ergo';
+        }
+        return argv;
+    }
+
+    /**
+     * Verify the template developer/author's signatures
+     *
+     * @param {string} templatePath - path to the template directory or archive
+     * @param {Object} [options] - an optional set of options
+     * @returns {object} returns true if signature is valid else false
+     */
+    static verify(templatePath, options) {
+        return Commands.loadTemplate(templatePath, options)
+            .then(async(template) => {
+                const result = await template.verifyTemplateSignature();
+                return result;
+            });
+    }
+
+    /**
      * Set default params before we compile a template
      *
      * @param {object} argv the inbound argument values object
