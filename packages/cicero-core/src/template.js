@@ -181,7 +181,7 @@ class Template {
 
     /**
      * verifies the signature stored in the template object using the template hash and timestamp
-     * @private
+     * @return {boolean} true if signature is valid else false
      */
     verifyTemplateSignature() {
         const templateHash = this.getHash();
@@ -204,6 +204,8 @@ class Template {
         const result = verify.verify(publicKey, signature, 'hex');
         if (!result) {
             throw new Error('Template\'s author signature is invalid!');
+        }else{
+            return result;
         }
     }
 
