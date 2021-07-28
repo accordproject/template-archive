@@ -43,7 +43,7 @@ class TemplateSaver {
         let zip = new JSZip();
 
         //save the signature if present
-        if(template.authorSignature !== null){
+        if(template.authorSignature){
             const templateSignatures = {
                 templateSignature: template.authorSignature
             };
