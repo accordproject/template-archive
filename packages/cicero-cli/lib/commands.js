@@ -446,7 +446,7 @@ class Commands {
 
         if (argv.params) {
             if (!fs.existsSync(argv.params)) {
-            throw new Error(`A params file was specified as "${argv.params}" but does not exist at this location.`);
+                throw new Error(`A params file was specified as "${argv.params}" but does not exist at this location.`);
             }
         } else {
             argv.params = defaultParams;
@@ -455,7 +455,7 @@ class Commands {
 
         if (argv.state) {
             if (!fs.existsSync(argv.state)) {
-            throw new Error(`A state file was specified as "${argv.state}" but does not exist at this location.`);
+                throw new Error(`A state file was specified as "${argv.state}" but does not exist at this location.`);
             }
         } else {
             argv.state = defaultState;
