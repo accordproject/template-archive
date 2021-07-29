@@ -444,15 +444,19 @@ class Commands {
             throw new Error('No clause name provided. Try the --clauseName flag to provide a clause to be invoked.');
         }
 
-        if (argv.params && !fs.existsSync(argv.params)) {
+        if (argv.params) {
+            if (!fs.existsSync(argv.params)) {
             throw new Error(`A params file was specified as "${argv.params}" but does not exist at this location.`);
+            }
         } else {
             argv.params = defaultParams;
             Logger.warn(`A params file was not provided. Loading params from default "${defaultParams}" file.`);
         }
 
-        if (argv.state && !fs.existsSync(argv.state)) {
+        if (argv.state) {
+            if (!fs.existsSync(argv.state)) {
             throw new Error(`A state file was specified as "${argv.state}" but does not exist at this location.`);
+            }
         } else {
             argv.state = defaultState;
             Logger.warn(`A state file was not provided. Loading state from default "${defaultState}" file.`);
