@@ -1,6 +1,6 @@
 # Cicero CLI.
 
-Command line interface (for parsing, execution, creating archives, etc.) for Accord Project legal templates.
+Command line interface (for parsing, execution, creating archives, etc.) for Accord Project legal templates
 
 ## Documentation
 
