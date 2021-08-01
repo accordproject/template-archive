@@ -187,7 +187,7 @@ class Template {
         const templateHash = this.getHash();
         if (this.authorSignature === null) {throw new Error('The template is missing author signature!');}
         const signature = this.authorSignature.templateSignature.signature;
-        const timeStamp = this.authorSignature.templateSignature.timestamp;
+        const timestamp = this.authorSignature.templateSignature.timestamp;
         const signatoryCert = this.authorSignature.templateSignature.signatoryCert;
         //X509 cert converted from PEM to forge type
         const certificateForge = forge.pki.certificateFromPem(signatoryCert);
@@ -199,7 +199,7 @@ class Template {
         const publicKey = crypto.createPublicKey(publicKeyPem);
         //signature verification process
         const verify = crypto.createVerify('SHA256');
-        verify.write(templateHash + timeStamp);
+        verify.write(templateHash + timestamp);
         verify.end();
         const result = verify.verify(publicKey, signature, 'hex');
         if (!result) {
@@ -220,7 +220,7 @@ class Template {
     signTemplate(p12File, passphrase, timestamp) {
         if (typeof(p12File) !== 'string') {throw new Error('p12File should be of type String!');}
         if (typeof(passphrase) !== 'string') {throw new Error('passphrase should be of type String!');}
-        if (typeof(timestamp) !== 'number') {throw new Error('timeStamp should be of type Number!');}
+        if (typeof(timestamp) !== 'number') {throw new Error('timestamp should be of type Number!');}
 
         const templateHash = this.getHash();
         // decode p12 from base64
