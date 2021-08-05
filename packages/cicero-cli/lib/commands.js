@@ -29,6 +29,10 @@ const CordaVisitor = CodeGen.CordaVisitor;
 const JSONSchemaVisitor = CodeGen.JSONSchemaVisitor;
 const PlantUMLVisitor = CodeGen.PlantUMLVisitor;
 const TypescriptVisitor = CodeGen.TypescriptVisitor;
+const defaultSample = 'text/sample.md';
+const defaultData = 'data.json';
+const defaultParams = 'params.json';
+const defaultState = 'state.json';
 
 /**
  * Utility class that implements the commands exposed by the Cicero CLI.
@@ -89,6 +93,36 @@ class Commands {
 
             if(!packageJsonExists || !isAPTemplate){
                 throw new Error(`${argv.template} is not a valid cicero template. Make sure that package.json exists and that it has a cicero entry.`);
+            }
+        }
+
+        return argv;
+    }
+
+    /**
+     * Check data params used by initialize, invoke and trigger commands.
+     * Data must be provided to these commands either via a "sample.md" file or via a "data.json" file.
+     * Function checks if params exist, if not then attempts to locate default "./text/sample.md" or "./data.json" files.
+     * If neither found then throws exception.
+     *
+     * @param {object} argv - the inbound argument values object
+     * @returns {object} a modfied argument object
+     */
+    static validateDataArgs(argv) {
+        if (argv.sample) {
+            if (!fs.existsSync(argv.sample)) {
+                throw new Error(`A sample file was specified as "${argv.sample}" but does not exist at this location.`);
+            }
+        } else if (argv.data) {
+            if (!fs.existsSync(argv.data)) {
+                throw new Error(`A data file was specified as "${argv.data}" but does not exist at this location.`);
+            }
+        } else {
+            if (fs.existsSync(defaultSample)) {
+                argv.sample = defaultSample;
+                Logger.warn('A data file was not provided. Loading data from default "/text/sample.md" file.');
+            } else {
+                throw new Error('A data file was not provided. Try the --sample flag to provide a data file in markdown format or the --data flag to provide a data file in JSON format.');
             }
         }
 
@@ -188,7 +222,7 @@ class Commands {
      */
     static validateDraftArgs(argv) {
         argv = Commands.validateCommonArgs(argv);
-        argv = Commands.setDefaultFileArg(argv, 'data', 'data.json', ((argv, argDefaultName) => { return path.resolve(argv.template,argDefaultName); }));
+        argv = Commands.setDefaultFileArg(argv, 'data', defaultData, ((argv, argDefaultName) => { return path.resolve(argv.template,argDefaultName); }));
 
         if(argv.verbose) {
             Logger.info(`draft text from data ${argv.data} using a template ${argv.template}`);
@@ -298,21 +332,30 @@ class Commands {
      */
     static validateTriggerArgs(argv) {
         argv = Commands.validateCommonArgs(argv);
-        argv = Commands.setDefaultFileArg(argv, 'sample', 'text/sample.md', ((argv, argDefaultName) => { return path.resolve(argv.template,argDefaultName); }));
+        argv = Commands.validateDataArgs(argv);
         argv = Commands.setDefaultFileArg(argv, 'request', 'request.json', ((argv, argDefaultName) => { return [path.resolve(argv.template,argDefaultName)]; }));
 
-        if(argv.verbose) {
-            Logger.info(`trigger sample ${argv.sample} using a template ${argv.template} with request ${argv.request} with state ${argv.state}`);
+        if (argv.verbose) {
+            if (argv.sample) {
+                Logger.info(
+                    `trigger: \n - Sample: ${argv.sample} \n - Template: ${argv.template} \n - Request: ${argv.request} \n - State: ${argv.state}`
+                );
+            } else {
+                Logger.info(
+                    `trigger: \n - Data: ${argv.data} \n - Template: ${argv.template} \n - Request: ${argv.request} \n - State: ${argv.state}`
+                );
+            }
         }
 
         return argv;
     }
 
     /**
-     * Trigger a sample text using a template
+     * Trigger a sample text or data json using a template
      *
      * @param {string} templatePath - path to the template directory or archive
      * @param {string} samplePath - to the sample file
+     * @param {string} dataPath - to the data file
      * @param {string[]} requestsPath - to the array of request files
      * @param {string} statePath - to the state file
      * @param {string} [currentTime] - the definition of 'now', defaults to current time
@@ -320,9 +363,17 @@ class Commands {
      * @param {Object} [options] - an optional set of options
      * @returns {object} Promise to the result of execution
      */
-    static trigger(templatePath, samplePath, requestsPath, statePath, currentTime, utcOffset, options) {
+    static trigger(templatePath, samplePath, dataPath, requestsPath, statePath, currentTime, utcOffset, options) {
         let clause;
-        const sampleText = fs.readFileSync(samplePath, 'utf8');
+        let sampleText;
+        let dataJson;
+
+        if (samplePath) {
+            sampleText = fs.readFileSync(samplePath, 'utf8');
+        } else {
+            dataJson = JSON.parse(fs.readFileSync(dataPath, 'utf8'));
+        }
+
         let requestsJson = [];
 
         for (let i = 0; i < requestsPath.length; i++) {
@@ -334,7 +385,11 @@ class Commands {
             .then(async (template) => {
                 // Initialize clause
                 clause = new Clause(template);
-                clause.parse(sampleText, currentTime, utcOffset);
+                if (sampleText) {
+                    clause.parse(sampleText, currentTime, utcOffset);
+                } else {
+                    clause.setData(dataJson);
+                }
 
                 let stateJson;
                 if(!fs.existsSync(statePath)) {
@@ -369,11 +424,40 @@ class Commands {
      */
     static validateInvokeArgs(argv) {
         argv = Commands.validateCommonArgs(argv);
-        argv = Commands.setDefaultFileArg(argv, 'sample', 'text/sample.md', ((argv, argDefaultName) => { return path.resolve(argv.template,argDefaultName); }));
-        argv = Commands.setDefaultFileArg(argv, 'params', 'params.json', ((argv, argDefaultName) => { return [path.resolve(argv.template,argDefaultName)]; }));
+        argv = Commands.validateDataArgs(argv);
+
+        if (!argv.clauseName) {
+            throw new Error('No clause name provided. Try the --clauseName flag to provide a clause to be invoked.');
+        }
+
+        if (argv.params) {
+            if (!fs.existsSync(argv.params)) {
+                throw new Error(`A params file was specified as "${argv.params}" but does not exist at this location.`);
+            }
+        } else {
+            argv.params = defaultParams;
+            Logger.warn(`A params file was not provided. Loading params from default "${defaultParams}" file.`);
+        }
+
+        if (argv.state) {
+            if (!fs.existsSync(argv.state)) {
+                throw new Error(`A state file was specified as "${argv.state}" but does not exist at this location.`);
+            }
+        } else {
+            argv.state = defaultState;
+            Logger.warn(`A state file was not provided. Loading state from default "${defaultState}" file.`);
+        }
 
         if(argv.verbose) {
-            Logger.info(`initialize sample ${argv.sample} using a template ${argv.template}`);
+            if (argv.sample) {
+                Logger.info(
+                    `invoke: \n - Sample: ${argv.sample} \n - Template: ${argv.template} \n Clause: ${argv.clauseName} \n Params: ${argv.paramsPath}`
+                );
+            } else {
+                Logger.info(
+                    `invoke: \n - Data: ${argv.data} \n - Template: ${argv.template} \n Clause: ${argv.clauseName} \n Params: ${argv.paramsPath}`
+                );
+            }
         }
 
         return argv;
@@ -384,6 +468,7 @@ class Commands {
      *
      * @param {string} templatePath - path to the template directory or archive
      * @param {string} samplePath - to the sample file
+     * @param {string} dataPath - to the data file
      * @param {string} clauseName the name of the clause to invoke
      * @param {object} paramsPath the parameters for the clause
      * @param {string} statePath - to the state file
@@ -392,9 +477,17 @@ class Commands {
      * @param {Object} [options] - an optional set of options
      * @returns {object} Promise to the result of execution
      */
-    static invoke(templatePath, samplePath, clauseName, paramsPath, statePath, currentTime, utcOffset, options) {
+    static invoke(templatePath, samplePath, dataPath, clauseName, paramsPath, statePath, currentTime, utcOffset, options) {
         let clause;
-        const sampleText = fs.readFileSync(samplePath, 'utf8');
+        let sampleText;
+        let dataJson;
+
+        if (samplePath) {
+            sampleText = fs.readFileSync(samplePath, 'utf8');
+        } else {
+            dataJson = JSON.parse(fs.readFileSync(dataPath, 'utf8'));
+        }
+
         const paramsJson = JSON.parse(fs.readFileSync(paramsPath, 'utf8'));
 
         const engine = new Engine();
@@ -402,7 +495,11 @@ class Commands {
             .then(async (template) => {
                 // Initialize clause
                 clause = new Clause(template);
-                clause.parse(sampleText, currentTime, utcOffset);
+                if (sampleText) {
+                    clause.parse(sampleText, currentTime, utcOffset);
+                } else {
+                    clause.setData(dataJson);
+                }
 
                 let stateJson;
                 if(!fs.existsSync(statePath)) {
@@ -428,10 +525,18 @@ class Commands {
      */
     static validateInitializeArgs(argv) {
         argv = Commands.validateCommonArgs(argv);
-        argv = Commands.setDefaultFileArg(argv, 'sample', 'text/sample.md', ((argv, argDefaultName) => { return path.resolve(argv.template,argDefaultName); }));
+        argv = Commands.validateDataArgs(argv);
 
         if(argv.verbose) {
-            Logger.info(`initialize sample ${argv.sample} using a template ${argv.template}`);
+            if (argv.sample) {
+                Logger.info(
+                    `initialize: \n - Sample: ${argv.sample} \n - Template: ${argv.template} \n - Request: ${argv.request} \n - State: ${argv.state}`
+                );
+            } else {
+                Logger.info(
+                    `initialize: \n - Data: ${argv.data} \n - Template: ${argv.template} \n - Request: ${argv.request} \n - State: ${argv.state}`
+                );
+            }
         }
 
         return argv;
@@ -442,15 +547,24 @@ class Commands {
      *
      * @param {string} templatePath - path to the template directory or archive
      * @param {string} samplePath - to the sample file
+     * @param {string} dataPath - to the data file
      * @param {object} paramsPath - the parameters for the initialization
      * @param {string} [currentTime] - the definition of 'now', defaults to current time
      * @param {number} [utcOffset] - UTC Offset for this execution, defaults to local offset
      * @param {Object} [options] - an optional set of options
      * @returns {object} Promise to the result of execution
      */
-    static initialize(templatePath, samplePath, paramsPath, currentTime, utcOffset, options) {
+    static initialize(templatePath, samplePath, dataPath, paramsPath, currentTime, utcOffset, options) {
         let clause;
-        const sampleText = fs.readFileSync(samplePath, 'utf8');
+        let sampleText;
+        let dataJson;
+
+        if (samplePath) {
+            sampleText = fs.readFileSync(samplePath, 'utf8');
+        } else {
+            dataJson = JSON.parse(fs.readFileSync(dataPath, 'utf8'));
+        }
+
         const paramsJson = paramsPath ? JSON.parse(fs.readFileSync(paramsPath, 'utf8')) : {};
 
         const engine = new Engine();
@@ -458,7 +572,11 @@ class Commands {
             .then((template) => {
                 // Initialize clause
                 clause = new Clause(template);
-                clause.parse(sampleText, currentTime, utcOffset);
+                if (sampleText) {
+                    clause.parse(sampleText, currentTime, utcOffset);
+                } else {
+                    clause.setData(dataJson);
+                }
 
                 return engine.init(clause, currentTime, utcOffset, paramsJson);
             })
