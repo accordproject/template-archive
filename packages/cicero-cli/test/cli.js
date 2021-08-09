@@ -1171,9 +1171,8 @@ describe('#archive', async () => {
     it('should create signed archive', async () => {
         const archiveName = 'test.cta';
         const p12path = path.resolve(__dirname, 'data/keystore.p12');
-        const p12File = fs.readFileSync(p12path, { encoding: 'base64' });
         const keystore = {
-            p12File: p12File,
+            path: p12path,
             passphrase: 'password'
         };
         const options = {
@@ -1324,7 +1323,7 @@ describe('#get', async () => {
 describe('#validateVerfiyArgs', () => {
     it('no args specified', () => {
         process.chdir(path.resolve(__dirname, 'data/signedArchive/'));
-        const args  = Commands.validateArchiveArgs({
+        const args  = Commands.validateVerifyArgs({
             _: ['verify']
         });
         args.template.should.match(/cicero-cli[/\\]test[/\\]data[/\\]signedArchive$/);
@@ -1332,7 +1331,7 @@ describe('#validateVerfiyArgs', () => {
     });
     it('only target arg specified', () => {
         process.chdir(path.resolve(__dirname, 'data/signedArchive/'));
-        const args  = Commands.validateArchiveArgs({
+        const args  = Commands.validateVerifyArgs({
             _: ['verify'],
             target: 'ergo'
         });
@@ -1341,7 +1340,7 @@ describe('#validateVerfiyArgs', () => {
     });
     it('template arg specified', () => {
         process.chdir(path.resolve(__dirname));
-        const args  = Commands.validateArchiveArgs({
+        const args  = Commands.validateVerifyArgs({
             _: ['verify', 'data/signedArchive/']
         });
         args.template.should.match(/cicero-cli[/\\]test[/\\]data[/\\]signedArchive$/);
@@ -1349,14 +1348,14 @@ describe('#validateVerfiyArgs', () => {
     });
     it('verbose flag specified', () => {
         process.chdir(path.resolve(__dirname, 'data/latedeliveryandpenalty/'));
-        Commands.validateArchiveArgs({
+        Commands.validateVerifyArgs({
             _: ['archive'],
             verbose: true
         });
     });
     it('bad package.json', () => {
         process.chdir(path.resolve(__dirname, 'data/'));
-        (() => Commands.validateArchiveArgs({
+        (() => Commands.validateVerifyArgs({
             _: ['verify']
         })).should.throw(' not a valid cicero template. Make sure that package.json exists and that it has a cicero entry.');
     });
