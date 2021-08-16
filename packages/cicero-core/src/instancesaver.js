@@ -37,6 +37,18 @@ class InstanceSaver {
             throw new Error('runtime is required and must be a string');
         }
 
+        // if (instance.contractSignatures.length === 0) {
+        //     const contractModel = Util.getContractModel(instance.logicManager, instance.instanceKind);
+        //     const properties = contractModel.getProperties();
+        //     properties.map((property) => property.getDecorators().map((decorator) => {
+        //         if (decorator.getName() === 'ContractParty') {
+        //             const data = instance.data;
+        //             const partyName = data[property.name];
+        //             instance.parties.push(partyName);
+        //         }
+        //     }));
+        // }
+
         let zip = new JSZip();
 
         // save the metadata
@@ -58,6 +70,16 @@ class InstanceSaver {
         if (instance.getParserManager().getTemplate()) {
             zip.file('text/grammar.tem.md', instance.getParserManager().getTemplate(), options);
         }
+
+        //save the signatures
+        let signatures = instance.contractSignatures;
+        zip.file('signatures/', null, Object.assign({}, options, {
+            dir: true
+        }));
+        signatures.forEach(function (signatureObject) {
+            let signature = JSON.stringify(signatureObject);
+            zip.file(`signatures/${signatureObject.signatory}.json`, signature, options);
+        });
 
         let modelFiles = instance.getModelManager().getModels();
         zip.file('model/', null, Object.assign({}, options, {
