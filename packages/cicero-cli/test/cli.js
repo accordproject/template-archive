@@ -1307,6 +1307,58 @@ describe('#archive', async () => {
 
 });
 
+describe('#validateSignArgs', () => {
+    it('no args specified', () => {
+        process.chdir(path.resolve(__dirname, 'data/signContract/'));
+        const args  = Commands.validateSignArgs({
+            _: ['sign']
+        });
+        args.template.should.match(/cicero-cli[/\\]test[/\\]data[/\\]signContract$/);
+        args.target.should.match(/ergo/);
+    });
+    it('only target arg specified', () => {
+        process.chdir(path.resolve(__dirname, 'data/signContract/'));
+        const args  = Commands.validateSignArgs({
+            _: ['sign'],
+            target: 'ergo'
+        });
+        args.template.should.match(/cicero-cli[/\\]test[/\\]data[/\\]signContract$/);
+        args.target.should.match(/ergo/);
+    });
+    it('template arg specified', () => {
+        process.chdir(path.resolve(__dirname));
+        const args  = Commands.validateSignArgs({
+            _: ['sign', 'data/signContract/']
+        });
+        args.template.should.match(/cicero-cli[/\\]test[/\\]data[/\\]signContract$/);
+        args.target.should.match(/ergo/);
+    });
+    it('verbose flag specified', () => {
+        process.chdir(path.resolve(__dirname, 'data/signContract/'));
+        Commands.validateSignArgs({
+            _: ['sign'],
+            verbose: true
+        });
+    });
+    it('bad package.json', () => {
+        process.chdir(path.resolve(__dirname, 'data/'));
+        (() => Commands.validateVerifyArgs({
+            _: ['sign']
+        })).should.throw(' not a valid cicero template. Make sure that package.json exists and that it has a cicero entry.');
+    });
+});
+
+describe('#sign', async () => {
+    it('should sign the contract for a party/individual', async () => {
+        const slcPath = path.resolve(__dirname, 'data/signContract/latedeliveryandpenalty@0.17.0-d0c1a14e8a7af52e0927a23b8b30af3b5a75bee1ab788a15736e603b88a6312c.slc');
+        const keystore = path.resolve(__dirname, 'data/keystore.p12');
+        const signatory = 'partyA';
+        const outputPath = path.resolve(__dirname, 'data/');
+        const result = await Commands.sign(slcPath, keystore, 'password', signatory, outputPath);
+        result.should.be.true;
+    });
+});
+
 describe('#validateInstantiateArgs', () => {
     it('no args specified', () => {
         process.chdir(path.resolve(__dirname, 'data/latedeliveryandpenalty/'));

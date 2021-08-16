@@ -21,12 +21,42 @@ const ClauseInstance = require('../lib/clauseinstance');
 const chai = require('chai');
 const fs = require('fs');
 const path = require('path');
+const ContractInstance = require('../src/contractinstance');
+const crypto = require('crypto');
+const forge = require('node-forge');
 
 chai.should();
 chai.use(require('chai-things'));
 chai.use(require('chai-as-promised'));
 
 const options = { offline: true };
+
+/* eslint-disable */
+
+function sign(instanceHash, timestamp, p12File, passphrase){
+    // decode p12 from base64
+    const p12Der = forge.util.decode64(p12File);
+    // get p12 as ASN.1 object
+    const p12Asn1 = forge.asn1.fromDer(p12Der);
+    // decrypt p12 using the passphrase 'password'
+    const p12 = forge.pkcs12.pkcs12FromAsn1(p12Asn1, false, passphrase);
+    //X509 cert forge type
+    const certificateForge = p12.safeContents[0].safeBags[0].cert;
+    //Private Key forge type
+    const privateKeyForge = p12.safeContents[1].safeBags[0].key;
+    //convert cert and private key from forge to PEM
+    const certificatePem = forge.pki.certificateToPem(certificateForge);
+    const privateKeyPem = forge.pki.privateKeyToPem(privateKeyForge);
+    //convert private key in pem to private key type in node
+    const privateKey = crypto.createPrivateKey(privateKeyPem);
+    const sign = crypto.createSign('SHA256');
+    sign.write(instanceHash + timestamp);
+    sign.end();
+    const signature = sign.sign(privateKey, 'hex');
+    return {signature: signature, certificate: certificatePem};
+}
+
+/* eslint-enable */
 
 const copyrightData = {
     '$class': 'org.accordproject.copyrightlicense.CopyrightLicenseContract',
@@ -876,6 +906,67 @@ Adding all precentages in this clause yields: {{% capPercentage + penaltyPercent
             // Draft again
             const nl = clause.draft();
             nl.should.equal(testLatePenaltyInputUpdated);
+        });
+    });
+
+    describe('#sign', () => {
+        it('should sign the content hash and timestamp string using the keystore', async() => {
+            const buffer = fs.readFileSync('./test/data/signContract/latedeliveryandpenalty@0.17.0-d0c1a14e8a7af52e0927a23b8b30af3b5a75bee1ab788a15736e603b88a6312c.slc');
+            const instance = await ContractInstance.fromArchive(buffer);
+            const timestamp = Date.now();
+            const instanceHash = instance.getHash();
+            const signatory = 'party1';
+            const p12File = fs.readFileSync('./test/data/signContract/keystore.p12', { encoding: 'base64' });
+            const signatureData = sign(instanceHash, timestamp, p12File, 'password');
+            instance.sign(p12File, 'password', timestamp, signatory);
+            const result = instance.contractSignatures[0];
+            const expected = {
+                signatory,
+                instanceHash,
+                timestamp,
+                signatoryCert: signatureData.certificate,
+                signature: signatureData.signature
+            };
+            result.should.deep.equal(expected);
+        });
+    });
+
+    describe('#verify', () => {
+        it('should verify a contract signature', async() => {
+            const buffer = fs.readFileSync('./test/data/signContract/latedeliveryandpenalty@0.17.0-d0c1a14e8a7af52e0927a23b8b30af3b5a75bee1ab788a15736e603b88a6312c.slc');
+            const instance = await ContractInstance.fromArchive(buffer);
+            const timestamp = Date.now();
+            const signatory = 'party1';
+            const p12File = fs.readFileSync('./test/data/signContract/keystore.p12', { encoding: 'base64' });
+            instance.sign(p12File, 'password', timestamp, signatory);
+            const partySignature = instance.contractSignatures[0];
+            const { signatoryCert, signature } = partySignature;
+            const result = instance.verify(signature, timestamp, signatoryCert);
+            result.should.deep.equal(true);
+        });
+    });
+
+    describe('#verifySignatures', () => {
+        it('should verify all contract signatures', async() => {
+            const buffer = fs.readFileSync('./test/data/signContract/latedeliveryandpenalty@0.17.0-d0c1a14e8a7af52e0927a23b8b30af3b5a75bee1ab788a15736e603b88a6312c.slc');
+            const instance = await ContractInstance.fromArchive(buffer);
+            const timestamp = Date.now();
+            const signatory = 'party1';
+            const p12File = fs.readFileSync('./test/data/signContract/keystore.p12', { encoding: 'base64' });
+            instance.sign(p12File, 'password', timestamp, signatory);
+            const result = instance.verifySignatures();
+            result.should.deep.equal(true);
+        });
+    });
+
+    describe('#signContract', () => {
+        it('should verify all contract signatures', async() => {
+            const buffer = fs.readFileSync('./test/data/signContract/latedeliveryandpenalty@0.17.0-d0c1a14e8a7af52e0927a23b8b30af3b5a75bee1ab788a15736e603b88a6312c.slc');
+            const instance = await ContractInstance.fromArchive(buffer);
+            const signatory = 'party1';
+            const p12File = fs.readFileSync('./test/data/signContract/keystore.p12', { encoding: 'base64' });
+            const buffer2 = await instance.signContract(p12File, 'password', signatory);
+            buffer2.should.not.be.null;
         });
     });
 });
