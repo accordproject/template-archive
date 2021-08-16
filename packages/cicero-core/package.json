@@ -89,6 +89,7 @@
     "json-stable-stringify": "1.0.1",
     "jszip": "3.2.1",
     "node-cache": "4.2.0",
+    "node-forge": "^0.10.0",
     "request": "2.88.0",
     "semver": "6.3.0",
     "slash": "3.0.0",

@@ -554,6 +554,86 @@ require('yargs')
             return;
         }
     })
+    .command('verify', 'verify the signatures of party/individuals who have signed the contarct', (yargs) => {
+        yargs.option('contract', {
+            describe: 'path to a smart legal contract slc file',
+            type: 'string'
+        });
+        yargs.option('warnings', {
+            describe: 'print warnings',
+            type: 'boolean',
+            default: false
+        });
+    }, (argv) => {
+
+        try {
+            argv = Commands.validateVerifyArgs(argv);
+            const options = {
+                warnings: argv.warnings,
+            };
+            return Commands.verify(argv.contract, options)
+                .then((result) => {
+                    if(result) {Logger.info(JSON.stringify(result));}
+                })
+                .catch((err) => {
+                    Logger.error(err.message);
+                });
+        } catch (err){
+            Logger.error(err.message);
+        }
+    })
+    .command('sign', 'sign a contract', (yargs) => {
+        yargs.option('contract', {
+            describe: 'path to a smart legal contract slc file',
+            type: 'string'
+        });
+        yargs.option('template', {
+            describe: 'path to a template',
+            type: 'string'
+        });
+        yargs.option('warnings', {
+            describe: 'print warnings',
+            type: 'boolean',
+            default: false
+        });
+        yargs.option('keystore', {
+            describe: 'p12 keystore path',
+            type: 'string',
+            default: null
+        });
+        yargs.option('passphrase', {
+            describe: 'p12 keystore passphrase',
+            type: 'string',
+            default: null
+        });
+        yargs.option('signatory', {
+            describe: 'name of the signatory',
+            type: 'string',
+            default: null
+        });
+        yargs.option('output', {
+            describe: 'file name for new archive',
+            type: 'string',
+            default: null
+        });
+    }, (argv) => {
+
+        try {
+            argv = Commands.validateSignArgs(argv);
+            const options = {
+                warnings: argv.warnings,
+            };
+            return Commands.sign(argv.contract, argv.keystore, argv.passphrase, argv.signatory, argv.output, options)
+                .then((result) => {
+                    if(result) {Logger.info('Contract has been successfully signed');}
+                })
+                .catch((err) => {
+                    Logger.error(err.message);
+                });
+        } catch (err){
+            Logger.error(err.message);
+        }
+    })
     .command('get', 'save local copies of external dependencies', (yargs) => {
         yargs.option('template', {
             describe: 'path to the template',

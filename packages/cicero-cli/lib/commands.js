@@ -628,6 +628,92 @@ class Commands {
     }
 
     /**
+     * Set default params before we create an archive using a template
+     *
+     * @param {object} argv the inbound argument values object
+     * @returns {object} a modfied argument object
+     */
+    static validateSignArgs(argv) {
+        argv = Commands.validateCommonArgs(argv);
+        if (argv.template) {
+            argv = Commands.validateDataArgs(argv);
+        }
+
+        if(!argv.target){
+            Logger.info('Using ergo as the default target for the archive.');
+            argv.target = 'ergo';
+        }
+
+        return argv;
+    }
+
+    /**
+     * Create an archive using a template
+     *
+     * @param {string} slcPath - path to the slc archive
+     * @param {string} keystore - path to the keystore
+     * @param {string} passphrase - passphrase of the keystore
+     * @param {string} signatory - name of the person/party signing the contract
+     * @param {string} outputPath - to the archive file
+     * @param {Object} [options] - an optional set of options
+     * @returns {object} Promise to the code creating an archive
+     */
+    static async sign(slcPath, keystore, passphrase, signatory, outputPath, options) {
+        return Commands.loadInstance(null, slcPath, options)
+            .then(async (instance) => {
+                const p12File = fs.readFileSync(keystore, { encoding: 'base64' });
+                const archive = await instance.signContract(p12File, passphrase, signatory);
+                let file;
+                if (outputPath) {
+                    file = outputPath;
+                }
+                else {
+                    const instanceName = instance.getIdentifier();
+                    const version = instance.contractSignatures.length;
+                    file = `${instanceName}.v${version}.slc`;
+                }
+                Logger.info('Creating archive: ' + file);
+                fs.writeFileSync(file, archive);
+                return true;
+            });
+    }
+
+    /**
+     * Set default params before we create an archive using a template
+     * @param {object} argv the inbound argument values object
+     * @returns {object} a modfied argument object
+     */
+    static validateVerifyArgs(argv) {
+        argv = Commands.validateCommonArgs(argv);
+
+        if(!argv.target){
+            Logger.info('Using ergo as the default target for the archive.');
+            argv.target = 'ergo';
+        }
+
+        return argv;
+    }
+
+    /**
+     * Create an archive using a template
+     *
+     * @param {string} contractPath - path to the template directory or archive
+     * @param {Object} [options] - an optional set of options
+     * @returns {object} Promise to the code creating an archive
+     */
+    static async verify(contractPath, options) {
+        return Commands.loadInstance(null, contractPath, options)
+            .then(async (instance) => {
+                const result = await instance.verifySignatures();
+                if (result) {
+                    Logger.info('All signatures verified successfully');
+                } else {
+                    Logger.error('Contract signature verification failed');
+                }
+            });
+    }
+
+    /**
      * Set default params before we create an instance archive
      *
      * @param {object} argv the inbound argument values object
