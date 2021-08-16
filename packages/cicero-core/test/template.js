@@ -18,7 +18,6 @@ const Template = require('../lib/template');
 const Clause = require('../lib/clause');
 
 const fs = require('fs');
-const path = require('path');
 const archiver = require('archiver');
 const forge = require('node-forge');
 const crypto = require('crypto');
@@ -29,7 +28,6 @@ const assert = require('chai').assert;
 chai.should();
 chai.use(require('chai-things'));
 chai.use(require('chai-as-promised'));
-chai.use(require('chai-fs'));
 
 /* eslint-disable */
 
@@ -106,10 +104,7 @@ describe('Template', () => {
         it('should create the archive without signing it', async() => {
             const template = await Template.fromDirectory('./test/data/signing-template/helloworldstate');
             const archiveBuffer = await template.toArchive('ergo');
-            fs.writeFileSync('./test/data/signing-template/unsignedArchive.cta', archiveBuffer);
-            const archivePath = path.join(__dirname,'data', 'signing-template', 'unsignedArchive.cta');
-            archivePath.should.be.a.file().and.not.empty;
-            fs.unlinkSync(archivePath);
+            archiveBuffer.should.not.be.null;
         });
 
         it('should create the archive with signing it', async() => {
@@ -120,10 +115,7 @@ describe('Template', () => {
                 passphrase: 'password'
             };
             const archiveBuffer = await template.toArchive('ergo', {keystore});
-            fs.writeFileSync('./test/data/signing-template/signedArchive.cta', archiveBuffer);
-            const archivePath = path.join(__dirname,'data', 'signing-template', 'signedArchive.cta');
-            archivePath.should.be.a.file().and.not.empty;
-            fs.unlinkSync(archivePath);
+            archiveBuffer.should.not.be.null;
         });
 
         it('should throw an error if passphrase of the keystore is wrong', async() => {

@@ -84,7 +84,6 @@
     "@accordproject/markdown-slate": "0.14.0",
     "@accordproject/markdown-template": "0.14.0",
     "axios": "0.21.1",
-    "chai-fs": "^2.0.0",
     "debug": "4.1.0",
     "ietf-language-tag-regex": "0.0.5",
     "json-stable-stringify": "1.0.1",
