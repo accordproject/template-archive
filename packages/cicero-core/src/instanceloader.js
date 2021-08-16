@@ -154,6 +154,24 @@ class InstanceLoader extends FileLoader {
         ));
 
         instance.setData(data);
+
+        // grab the signatures
+        const signatureFiles = await InstanceLoader.loadZipFilesContents(zip, /signatures[/\\].*\.json$/, true, false);
+        signatureFiles.forEach((signatureFile) => {
+            let signature = JSON.parse(signatureFile.contents);
+            instance.contractSignatures.push(signature);
+        });
+
+        //grab the parties
+        const contractModel = Util.getContractModel(instance.logicManager, instance.instanceKind);
+        const properties = contractModel.getProperties();
+        properties.map((property) => property.getDecorators().map((decorator) => {
+            if (decorator.getName() === 'ContractParty') {
+                const data = instance.data;
+                const partyName = data[property.name];
+                instance.parties.push(partyName);
+            }
+        }));
         return instance;
     }
 }
