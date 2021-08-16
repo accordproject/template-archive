@@ -615,7 +615,7 @@ class Commands {
         return Commands.loadTemplate(templatePath, options)
             .then(async (template) => {
                 let keystore = null;
-                if (options.keystore.path) {
+                if (options.keystore) {
                     const p12File = fs.readFileSync(options.keystore.path, { encoding: 'base64' });
                     const inputKeystore = {
                         p12File: p12File,
@@ -623,7 +623,7 @@ class Commands {
                     };
                     keystore = inputKeystore;
                 }
-                const archive = await template.toArchive(target, {keystore});
+                const archive = await template.toArchive(target, {keystore}, options);
                 let file;
                 if (outputPath) {
                     file = outputPath;
@@ -647,11 +647,6 @@ class Commands {
      */
     static validateVerifyArgs(argv) {
         argv = Commands.validateCommonArgs(argv);
-
-        if(!argv.target){
-            Logger.info('Using ergo as the default target for the archive.');
-            argv.target = 'ergo';
-        }
         return argv;
     }
 

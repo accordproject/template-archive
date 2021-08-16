@@ -1188,12 +1188,7 @@ describe('#archive', async () => {
 
     it('should create a valid ergo archive', async () => {
         const archiveName = 'test.cta';
-        const options = {
-            keystore: {
-                path: null,
-                passphrase: null
-            }
-        };
+        const options = {};
         const result = await Commands.archive(template, 'ergo', archiveName, options);
         result.should.eql(true);
         const newTemplate = await Template.fromArchive(fs.readFileSync(archiveName));
@@ -1204,12 +1199,7 @@ describe('#archive', async () => {
 
     it('should create a valid ergo archive with a default name', async () => {
         const archiveName = 'latedeliveryandpenalty@0.0.1.cta';
-        const options = {
-            keystore: {
-                path: null,
-                passphrase: null
-            }
-        };
+        const options = {};
         const result = await Commands.archive(template, 'ergo', null, options);
         result.should.eql(true);
         const newTemplate = await Template.fromArchive(fs.readFileSync(archiveName));
@@ -1221,13 +1211,7 @@ describe('#archive', async () => {
     it('should create an Ergo archive', async () => {
         const tmpFile = await tmp.file();
         const tmpArchive = tmpFile.path + '.cta';
-        const options = {
-            warnings: false,
-            keystore: {
-                path: null,
-                passphrase: null
-            }
-        };
+        const options = {};
         await Commands.archive(template, 'ergo', tmpArchive, options);
         fs.readFileSync(tmpArchive).length.should.be.above(0);
         tmpFile.cleanup();
@@ -1235,13 +1219,7 @@ describe('#archive', async () => {
     it('should create a JavaScript archive', async () => {
         const tmpFile = await tmp.file();
         const tmpArchive = tmpFile.path + '.cta';
-        const options = {
-            warnings: false,
-            keystore: {
-                path: null,
-                passphrase: null
-            }
-        };
+        const options = {};
         await Commands.archive(template, 'es6', tmpArchive, options);
         fs.readFileSync(tmpArchive).length.should.be.above(0);
         tmpFile.cleanup();
@@ -1249,13 +1227,7 @@ describe('#archive', async () => {
     it('should not create an unknown archive', async () => {
         const tmpFile = await tmp.file();
         const tmpArchive = tmpFile.path + '.cta';
-        const options = {
-            warnings: false,
-            keystore: {
-                path: null,
-                passphrase: null
-            }
-        };
+        const options = {};
         return Commands.archive(template, 'foo', tmpArchive, options)
             .should.be.rejectedWith('Unknown target: foo (available: es6,java)');
     });
@@ -1327,16 +1299,6 @@ describe('#validateVerfiyArgs', () => {
             _: ['verify']
         });
         args.template.should.match(/cicero-cli[/\\]test[/\\]data[/\\]signedArchive$/);
-        args.target.should.match(/ergo/);
-    });
-    it('only target arg specified', () => {
-        process.chdir(path.resolve(__dirname, 'data/signedArchive/'));
-        const args  = Commands.validateVerifyArgs({
-            _: ['verify'],
-            target: 'ergo'
-        });
-        args.template.should.match(/cicero-cli[/\\]test[/\\]data[/\\]signedArchive$/);
-        args.target.should.match(/ergo/);
     });
     it('template arg specified', () => {
         process.chdir(path.resolve(__dirname));
@@ -1344,12 +1306,11 @@ describe('#validateVerfiyArgs', () => {
             _: ['verify', 'data/signedArchive/']
         });
         args.template.should.match(/cicero-cli[/\\]test[/\\]data[/\\]signedArchive$/);
-        args.target.should.match(/ergo/);
     });
     it('verbose flag specified', () => {
         process.chdir(path.resolve(__dirname, 'data/latedeliveryandpenalty/'));
         Commands.validateVerifyArgs({
-            _: ['archive'],
+            _: ['verify'],
             verbose: true
         });
     });
@@ -1364,8 +1325,10 @@ describe('#validateVerfiyArgs', () => {
 describe('#verify', async () => {
     it('should verify the signature of the template author/developer', async () => {
         const templatePath = path.resolve(__dirname, 'data/signedArchive/');
-        const result = await Commands.verify(templatePath);
-        result.should.not.be.null;
-        result.should.be.true;
+        return Commands.verify(templatePath).should.be.fulfilled;
+    });
+    it('should throw error when signture is invalid', async () => {
+        const templatePath = path.resolve(__dirname, 'data/signedArchiveFail/');
+        return Commands.verify(templatePath).should.be.rejectedWith('Template\'s author signature is invalid!');
     });
 });
