@@ -18,6 +18,8 @@ const Metadata = require('./metadata');
 const Logger = require('@accordproject/concerto-core').Logger;
 const ParserManager = require('@accordproject/markdown-template').ParserManager;
 const crypto = require('crypto');
+const fs = require('fs');
+const forge = require('node-forge');
 const stringify = require('json-stable-stringify');
 const LogicManager = require('@accordproject/ergo-compiler').LogicManager;
 const TemplateLoader = require('./templateloader');
@@ -173,14 +175,57 @@ class Template {
     }
 
     /**
+     * signs a string made up of template hash and time stamp using private key derived
+     * from the keystore
+     * @param {string} [path] - path of the keystore to be used
+     * @param {string} [password] - password for the keystore file
+     * @return {object} - object containing signatory's metadata, timestamp, signatory's certificate, signature
+     * @private
+     */
+    signTemplate(path, password) {
+        const timeStamp = Date.now();
+        const templateHash = this.getHash();
+        const p12Ffile = fs.readFileSync(path, { encoding: 'base64' });
+        // decode p12 from base64
+        const p12Der = forge.util.decode64(p12Ffile);
+        // get p12 as ASN.1 object
+        const p12Asn1 = forge.asn1.fromDer(p12Der);
+        // decrypt p12 using the password 'password'
+        const p12 = forge.pkcs12.pkcs12FromAsn1(p12Asn1, false, password);
+        //X509 cert forge type
+        const certificateForge = p12.safeContents[0].safeBags[0].cert;
+        const subjectAttributes = certificateForge.subject.attributes;
+        //Private Key forge type
+        const privateKeyForge = p12.safeContents[1].safeBags[0].key;
+        //convert cert and private key from forge to PEM
+        const certificatePem = forge.pki.certificateToPem(certificateForge);
+        const privateKeyPem = forge.pki.privateKeyToPem(privateKeyForge);
+        //convert private key in pem to private key type in node
+        const privateKey = crypto.createPrivateKey(privateKeyPem);
+        const sign = crypto.createSign('SHA256');
+        sign.write(templateHash + timeStamp);
+        sign.end();
+        const signature = sign.sign(privateKey, 'hex');
+        const signatureObject = {
+            signatoryInfo: subjectAttributes,
+            timeStamp: timeStamp,
+            signatoryCert: certificatePem,
+            signature: signature
+        };
+        return signatureObject;
+    }
+
+    /**
      * Persists this template to a Cicero Template Archive (cta) file.
      * @param {string} [language] - target language for the archive (should be 'ergo')
+     * @param {Object} [keyStore] - path for the keystore and password of the keystore
      * @param {Object} [options] - JSZip options
      * @param {Buffer} logo - Bytes data of the PNG file
      * @return {Promise<Buffer>} the zlib buffer
      */
-    async toArchive(language, options) {
-        return TemplateSaver.toArchive(this, language, options);
+    async toArchive(language, keyStore, options) {
+        const signatureObject = keyStore !== undefined ? this.signTemplate(keyStore.path, keyStore.password) : undefined;
+        return TemplateSaver.toArchive(this, language, signatureObject, options);
     }
 
     /**
