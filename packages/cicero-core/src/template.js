@@ -61,7 +61,7 @@ class Template {
      * @param {Object} options  - e.g., { verify: true }
      */
     validate(options = {}) {
-        if (options.verify) {
+        if (options.verifySignature) {
             this.verifyTemplateSignature();
         }
         this.getModelManager().validateModelFiles();
@@ -181,7 +181,6 @@ class Template {
 
     /**
      * verifies the signature stored in the template object using the template hash and timestamp
-     * @return {boolean} true if signature is valid else false
      */
     verifyTemplateSignature() {
         const templateHash = this.getHash();
@@ -204,8 +203,6 @@ class Template {
         const result = verify.verify(publicKey, signature, 'hex');
         if (!result) {
             throw new Error('Template\'s author signature is invalid!');
-        }else{
-            return result;
         }
     }
 
@@ -215,7 +212,6 @@ class Template {
      * @param {String} p12File - encoded string of p12 keystore file
      * @param {String} passphrase - passphrase for the keystore file
      * @param {Number} timestamp - timestamp of the moment of signature is done
-     * @private
      */
     signTemplate(p12File, passphrase, timestamp) {
         if (typeof(p12File) !== 'string') {throw new Error('p12File should be of type String!');}

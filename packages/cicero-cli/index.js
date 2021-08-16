@@ -475,13 +475,21 @@ require('yargs')
 
         try {
             argv = Commands.validateArchiveArgs(argv);
-            const options = {
-                warnings: argv.warnings,
-                keystore: {
-                    path: argv.keystore,
-                    passphrase: argv.passphrase
-                }
-            };
+            let options = {};
+
+            if (argv.keystore) {
+                options = {
+                    warnings: argv.warnings,
+                    keystore: {
+                        path: argv.keystore,
+                        passphrase: argv.passphrase
+                    }
+                };
+            } else {
+                options = {
+                    warnings: argv.warnings,
+                };
+            }
             return Commands.archive(argv.template, argv.target, argv.output, options)
                 .catch((err) => {
                     Logger.error(err.message);
