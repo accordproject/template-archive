@@ -565,6 +565,9 @@ require('yargs')
             default: false
         });
     }, (argv) => {
+        if (argv.verbose) {
+            Logger.info(`verifying signatures of contract ${argv.contract}`);
+        }
 
         try {
             argv = Commands.validateVerifyArgs(argv);
@@ -587,15 +590,6 @@ require('yargs')
             describe: 'path to a smart legal contract slc file',
             type: 'string'
         });
-        yargs.option('template', {
-            describe: 'path to a template',
-            type: 'string'
-        });
-        yargs.option('warnings', {
-            describe: 'print warnings',
-            type: 'boolean',
-            default: false
-        });
         yargs.option('keystore', {
             describe: 'p12 keystore path',
             type: 'string',
@@ -616,7 +610,15 @@ require('yargs')
             type: 'string',
             default: null
         });
+        yargs.option('warnings', {
+            describe: 'print warnings',
+            type: 'boolean',
+            default: false
+        });
     }, (argv) => {
+        if (argv.verbose) {
+            Logger.info(`sign contract ${argv.contract} for signatory ${argv.signatory}`);
+        }
 
         try {
             argv = Commands.validateSignArgs(argv);
