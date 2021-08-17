@@ -655,13 +655,18 @@ class Commands {
      */
     static validateSignArgs(argv) {
         argv = Commands.validateCommonArgs(argv);
-        if (argv.template) {
-            argv = Commands.validateDataArgs(argv);
-        }
 
-        if(!argv.target){
-            Logger.info('Using ergo as the default target for the archive.');
-            argv.target = 'ergo';
+        if (!argv.keystore) {
+            throw new Error('please define path of the keystore using --keystore');
+        }
+        if (!argv.passphrase) {
+            throw new Error('please define the passphrase of the keystore using --pasphrase');
+        }
+        if (!argv.signatory) {
+            throw new Error('please define the signatory signing the contract using --signatory');
+        }
+        if(argv.verbose) {
+            Logger.info(`verifying signatures of contract ${argv.contract}`);
         }
 
         return argv;

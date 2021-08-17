@@ -28,6 +28,7 @@ chai.use(require('chai-things'));
 chai.use(require('chai-as-promised'));
 
 const Commands = require('../lib/commands');
+const { ContractInstance } = require('@accordproject/cicero-core');
 
 const template = path.resolve(__dirname, 'data/latedeliveryandpenalty/');
 const templateJs = path.resolve(__dirname, 'data/latedeliveryandpenalty_js/');
@@ -1308,37 +1309,16 @@ describe('#archive', async () => {
 });
 
 describe('#validateSignArgs', () => {
-    it('no args specified', () => {
-        process.chdir(path.resolve(__dirname, 'data/signContract/'));
+    it('all args specified', () => {
+        process.chdir(path.resolve(__dirname, 'data/contractsigning/'));
         const args  = Commands.validateSignArgs({
+            contract: 'latedeliveryandpenalty@0.17.0-d0c1a14e8a7af52e0927a23b8b30af3b5a75bee1ab788a15736e603b88a6312c.slc',
+            keystore: 'keystore.p12',
+            passphrase: 'password',
+            signatory: 'partyA',
             _: ['sign']
         });
-        args.template.should.match(/cicero-cli[/\\]test[/\\]data[/\\]signContract$/);
-        args.target.should.match(/ergo/);
-    });
-    it('only target arg specified', () => {
-        process.chdir(path.resolve(__dirname, 'data/signContract/'));
-        const args  = Commands.validateSignArgs({
-            _: ['sign'],
-            target: 'ergo'
-        });
-        args.template.should.match(/cicero-cli[/\\]test[/\\]data[/\\]signContract$/);
-        args.target.should.match(/ergo/);
-    });
-    it('template arg specified', () => {
-        process.chdir(path.resolve(__dirname));
-        const args  = Commands.validateSignArgs({
-            _: ['sign', 'data/signContract/']
-        });
-        args.template.should.match(/cicero-cli[/\\]test[/\\]data[/\\]signContract$/);
-        args.target.should.match(/ergo/);
-    });
-    it('verbose flag specified', () => {
-        process.chdir(path.resolve(__dirname, 'data/signContract/'));
-        Commands.validateSignArgs({
-            _: ['sign'],
-            verbose: true
-        });
+        args.contract.should.match(/.slc$/);
     });
     it('bad package.json', () => {
         process.chdir(path.resolve(__dirname, 'data/'));
@@ -1350,12 +1330,16 @@ describe('#validateSignArgs', () => {
 
 describe('#sign', async () => {
     it('should sign the contract for a party/individual', async () => {
-        const slcPath = path.resolve(__dirname, 'data/signContract/latedeliveryandpenalty@0.17.0-d0c1a14e8a7af52e0927a23b8b30af3b5a75bee1ab788a15736e603b88a6312c.slc');
-        const keystore = path.resolve(__dirname, 'data/keystore.p12');
+        const archiveName = 'test.slc';
+        const slcPath = path.resolve(__dirname, 'data/contractsigning/latedeliveryandpenalty@0.17.0-d0c1a14e8a7af52e0927a23b8b30af3b5a75bee1ab788a15736e603b88a6312c.slc');
+        const keystore = path.resolve(__dirname, 'data/contractsigning/keystore.p12');
         const signatory = 'partyA';
-        const outputPath = path.resolve(__dirname, 'data/');
-        const result = await Commands.sign(slcPath, keystore, 'password', signatory, outputPath);
-        result.should.be.true;
+        const result = await Commands.sign(slcPath, keystore, 'password', signatory, archiveName);
+        result.should.eql(true);
+        const newInstance = await ContractInstance.fromArchive(fs.readFileSync(archiveName));
+        newInstance.should.not.be.null;
+        newInstance.contractSignatures.should.have.lengthOf(1);
+        fs.unlinkSync(archiveName);
     });
 });
 
