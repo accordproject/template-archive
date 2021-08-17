@@ -190,7 +190,7 @@ class Template {
         const signatoryCert = this.authorSignature.templateSignature.signatoryCert;
         //X509 cert converted from PEM to forge type
         const certificateForge = forge.pki.certificateFromPem(signatoryCert);
-        //public key in forge typenode index.js sign acme 123 helloworldstate
+        //public key in forge type
         const publicKeyForge = certificateForge.publicKey;
         //convert public key from forge to pem
         const publicKeyPem = forge.pki.publicKeyToPem(publicKeyForge);
