@@ -1320,9 +1320,47 @@ describe('#validateSignArgs', () => {
         });
         args.contract.should.match(/.slc$/);
     });
+    it('keystore not defined', () => {
+        process.chdir(path.resolve(__dirname, 'data/contractsigning/'));
+        (() => Commands.validateSignArgs({
+            contract: 'latedeliveryandpenalty@0.17.0-d0c1a14e8a7af52e0927a23b8b30af3b5a75bee1ab788a15736e603b88a6312c.slc',
+            passphrase: 'password',
+            signatory: 'partyA',
+            _: ['sign']
+        })).should.throw('please define path of the keystore using --keystore');
+    });
+    it('passphrase not defined', () => {
+        process.chdir(path.resolve(__dirname, 'data/contractsigning/'));
+        (() => Commands.validateSignArgs({
+            contract: 'latedeliveryandpenalty@0.17.0-d0c1a14e8a7af52e0927a23b8b30af3b5a75bee1ab788a15736e603b88a6312c.slc',
+            keystore: 'keystore.p12',
+            signatory: 'partyA',
+            _: ['sign']
+        })).should.throw('please define the passphrase of the keystore using --pasphrase');
+    });
+    it('signatory not defined', () => {
+        process.chdir(path.resolve(__dirname, 'data/contractsigning/'));
+        (() => Commands.validateSignArgs({
+            contract: 'latedeliveryandpenalty@0.17.0-d0c1a14e8a7af52e0927a23b8b30af3b5a75bee1ab788a15736e603b88a6312c.slc',
+            keystore: 'keystore.p12',
+            passphrase: 'password',
+            _: ['sign']
+        })).should.throw('please define the signatory signing the contract using --signatory');
+    });
+    it('verbose flag specified', () => {
+        process.chdir(path.resolve(__dirname, 'data/contractsigning/'));
+        Commands.validateSignArgs({
+            contract: 'latedeliveryandpenalty@0.17.0-d0c1a14e8a7af52e0927a23b8b30af3b5a75bee1ab788a15736e603b88a6312c.slc',
+            keystore: 'keystore.p12',
+            passphrase: 'password',
+            signatory: 'partyA',
+            _: ['sign'],
+            verbose: true
+        });
+    });
     it('bad package.json', () => {
         process.chdir(path.resolve(__dirname, 'data/'));
-        (() => Commands.validateVerifyArgs({
+        (() => Commands.validateSignArgs({
             _: ['sign']
         })).should.throw(' not a valid cicero template. Make sure that package.json exists and that it has a cicero entry.');
     });
@@ -1340,6 +1378,38 @@ describe('#sign', async () => {
         newInstance.should.not.be.null;
         newInstance.contractSignatures.should.have.lengthOf(1);
         fs.unlinkSync(archiveName);
+    });
+});
+
+describe('#validateVerifyArgs', () => {
+    it('all args specified', () => {
+        process.chdir(path.resolve(__dirname, 'data/contractsigning/'));
+        const args  = Commands.validateVerifyArgs({
+            contract: 'latedeliveryandpenalty@0.17.0-d0c1a14e8a7af52e0927a23b8b30af3b5a75bee1ab788a15736e603b88a6312c.v1.slc',
+            _: ['verify']
+        });
+        args.contract.should.match(/.slc$/);
+    });
+    it('verbose flag specified', () => {
+        process.chdir(path.resolve(__dirname, 'data/contractsigning/'));
+        Commands.validateVerifyArgs({
+            contract: 'latedeliveryandpenalty@0.17.0-d0c1a14e8a7af52e0927a23b8b30af3b5a75bee1ab788a15736e603b88a6312c.v1.slc',
+            _: ['verify'],
+            verbose: true
+        });
+    });
+    it('bad package.json', () => {
+        process.chdir(path.resolve(__dirname, 'data/'));
+        (() => Commands.validateVerifyArgs({
+            _: ['verify']
+        })).should.throw(' not a valid cicero template. Make sure that package.json exists and that it has a cicero entry.');
+    });
+});
+
+describe('#verify', async () => {
+    it('should verify contract signatures', async () => {
+        const slcPath = path.resolve(__dirname, 'data/contractsigning/latedeliveryandpenalty@0.17.0-d0c1a14e8a7af52e0927a23b8b30af3b5a75bee1ab788a15736e603b88a6312c.v1.slc');
+        return Commands.verify(slcPath).should.be.fulfilled;
     });
 });
 
