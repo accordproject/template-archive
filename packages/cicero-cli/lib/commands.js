@@ -708,13 +708,9 @@ class Commands {
      */
     static async verify(contractPath, options) {
         return Commands.loadInstance(null, contractPath, options)
-            .then(async (instance) => {
-                const result = await instance.verifySignatures();
-                if (result) {
-                    Logger.info('All signatures verified successfully');
-                } else {
-                    Logger.error('Contract signature verification failed');
-                }
+            .then((instance) => {
+                instance.verifySignatures();
+                Logger.info('All signatures verified successfully');
             });
     }
 
