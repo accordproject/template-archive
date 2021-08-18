@@ -202,7 +202,7 @@ class ContractInstance extends Instance {
         verify.end();
         const result = verify.verify(publicKey, signature, 'hex');
         if (!result) {
-            throw new Error('Template\'s author signature is invalid!');
+            throw new Error('Contract signature is invalid!');
         }
     }
 }
