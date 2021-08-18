@@ -78,7 +78,7 @@ class ContractInstance extends Instance {
      * @param {String} p12File - encoded string of p12 keystore file
      * @param {String} passphrase - passphrase for the keystore file
      * @param {String} signatory - name of the signatory
-     * @return {Promise<ContractInstance>} a Promise to the instance
+     * @return {Promise<Buffer>} the zlib buffer
      */
     async signContract(p12File, passphrase, signatory) {
         if (this.contractSignatures.length !== 0 ) {
@@ -96,7 +96,7 @@ class ContractInstance extends Instance {
      * @param {String} passphrase - passphrase for the keystore file
      * @param {Number} timestamp - timestamp of the moment of signature is done
      * @param {String} signatory - name of the signatory
-     * @private
+     * @ppublic
      */
     sign(p12File, passphrase, timestamp, signatory) {
         if (typeof(p12File) !== 'string') {throw new Error('p12File should be of type String!');}
@@ -168,7 +168,6 @@ class ContractInstance extends Instance {
 
     /**
      * Verify the signatures of the parties/individuals who signed the contract
-     * @return {boolean} true if all signatures are valid
      */
     verifySignatures() {
         if(this.contractSignatures.length > 0){
@@ -176,7 +175,6 @@ class ContractInstance extends Instance {
                 const { timestamp, signatoryCert, signature } = contractSignature;
                 this.verify(signature, timestamp, signatoryCert);
             });
-            return true;
         } else {
             throw new Error('The contract is not signed by any party/individual.');
         }
@@ -187,13 +185,12 @@ class ContractInstance extends Instance {
      * @param {string} signature  - signature of the signatory
      * @param {number} timestamp - timestamp of signing of the contract
      * @param {string} signatoryCert  - x509 certificate of the signatory
-     * @return {boolean} true if signature is valid
      */
     verify(signature, timestamp, signatoryCert) {
         const contractHash = this.getHash();
         //X509 cert converted from PEM to forge type
         const certificateForge = forge.pki.certificateFromPem(signatoryCert);
-        //public key in forge typenode index.js sign acme 123 helloworldstate
+        //public key in forge type
         const publicKeyForge = certificateForge.publicKey;
         //convert public key from forge to pem
         const publicKeyPem = forge.pki.publicKeyToPem(publicKeyForge);
@@ -206,8 +203,6 @@ class ContractInstance extends Instance {
         const result = verify.verify(publicKey, signature, 'hex');
         if (!result) {
             throw new Error('Template\'s author signature is invalid!');
-        } else {
-            return true;
         }
     }
 }
