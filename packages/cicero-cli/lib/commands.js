@@ -674,8 +674,7 @@ class Commands {
                 }
                 else {
                     const instanceName = instance.getIdentifier();
-                    const version = instance.contractSignatures.length;
-                    file = `${instanceName}.v${version}.slc`;
+                    file = `${instanceName}.slc`;
                 }
                 Logger.info('Creating archive: ' + file);
                 fs.writeFileSync(file, archive);
