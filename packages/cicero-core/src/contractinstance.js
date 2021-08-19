@@ -67,9 +67,6 @@ class ContractInstance extends Instance {
      */
     static async fromArchive(buffer, options) {
         const instance = await InstanceLoader.fromArchive(ContractInstance, buffer, options);
-        if (instance.contractSignatures.length !== 0) {
-            instance.verifySignatures();
-        }
         return instance;
     }
 
