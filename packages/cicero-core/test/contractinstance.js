@@ -28,6 +28,7 @@ chai.should();
 chai.use(require('chai-things'));
 chai.use(require('chai-as-promised'));
 
+
 /* eslint-disable */
 
 function sign(instanceHash, timestamp, p12File, passphrase){
@@ -109,7 +110,15 @@ describe('ContractInstance', () => {
             instance.sign(p12File, 'password', timestamp, signatory);
             const partySignature = instance.contractSignatures[1];
             const { signatoryCert, signature } = partySignature;
-            instance.verify(signature, timestamp, signatoryCert).should.not.throw();
+            (() => instance.verify(signature, timestamp, signatoryCert)).should.not.throw();
+        });
+
+        it('should throw error for failed signature verification', async() => {
+            const buffer = fs.readFileSync('./test/data/signContract/latedeliveryandpenalty@0.17.0-a3d6e61ddfe056ec65e240053e1f13e4f95a3e7804027ca6bb5652d0d65ac8ba.slc');
+            const instance = await ContractInstance.fromArchive(buffer);
+            const partySignature = instance.contractSignatures[1];
+            const { signatoryCert, signature, timestamp } = partySignature;
+            return instance.verify(signature, timestamp, signatoryCert).should.be.rejectedWith('Contract signature is invalid!');
         });
     });
 
@@ -121,7 +130,13 @@ describe('ContractInstance', () => {
             const signatory = 'party1';
             const p12File = fs.readFileSync('./test/data/signContract/keystore.p12', { encoding: 'base64' });
             instance.sign(p12File, 'password', timestamp, signatory);
-            return instance.verifySignatures().should.not.throw();
+            (() => instance.verifySignatures()).should.not.throw();
+        });
+
+        it('should throw error while verifying the contract signatures', async() => {
+            const buffer = fs.readFileSync('./test/data/signContract/latedeliveryandpenalty@0.17.0-a3d6e61ddfe056ec65e240053e1f13e4f95a3e7804027ca6bb5652d0d65ac8ba.slc');
+            const instance = await ContractInstance.fromArchive(buffer);
+            return instance.verifySignatures().should.be.rejectedWith('Contract signature is invalid!');
         });
     });
 
