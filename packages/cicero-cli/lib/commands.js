@@ -657,16 +657,16 @@ class Commands {
         argv = Commands.validateCommonArgs(argv);
 
         if (!argv.keystore) {
-            throw new Error('please define path of the keystore using --keystore');
+            throw new Error('Please define path of the keystore using --keystore');
         }
         if (!argv.passphrase) {
-            throw new Error('please define the passphrase of the keystore using --pasphrase');
+            throw new Error('Please define the passphrase of the keystore using --pasphrase');
         }
         if (!argv.signatory) {
-            throw new Error('please define the signatory signing the contract using --signatory');
+            throw new Error('Please define the signatory signing the contract using --signatory');
         }
         if(argv.verbose) {
-            Logger.info(`verifying signatures of contract ${argv.contract}`);
+            Logger.info(`Verifying signatures of contract ${argv.contract}`);
         }
 
         return argv;
