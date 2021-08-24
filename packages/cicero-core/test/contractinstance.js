@@ -118,7 +118,7 @@ describe('ContractInstance', () => {
             const instance = await ContractInstance.fromArchive(buffer);
             const partySignature = instance.contractSignatures[1];
             const { signatoryCert, signature, timestamp } = partySignature;
-            return instance.verify(signature, timestamp, signatoryCert).should.be.rejectedWith('Contract signature is invalid!');
+            return (() => instance.verify(signature, timestamp, signatoryCert)).should.throw('Contract signature is invalid!');
         });
     });
 
@@ -136,7 +136,7 @@ describe('ContractInstance', () => {
         it('should throw error while verifying the contract signatures', async() => {
             const buffer = fs.readFileSync('./test/data/signContract/latedeliveryandpenalty@0.17.0-a3d6e61ddfe056ec65e240053e1f13e4f95a3e7804027ca6bb5652d0d65ac8ba.slc');
             const instance = await ContractInstance.fromArchive(buffer);
-            return instance.verifySignatures().should.be.rejectedWith('Contract signature is invalid!');
+            return (() => instance.verifySignatures()).should.throw('Contract signature is invalid!');
         });
     });
 
