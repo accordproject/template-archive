@@ -1327,7 +1327,7 @@ describe('#validateSignArgs', () => {
             passphrase: 'password',
             signatory: 'partyA',
             _: ['sign']
-        })).should.throw('please define path of the keystore using --keystore');
+        })).should.throw('Please define path of the keystore using --keystore');
     });
     it('passphrase not defined', () => {
         process.chdir(path.resolve(__dirname, 'data/contractsigning/'));
@@ -1336,7 +1336,7 @@ describe('#validateSignArgs', () => {
             keystore: 'keystore.p12',
             signatory: 'partyA',
             _: ['sign']
-        })).should.throw('please define the passphrase of the keystore using --pasphrase');
+        })).should.throw('Please define the passphrase of the keystore using --pasphrase');
     });
     it('signatory not defined', () => {
         process.chdir(path.resolve(__dirname, 'data/contractsigning/'));
@@ -1345,7 +1345,7 @@ describe('#validateSignArgs', () => {
             keystore: 'keystore.p12',
             passphrase: 'password',
             _: ['sign']
-        })).should.throw('please define the signatory signing the contract using --signatory');
+        })).should.throw('Please define the signatory signing the contract using --signatory');
     });
     it('verbose flag specified', () => {
         process.chdir(path.resolve(__dirname, 'data/contractsigning/'));
@@ -1379,6 +1379,14 @@ describe('#sign', async () => {
         newInstance.contractSignatures.should.have.lengthOf(1);
         fs.unlinkSync(archiveName);
     });
+    it('should sign the contract for a party/individual without specifying output path', async () => {
+        const slcPath = path.resolve(__dirname, 'data/contractsigning/latedeliveryandpenalty@0.17.0-d0c1a14e8a7af52e0927a23b8b30af3b5a75bee1ab788a15736e603b88a6312c.slc');
+        const keystore = path.resolve(__dirname, 'data/contractsigning/keystore.p12');
+        const signatory = 'partyA';
+        const result = await Commands.sign(slcPath, keystore, 'password', signatory);
+        result.should.eql(true);
+        fs.unlinkSync('latedeliveryandpenalty@0.17.0-d0c1a14e8a7af52e0927a23b8b30af3b5a75bee1ab788a15736e603b88a6312c.slc');
+    });
 });
 
 describe('#validateVerifyArgs', () => {
@@ -1409,7 +1417,7 @@ describe('#validateVerifyArgs', () => {
 describe('#verify', async () => {
     it('should verify contract signatures', async () => {
         const slcPath = path.resolve(__dirname, 'data/contractsigning/latedeliveryandpenalty@0.17.0-d0c1a14e8a7af52e0927a23b8b30af3b5a75bee1ab788a15736e603b88a6312c.v1.slc');
-        return Commands.verify(slcPath).should.be.fulfilled;
+        return Commands.verify(null, slcPath).should.be.fulfilled;
     });
 });
 
