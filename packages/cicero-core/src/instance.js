@@ -65,6 +65,7 @@ class Instance {
 
         this.data = null;
         this.concertoData = null;
+        this.authorSignature = null;
         this.contractSignatures = [];
         this.parties = [];
 
