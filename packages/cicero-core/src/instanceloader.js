@@ -155,12 +155,15 @@ class InstanceLoader extends FileLoader {
 
         instance.setData(data);
 
-        // grab the signatures
+        // grab the party signatures
         const signatureFiles = await InstanceLoader.loadZipFilesContents(zip, /signatures[/\\].*\.json$/, true, false);
         signatureFiles.forEach((signatureFile) => {
             let signature = JSON.parse(signatureFile.contents);
             instance.contractSignatures.push(signature);
         });
+
+        //grab the author/developer signature
+        this.authorSignature = await InstanceLoader.loadZipFileContents(zip, 'signature.json', true, false);
 
         //grab the parties
         const contractModel = Util.getContractModel(instance.logicManager, instance.instanceKind);

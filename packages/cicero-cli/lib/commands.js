@@ -637,17 +637,6 @@ class Commands {
     }
 
     /**
-     * Set default params before we verify signatures of template author/developer
-     *
-     * @param {object} argv the inbound argument values object
-     * @returns {object} a modfied argument object
-     */
-    static validateVerifyArgs(argv) {
-        argv = Commands.validateCommonArgs(argv);
-        return argv;
-    }
-
-    /**
      * Set default params before we create an archive using a template
      *
      * @param {object} argv the inbound argument values object
@@ -673,7 +662,7 @@ class Commands {
     }
 
     /**
-     * Create an archive using a template
+     * Sign a contract instance
      *
      * @param {string} slcPath - path to the slc archive
      * @param {string} keystore - path to the keystore
@@ -703,34 +692,38 @@ class Commands {
     }
 
     /**
-     * Set default params before we create an archive using a template
+     * Set default params before we verify signatures of template author/developer
+     *
      * @param {object} argv the inbound argument values object
      * @returns {object} a modfied argument object
      */
     static validateVerifyArgs(argv) {
         argv = Commands.validateCommonArgs(argv);
-
-        if(!argv.target){
-            Logger.info('Using ergo as the default target for the archive.');
-            argv.target = 'ergo';
-        }
-
         return argv;
     }
 
     /**
-     * Create an archive using a template
+     * Verify signatures on templates or contract instances
      *
+     * @param {string} templatePath - path to the template directory or archive
      * @param {string} contractPath - path to the template directory or archive
      * @param {Object} [options] - an optional set of options
      * @returns {object} Promise to the code creating an archive
      */
-    static async verify(contractPath, options) {
-        return Commands.loadInstance(null, contractPath, options)
-            .then((instance) => {
-                instance.verifySignatures();
-                Logger.info('All signatures verified successfully');
-            });
+    static async verify(templatePath, contractPath, options) {
+        if (templatePath) {
+            return Commands.loadTemplate(templatePath, options)
+                .then(async(template) => {
+                    const result = await template.verifyTemplateSignature();
+                    return result;
+                });
+        } else {
+            return Commands.loadInstance(null, contractPath, options)
+                .then((instance) => {
+                    instance.verifySignatures();
+                    Logger.info('All signatures verified successfully');
+                });
+        }
     }
 
     /**
@@ -748,21 +741,6 @@ class Commands {
         }
 
         return argv;
-    }
-
-    /**
-     * Verify the template developer/author's signatures
-     *
-     * @param {string} templatePath - path to the template directory or archive
-     * @param {Object} [options] - an optional set of options
-     * @returns {object} returns true if signature is valid else false
-     */
-    static verify(templatePath, options) {
-        return Commands.loadTemplate(templatePath, options)
-            .then(async(template) => {
-                const result = await template.verifyTemplateSignature();
-                return result;
-            });
     }
 
     /**
