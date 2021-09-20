@@ -149,9 +149,13 @@ require('yargs')
         }
     })
 
-    .command('verify', 'verify the template signatures of the template author/developer', (yargs) => {
+    .command('verify', 'verify the signatures on template or contract instances', (yargs) => {
         yargs.option('template', {
             describe: 'path to the template',
+            type: 'string'
+        });
+        yargs.option('contract', {
+            describe: 'path to a smart legal contract slc file',
             type: 'string'
         });
         yargs.option('warnings', {
@@ -169,9 +173,9 @@ require('yargs')
             const options = {
                 warnings: argv.warnings,
             };
-            return Commands.verify(argv.template, options)
+            return Commands.verify(argv.template, argv.contract, options)
                 .then((result) => {
-                    if(result) {Logger.info(`Author/developer's signature for ${argv.template} template is verified`);}
+                    if(result) {Logger.info('all signatures verified');}
                 })
                 .catch((err) => {
                     Logger.error(err.message);
@@ -671,7 +675,7 @@ require('yargs')
             };
             return Commands.sign(argv.contract, argv.keystore, argv.passphrase, argv.signatory, argv.output, options)
                 .then((result) => {
-                    if(result) {Logger.info('Contract has been successfully signed');}
+                    if(result) {Logger.info('contract has been successfully signed');}
                 })
                 .catch((err) => {
                     Logger.error(err.message);
