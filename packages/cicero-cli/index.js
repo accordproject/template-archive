@@ -531,6 +531,10 @@ require('yargs')
             type: 'string',
             default: 'ergo'
         });
+        yargs.option('instantiator', {
+            describe: 'name of the instantiator',
+            type: 'string'
+        });
         yargs.option('output', {
             describe: 'file name for new archive',
             type: 'string',
@@ -551,7 +555,7 @@ require('yargs')
             const options = {
                 warnings: argv.warnings,
             };
-            return Commands.instantiate(argv.template, argv.data, argv.target, argv.output, options)
+            return Commands.instantiate(argv.template, argv.data, argv.target, argv.output, argv.instantiator, options)
                 .catch((err) => {
                     Logger.error(err.message);
                 });

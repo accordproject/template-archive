@@ -735,6 +735,10 @@ class Commands {
     static validateInstantiateArgs(argv) {
         argv = Commands.validateCommonArgs(argv);
 
+        if(!argv.instantiator){
+            throw new Error('Please enter the instantiator\'s name. Try the --instantiator flag to enter instantiator\'s name.');
+        }
+
         if(!argv.target){
             Logger.info('Using ergo as the default target for the archive.');
             argv.target = 'ergo';
@@ -750,15 +754,16 @@ class Commands {
      * @param {string} dataPath - path to the JSON data
      * @param {string} target - target language for the archive (should be either 'ergo' or 'es6')
      * @param {string} outputPath - to the archive file
+     * @param {string} instantiator - name of the person/party which instantiates the contract instance
      * @param {Object} [options] - an optional set of options
      * @returns {object} Promise to the code creating an archive
      */
-    static instantiate(templatePath, dataPath, target, outputPath, options) {
+    static instantiate(templatePath, dataPath, target, outputPath, instantiator, options) {
         const dataJson = JSON.parse(fs.readFileSync(dataPath, 'utf8'));
 
         return Commands.loadTemplate(templatePath, options)
             .then(async (template) => {
-                const instance = ContractInstance.fromTemplateWithData(template, dataJson);
+                const instance = ContractInstance.fromTemplateWithData(template, dataJson, instantiator);
                 const archive = await instance.toArchive(target);
                 let file;
                 if (outputPath) {
