@@ -43,10 +43,28 @@ class ContractInstance extends Instance {
      * Create an instance from a Template with data.
      * @param {Template} template  - the template for the instance
      * @param {object} data - the contract data
+     * @param {string} instantiator - name of the person/party which instantiates the contract instance
      * @return {object} - the clause instance
      */
-    static fromTemplateWithData(template, data) {
-        return InstanceLoader.fromTemplateWithData(ContractInstance, template, data);
+    static fromTemplateWithData(template, data, instantiator) {
+        const instance = InstanceLoader.fromTemplateWithData(ContractInstance, template, data, instantiator);
+        const currentState =  {
+            previousHash: null,
+            operation: 'instantiate',
+            instantiator: instance.instantiator,
+            result: 'Instantiated Successfully',
+            timestamp: Date(),
+            state: 'Draft'
+        };
+        const hasher = crypto.createHash('sha256');
+        hasher.update(stringify(currentState));
+        const currentHash =  hasher.digest('hex');
+        const state = {
+            currentState: currentState,
+            currentHash: currentHash
+        };
+        instance.states.push(state);
+        return instance;
     }
 
     /**
@@ -83,6 +101,25 @@ class ContractInstance extends Instance {
         }
         const timestamp = Date.now();
         this.sign(p12File, passphrase, timestamp, signatory);
+
+        const previousHash = this.states[this.states.length-1].currentHash;
+        const currentState =  {
+            previousHash: previousHash,
+            partyName: signatory,
+            operation: 'sign',
+            result: 'Signed Successfully',
+            timestamp: Date(),
+            state: 'Signing in Progress'
+        };
+        const hasher = crypto.createHash('sha256');
+        hasher.update(stringify(currentState));
+        const currentHash =  hasher.digest('hex');
+        const state = {
+            currentState: currentState,
+            currentHash: currentHash
+        };
+        this.states.push(state);
+
         return await this.toArchive('ergo');
     }
 
@@ -131,8 +168,8 @@ class ContractInstance extends Instance {
     }
 
     /**
-     * Gets a content based SHA-256 hash for this template. Hash
-     * is based on the metadata for the template plus the contents of
+     * Gets a content based SHA-256 hash for this contract instance. Hash
+     * is based on the metadata for the contract instance plus the contents of
      * all the models and all the script files.
      * @return {string} the SHA-256 hash in hex format
      */

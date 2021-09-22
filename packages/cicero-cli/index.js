@@ -531,6 +531,10 @@ require('yargs')
             type: 'string',
             default: 'ergo'
         });
+        yargs.option('instantiator', {
+            describe: 'name of the instantiator',
+            type: 'string'
+        });
         yargs.option('output', {
             describe: 'file name for new archive',
             type: 'string',
@@ -551,7 +555,7 @@ require('yargs')
             const options = {
                 warnings: argv.warnings,
             };
-            return Commands.instantiate(argv.template, argv.data, argv.target, argv.output, options)
+            return Commands.instantiate(argv.template, argv.data, argv.target, argv.output, argv.instantiator, options)
                 .catch((err) => {
                     Logger.error(err.message);
                 });
@@ -600,37 +604,6 @@ require('yargs')
         } catch (err){
             Logger.error(err.message);
             return;
-        }
-    })
-    .command('verify', 'verify the signatures of party/individuals who have signed the contarct', (yargs) => {
-        yargs.option('contract', {
-            describe: 'path to a smart legal contract slc file',
-            type: 'string'
-        });
-        yargs.option('warnings', {
-            describe: 'print warnings',
-            type: 'boolean',
-            default: false
-        });
-    }, (argv) => {
-        if (argv.verbose) {
-            Logger.info(`verifying signatures of contract ${argv.contract}`);
-        }
-
-        try {
-            argv = Commands.validateVerifyArgs(argv);
-            const options = {
-                warnings: argv.warnings,
-            };
-            return Commands.verify(argv.contract, options)
-                .then((result) => {
-                    if(result) {Logger.info(JSON.stringify(result));}
-                })
-                .catch((err) => {
-                    Logger.error(err.message);
-                });
-        } catch (err){
-            Logger.error(err.message);
         }
     })
     .command('sign', 'sign a contract', (yargs) => {
