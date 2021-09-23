@@ -14,6 +14,9 @@
 
 'use strict';
 
+const crypto = require('crypto');
+const stringify = require('json-stable-stringify');
+
 const TemplateMarkTransformer = require('@accordproject/markdown-template').TemplateMarkTransformer;
 
 const getMimeType = require('./mimetype');
@@ -194,6 +197,34 @@ function parseText(parserManager, ciceroMarkTransformer, input, currentTime, utc
 }
 
 /**
+ * add a new state after execution of an operation
+ * @param {object} instance - the contract instance
+ * @param {string} partyName - name of the party that executed the operation
+ * @param {string} operation - name of the operation that was executed
+ * @param {*} output - result of the operation
+ * @param {string} lifecycleState - current state in instance's lifecycle
+ */
+function addState(instance, partyName, operation, output, lifecycleState) {
+    const previousHash = instance.states.length !==0 ? instance.states[instance.states.length-1].currentHash : null;
+    const currentState =  {
+        previousHash: previousHash,
+        partyName: partyName,
+        operation: operation,
+        result: output,
+        timestamp: Date(),
+        lifecycleState: lifecycleState
+    };
+    const hasher = crypto.createHash('sha256');
+    hasher.update(stringify(currentState));
+    const currentHash =  hasher.digest('hex');
+    const state = {
+        currentState: currentState,
+        currentHash: currentHash
+    };
+    instance.states.push(state);
+}
+
+/**
  * Checks if dimensions for the image are correct.
  * @param {Buffer} buffer the buffer object
  * @param {string} mimeType the mime type of the object
@@ -249,4 +280,4 @@ function isValidName(name) {
     return true;
 }
 
-module.exports = { getContractModel, ciceroFormulaEval, initParser, rebuildParser, parseText, checkImage, isValidName, templateTypes };
+module.exports = { getContractModel, ciceroFormulaEval, initParser, rebuildParser, parseText, checkImage, isValidName, addState, templateTypes };

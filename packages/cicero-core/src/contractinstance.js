@@ -21,6 +21,8 @@ const crypto = require('crypto');
 const stringify = require('json-stable-stringify');
 const forge = require('node-forge');
 
+const Util = require('./util');
+
 /**
  * A Contract is executable business logic, linked to a natural language (legally enforceable) template.
  * A Clause must be constructed with a template and then prior to execution the data for the clause must be set.
@@ -48,22 +50,15 @@ class ContractInstance extends Instance {
      */
     static fromTemplateWithData(template, data, instantiator) {
         const instance = InstanceLoader.fromTemplateWithData(ContractInstance, template, data, instantiator);
-        const currentState =  {
-            previousHash: null,
-            operation: 'instantiate',
-            instantiator: instance.instantiator,
-            result: 'Instantiated Successfully',
-            timestamp: Date(),
-            state: 'Draft'
-        };
-        const hasher = crypto.createHash('sha256');
-        hasher.update(stringify(currentState));
-        const currentHash =  hasher.digest('hex');
-        const state = {
-            currentState: currentState,
-            currentHash: currentHash
-        };
-        instance.states.push(state);
+
+        //Add state
+        Util.addState(
+            instance,
+            instance.instantiator,
+            'instantiate',
+            'Instantiated Succesfully',
+            'Draft'
+        );
         return instance;
     }
 
@@ -102,23 +97,14 @@ class ContractInstance extends Instance {
         const timestamp = Date.now();
         this.sign(p12File, passphrase, timestamp, signatory);
 
-        const previousHash = this.states[this.states.length-1].currentHash;
-        const currentState =  {
-            previousHash: previousHash,
-            partyName: signatory,
-            operation: 'sign',
-            result: 'Signed Successfully',
-            timestamp: Date(),
-            state: 'Signing in Progress'
-        };
-        const hasher = crypto.createHash('sha256');
-        hasher.update(stringify(currentState));
-        const currentHash =  hasher.digest('hex');
-        const state = {
-            currentState: currentState,
-            currentHash: currentHash
-        };
-        this.states.push(state);
+        //Add state
+        Util.addState(
+            this,
+            signatory,
+            'sign',
+            'Signed Succesfully',
+            'Signing in Progress'
+        );
 
         return await this.toArchive('ergo');
     }

@@ -183,7 +183,20 @@ class Instance {
 
         // Draft
         const ciceroMark = this.templateMarkTransformer.draftCiceroMark(data, this.parserManager, kind, {});
-        return this.formatCiceroMark(ciceroMark,options);
+        const draft =  this.formatCiceroMark(ciceroMark,options);
+
+        //Add state
+        if (kind === 'contract') {
+            Util.addState(
+                this,
+                'some-party',
+                'draft',
+                draft,
+                'Draft'
+            );
+        }
+
+        return draft;
     }
 
     /**

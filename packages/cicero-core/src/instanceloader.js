@@ -162,6 +162,12 @@ class InstanceLoader extends FileLoader {
             instantiator
         ));
 
+        //grab contract states
+        instance.states = states;
+
+        //grab the author/developer's signature
+        instance.authorSignature = await InstanceLoader.loadZipFileContents(zip, 'signature.json', true, false);
+
         instance.setData(data);
 
         // grab the party signatures
@@ -170,12 +176,6 @@ class InstanceLoader extends FileLoader {
             let signature = JSON.parse(signatureFile.contents);
             instance.contractSignatures.push(signature);
         });
-
-        //grab contract states
-        instance.states = states;
-
-        //grab the author/deve
-        instance.authorSignature = await InstanceLoader.loadZipFileContents(zip, 'signature.json', true, false);
 
         //grab the parties
         const contractModel = Util.getContractModel(instance.logicManager, instance.instanceKind);
