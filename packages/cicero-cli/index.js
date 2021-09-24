@@ -621,11 +621,6 @@ require('yargs')
             type: 'string',
             default: null
         });
-        yargs.option('signatory', {
-            describe: 'name of the signatory',
-            type: 'string',
-            default: null
-        });
         yargs.option('output', {
             describe: 'file name for new archive',
             type: 'string',
@@ -646,7 +641,7 @@ require('yargs')
             const options = {
                 warnings: argv.warnings,
             };
-            return Commands.sign(argv.contract, argv.keystore, argv.passphrase, argv.signatory, argv.output, options)
+            return Commands.sign(argv.contract, argv.keystore, argv.passphrase, argv.output, options)
                 .then((result) => {
                     if(result) {Logger.info('contract has been successfully signed');}
                 })

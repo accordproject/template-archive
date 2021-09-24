@@ -58,6 +58,17 @@ class InstanceLoader extends FileLoader {
         ));
 
         instance.setData(data);
+
+        //grab the parties
+        const contractModel = Util.getContractModel(instance.logicManager, instance.instanceKind);
+        const properties = contractModel.getProperties();
+        properties.map((property) => property.getDecorators().map((decorator) => {
+            if (decorator.getName() === 'ContractParty') {
+                const data = instance.data;
+                const partyName = data[property.name];
+                instance.parties.push(partyName);
+            }
+        }));
         return instance;
     }
 

@@ -35,10 +35,7 @@ const defaultSample = 'text/sample.md';
 const defaultData = 'data.json';
 const defaultParams = 'params.json';
 const defaultState = 'state.json';
-// const readline = require('readline').createInterface({
-//     input: process.stdin,
-//     output: process.stdout
-//   })
+const readline = require('readline');
 
 /**
  * Utility class that implements the commands exposed by the Cicero CLI.
@@ -655,9 +652,6 @@ class Commands {
         if (!argv.passphrase) {
             throw new Error('Please define the passphrase of the keystore using --pasphrase');
         }
-        if (!argv.signatory) {
-            throw new Error('Please define the signatory signing the contract using --signatory');
-        }
         if(argv.verbose) {
             Logger.info(`Verifying signatures of contract ${argv.contract}`);
         }
@@ -671,16 +665,30 @@ class Commands {
      * @param {string} slcPath - path to the slc archive
      * @param {string} keystore - path to the keystore
      * @param {string} passphrase - passphrase of the keystore
-     * @param {string} signatory - name of the person/party signing the contract
      * @param {string} outputPath - to the archive file
      * @param {Object} [options] - an optional set of options
      * @returns {object} Promise to the code creating an archive
      */
-    static async sign(slcPath, keystore, passphrase, signatory, outputPath, options) {
+    static async sign(slcPath, keystore, passphrase, outputPath, options) {
         return Commands.loadInstance(null, slcPath, options)
             .then(async (instance) => {
                 const p12File = fs.readFileSync(keystore, { encoding: 'base64' });
-                const archive = await instance.signContract(p12File, passphrase, signatory);
+                const rl = readline.createInterface(
+                    {
+                        input: process.stdin,
+                        output: process.stdout
+                    });
+                console.log('Select the party instantiating the contract');
+                instance.parties.map((party, key)=>{
+                    console.log(`${key+1}. ${party}`);
+                });
+                const partyKey = await new Promise(resolve => {
+                    rl.question('Enter party serial number: ', resolve);
+                });
+                const partyName = instance.parties[partyKey-1];
+                console.log(partyName);
+                rl.close();
+                const archive = await instance.signContract(p12File, passphrase, partyName);
                 let file;
                 if (outputPath) {
                     file = outputPath;
@@ -768,18 +776,6 @@ class Commands {
         return Commands.loadTemplate(templatePath, options)
             .then(async (template) => {
                 const instance = ContractInstance.fromTemplateWithData(template, dataJson, instantiator);
-                console.log(instance.parties);
-                // console.log('Select the party instantiating the contract');
-                // instance.parties.map((party, key)=>{
-                //     console.log(`${key+1}. ${party}`)
-                // });
-                // const instantiatorKey = await new Promise(resolve => {
-                //     readline.question("Enter party serial number: ", resolve)
-                // });
-                // const instantiator = instance.parties[instantiatorKey-1];
-                // console.log(instantiator);
-                // instance.instantiator = instantiator   
-                // readline.close();
 
                 const archive = await instance.toArchive(target);
                 let file;
