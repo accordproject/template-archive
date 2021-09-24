@@ -132,7 +132,7 @@ class InstanceLoader extends FileLoader {
         const states = await InstanceLoader.loadZipFileContents(zip, 'states.json', true, true);
 
         //grab instantiator
-        const instantiator = states[0].currentState.instatiator;
+        const instantiator = states.length !== 0 ? states[0].currentState.instatiator : null;
 
         // add template grammar (.md form)
         const grammar = await InstanceLoader.loadZipFileContents(zip, 'text/grammar.tem.md', false, false);

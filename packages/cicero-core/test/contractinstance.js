@@ -80,7 +80,7 @@ describe('ContractInstance', () => {
 
     describe('#sign', () => {
         it('should sign the content hash and timestamp string using the keystore', async() => {
-            const buffer = fs.readFileSync('./test/data/signContract/latedeliveryandpenalty@0.17.0-d0c1a14e8a7af52e0927a23b8b30af3b5a75bee1ab788a15736e603b88a6312c.slc');
+            const buffer = fs.readFileSync('./test/data/signContract/latedeliveryandpenalty@0.17.0.slc');
             const instance = await ContractInstance.fromArchive(buffer);
             const timestamp = Date.now();
             const instanceHash = instance.getHash();
@@ -102,21 +102,21 @@ describe('ContractInstance', () => {
 
     describe('#verify', () => {
         it('should verify a contract signature', async() => {
-            const buffer = fs.readFileSync('./test/data/signContract/latedeliveryandpenalty@0.17.0-d0c1a14e8a7af52e0927a23b8b30af3b5a75bee1ab788a15736e603b88a6312c.v1.slc');
+            const buffer = fs.readFileSync('./test/data/signContract/latedeliveryandpenalty@0.17.0.slc');
             const instance = await ContractInstance.fromArchive(buffer);
             const timestamp = Date.now();
-            const signatory = 'party1';
+            const signatory = 'resource:org.accordproject.party.Party#Steve';
             const p12File = fs.readFileSync('./test/data/signContract/keystore.p12', { encoding: 'base64' });
             instance.sign(p12File, 'password', timestamp, signatory);
-            const partySignature = instance.contractSignatures[1];
+            const partySignature = instance.contractSignatures[0];
             const { signatoryCert, signature } = partySignature;
             (() => instance.verify(signature, timestamp, signatoryCert)).should.not.throw();
         });
 
         it('should throw error for failed signature verification', async() => {
-            const buffer = fs.readFileSync('./test/data/signContract/latedeliveryandpenalty@0.17.0-a3d6e61ddfe056ec65e240053e1f13e4f95a3e7804027ca6bb5652d0d65ac8ba.slc');
+            const buffer = fs.readFileSync('./test/data/signContract/latedeliveryandpenalty@0.17.0-invalidsignature.slc');
             const instance = await ContractInstance.fromArchive(buffer);
-            const partySignature = instance.contractSignatures[1];
+            const partySignature = instance.contractSignatures[0];
             const { signatoryCert, signature, timestamp } = partySignature;
             return (() => instance.verify(signature, timestamp, signatoryCert)).should.throw('Contract signature is invalid!');
         });
@@ -124,27 +124,27 @@ describe('ContractInstance', () => {
 
     describe('#verifySignatures', () => {
         it('should verify all contract signatures', async() => {
-            const buffer = fs.readFileSync('./test/data/signContract/latedeliveryandpenalty@0.17.0-d0c1a14e8a7af52e0927a23b8b30af3b5a75bee1ab788a15736e603b88a6312c.v1.slc');
+            const buffer = fs.readFileSync('./test/data/signContract/latedeliveryandpenalty@0.17.0-verifysignatures.slc');
             const instance = await ContractInstance.fromArchive(buffer);
             const timestamp = Date.now();
-            const signatory = 'party1';
+            const signatory = 'resource:org.accordproject.party.Party#Dan';
             const p12File = fs.readFileSync('./test/data/signContract/keystore.p12', { encoding: 'base64' });
             instance.sign(p12File, 'password', timestamp, signatory);
             (() => instance.verifySignatures()).should.not.throw();
         });
 
         it('should throw error while verifying the contract signatures', async() => {
-            const buffer = fs.readFileSync('./test/data/signContract/latedeliveryandpenalty@0.17.0-a3d6e61ddfe056ec65e240053e1f13e4f95a3e7804027ca6bb5652d0d65ac8ba.slc');
+            const buffer = fs.readFileSync('./test/data/signContract/latedeliveryandpenalty@0.17.0-invalidsignature.slc');
             const instance = await ContractInstance.fromArchive(buffer);
             return (() => instance.verifySignatures()).should.throw('Contract signature is invalid!');
         });
     });
 
     describe('#signContract', () => {
-        it('should verify all contract signatures', async() => {
-            const buffer = fs.readFileSync('./test/data/signContract/latedeliveryandpenalty@0.17.0-d0c1a14e8a7af52e0927a23b8b30af3b5a75bee1ab788a15736e603b88a6312c.slc');
+        it('should create archive buffer', async() => {
+            const buffer = fs.readFileSync('./test/data/signContract/latedeliveryandpenalty@0.17.0.slc');
             const instance = await ContractInstance.fromArchive(buffer);
-            const signatory = 'party1';
+            const signatory = 'resource:org.accordproject.party.Party#Dan';
             const p12File = fs.readFileSync('./test/data/signContract/keystore.p12', { encoding: 'base64' });
             const buffer2 = await instance.signContract(p12File, 'password', signatory);
             buffer2.should.not.be.null;
