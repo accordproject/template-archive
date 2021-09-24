@@ -35,6 +35,10 @@ const defaultSample = 'text/sample.md';
 const defaultData = 'data.json';
 const defaultParams = 'params.json';
 const defaultState = 'state.json';
+// const readline = require('readline').createInterface({
+//     input: process.stdin,
+//     output: process.stdout
+//   })
 
 /**
  * Utility class that implements the commands exposed by the Cicero CLI.
@@ -764,6 +768,19 @@ class Commands {
         return Commands.loadTemplate(templatePath, options)
             .then(async (template) => {
                 const instance = ContractInstance.fromTemplateWithData(template, dataJson, instantiator);
+                console.log(instance.parties);
+                // console.log('Select the party instantiating the contract');
+                // instance.parties.map((party, key)=>{
+                //     console.log(`${key+1}. ${party}`)
+                // });
+                // const instantiatorKey = await new Promise(resolve => {
+                //     readline.question("Enter party serial number: ", resolve)
+                // });
+                // const instantiator = instance.parties[instantiatorKey-1];
+                // console.log(instantiator);
+                // instance.instantiator = instantiator   
+                // readline.close();
+
                 const archive = await instance.toArchive(target);
                 let file;
                 if (outputPath) {
