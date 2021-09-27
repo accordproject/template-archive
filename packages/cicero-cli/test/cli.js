@@ -66,7 +66,7 @@ const stateErr = path.resolve(__dirname, 'data/latedeliveryandpenalty/', 'state_
 const requestErr = path.resolve(__dirname, 'data/latedeliveryandpenalty/', 'request_err.json');
 const paramsErr = path.resolve(__dirname, 'data/latedeliveryandpenalty/', 'params_err.json');
 
-const slcArchive = path.resolve(__dirname, 'data/installment-sale@0.1.0-316a9177c6d52bfd4e1df6d543ddab775cc217cdb44f92120e2f24bd11f8381b.slc');
+const slcArchive = path.resolve(__dirname, 'data/installment-sale@5.0.0-5c1f7e2caeaf4f5b54ab40d62cfc04d9503d5dc47fdc7c844d53ae4c7121c868.slc');
 const slcRequest = path.resolve(__dirname, 'data/installment-sale-ergo/', 'request.json');
 const slcParams = path.resolve(__dirname, 'data/installment-sale-ergo/', 'params.json');
 const slcState = path.resolve(__dirname, 'data/installment-sale-ergo/', 'state.json');
@@ -686,6 +686,7 @@ describe('#trigger-javascript', () => {
 describe('#trigger-slc', () => {
     it('should trigger a smart legal contract in ergo', async () => {
         const response = await Commands.trigger(null, slcArchive, null, null, [slcRequest], slcState);
+        console.log(response);
         response.response.$class.should.be.equal('org.accordproject.installmentsale.Balance');
         response.response.balance.should.be.equal(7612.499999999999);
         response.state.$class.should.be.equal('org.accordproject.installmentsale.InstallmentSaleState');
@@ -1315,7 +1316,6 @@ describe('#validateSignArgs', () => {
             contract: 'latedeliveryandpenalty@0.17.0-d0c1a14e8a7af52e0927a23b8b30af3b5a75bee1ab788a15736e603b88a6312c.slc',
             keystore: 'keystore.p12',
             passphrase: 'password',
-            signatory: 'partyA',
             _: ['sign']
         });
         args.contract.should.match(/.slc$/);
@@ -1325,7 +1325,6 @@ describe('#validateSignArgs', () => {
         (() => Commands.validateSignArgs({
             contract: 'latedeliveryandpenalty@0.17.0-d0c1a14e8a7af52e0927a23b8b30af3b5a75bee1ab788a15736e603b88a6312c.slc',
             passphrase: 'password',
-            signatory: 'partyA',
             _: ['sign']
         })).should.throw('Please define path of the keystore using --keystore');
     });
@@ -1334,18 +1333,8 @@ describe('#validateSignArgs', () => {
         (() => Commands.validateSignArgs({
             contract: 'latedeliveryandpenalty@0.17.0-d0c1a14e8a7af52e0927a23b8b30af3b5a75bee1ab788a15736e603b88a6312c.slc',
             keystore: 'keystore.p12',
-            signatory: 'partyA',
             _: ['sign']
         })).should.throw('Please define the passphrase of the keystore using --pasphrase');
-    });
-    it('signatory not defined', () => {
-        process.chdir(path.resolve(__dirname, 'data/contractsigning/'));
-        (() => Commands.validateSignArgs({
-            contract: 'latedeliveryandpenalty@0.17.0-d0c1a14e8a7af52e0927a23b8b30af3b5a75bee1ab788a15736e603b88a6312c.slc',
-            keystore: 'keystore.p12',
-            passphrase: 'password',
-            _: ['sign']
-        })).should.throw('Please define the signatory signing the contract using --signatory');
     });
     it('verbose flag specified', () => {
         process.chdir(path.resolve(__dirname, 'data/contractsigning/'));
@@ -1353,7 +1342,6 @@ describe('#validateSignArgs', () => {
             contract: 'latedeliveryandpenalty@0.17.0-d0c1a14e8a7af52e0927a23b8b30af3b5a75bee1ab788a15736e603b88a6312c.slc',
             keystore: 'keystore.p12',
             passphrase: 'password',
-            signatory: 'partyA',
             _: ['sign'],
             verbose: true
         });
@@ -1369,10 +1357,9 @@ describe('#validateSignArgs', () => {
 describe('#sign', async () => {
     it('should sign the contract for a party/individual', async () => {
         const archiveName = 'test.slc';
-        const slcPath = path.resolve(__dirname, 'data/contractsigning/latedeliveryandpenalty@0.17.0-d0c1a14e8a7af52e0927a23b8b30af3b5a75bee1ab788a15736e603b88a6312c.slc');
+        const slcPath = path.resolve(__dirname, 'data/contractsigning/latedeliveryandpenalty@0.17.0.slc');
         const keystore = path.resolve(__dirname, 'data/contractsigning/keystore.p12');
-        const signatory = 'partyA';
-        const result = await Commands.sign(slcPath, keystore, 'password', signatory, archiveName);
+        const result = await Commands.sign(slcPath, keystore, 'password', archiveName);
         result.should.eql(true);
         const newInstance = await ContractInstance.fromArchive(fs.readFileSync(archiveName));
         newInstance.should.not.be.null;
@@ -1380,12 +1367,11 @@ describe('#sign', async () => {
         fs.unlinkSync(archiveName);
     });
     it('should sign the contract for a party/individual without specifying output path', async () => {
-        const slcPath = path.resolve(__dirname, 'data/contractsigning/latedeliveryandpenalty@0.17.0-d0c1a14e8a7af52e0927a23b8b30af3b5a75bee1ab788a15736e603b88a6312c.slc');
+        const slcPath = path.resolve(__dirname, 'data/contractsigning/latedeliveryandpenalty@0.17.0.slc');
         const keystore = path.resolve(__dirname, 'data/contractsigning/keystore.p12');
-        const signatory = 'partyA';
-        const result = await Commands.sign(slcPath, keystore, 'password', signatory);
+        const result = await Commands.sign(slcPath, keystore, 'password');
         result.should.eql(true);
-        fs.unlinkSync('latedeliveryandpenalty@0.17.0-d0c1a14e8a7af52e0927a23b8b30af3b5a75bee1ab788a15736e603b88a6312c.slc');
+        fs.unlinkSync('latedeliveryandpenalty@0.17.0-be17e1d93f16c8bf05bfc6f680e2b9a121001e02e96c4cd9b4cde77a769c5b02.slc');
     });
 });
 
@@ -1416,7 +1402,7 @@ describe('#validateVerifyArgs', () => {
 
 describe('#verify', async () => {
     it('should verify contract signatures', async () => {
-        const slcPath = path.resolve(__dirname, 'data/contractsigning/latedeliveryandpenalty@0.17.0-d0c1a14e8a7af52e0927a23b8b30af3b5a75bee1ab788a15736e603b88a6312c.v1.slc');
+        const slcPath = path.resolve(__dirname, 'data/contractsigning/latedeliveryandpenalty@0.17.0-verifysignatures.slc');
         return Commands.verify(null, slcPath).should.be.fulfilled;
     });
 });
@@ -1425,14 +1411,22 @@ describe('#validateInstantiateArgs', () => {
     it('no args specified', () => {
         process.chdir(path.resolve(__dirname, 'data/latedeliveryandpenalty/'));
         const args  = Commands.validateInstantiateArgs({
+            instantiator: 'some-party',
             _: ['instantiate']
         });
         args.template.should.match(/cicero-cli[/\\]test[/\\]data[/\\]latedeliveryandpenalty$/);
         args.target.should.match(/ergo/);
     });
+    it('instantiator not defined', () => {
+        process.chdir(path.resolve(__dirname, 'data/latedeliveryandpenalty/'));
+        (() => Commands.validateInstantiateArgs({
+            _: ['instantiate']
+        })).should.throw('Please enter the instantiator\'s name. Try the --instantiator flag to enter instantiator\'s name.');
+    });
     it('only target arg specified', () => {
         process.chdir(path.resolve(__dirname, 'data/latedeliveryandpenalty/'));
         const args  = Commands.validateInstantiateArgs({
+            instantiator: 'some-party',
             _: ['instantiate'],
             target: 'ergo'
         });
@@ -1442,6 +1436,7 @@ describe('#validateInstantiateArgs', () => {
     it('template arg specified', () => {
         process.chdir(path.resolve(__dirname));
         const args  = Commands.validateInstantiateArgs({
+            instantiator: 'some-party',
             _: ['instantiate', 'data/latedeliveryandpenalty/']
         });
         args.template.should.match(/cicero-cli[/\\]test[/\\]data[/\\]latedeliveryandpenalty$/);
@@ -1450,6 +1445,7 @@ describe('#validateInstantiateArgs', () => {
     it('verbose flag specified', () => {
         process.chdir(path.resolve(__dirname, 'data/latedeliveryandpenalty/'));
         Commands.validateInstantiateArgs({
+            instantiator: 'some-party',
             _: ['instantiate'],
             verbose: true
         });

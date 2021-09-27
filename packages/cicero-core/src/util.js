@@ -205,7 +205,7 @@ function parseText(parserManager, ciceroMarkTransformer, input, currentTime, utc
  * @param {string} lifecycleState - current state in instance's lifecycle
  */
 function addState(instance, partyName, operation, output, lifecycleState) {
-    const previousHash = instance.states.length !==0 ? instance.states[instance.states.length-1].currentHash : null;
+    const previousHash = instance.states.length !== 0 ? instance.states[instance.states.length-1].currentHash : null;
     const currentState =  {
         previousHash: previousHash,
         partyName: partyName,
