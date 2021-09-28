@@ -66,7 +66,7 @@ const stateErr = path.resolve(__dirname, 'data/latedeliveryandpenalty/', 'state_
 const requestErr = path.resolve(__dirname, 'data/latedeliveryandpenalty/', 'request_err.json');
 const paramsErr = path.resolve(__dirname, 'data/latedeliveryandpenalty/', 'params_err.json');
 
-const slcArchive = path.resolve(__dirname, 'data/installment-sale@5.0.0-5c1f7e2caeaf4f5b54ab40d62cfc04d9503d5dc47fdc7c844d53ae4c7121c868.slc');
+const slcArchive = path.resolve(__dirname, 'data/installment-sale@0.1.0-618c1db9466fa1a98e3cda14af3ae73b5b2b6be5e7f8e5ef5507ae43ea007e4b.slc');
 const slcRequest = path.resolve(__dirname, 'data/installment-sale-ergo/', 'request.json');
 const slcParams = path.resolve(__dirname, 'data/installment-sale-ergo/', 'params.json');
 const slcState = path.resolve(__dirname, 'data/installment-sale-ergo/', 'state.json');
