@@ -18,6 +18,7 @@ const Logger = require('@accordproject/concerto-core').Logger;
 const Template = require('@accordproject/cicero-core').Template;
 const ClauseInstance = require('@accordproject/cicero-core').ClauseInstance;
 const ContractInstance = require('@accordproject/cicero-core').ContractInstance;
+const Util = require('@accordproject/cicero-core/src/util');
 const Engine = require('@accordproject/cicero-engine').Engine;
 const Export = require('@accordproject/cicero-transform').Export;
 const CodeGen = require('@accordproject/cicero-tools').CodeGen;
@@ -420,6 +421,24 @@ class Commands {
         const engine = new Engine();
         return Commands.loadInstance(templatePath, slcPath, samplePath, dataPath, currentTime, utcOffset, options)
             .then(async (instance) => {
+                let partyName;
+                if (slcPath) {
+                    const rl = readline.createInterface(
+                        {
+                            input: process.stdin,
+                            output: process.stdout
+                        });
+                    console.log('Select the party triggering the contract');
+                    instance.parties.map((party, key)=>{
+                        console.log(`${key+1}. ${party}`);
+                    });
+                    const partyKey = await new Promise(resolve => {
+                        rl.question('Enter party serial number: ', resolve);
+                    });
+                    partyName = instance.parties[partyKey-1];
+                    console.log(partyName);
+                    rl.close();
+                }
                 let stateJson;
                 if(!fs.existsSync(statePath)) {
                     Logger.warn('A state file was not provided, initializing state. Try the --state flag or create a state.json in the root folder of your template.');
@@ -434,11 +453,29 @@ class Commands {
                 const initResponse = engine.trigger(instance, firstRequest, stateJson, currentTime, utcOffset);
                 // Get all the other requests and chain execution through Promise.reduce()
                 const otherRequests = requestsJson.slice(1, requestsJson.length);
-                return otherRequests.reduce((promise,requestJson) => {
+                const triggerResult = otherRequests.reduce((promise,requestJson) => {
                     return promise.then((result) => {
                         return engine.trigger(instance, requestJson, result.state, currentTime, utcOffset);
                     });
                 }, initResponse);
+
+                if (slcPath) {
+                    //Add state
+                    Util.addState(
+                        instance,
+                        partyName,
+                        'trigger',
+                        'Triggered Successfully',
+                        'Execution'
+                    );
+                    const archive = await instance.toArchive('ergo');
+                    let file;
+                    const instanceName = instance.getIdentifier();
+                    file = `${instanceName}.slc`;
+                    Logger.info('Creating archive: ' + file);
+                    fs.writeFileSync(file, archive);
+                }
+                return triggerResult;
             })
             .catch((err) => {
                 Logger.error(err.message);
@@ -522,8 +559,44 @@ class Commands {
                 } else {
                     stateJson = JSON.parse(fs.readFileSync(statePath, 'utf8'));
                 }
+                let partyName
+                if (slcPath) {
+                    const rl = readline.createInterface(
+                        {
+                            input: process.stdin,
+                            output: process.stdout
+                        });
+                    console.log('Select the party invoking the contract');
+                    instance.parties.map((party, key)=>{
+                        console.log(`${key+1}. ${party}`);
+                    });
+                    const partyKey = await new Promise(resolve => {
+                        rl.question('Enter party serial number: ', resolve);
+                    });
+                    partyName = instance.parties[partyKey-1];
+                    console.log(partyName);
+                    rl.close();
+                }
 
-                return engine.invoke(instance, clauseName, paramsJson, stateJson, currentTime, utcOffset);
+                const result =  await engine.invoke(instance, clauseName, paramsJson, stateJson, currentTime, utcOffset);
+
+                if (slcPath) {
+                    //Add state
+                    Util.addState(
+                        instance,
+                        partyName,
+                        'invoke',
+                        'Invoked Successfully',
+                        'Execution'
+                    );
+                    const archive = await instance.toArchive('ergo');
+                    let file;
+                    const instanceName = instance.getIdentifier();
+                    file = `${instanceName}.slc`;
+                    Logger.info('Creating archive: ' + file);
+                    fs.writeFileSync(file, archive);
+                }
+                return result;
             })
             .catch((err) => {
                 Logger.error(err.message);
@@ -576,7 +649,43 @@ class Commands {
         const engine = new Engine();
         return Commands.loadInstance(templatePath, slcPath, samplePath, dataPath, currentTime, utcOffset, options)
             .then(async (instance) => {
-                return engine.init(instance, currentTime, utcOffset, paramsJson);
+                let partyName
+                if (slcPath) {
+                    const rl = readline.createInterface(
+                        {
+                            input: process.stdin,
+                            output: process.stdout
+                        });
+                    console.log('Select the party initializing the contract');
+                    instance.parties.map((party, key)=>{
+                        console.log(`${key+1}. ${party}`);
+                    });
+                    const partyKey = await new Promise(resolve => {
+                        rl.question('Enter party serial number: ', resolve);
+                    });
+                    partyName = instance.parties[partyKey-1];
+                    console.log(partyName);
+                    rl.close();
+                }
+                const result = await engine.init(instance, currentTime, utcOffset, paramsJson);
+
+                if (slcPath) {
+                    //Add state
+                    Util.addState(
+                        instance,
+                        partyName,
+                        'initialize',
+                        'Initialized Successfully',
+                        'Execution'
+                    );
+                    const archive = await instance.toArchive('ergo');
+                    let file;
+                    const instanceName = instance.getIdentifier();
+                    file = `${instanceName}.slc`;
+                    Logger.info('Creating archive: ' + file);
+                    fs.writeFileSync(file, archive);
+                }
+                return result;
             })
             .catch((err) => {
                 Logger.error(err.message);
