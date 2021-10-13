@@ -17,13 +17,21 @@
 'use strict';
 
 const app = require('express')();
+const fs = require('fs');
 const bodyParser = require('body-parser');
 const Template = require('@accordproject/cicero-core').Template;
 const ClauseInstance = require('@accordproject/cicero-core').ClauseInstance;
+const ContractInstance = require('@accordproject/cicero-core').ContractInstance;
 const Engine = require('@accordproject/cicero-engine').Engine;
 
 if(!process.env.CICERO_DIR) {
     throw new Error('You must set the CICERO_DIR environment variable.');
+}
+
+function checkContractsPath() {
+    if(!process.env.CICERO_CONTRACTS) {
+        throw new Error('You must set the CICERO_CONTRACTS environment variable.');
+    }
 }
 
 const PORT = process.env.CICERO_PORT | 6001;
@@ -163,6 +171,105 @@ app.post('/draft/:template', async function (req, httpResponse, next) {
 });
 
 /**
+ * Handle POST requests to /instantiate/:template
+ * The body of the POST should contain the request data and any options.
+ * The contract instance is created using the template and the data and saved in $CICERO_CONTRACTS path.
+ * The call returns an object having the data, instatiator's name, author's signatures, party signatures and the states.
+ *
+ * Template
+ * ----------
+ * The template parameter is the name of a directory under CICERO_DIR that contains
+ * the template to use.
+ *
+ * Request
+ * ----------
+ * The POST body contains three properties:
+ *  - data
+ *  - instantiator
+ *  - options
+ *
+ * Response
+ * ----------
+ * An object containing the data, instatiator's name, author's signatures, party signatures and the states
+ *
+ */
+app.post('/instantiate/:template', async function (req, httpResponse, next) {
+    checkContractsPath();
+    try {
+        if(Object.prototype.hasOwnProperty.call(req.body,'instantiator') &&
+           Object.prototype.hasOwnProperty.call(req.body,'data')) {
+            const instance = await instantiateContract(req);
+            const instanceBuffer = await instance.toArchive(instance.runtime);
+            const instanceName = instance.getIdentifier();
+            const file = `${process.env.CICERO_CONTRACTS}/${instanceName}.slc`;
+            fs.writeFileSync(file, instanceBuffer);
+            const responseInstance = {
+                data: instance.data,
+                instantiator: instance.instantiator,
+                authorSignature: instance.authorSignature,
+                contractSignatures: instance.contractSignatures,
+                states: instance.states
+            }
+            httpResponse.send(responseInstance);
+        } else {
+            throw new Error('Missing data or instantiator name in /instantiate body');
+        }
+    }
+    catch(err) {
+        return next(err);
+    }
+});
+
+/**
+ * Handle POST requests to /sign/:contract
+ * The body of the POST should contain the request data and any options.
+ * The contract instance is signed using the contarct, p12File, passphrase and the signatory's name and the data and saved in $CICERO_CONTRACTS path.
+ * The call returns the object with author's signature, party signatures and the states.
+ *
+ * Contract
+ * ----------
+ * The contract parameter is the name of a directory under CICERO_CONTRACT that contains
+ * the contract to use.
+ *
+ * Request
+ * ----------
+ * The POST body contains three properties:
+ *  - p12File
+ *  - passphrase
+ *  - signatory
+ *
+ * Response
+ * ----------
+ * An object containing the author's signature, party signatures and the states
+ *
+ */
+app.post('/sign/:contract', async function (req, httpResponse, next) {
+    checkContractsPath();
+    try {
+        if(Object.prototype.hasOwnProperty.call(req.body,'p12File') &&
+           Object.prototype.hasOwnProperty.call(req.body,'passphrase') &&
+           Object.prototype.hasOwnProperty.call(req.body,'signatory')) {
+            const instance = await loadInstance(req);
+            const instanceBuffer = await instance.signContract(req.body.p12File, req.body.passphrase, req.body.signatory);
+            const instanceName = instance.getIdentifier();
+            const file = `${process.env.CICERO_CONTRACTS}/${instanceName}.slc`;
+            fs.writeFileSync(file, instanceBuffer);
+            const response = {
+                authorSignature: instance.authorSignature,
+                contractSignatures: instance.contractSignatures,
+                states: instance.states
+            }
+            httpResponse.send(response);
+        } else {
+            throw new Error('Missing p12File encoded string or passphrase of keystore or signatory\'s name in /instantiate body');
+        }
+    }
+    catch(err) {
+        return next(err);
+    }
+});
+
+/**
  * Helper function to initialise the template.
  * @param {req} req The request passed in from endpoint.
  * @returns {object} The template instance object.
@@ -170,6 +277,26 @@ app.post('/draft/:template', async function (req, httpResponse, next) {
 async function initTemplateInstance(req) {
     const template = await Template.fromDirectory(`${process.env.CICERO_DIR}/${req.params.template}`);
     return ClauseInstance.fromTemplate(template);
+}
+
+/**
+ * Helper function to instantiate the contract instance.
+ * @param {req} req The request passed in from endpoint.
+ * @returns {object} The contract instance object.
+ */
+async function instantiateContract(req) {
+    const template = await Template.fromDirectory(`${process.env.CICERO_DIR}/${req.params.template}`);
+    return ContractInstance.fromTemplateWithData(template, req.body.data, req.body.instantiator);
+}
+
+/**
+ * Helper function to load the contract instance.
+ * @param {req} req The request passed in from endpoint.
+ * @returns {object} The contract instance object.
+ */
+async function loadInstance(req) {
+    const buffer = fs.readFileSync(`${process.env.CICERO_CONTRACTS}/${req.params.contract}.slc`);
+    return ContractInstance.fromArchive(buffer);
 }
 
 const server = app.listen(app.get('port'), function () {
