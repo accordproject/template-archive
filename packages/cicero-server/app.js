@@ -194,8 +194,8 @@ app.post('/draft/:template', async function (req, httpResponse, next) {
  *
  */
 app.post('/instantiate/:template', async function (req, httpResponse, next) {
-    checkContractsPath();
     try {
+        checkContractsPath();
         if(Object.prototype.hasOwnProperty.call(req.body,'instantiator') &&
            Object.prototype.hasOwnProperty.call(req.body,'data')) {
             const instance = await instantiateContract(req);
@@ -244,13 +244,14 @@ app.post('/instantiate/:template', async function (req, httpResponse, next) {
  *
  */
 app.post('/sign/:contract', async function (req, httpResponse, next) {
-    checkContractsPath();
     try {
-        if(Object.prototype.hasOwnProperty.call(req.body,'p12File') &&
+        checkContractsPath();
+        if(Object.prototype.hasOwnProperty.call(req.body,'keystore') &&
            Object.prototype.hasOwnProperty.call(req.body,'passphrase') &&
            Object.prototype.hasOwnProperty.call(req.body,'signatory')) {
+            const p12File = p12FileLoader(req.body.keystore);
             const instance = await loadInstance(req);
-            const instanceBuffer = await instance.signContract(req.body.p12File, req.body.passphrase, req.body.signatory);
+            const instanceBuffer = await instance.signContract(p12File, req.body.passphrase, req.body.signatory);
             const instanceName = instance.getIdentifier();
             const file = `${process.env.CICERO_CONTRACTS}/${instanceName}.slc`;
             fs.writeFileSync(file, instanceBuffer);
@@ -297,6 +298,24 @@ async function instantiateContract(req) {
 async function loadInstance(req) {
     const buffer = fs.readFileSync(`${process.env.CICERO_CONTRACTS}/${req.params.contract}.slc`);
     return ContractInstance.fromArchive(buffer);
+}
+
+/**
+ * Helper function to load the encoded p12file.
+ * @param {req} req The request passed in from endpoint.
+ * @returns {string} The p12file encoded string.
+ */
+function p12FileLoader(keystore) {
+    if(keystore.type === 'file') {
+        if(!process.env.CICERO_KEYSTORES) {
+            throw new Error('You must set the CICERO_KEYSTORE environment variable.');
+        }
+        return fs.readFileSync(`${process.env.CICERO_KEYSTORES}/${keystore.value}.p12`, { encoding: 'base64' });
+    }else if(keystore.type === 'inline') {
+        return keystore.value;
+    }else {
+        throw new Error('Missing or incorrect keystore type or value.');
+    }
 }
 
 const server = app.listen(app.get('port'), function () {
