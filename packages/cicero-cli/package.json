@@ -1,6 +1,6 @@
 {
   "name": "@accordproject/cicero-cli",
-  "version": "0.22.1",
+  "version": "0.22.2",
   "description": "Cicero CLI",
   "engines": {
     "node": ">=12",
@@ -42,10 +42,10 @@
   },
   "homepage": "https://www.accordproject.org/projects/cicero",
   "dependencies": {
-    "@accordproject/cicero-core": "0.22.1",
-    "@accordproject/cicero-engine": "0.22.1",
-    "@accordproject/cicero-test": "0.22.1",
-    "@accordproject/cicero-tools": "0.22.1",
+    "@accordproject/cicero-core": "0.22.2",
+    "@accordproject/cicero-engine": "0.22.2",
+    "@accordproject/cicero-test": "0.22.2",
+    "@accordproject/cicero-tools": "0.22.2",
     "@accordproject/concerto-core": "1.2.1",
     "mkdirp": "0.5.1",
     "uuid": "3.3.2",
