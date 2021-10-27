@@ -128,11 +128,11 @@ class InstanceLoader extends FileLoader {
         // add contract data
         const data = await InstanceLoader.loadZipFileContents(zip, 'data.json', true, true);
 
-        // add contract states
-        const states = await InstanceLoader.loadZipFileContents(zip, 'states.json', true, true);
+        // add contract history
+        const history = await InstanceLoader.loadZipFileContents(zip, 'history.json', true, true);
 
         //grab instantiator
-        const instantiator = states.length !== 0 ? states[0].currentState.instatiator : null;
+        const instantiator = history.length !== 0 ? history[0].currentState.instatiator : null;
 
         // add template grammar (.md form)
         const grammar = await InstanceLoader.loadZipFileContents(zip, 'text/grammar.tem.md', false, false);
@@ -173,8 +173,8 @@ class InstanceLoader extends FileLoader {
             instantiator
         ));
 
-        //grab contract states
-        instance.states = states;
+        //grab contract history
+        instance.history = history;
 
         //grab the author/developer's signature
         instance.authorSignature = await InstanceLoader.loadZipFileContents(zip, 'signature.json', true, false);

@@ -23,11 +23,16 @@ const Template = require('@accordproject/cicero-core').Template;
 const ClauseInstance = require('@accordproject/cicero-core').ClauseInstance;
 const ContractInstance = require('@accordproject/cicero-core').ContractInstance;
 const Engine = require('@accordproject/cicero-engine').Engine;
+const Util = require('@accordproject/cicero-core/src/util');
+const Export = require('@accordproject/cicero-transform').Export;
 
 if(!process.env.CICERO_DIR) {
     throw new Error('You must set the CICERO_DIR environment variable.');
 }
 
+/**
+ * Helper function to check if contract slc file is present.
+ */
 function checkContractsPath() {
     if(!process.env.CICERO_CONTRACTS) {
         throw new Error('You must set the CICERO_CONTRACTS environment variable.');
@@ -43,47 +48,76 @@ app.use(bodyParser.json());
 app.set('port', PORT);
 
 /**
- * Handle POST requests to /trigger/:template
- * The clause is created using the template and the data.
+ * Handle POST requests to /trigger/:type/:path
+ * The clause is created using the template and the data or the contract instance is created.
  *
- * Template
+ * Type
  * ----------
- * The template parameter is the name of a directory under CICERO_DIR that contains
- * the template to use.
+ * The type parameter is the type that specifies what is to be triggered, a clause or contract.
+ *
+ * Instance Name
+ * ----------
+ * The instanceName parameter is the name of a directory under CICERO_DIR or CICERO_CONTRACTS that contains
+ * the template/contract to use.
  *
  * Request
  * ----------
  * The POST body contains three properties:
  *  - request
+ *  - partyName
  *  - data
  *  - state (optional - for stateless execution)
+ *  - output (optional - for saving updated contract instance in a new slc file under CICERO_CONTRACTS
  *
  * Response
  * ----------
  * JSON formated response object
  *
  */
-app.post('/trigger/:template', async function (req, httpResponse, next) {
+app.post('/trigger/:type/:instanceName', async function (req, httpResponse, next) {
     try {
-        const clause = await initTemplateInstance(req);
+        const instance = req.params.type === 'clause' ? await initTemplateInstance(req) : req.params.type === 'contract' ? await loadInstance(req) : null;
+        if(!instance) {
+            throw new Error('The type specified is wrong. Please use either \'clause\' or \'contract\' type');
+        }
+        if(req.params.type === 'clause') {
+            instance.setData(req.body.data);
+        }
+        if(req.params.type === 'contract' && !req.body.partyName) {
+            throw new Error('Please enter the name of the party that is triggering the contract Instance');
+        }
 
         const engine = new Engine();
         let result;
-        if(Object.keys(req.body).length === 3 &&
+        if((Object.keys(req.body).length === 4 && req.params.type === 'contract' ||
+           Object.keys(req.body).length === 3 && req.params.type === 'clause') &&
            Object.prototype.hasOwnProperty.call(req.body,'request') &&
            Object.prototype.hasOwnProperty.call(req.body,'state') &&
            Object.prototype.hasOwnProperty.call(req.body,'data')) {
-            clause.setData(req.body.data);
-            result = await engine.trigger(clause, req.body.request, req.body.state);
-        } else if(Object.keys(req.body).length === 2 &&
+            result = await engine.trigger(instance, req.body.request, req.body.state);
+            console.log(result);
+        } else if((Object.keys(req.body).length === 3 && req.params.type === 'contract' ||
+           Object.keys(req.body).length === 2 && req.params.type === 'clause') &&
            Object.prototype.hasOwnProperty.call(req.body,'request') &&
            Object.prototype.hasOwnProperty.call(req.body,'data')) {
             const state = { '$class' : 'org.accordproject.runtime.State' };
-            clause.setData(req.body.data);
-            result = await engine.trigger(clause, req.body.request, state);
+            result = await engine.trigger(instance, req.body.request, state);
             delete result.state;
         } else {
             throw new Error('Missing request, state or data in /trigger body');
+        }
+        if(req.params.type === 'contract') {
+            //Add state
+            Util.addHistory(
+                instance,
+                req.body.partyName,
+                'trigger',
+                result,
+                'Execution'
+            );
+            const archive = await instance.toArchive('ergo');
+            const file = !req.body.output ? `${process.env.CICERO_CONTRACTS}/${req.params.instanceName}.slc` : `${process.env.CICERO_CONTRACTS}/${req.body.output}.slc`;
+            fs.writeFileSync(file, archive);
         }
         httpResponse.send(result);
     }
@@ -97,9 +131,9 @@ app.post('/trigger/:template', async function (req, httpResponse, next) {
  * The body of the POST should contain the sample text.
  * The clause is created using the template, parsing the text and if parsing succeeds returning the contract data.
  *
- * Template
+ * Intance Name
  * ----------
- * The template parameter is the name of a directory under CICERO_DIR that contains
+ * The instanceName parameter is the name of a directory under CICERO_DIR that contains
  * the template to use.
  *
  * Request
@@ -112,7 +146,7 @@ app.post('/trigger/:template', async function (req, httpResponse, next) {
  * A data string containing the parsed output
  *
  */
-app.post('/parse/:template', async function (req, httpResponse, next) {
+app.post('/parse/:instanceName', async function (req, httpResponse, next) {
     try {
         const clause = await initTemplateInstance(req);
         if(Object.keys(req.body).length === 1 &&
@@ -133,9 +167,9 @@ app.post('/parse/:template', async function (req, httpResponse, next) {
  * The clause is created using the template and the data.
  * The call returns the text of the contract.
  *
- * Template
+ * Instance Name
  * ----------
- * The template parameter is the name of a directory under CICERO_DIR that contains
+ * The InstanceName parameter is the name of a directory under CICERO_DIR that contains
  * the template to use.
  *
  * Request
@@ -149,7 +183,7 @@ app.post('/parse/:template', async function (req, httpResponse, next) {
  * A string containing the draft output
  *
  */
-app.post('/draft/:template', async function (req, httpResponse, next) {
+app.post('/draft/:instanceName', async function (req, httpResponse, next) {
     try {
         const clause = await initTemplateInstance(req);
         if(Object.keys(req.body).length === 1 &&
@@ -173,43 +207,43 @@ app.post('/draft/:template', async function (req, httpResponse, next) {
 /**
  * Handle POST requests to /instantiate/:template
  * The body of the POST should contain the request data and any options.
- * The contract instance is created using the template and the data and saved in $CICERO_CONTRACTS path.
- * The call returns an object having the data, instatiator's name, author's signatures, party signatures and the states.
+ * The contract instance is created using the template and the data and saved under $CICERO_CONTRACTS path.
+ * The call returns an object having the data, instatiator's name, author's signatures, party signatures and the history.
  *
- * Template
+ * Instance Name
  * ----------
- * The template parameter is the name of a directory under CICERO_DIR that contains
- * the template to use.
+ * The instanceName parameter is the name of a directory under CICERO_CONTRACTS that contains
+ * the contract to use.
  *
  * Request
  * ----------
  * The POST body contains three properties:
  *  - data
  *  - instantiator
+ *  - output (optional - for saving updated contract instance in a new slc file under CICERO_CONTRACTS
  *  - options
  *
  * Response
  * ----------
- * An object containing the data, instatiator's name, author's signatures, party signatures and the states
+ * An object containing the data, instatiator's name, author's signatures, party signatures and the history
  *
  */
-app.post('/instantiate/:template', async function (req, httpResponse, next) {
+app.post('/instantiate/:instanceName', async function (req, httpResponse, next) {
     try {
         checkContractsPath();
         if(Object.prototype.hasOwnProperty.call(req.body,'instantiator') &&
            Object.prototype.hasOwnProperty.call(req.body,'data')) {
             const instance = await instantiateContract(req);
             const instanceBuffer = await instance.toArchive(instance.runtime);
-            const instanceName = instance.getIdentifier();
-            const file = `${process.env.CICERO_CONTRACTS}/${instanceName}.slc`;
+            const file = !req.body.output ? `${process.env.CICERO_CONTRACTS}/${req.params.instanceName}.slc` : `${process.env.CICERO_CONTRACTS}/${req.body.output}.slc`;
             fs.writeFileSync(file, instanceBuffer);
             const responseInstance = {
                 data: instance.data,
                 instantiator: instance.instantiator,
                 authorSignature: instance.authorSignature,
                 contractSignatures: instance.contractSignatures,
-                states: instance.states
-            }
+                history: instance.history
+            };
             httpResponse.send(responseInstance);
         } else {
             throw new Error('Missing data or instantiator name in /instantiate body');
@@ -224,11 +258,11 @@ app.post('/instantiate/:template', async function (req, httpResponse, next) {
  * Handle POST requests to /sign/:contract
  * The body of the POST should contain the request data and any options.
  * The contract instance is signed using the contarct, p12File, passphrase and the signatory's name and the data and saved in $CICERO_CONTRACTS path.
- * The call returns the object with author's signature, party signatures and the states.
+ * The call returns the object with author's signature, party signatures and the history.
  *
- * Contract
+ * Instance Name
  * ----------
- * The contract parameter is the name of a directory under CICERO_CONTRACT that contains
+ * The instanceName parameter is the name of a directory under CICERO_CONTRACTS that contains
  * the contract to use.
  *
  * Request
@@ -237,13 +271,14 @@ app.post('/instantiate/:template', async function (req, httpResponse, next) {
  *  - p12File
  *  - passphrase
  *  - signatory
+ *  - output (optional - for saving updated contract instance in a new slc file under CICERO_CONTRACTS
  *
  * Response
  * ----------
- * An object containing the author's signature, party signatures and the states
+ * An object containing the author's signature, party signatures and the history
  *
  */
-app.post('/sign/:contract', async function (req, httpResponse, next) {
+app.post('/sign/:instanceName', async function (req, httpResponse, next) {
     try {
         checkContractsPath();
         if(Object.prototype.hasOwnProperty.call(req.body,'keystore') &&
@@ -252,17 +287,71 @@ app.post('/sign/:contract', async function (req, httpResponse, next) {
             const p12File = p12FileLoader(req.body.keystore);
             const instance = await loadInstance(req);
             const instanceBuffer = await instance.signContract(p12File, req.body.passphrase, req.body.signatory);
-            const instanceName = instance.getIdentifier();
-            const file = `${process.env.CICERO_CONTRACTS}/${instanceName}.slc`;
+            const file = !req.body.output ? `${process.env.CICERO_CONTRACTS}/${req.params.instanceName}.slc` : `${process.env.CICERO_CONTRACTS}/${req.body.output}.slc`;
             fs.writeFileSync(file, instanceBuffer);
             const response = {
                 authorSignature: instance.authorSignature,
                 contractSignatures: instance.contractSignatures,
-                states: instance.states
-            }
+                history: instance.history
+            };
             httpResponse.send(response);
         } else {
-            throw new Error('Missing p12File encoded string or passphrase of keystore or signatory\'s name in /instantiate body');
+            throw new Error('Missing p12File encoded string or passphrase of keystore or signatory\'s name in /sign body');
+        }
+    }
+    catch(err) {
+        return next(err);
+    }
+});
+
+/**
+ * Handle POST requests to /export/:instanceName
+ * The body of the POST should contain the request data and any options.
+ * The contract instance is exported either in a markdown or a pdf format, from the contracts stored under CICERO_CONTRACT.
+ * The call returns the buffer string or the markdown file.
+ *
+ * Instance Name
+ * ----------
+ * The contract parameter is the name of a directory under CICERO_CONTRACT that contains
+ * the contract to use.
+ *
+ * Request
+ * ----------
+ * The POST body contains three properties:
+ *  - format
+ *  - utcOffset
+ *  - partyName
+ *  - output (optional - for saving updated contract instance in a new slc file under CICERO_CONTRACTS
+ *
+ * Response
+ * ----------
+ * A string containing the pdf buffer or markdown file
+ *
+ */
+app.post('/export/:instanceName', async function (req, httpResponse, next) {
+    try {
+        checkContractsPath();
+        if(Object.prototype.hasOwnProperty.call(req.body,'format') &&
+           Object.prototype.hasOwnProperty.call(req.body,'partyName') &&
+           Object.prototype.hasOwnProperty.call(req.body,'utcOffset')) {
+            const instance = await loadInstance(req);
+            const result = await Export.toFormat(instance, req.body.format, req.body.utcOffset, req.body.options);
+            const fileFormat = Export.formatDescriptor(req.body.format).fileFormat;
+            const outputFile = fileFormat === 'json' ? JSON.stringify(result) : result;
+            //Add state
+            Util.addHistory(
+                instance,
+                req.body.partyName,
+                'export',
+                'Exported Successfully',
+                'Execution'
+            );
+            const archive = await instance.toArchive('ergo');
+            const file = !req.body.output ? `${process.env.CICERO_CONTRACTS}/${req.params.instanceName}.slc` : `${process.env.CICERO_CONTRACTS}/${req.body.output}.slc`;
+            fs.writeFileSync(file, archive);
+            httpResponse.send(outputFile);
+        } else {
+            throw new Error('Missing format or utcOffset or partyName in /export body');
         }
     }
     catch(err) {
@@ -276,7 +365,7 @@ app.post('/sign/:contract', async function (req, httpResponse, next) {
  * @returns {object} The template instance object.
  */
 async function initTemplateInstance(req) {
-    const template = await Template.fromDirectory(`${process.env.CICERO_DIR}/${req.params.template}`);
+    const template = await Template.fromDirectory(`${process.env.CICERO_DIR}/${req.params.instanceName}`);
     return ClauseInstance.fromTemplate(template);
 }
 
@@ -286,7 +375,7 @@ async function initTemplateInstance(req) {
  * @returns {object} The contract instance object.
  */
 async function instantiateContract(req) {
-    const template = await Template.fromDirectory(`${process.env.CICERO_DIR}/${req.params.template}`);
+    const template = await Template.fromDirectory(`${process.env.CICERO_DIR}/${req.params.instanceName}`);
     return ContractInstance.fromTemplateWithData(template, req.body.data, req.body.instantiator);
 }
 
@@ -296,13 +385,13 @@ async function instantiateContract(req) {
  * @returns {object} The contract instance object.
  */
 async function loadInstance(req) {
-    const buffer = fs.readFileSync(`${process.env.CICERO_CONTRACTS}/${req.params.contract}.slc`);
+    const buffer = fs.readFileSync(`${process.env.CICERO_CONTRACTS}/${req.params.instanceName}.slc`);
     return ContractInstance.fromArchive(buffer);
 }
 
 /**
  * Helper function to load the encoded p12file.
- * @param {req} req The request passed in from endpoint.
+ * @param {keystore} keystore object containing dtata about the keystore.
  * @returns {string} The p12file encoded string.
  */
 function p12FileLoader(keystore) {

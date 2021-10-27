@@ -461,11 +461,11 @@ class Commands {
 
                 if (slcPath) {
                     //Add state
-                    Util.addState(
+                    Util.addHistory(
                         instance,
                         partyName,
                         'trigger',
-                        'Triggered Successfully',
+                        triggerResult,
                         'Execution'
                     );
                     const archive = await instance.toArchive('ergo');
@@ -582,7 +582,7 @@ class Commands {
 
                 if (slcPath) {
                     //Add state
-                    Util.addState(
+                    Util.addHistory(
                         instance,
                         partyName,
                         'invoke',
@@ -671,7 +671,7 @@ class Commands {
 
                 if (slcPath) {
                     //Add state
-                    Util.addState(
+                    Util.addHistory(
                         instance,
                         partyName,
                         'initialize',

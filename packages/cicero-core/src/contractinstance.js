@@ -52,7 +52,7 @@ class ContractInstance extends Instance {
         const instance = InstanceLoader.fromTemplateWithData(ContractInstance, template, data, instantiator);
 
         //Add state
-        Util.addState(
+        Util.addHistory(
             instance,
             instance.instantiator,
             'instantiate',
@@ -98,7 +98,7 @@ class ContractInstance extends Instance {
         this.sign(p12File, passphrase, timestamp, signatory);
 
         //Add state
-        Util.addState(
+        Util.addHistory(
             this,
             signatory,
             'sign',

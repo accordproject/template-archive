@@ -70,7 +70,7 @@ class Instance {
         this.authorSignature = null;
         this.contractSignatures = [];
         this.parties = [];
-        this.states = [];
+        this.history = [];
 
         // Initialize the parser
         Util.initParser(
@@ -187,7 +187,7 @@ class Instance {
 
         //Add state
         if (kind === 'contract') {
-            Util.addState(
+            Util.addHistory(
                 this,
                 'some-party',
                 'draft',

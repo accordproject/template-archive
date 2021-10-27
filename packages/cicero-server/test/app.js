@@ -153,12 +153,14 @@ describe('cicero-server', () => {
 
     before(()=>{
         process.env.CICERO_DIR = './test/data';
+        process.env.CICERO_CONTRACTS = './test/data/contracts';
+        process.env.CICERO_KEYSTORES = './test/data/keystores';
         server = require('../app');
         request = request(server);
     });
 
-    it('/should trigger a simple stateless request (ergo)', async () => {
-        return request.post('/trigger/latedeliveryandpenalty')
+    it('/should trigger a clause with simple stateless request (ergo)', async () => {
+        return request.post('/trigger/clause/latedeliveryandpenalty')
             .send({ 'request' : body, 'data' : triggerData })
             .expect(200)
             .expect('Content-Type',/json/)
@@ -168,14 +170,25 @@ describe('cicero-server', () => {
             });
     });
 
-    it('/should fail to trigger without data', async () => {
-        return request.post('/trigger/latedeliveryandpenalty')
+    it('/should trigger a contract with simple stateless request (ergo)', async () => {
+        return request.post('/trigger/contract/latedeliveryandpenalty-test')
+            .send({ 'request' : body, 'data' : {triggerData, partyName: 'Acme Corp'} })
+            .expect(200)
+            .expect('Content-Type',/json/)
+            .then(response => {
+                response.body.response.should.include(responseBody);
+                response.body.should.not.have.property('state');
+            });
+    });
+
+    it('/should fail to trigger a clause without data', async () => {
+        return request.post('/trigger/clause/latedeliveryandpenalty')
             .send({ 'request' : body })
             .expect(500);
     });
 
-    it('/should trigger a simple stateless request with a sample clause (ergo)', async () => {
-        return request.post('/trigger/latedeliveryandpenalty')
+    it('/should trigger a clause with simple stateless request with a sample clause (ergo)', async () => {
+        return request.post('/trigger/clause/latedeliveryandpenalty')
             .send({ 'request' : body, 'data' : triggerData })
             .expect(200)
             .expect('Content-Type',/json/)
@@ -185,8 +198,8 @@ describe('cicero-server', () => {
             });
     });
 
-    it('/should trigger a stateful request (ergo)', async () => {
-        return request.post('/trigger/latedeliveryandpenalty')
+    it('/should trigger a clause with stateful request (ergo)', async () => {
+        return request.post('/trigger/clause/latedeliveryandpenalty')
             .send({
                 data: triggerData,
                 request: body,

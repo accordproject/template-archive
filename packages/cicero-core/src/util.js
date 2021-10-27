@@ -204,24 +204,49 @@ function parseText(parserManager, ciceroMarkTransformer, input, currentTime, utc
  * @param {*} output - result of the operation
  * @param {string} lifecycleState - current state in instance's lifecycle
  */
-function addState(instance, partyName, operation, output, lifecycleState) {
-    const previousHash = instance.states.length !== 0 ? instance.states[instance.states.length-1].currentHash : null;
+function addHistory(instance, partyName, operation, output, lifecycleState) {
+    const previousHash = instance.history.length !== 0 ? instance.history[instance.history.length-1].currentHash : null;
+    const timestamp = new Date().toISOString();
     const currentState =  {
         previousHash: previousHash,
         partyName: partyName,
         operation: operation,
         result: output,
-        timestamp: Date(),
+        timestamp,
         lifecycleState: lifecycleState
     };
+    const content = {};
+    content.metadata = instance.metadata;
+    content.history = instance.history;
+    if(instance.parserManager.getTemplate()) {
+        content.grammar = instance.parserManager.getTemplate();
+    }
+    content.models = {};
+    content.scripts = {};
+
+    let modelFiles = instance.getModelManager().getModels();
+    modelFiles.forEach(function (file) {
+        content.models[file.namespace] = file.content;
+    });
+
+    let scriptManager = instance.getScriptManager();
+    let scriptFiles = scriptManager.getScripts();
+    scriptFiles.forEach(function (file) {
+        content.scripts[file.getIdentifier()] = file.contents;
+    });
+
+    content.data = instance.getData();
+
+    content.signatures = instance.contractSignatures;
+
     const hasher = crypto.createHash('sha256');
-    hasher.update(stringify(currentState));
+    hasher.update(stringify(content));
     const currentHash =  hasher.digest('hex');
     const state = {
         currentState: currentState,
         currentHash: currentHash
     };
-    instance.states.push(state);
+    instance.history.push(state);
 }
 
 /**
@@ -280,4 +305,4 @@ function isValidName(name) {
     return true;
 }
 
-module.exports = { getContractModel, ciceroFormulaEval, initParser, rebuildParser, parseText, checkImage, isValidName, addState, templateTypes };
+module.exports = { getContractModel, ciceroFormulaEval, initParser, rebuildParser, parseText, checkImage, isValidName, addHistory, templateTypes };
