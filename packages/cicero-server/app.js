@@ -86,25 +86,23 @@ app.post('/trigger/:type/:instanceName', async function (req, httpResponse, next
         if(req.params.type === 'contract' && !req.body.partyName) {
             throw new Error('Please enter the name of the party that is triggering the contract Instance');
         }
+        if(req.params.type === 'clause' && !Object.prototype.hasOwnProperty.call(req.body,'data')) {
+            throw new Error('Missing data in /trigger body');
+        }
 
         const engine = new Engine();
         let result;
-        if((Object.keys(req.body).length === 4 && req.params.type === 'contract' ||
-           Object.keys(req.body).length === 3 && req.params.type === 'clause') &&
+        if(Object.keys(req.body).length === 3 &&
            Object.prototype.hasOwnProperty.call(req.body,'request') &&
-           Object.prototype.hasOwnProperty.call(req.body,'state') &&
-           Object.prototype.hasOwnProperty.call(req.body,'data')) {
+           Object.prototype.hasOwnProperty.call(req.body,'state')) {
             result = await engine.trigger(instance, req.body.request, req.body.state);
-            console.log(result);
-        } else if((Object.keys(req.body).length === 3 && req.params.type === 'contract' ||
-           Object.keys(req.body).length === 2 && req.params.type === 'clause') &&
-           Object.prototype.hasOwnProperty.call(req.body,'request') &&
-           Object.prototype.hasOwnProperty.call(req.body,'data')) {
+        } else if(Object.keys(req.body).length === 2 &&
+           Object.prototype.hasOwnProperty.call(req.body,'request')) {
             const state = { '$class' : 'org.accordproject.runtime.State' };
             result = await engine.trigger(instance, req.body.request, state);
             delete result.state;
         } else {
-            throw new Error('Missing request, state or data in /trigger body');
+            throw new Error('Missing request or state in /trigger body');
         }
         if(req.params.type === 'contract') {
             //Add state
