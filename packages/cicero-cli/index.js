@@ -286,6 +286,10 @@ require('yargs')
             describe: 'path to the JSON state',
             type: 'string'
         });
+        yargs.option('party', {
+            describe: 'party which triggers the contract',
+            type: 'string'
+        });
         yargs.option('currentTime', {
             describe: 'set current time',
             type: 'string',
@@ -314,7 +318,7 @@ require('yargs')
                 offline: argv.offline,
                 warnings: argv.warnings,
             };
-            return Commands.trigger(argv.template, argv.contract, argv.sample, argv.data, argv.request, argv.state, argv.currentTime, argv.utcOffset, options)
+            return Commands.trigger(argv.template, argv.contract, argv.sample, argv.data, argv.request, argv.state, argv.party, argv.currentTime, argv.utcOffset, options)
                 .then((result) => {
                     if(result) {Logger.info(JSON.stringify(result));}
                 })
@@ -356,6 +360,10 @@ require('yargs')
             describe: 'path to the JSON state',
             type: 'string'
         });
+        yargs.option('party', {
+            describe: 'party which invokes the contract',
+            type: 'string'
+        });
         yargs.option('currentTime', {
             describe: 'set current time',
             type: 'string',
@@ -383,7 +391,7 @@ require('yargs')
                 offline: argv.offline,
                 warnings: argv.warnings,
             };
-            return Commands.invoke(argv.template, argv.contract, argv.sample, argv.data, argv.clauseName, argv.params, argv.state, argv.currentTime, argv.utcOffset, options)
+            return Commands.invoke(argv.template, argv.contract, argv.sample, argv.data, argv.clauseName, argv.params, argv.state, argv.party, argv.currentTime, argv.utcOffset, options)
                 .then((result) => {
                     if(result) {Logger.info(JSON.stringify(result));}
                 })
@@ -417,6 +425,10 @@ require('yargs')
             describe: 'path to the parameters',
             type: 'string'
         });
+        yargs.option('party', {
+            describe: 'party which initializes the contract',
+            type: 'string'
+        });
         yargs.option('currentTime', {
             describe: 'initialize with this current time',
             type: 'string',
@@ -445,7 +457,7 @@ require('yargs')
                 offline: argv.offline,
                 warnings: argv.warnings,
             };
-            return Commands.initialize(argv.template, argv.contract, argv.sample, argv.data, argv.params, argv.currentTime, argv.utcOffset, options)
+            return Commands.initialize(argv.template, argv.contract, argv.sample, argv.data, argv.params, argv.party, argv.currentTime, argv.utcOffset, options)
                 .then((result) => {
                     if(result) {Logger.info(JSON.stringify(result));}
                 })
@@ -621,6 +633,10 @@ require('yargs')
             type: 'string',
             default: null
         });
+        yargs.option('signatory', {
+            describe: 'name of the party/signatory signing the contract',
+            type: 'string'
+        });
         yargs.option('output', {
             describe: 'file name for new archive',
             type: 'string',
@@ -641,7 +657,7 @@ require('yargs')
             const options = {
                 warnings: argv.warnings,
             };
-            return Commands.sign(argv.contract, argv.keystore, argv.passphrase, argv.output, options)
+            return Commands.sign(argv.contract, argv.keystore, argv.passphrase, argv.signatory, argv.output, options)
                 .then((result) => {
                     if(result) {Logger.info('contract has been successfully signed');}
                 })
@@ -685,6 +701,10 @@ require('yargs')
             describe: 'path to a smart legal contract',
             type: 'string'
         });
+        yargs.option('party', {
+            describe: 'party which exports the contract',
+            type: 'string'
+        });
         yargs.option('output', {
             describe: 'path to the output file',
             type: 'string'
@@ -722,7 +742,7 @@ require('yargs')
                 warnings: argv.warnings,
                 format: argv.format,
             };
-            return Commands.export(argv.contract, argv.output, argv.currentTime, argv.utcOffset, options)
+            return Commands.export(argv.contract, argv.party, argv.output, argv.currentTime, argv.utcOffset, options)
                 .then((result) => {
                 })
                 .catch((err) => {

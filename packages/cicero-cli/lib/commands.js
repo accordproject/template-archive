@@ -36,7 +36,6 @@ const defaultSample = 'text/sample.md';
 const defaultData = 'data.json';
 const defaultParams = 'params.json';
 const defaultState = 'state.json';
-const readline = require('readline');
 
 /**
  * Utility class that implements the commands exposed by the Cicero CLI.
@@ -380,6 +379,9 @@ class Commands {
         if (argv.template) {
             argv = Commands.validateDataArgs(argv);
         }
+        if (!argv.party && argv.contract) {
+            throw new Error('No party name name provided. Try the --party flag to provide a party to be triggred.');
+        }
         argv = Commands.setDefaultFileArg(argv, 'request', 'request.json', ((argv, argDefaultName) => { return [path.resolve(argv.template,argDefaultName)]; }));
 
         if (argv.verbose) {
@@ -406,12 +408,13 @@ class Commands {
      * @param {string} dataPath - to the data file
      * @param {string[]} requestsPath - to the array of request files
      * @param {string} statePath - to the state file
+     * @param {string} party - name of the party triggering the contract
      * @param {string} [currentTime] - the definition of 'now', defaults to current time
      * @param {number} [utcOffset] - UTC Offset for this execution, defaults to local offset
      * @param {Object} [options] - an optional set of options
      * @returns {object} Promise to the result of execution
      */
-    static trigger(templatePath, slcPath, samplePath, dataPath, requestsPath, statePath, currentTime, utcOffset, options) {
+    static trigger(templatePath, slcPath, samplePath, dataPath, requestsPath, statePath, party, currentTime, utcOffset, options) {
         let requestsJson = [];
 
         for (let i = 0; i < requestsPath.length; i++) {
@@ -419,26 +422,8 @@ class Commands {
         }
 
         const engine = new Engine();
-        return Commands.loadInstance(templatePath, slcPath, samplePath, dataPath, currentTime, utcOffset, options)
+        return Commands.loadInstance(templatePath, slcPath, samplePath, dataPath, currentTime, utcOffset, party, options)
             .then(async (instance) => {
-                let partyName;
-                if (slcPath) {
-                    const rl = readline.createInterface(
-                        {
-                            input: process.stdin,
-                            output: process.stdout
-                        });
-                    console.log('Select the party triggering the contract');
-                    instance.parties.map((party, key)=>{
-                        console.log(`${key+1}. ${party}`);
-                    });
-                    const partyKey = await new Promise(resolve => {
-                        rl.question('Enter party serial number: ', resolve);
-                    });
-                    partyName = instance.parties[partyKey-1];
-                    console.log(partyName);
-                    rl.close();
-                }
                 let stateJson;
                 if(!fs.existsSync(statePath)) {
                     Logger.warn('A state file was not provided, initializing state. Try the --state flag or create a state.json in the root folder of your template.');
@@ -463,7 +448,7 @@ class Commands {
                     //Add state
                     Util.addHistory(
                         instance,
-                        partyName,
+                        party,
                         'trigger',
                         triggerResult,
                         'Execution'
@@ -496,6 +481,9 @@ class Commands {
 
         if (!argv.clauseName) {
             throw new Error('No clause name provided. Try the --clauseName flag to provide a clause to be invoked.');
+        }
+        if (!argv.party && argv.contract) {
+            throw new Error('No party name name provided. Try the --party flag to provide a party to be invoked.');
         }
         if (argv.params) {
             if (!fs.existsSync(argv.params)) {
@@ -540,12 +528,13 @@ class Commands {
      * @param {string} clauseName the name of the clause to invoke
      * @param {object} paramsPath the parameters for the clause
      * @param {string} statePath - to the state file
+     * @param {string} party - name of the party invoking the contract
      * @param {string} [currentTime] - the definition of 'now', defaults to current time
      * @param {number} [utcOffset] - UTC Offset for this execution, defaults to local offset
      * @param {Object} [options] - an optional set of options
      * @returns {object} Promise to the result of execution
      */
-    static invoke(templatePath, slcPath, samplePath, dataPath, clauseName, paramsPath, statePath, currentTime, utcOffset, options) {
+    static invoke(templatePath, slcPath, samplePath, dataPath, clauseName, paramsPath, statePath, party, currentTime, utcOffset, options) {
         const paramsJson = JSON.parse(fs.readFileSync(paramsPath, 'utf8'));
 
         const engine = new Engine();
@@ -559,24 +548,6 @@ class Commands {
                 } else {
                     stateJson = JSON.parse(fs.readFileSync(statePath, 'utf8'));
                 }
-                let partyName
-                if (slcPath) {
-                    const rl = readline.createInterface(
-                        {
-                            input: process.stdin,
-                            output: process.stdout
-                        });
-                    console.log('Select the party invoking the contract');
-                    instance.parties.map((party, key)=>{
-                        console.log(`${key+1}. ${party}`);
-                    });
-                    const partyKey = await new Promise(resolve => {
-                        rl.question('Enter party serial number: ', resolve);
-                    });
-                    partyName = instance.parties[partyKey-1];
-                    console.log(partyName);
-                    rl.close();
-                }
 
                 const result =  await engine.invoke(instance, clauseName, paramsJson, stateJson, currentTime, utcOffset);
 
@@ -584,7 +555,7 @@ class Commands {
                     //Add state
                     Util.addHistory(
                         instance,
-                        partyName,
+                        party,
                         'invoke',
                         'Invoked Successfully',
                         'Execution'
@@ -614,6 +585,9 @@ class Commands {
         if (argv.template) {
             argv = Commands.validateDataArgs(argv);
         }
+        if (!argv.party && argv.contract) {
+            throw new Error('No party name name provided. Try the --party flag to provide a party to be initialized.');
+        }
 
         if(argv.verbose) {
             if (argv.sample) {
@@ -638,42 +612,25 @@ class Commands {
      * @param {string} samplePath - to the sample file
      * @param {string} dataPath - to the data file
      * @param {object} paramsPath - the parameters for the initialization
+     * @param {string} party - name of the party initializing the contract
      * @param {string} [currentTime] - the definition of 'now', defaults to current time
      * @param {number} [utcOffset] - UTC Offset for this execution, defaults to local offset
      * @param {Object} [options] - an optional set of options
      * @returns {object} Promise to the result of execution
      */
-    static initialize(templatePath, slcPath, samplePath, dataPath, paramsPath, currentTime, utcOffset, options) {
+    static initialize(templatePath, slcPath, samplePath, dataPath, paramsPath, party, currentTime, utcOffset, options) {
         const paramsJson = paramsPath ? JSON.parse(fs.readFileSync(paramsPath, 'utf8')) : {};
 
         const engine = new Engine();
         return Commands.loadInstance(templatePath, slcPath, samplePath, dataPath, currentTime, utcOffset, options)
             .then(async (instance) => {
-                let partyName
-                if (slcPath) {
-                    const rl = readline.createInterface(
-                        {
-                            input: process.stdin,
-                            output: process.stdout
-                        });
-                    console.log('Select the party initializing the contract');
-                    instance.parties.map((party, key)=>{
-                        console.log(`${key+1}. ${party}`);
-                    });
-                    const partyKey = await new Promise(resolve => {
-                        rl.question('Enter party serial number: ', resolve);
-                    });
-                    partyName = instance.parties[partyKey-1];
-                    console.log(partyName);
-                    rl.close();
-                }
                 const result = await engine.init(instance, currentTime, utcOffset, paramsJson);
 
                 if (slcPath) {
                     //Add state
                     Util.addHistory(
                         instance,
-                        partyName,
+                        party,
                         'initialize',
                         'Initialized Successfully',
                         'Execution'
@@ -755,11 +712,14 @@ class Commands {
     static validateSignArgs(argv) {
         argv = Commands.validateCommonArgs(argv);
 
-        if (!argv.keystore) {
-            throw new Error('Please define path of the keystore using --keystore');
+        if(!argv.keystore){
+            throw new Error('Please enter the keystore\'s path. Try the --keystore flag to enter keystore\'s path.');
         }
-        if (!argv.passphrase) {
-            throw new Error('Please define the passphrase of the keystore using --pasphrase');
+        if(!argv.passphrase){
+            throw new Error('Please enter the passphrase of the keystore. Try the --passphrase flag to enter passphrase.');
+        }
+        if(!argv.signatory){
+            throw new Error('Please enter the signatory\'s name. Try the --signatory flag to enter signatory\'s name.');
         }
         if(argv.verbose) {
             Logger.info(`Verifying signatures of contract ${argv.contract}`);
@@ -774,30 +734,16 @@ class Commands {
      * @param {string} slcPath - path to the slc archive
      * @param {string} keystore - path to the keystore
      * @param {string} passphrase - passphrase of the keystore
+     * @param {string} signatory - name of the signatory/party signing the contract
      * @param {string} outputPath - to the archive file
      * @param {Object} [options] - an optional set of options
      * @returns {object} Promise to the code creating an archive
      */
-    static async sign(slcPath, keystore, passphrase, outputPath, options) {
+    static async sign(slcPath, keystore, passphrase, signatory, outputPath, options) {
         return Commands.loadInstance(null, slcPath, options)
             .then(async (instance) => {
                 const p12File = fs.readFileSync(keystore, { encoding: 'base64' });
-                const rl = readline.createInterface(
-                    {
-                        input: process.stdin,
-                        output: process.stdout
-                    });
-                console.log('Select the party instantiating the contract');
-                instance.parties.map((party, key)=>{
-                    console.log(`${key+1}. ${party}`);
-                });
-                const partyKey = await new Promise(resolve => {
-                    rl.question('Enter party serial number: ', resolve);
-                });
-                const partyName = instance.parties[partyKey-1];
-                console.log(partyName);
-                rl.close();
-                const archive = await instance.signContract(p12File, passphrase, partyName);
+                const archive = await instance.signContract(p12File, passphrase, signatory);
                 let file;
                 if (outputPath) {
                     file = outputPath;
@@ -1013,6 +959,9 @@ class Commands {
         if(argv.verbose) {
             Logger.info(`export contract to format ${argv.format}`);
         }
+        if (!argv.party) {
+            throw new Error('No party name name provided. Try the --party flag to provide a party to be exported.');
+        }
 
         return argv;
     }
@@ -1021,13 +970,14 @@ class Commands {
      * Export a contract to a given format
      *
      * @param {string} slcPath - path to the smart legal contract archive
+     * @param {string} party - name of the party exporting the contract
      * @param {string} outputPath - to the contract file
      * @param {string} [currentTime] - the definition of 'now', defaults to current time
      * @param {number} [utcOffset] - UTC Offset for this execution, defaults to local offset
      * @param {Object} [options] - an optional set of options
      * @returns {object} Promise to the result of parsing
      */
-    static async export(slcPath, outputPath, currentTime, utcOffset, options) {
+    static async export(slcPath, party, outputPath, currentTime, utcOffset, options) {
         return Commands.loadInstance(null, slcPath, null, currentTime, utcOffset, options)
             .then(async function (instance) {
                 const format = options.format;
@@ -1041,6 +991,20 @@ class Commands {
                 if (outputPath) {
                     Commands.printFormatToFile(result, format, outputPath);
                 }
+                //Add state
+                Util.addHistory(
+                    instance,
+                    party,
+                    'export',
+                    'Exported Successfully',
+                    'Execution'
+                );
+                const archive = await instance.toArchive('ergo');
+                let file;
+                const instanceName = instance.getIdentifier();
+                file = `${instanceName}.slc`;
+                Logger.info('Creating archive: ' + file);
+                fs.writeFileSync(file, archive);
                 return result;
             })
             .catch((err) => {
