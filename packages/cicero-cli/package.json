@@ -46,7 +46,9 @@
     "@accordproject/cicero-engine": "0.22.2",
     "@accordproject/cicero-test": "0.22.2",
     "@accordproject/cicero-tools": "0.22.2",
-    "@accordproject/concerto-core": "1.2.1",
+    "@accordproject/cicero-transform": "0.22.2",
+    "@accordproject/concerto-core": "1.2.2-20211019133821",
+    "@accordproject/markdown-transform": "0.14.2-20211028094604",
     "mkdirp": "0.5.1",
     "uuid": "3.3.2",
     "yargs": "13.2.4"

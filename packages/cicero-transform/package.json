@@ -1,7 +1,7 @@
 {
-  "name": "@accordproject/cicero-test",
+  "name": "@accordproject/cicero-transform",
   "version": "0.22.2",
-  "description": "Cicero Test - Testing support for Cicero based on cucumber",
+  "description": "Cicero Core - Import and export between other formats",
   "engines": {
     "node": ">=12",
     "npm": ">=5"
@@ -9,50 +9,59 @@
   "publishConfig": {
     "access": "public"
   },
+  "files": [
+    "lib",
+    "umd"
+  ],
   "main": "index.js",
   "scripts": {
     "pretest": "npm run lint",
     "lint": "eslint .",
     "postlint": "npm run licchk",
     "licchk": "license-check",
-    "test:cucumber": "cucumber-js test/features --require lib/steps.js --world-parameters \"{\\\"rootdir\\\":\\\"./test\\\"}\" && cucumber-js test/data/helloemit/test --require lib/steps.js --world-parameters \"{\\\"rootdir\\\":\\\"./test/data/helloemit\\\"}\"",
-    "test:windows": "npm run test:all",
-    "test:all": "npm run test:cucumber",
+    "test:mocha": "mocha",
+    "test:windows": "npm run test:mocha",
+    "test": "npm run test:mocha",
     "test:cov": "nyc npm run test",
-    "test": "npm run test:all"
+    "jsdoc": "jsdoc -c jsdoc.json package.json",
+    "typescript": "jsdoc -t node_modules/tsd-jsdoc/dist -r ./lib/"
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/accordproject/cicero.git",
-    "directory": "packages/cicero-test"
+    "url": "https://github.com/accordproject/cicero.git",
+    "directory": "packages/cicero-core"
   },
   "keywords": [
     "accord",
-    "legal",
-    "tech",
+    "cicero",
     "smart",
     "contract"
   ],
-  "author": "clause.io",
+  "author": "accordproject.org",
   "license": "Apache-2.0",
   "bugs": {
     "url": "https://github.com/accordproject/cicero/issues"
   },
-  "homepage": "https://github.com/accordproject/cicero#readme",
+  "homepage": "https://github.com/accordproject/cicero",
   "devDependencies": {
+    "@istanbuljs/nyc-config-babel": "2.1.1",
+    "chai": "4.2.0",
+    "chai-as-promised": "7.1.1",
+    "chai-things": "0.2.0",
     "eslint": "8.1.0",
     "jsdoc": "^3.6.7",
     "license-check": "1.1.5",
     "mocha": "6.1.4",
-    "nyc": "14.1.1"
+    "mock-require": "^3.0.3",
+    "nyc": "14.1.1",
+    "tsd-jsdoc": "^2.3.0"
   },
   "dependencies": {
     "@accordproject/cicero-core": "0.22.2",
-    "@accordproject/cicero-engine": "0.22.2",
-    "@accordproject/ergo-test": "0.22.3-20211027072650",
-    "chai": "4.2.0",
-    "chai-things": "0.2.0",
-    "cucumber": "5.1.0"
+    "@accordproject/concerto-core": "1.2.2-20211019133821",
+    "@accordproject/markdown-transform": "0.14.2-20211028094604",
+    "uuid": "3.3.2",
+    "xregexp": "4.2.4"
   },
   "license-check-config": {
     "src": [
@@ -72,6 +81,7 @@
     "sourceMap": "inline",
     "reporter": [
       "lcov",
+      "text",
       "text-summary",
       "html",
       "json"
@@ -79,13 +89,15 @@
     "include": [
       "lib/**/*.js"
     ],
-    "exclude": [],
+    "exclude": [
+      "lib/tdl.js",
+      "lib/compiled_template.js"
+    ],
     "all": true,
     "check-coverage": true,
-    "statements": 93,
-    "branches": 70,
-    "functions": 92,
-    "lines": 93
-  },
-  "gitHead": "514fd02f46752e018aedb77e1716a212ef4a59e5"
+    "statements": 88,
+    "branches": 76,
+    "functions": 84,
+    "lines": 88
+  }
 }

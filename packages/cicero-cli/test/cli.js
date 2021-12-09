@@ -982,6 +982,15 @@ describe('#invoke-slc', () => {
     });
 });
 
+describe('#invoke-slc', () => {
+    it('should invoke a smart legal contract in ergo', async () => {
+        const response = await Commands.invoke(null, slcArchive, null, null, 'PayInstallment', slcParams, slcState, '2017-12-19T17:38:01Z');
+        response.response.$class.should.be.equal('org.accordproject.installmentsale.Balance');
+        response.response.balance.should.be.equal(7612.499999999999);
+        response.state.$class.should.be.equal('org.accordproject.installmentsale.InstallmentSaleState');
+    });
+});
+
 describe('#validateInitializeArgs', () => {
     it('no args specified', () => {
         process.chdir(path.resolve(__dirname, 'data/latedeliveryandpenalty/'));
