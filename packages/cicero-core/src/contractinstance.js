@@ -85,7 +85,7 @@ class ContractInstance extends Instance {
 
     /**
      * Sign a smart legal contract.
-     * @param {String} p12File - encoded string of p12 keystore file
+     * @param {String} p12File - base64 encoded string of p12 keystore file
      * @param {String} passphrase - passphrase for the keystore file
      * @param {String} signatory - name of the signatory
      * @return {Promise<Buffer>} the zlib buffer
@@ -106,13 +106,13 @@ class ContractInstance extends Instance {
             'Signing in Progress'
         );
 
-        return await this.toArchive('ergo');
+        return this.toArchive('ergo');
     }
 
     /**
      * signs a string made up of contract hash and time stamp using private key derived
      * from the keystore
-     * @param {String} p12File - encoded string of p12 keystore file
+     * @param {String} p12File - base64 encoded string of p12 keystore file
      * @param {String} passphrase - passphrase for the keystore file
      * @param {Number} timestamp - timestamp of the moment of signature is done
      * @param {String} signatory - name of the signatory
@@ -121,7 +121,7 @@ class ContractInstance extends Instance {
     sign(p12File, passphrase, timestamp, signatory) {
         if (typeof(p12File) !== 'string') {throw new Error('p12File should be of type String!');}
         if (typeof(passphrase) !== 'string') {throw new Error('passphrase should be of type String!');}
-        if (typeof(timestamp) !== 'number') {throw new Error('timeStamp should be of type Number!');}
+        if (typeof(timestamp) !== 'number') {throw new Error('timestamp should be of type Number!');}
 
         const instanceHash = this.getHash();
         // decode p12 from base64
@@ -202,7 +202,7 @@ class ContractInstance extends Instance {
 
     /**
      * Verify the signatures of a partcular party/individual
-     * @param {string} signature  - signature of the signatory
+     * @param {string} signature  - cryptographic signature of the signatory generated while signing process
      * @param {number} timestamp - timestamp of signing of the contract
      * @param {string} signatoryCert  - x509 certificate of the signatory
      */

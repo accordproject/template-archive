@@ -91,7 +91,7 @@ async function writeZip(template){
     archive.directory(`test/data/${template}/`, false);
     archive.finalize();
 
-    return await waitForEvent(output, 'close');
+    return waitForEvent(output, 'close');
 }
 /* eslint-enable */
 

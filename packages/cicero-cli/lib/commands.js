@@ -81,7 +81,7 @@ class Commands {
     static async loadInstance(templatePath, slcPath, samplePath, dataPath, currentTime, utcOffset, options) {
         if (slcPath) {
             const buffer = fs.readFileSync(slcPath);
-            return await ContractInstance.fromArchive(buffer, options);
+            return ContractInstance.fromArchive(buffer, options);
         }
         let template;
         if (Commands.isArchive(templatePath)) {
