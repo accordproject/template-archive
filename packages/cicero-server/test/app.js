@@ -241,44 +241,6 @@ describe('cicero-server', () => {
             .expect(500);
     });
 
-    it('/should trigger a contract with simple stateless request (ergo)', async () => {
-        return request.post('/trigger/contract/latedeliveryandpenalty-test')
-            .send({ request : body, partyName: 'Acme Corp' })
-            .expect(200)
-            .expect('Content-Type',/json/)
-            .then(response => {
-                response.body.response.should.include(contractResponseBody);
-                response.body.should.not.have.property('state');
-            });
-    });
-
-    it('/should trigger a contract with stateful request (ergo)', async () => {
-        return request.post('/trigger/contract/latedeliveryandpenalty-test')
-            .send({
-                request: body,
-                state,
-                partyName: 'Acme Corp'
-            })
-            .expect(200)
-            .expect('Content-Type',/json/)
-            .then(response => {
-                response.body.response.should.include(contractResponseBody);
-                response.body.state.should.include(state);
-            });
-    });
-
-    it('/should fail to trigger a contract without partyName', async () => {
-        return request.post('/trigger/contract/latedeliveryandpenalty-test')
-            .send({ request : body })
-            .expect(500);
-    });
-
-    it('/should fail to trigger a contract/clause with wrong type', async () => {
-        return request.post('/trigger/wrontype/latedeliveryandpenalty-test')
-            .send({ 'request' : body, partyName: 'Acme Corp' })
-            .expect(500);
-    });
-
     it('/should parse a template sample', async () => {
         return request.post('/parse/latedeliveryandpenalty')
             .send({ sample: draftLateText })
@@ -348,6 +310,44 @@ describe('cicero-server', () => {
     it('/should fail to instantiate a contract without instantiator', async () => {
         return request.post('/instantiate/latedeliveryandpenalty-instantiate')
             .send({ data: instantiateData })
+            .expect(500);
+    });
+
+    it('/should trigger a contract with simple stateless request (ergo)', async () => {
+        return request.post('/trigger/contract/latedeliveryandpenalty-instantiate')
+            .send({ request : body, partyName: 'Acme Corp' })
+            .expect(200)
+            .expect('Content-Type',/json/)
+            .then(response => {
+                response.body.response.should.include(contractResponseBody);
+                response.body.should.not.have.property('state');
+            });
+    });
+
+    it('/should trigger a contract with stateful request (ergo)', async () => {
+        return request.post('/trigger/contract/latedeliveryandpenalty-instantiate')
+            .send({
+                request: body,
+                state,
+                partyName: 'Acme Corp'
+            })
+            .expect(200)
+            .expect('Content-Type',/json/)
+            .then(response => {
+                response.body.response.should.include(contractResponseBody);
+                response.body.state.should.include(state);
+            });
+    });
+
+    it('/should fail to trigger a contract without partyName', async () => {
+        return request.post('/trigger/contract/latedeliveryandpenalty-instantiate')
+            .send({ request : body })
+            .expect(500);
+    });
+
+    it('/should fail to trigger a contract/clause with wrong type', async () => {
+        return request.post('/trigger/wrontype/latedeliveryandpenalty-instantiate')
+            .send({ 'request' : body, partyName: 'Acme Corp' })
             .expect(500);
     });
 
@@ -476,7 +476,6 @@ describe('cicero-server', () => {
             .expect(200)
             .then(response => {
                 response.body.should.not.be.null;
-                fs.unlinkSync('./test/data/contracts/latedeliveryandpenalty-instantiate.slc');
             });
     });
 
@@ -511,7 +510,10 @@ describe('cicero-server', () => {
                 partyName: 'Acme Corp',
                 utcOffset: 10
             })
-            .expect(500);
+            .expect(500)
+            .then(() => {
+                fs.unlinkSync('./test/data/contracts/latedeliveryandpenalty-instantiate.slc');
+            });
     });
 
     after(() => {
