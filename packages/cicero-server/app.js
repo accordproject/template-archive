@@ -80,14 +80,14 @@ app.post('/trigger/:type/:instanceName', async function (req, httpResponse, next
         if(!instance) {
             throw new Error('The type specified is wrong. Please use either \'clause\' or \'contract\' type');
         }
+        if(req.params.type === 'clause' && !Object.prototype.hasOwnProperty.call(req.body,'data')) {
+            throw new Error('Missing data in /trigger body');
+        }
         if(req.params.type === 'clause') {
             instance.setData(req.body.data);
         }
         if(req.params.type === 'contract' && !req.body.partyName) {
             throw new Error('Please enter the name of the party that is triggering the contract Instance');
-        }
-        if(req.params.type === 'clause' && !Object.prototype.hasOwnProperty.call(req.body,'data')) {
-            throw new Error('Missing data in /trigger body');
         }
 
         const engine = new Engine();

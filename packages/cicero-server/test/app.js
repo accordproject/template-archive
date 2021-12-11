@@ -229,6 +229,18 @@ describe('cicero-server', () => {
             });
     });
 
+    it('/should fail to trigger a clause without data', async () => {
+        return request.post('/trigger/clause/latedeliveryandpenalty')
+            .send({ 'request' : body })
+            .expect(500);
+    });
+
+    it('/should fail to trigger a clause without request', async () => {
+        return request.post('/trigger/clause/latedeliveryandpenalty')
+            .send({ 'data' : triggerData })
+            .expect(500);
+    });
+
     it('/should trigger a contract with simple stateless request (ergo)', async () => {
         return request.post('/trigger/contract/latedeliveryandpenalty-test')
             .send({ request : body, partyName: 'Acme Corp' })
@@ -404,12 +416,25 @@ describe('cicero-server', () => {
             });
     });
 
-    it('/should export a smart legal contract to pdf', async () => {
-        return request.post('/export/latedeliveryandpenalty-instantiate')
+    it('/should fail to sign a contract without keystore', async () => {
+        return request.post('/sign/latedeliveryandpenalty-instantiate')
             .send({
-                format: 'foobar',
-                partyName: 'Acme Corp',
-                utcOffset: 10
+                passphrase: 'password',
+                signatory: 'Magneto Corp'
+            })
+            .expect(500);
+    });
+
+    it('/should fail to sign a contract without type not defined of either file/inline type', async () => {
+        delete process.env.CICERO_KEYSTORES;
+        return request.post('/sign/latedeliveryandpenalty-instantiate')
+            .send({
+                keystore: {
+                    type: 'foobar',
+                    value: 'keystore',
+                },
+                passphrase: 'password',
+                signatory: 'Magneto Corp'
             })
             .expect(500);
     });
@@ -453,6 +478,40 @@ describe('cicero-server', () => {
                 response.body.should.not.be.null;
                 fs.unlinkSync('./test/data/contracts/latedeliveryandpenalty-instantiate.slc');
             });
+    });
+
+    it('/should fail to export a smart legal contract to pdf because of missing format', async () => {
+        return request.post('/export/latedeliveryandpenalty-instantiate')
+            .send({
+                partyName: 'Acme Corp',
+                utcOffset: 10
+            })
+            .expect(500);
+    });
+
+    it('/should fail to sign a contract without CICERO_KEYSTORES defined', async () => {
+        delete process.env.CICERO_KEYSTORES;
+        return request.post('/sign/latedeliveryandpenalty-instantiate')
+            .send({
+                keystore: {
+                    type: 'file',
+                    value: 'keystore',
+                },
+                passphrase: 'password',
+                signatory: 'Magneto Corp'
+            })
+            .expect(500);
+    });
+
+    it('/should fail to export a smart legal contract without CICERO_CONTRACTS defined', async () => {
+        delete process.env.CICERO_CONTRACTS;
+        return request.post('/export/latedeliveryandpenalty-instantiate')
+            .send({
+                format: 'pdf',
+                partyName: 'Acme Corp',
+                utcOffset: 10
+            })
+            .expect(500);
     });
 
     after(() => {

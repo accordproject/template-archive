@@ -14,7 +14,6 @@
 
 concerto version ">= 1.0.0"
 
-<<<<<<< HEAD:packages/cicero-core/test/data/latedeliveryandpenalty@0.17.0-cicero/model/@models.accordproject.org.accordproject.contract.cto
 namespace org.accordproject.contract
 
 /**
@@ -31,11 +30,3 @@ abstract asset Contract identified by contractId {
 abstract asset Clause identified by clauseId {
   o String clauseId
 }
-=======
-/**
- * Cicero Core - defines the core data types for Cicero.
- * @module cicero-core
- */
-
-module.exports.Export = require('./lib/export');
->>>>>>> de62bc8bff7128607dae7cd7187a72b343bbab4d:packages/cicero-transform/index.js
