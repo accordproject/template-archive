@@ -1,0 +1,1 @@
+# This directory is needed for testing contract creation
