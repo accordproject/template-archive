@@ -129,7 +129,7 @@ class InstanceLoader extends FileLoader {
         const data = await InstanceLoader.loadZipFileContents(zip, 'data.json', true, true);
 
         // add contract history
-        const history = await InstanceLoader.loadZipFileContents(zip, 'history.json', true, true);
+        const history = await InstanceLoader.loadZipFileContents(zip, 'history.json', true, false) || [];
 
         //grab instantiator
         const instantiator = history.length !== 0 ? history[0].currentState.instatiator : null;
