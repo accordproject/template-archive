@@ -17,6 +17,7 @@
 let request = require('supertest');
 const decache = require('decache');
 const chai = require('chai');
+const fs = require('fs');
 
 let server;
 
@@ -25,11 +26,37 @@ chai.should();
 const body = require('./data/latedeliveryandpenalty/request.json');
 const state = require('./data/latedeliveryandpenalty/state.json');
 const triggerData = require('./data/latedeliveryandpenalty/data.json');
-const responseBody = {
+const instantiateData = require('./data/latedeliveryandpenalty-instantiate/data.json');
+const p12File = fs.readFileSync('./test/data/keystores/keystore.p12', { encoding: 'base64' });
+const clauseResponseBody = {
     '$class': 'org.accordproject.latedeliveryandpenalty.LateDeliveryAndPenaltyResponse',
     penalty: 4,
     buyerMayTerminate: true,
 };
+
+const contractResponseBody = {
+    '$class': 'org.accordproject.latedeliveryandpenalty.LateDeliveryAndPenaltyResponse',
+    penalty: 110.00000000000001,
+    buyerMayTerminate: true,
+};
+
+const instantiateResponseBody = {
+    data: instantiateData,
+    instantiator: 'Acme Corp',
+    authorSignature: null,
+    contractSignatures: []
+};
+
+const exportResponseText = 'Late Delivery and Penalty.\n' +
+'----\n' +
+'\n' +
+'In case of delayed delivery except for Force Majeure cases,\n' +
+'"Dan" (the Seller) shall pay to "Steve" (the Buyer) for every 2 days\n' +
+'of delay penalty amounting to 10.5% of the total value of the Equipment\n' +
+'whose delivery has been delayed. Any fractional part of a days is to be\n' +
+'considered a full days. The total amount of penalty shall not however,\n' +
+'exceed 55.0% of the total value of the Equipment involved in late delivery.\n' +
+'If the delay is more than 15 days, the Buyer is entitled to terminate this Contract.';
 
 const parseBody = {
     '$class': 'org.accordproject.latedeliveryandpenalty.TemplateModel',
@@ -153,40 +180,42 @@ describe('cicero-server', () => {
 
     before(()=>{
         process.env.CICERO_DIR = './test/data';
+        process.env.CICERO_CONTRACTS = './test/data/contracts';
+        process.env.CICERO_KEYSTORES = './test/data/keystores';
         server = require('../app');
         request = request(server);
     });
 
-    it('/should trigger a simple stateless request (ergo)', async () => {
-        return request.post('/trigger/latedeliveryandpenalty')
+    it('/should trigger a clause with simple stateless request (ergo)', async () => {
+        return request.post('/trigger/clause/latedeliveryandpenalty')
             .send({ 'request' : body, 'data' : triggerData })
             .expect(200)
             .expect('Content-Type',/json/)
             .then(response => {
-                response.body.response.should.include(responseBody);
+                response.body.response.should.include(clauseResponseBody);
                 response.body.should.not.have.property('state');
             });
     });
 
-    it('/should fail to trigger without data', async () => {
-        return request.post('/trigger/latedeliveryandpenalty')
+    it('/should fail to trigger a clause without data', async () => {
+        return request.post('/trigger/clause/latedeliveryandpenalty')
             .send({ 'request' : body })
             .expect(500);
     });
 
-    it('/should trigger a simple stateless request with a sample clause (ergo)', async () => {
-        return request.post('/trigger/latedeliveryandpenalty')
+    it('/should trigger a clause with simple stateless request with a sample clause (ergo)', async () => {
+        return request.post('/trigger/clause/latedeliveryandpenalty')
             .send({ 'request' : body, 'data' : triggerData })
             .expect(200)
             .expect('Content-Type',/json/)
             .then(response => {
-                response.body.response.should.include(responseBody);
+                response.body.response.should.include(clauseResponseBody);
                 response.body.should.not.have.property('state');
             });
     });
 
-    it('/should trigger a stateful request (ergo)', async () => {
-        return request.post('/trigger/latedeliveryandpenalty')
+    it('/should trigger a clause with stateful request (ergo)', async () => {
+        return request.post('/trigger/clause/latedeliveryandpenalty')
             .send({
                 data: triggerData,
                 request: body,
@@ -195,9 +224,21 @@ describe('cicero-server', () => {
             .expect(200)
             .expect('Content-Type',/json/)
             .then(response => {
-                response.body.response.should.include(responseBody);
+                response.body.response.should.include(clauseResponseBody);
                 response.body.state.should.include(state);
             });
+    });
+
+    it('/should fail to trigger a clause without data', async () => {
+        return request.post('/trigger/clause/latedeliveryandpenalty')
+            .send({ 'request' : body })
+            .expect(500);
+    });
+
+    it('/should fail to trigger a clause without request', async () => {
+        return request.post('/trigger/clause/latedeliveryandpenalty')
+            .send({ 'data' : triggerData })
+            .expect(500);
     });
 
     it('/should parse a template sample', async () => {
@@ -252,6 +293,226 @@ describe('cicero-server', () => {
             .expect('Content-Type',/text/)
             .then(response => {
                 response.text.should.equal(draftCopyrightTextUnquoted);
+            });
+    });
+
+    it('/should instantiate a contract', async () => {
+        return request.post('/instantiate/latedeliveryandpenalty-instantiate')
+            .send({ data: instantiateData, instantiator: 'Acme Corp' })
+            .expect(200)
+            .expect('Content-Type',/json/)
+            .then(response => {
+                delete response.body.history;
+                response.body.should.deep.include(instantiateResponseBody);
+            });
+    });
+
+    it('/should fail to instantiate a contract without instantiator', async () => {
+        return request.post('/instantiate/latedeliveryandpenalty-instantiate')
+            .send({ data: instantiateData })
+            .expect(500);
+    });
+
+    it('/should trigger a contract with simple stateless request (ergo)', async () => {
+        return request.post('/trigger/contract/latedeliveryandpenalty-instantiate')
+            .send({ request : body, partyName: 'Acme Corp' })
+            .expect(200)
+            .expect('Content-Type',/json/)
+            .then(response => {
+                response.body.response.should.include(contractResponseBody);
+                response.body.should.not.have.property('state');
+            });
+    });
+
+    it('/should trigger a contract with stateful request (ergo)', async () => {
+        return request.post('/trigger/contract/latedeliveryandpenalty-instantiate')
+            .send({
+                request: body,
+                state,
+                partyName: 'Acme Corp'
+            })
+            .expect(200)
+            .expect('Content-Type',/json/)
+            .then(response => {
+                response.body.response.should.include(contractResponseBody);
+                response.body.state.should.include(state);
+            });
+    });
+
+    it('/should fail to trigger a contract without partyName', async () => {
+        return request.post('/trigger/contract/latedeliveryandpenalty-instantiate')
+            .send({ request : body })
+            .expect(500);
+    });
+
+    it('/should fail to trigger a contract/clause with wrong type', async () => {
+        return request.post('/trigger/wrontype/latedeliveryandpenalty-instantiate')
+            .send({ 'request' : body, partyName: 'Acme Corp' })
+            .expect(500);
+    });
+
+    it('/should fail to sign a contract with wrong type of keystore', async () => {
+        return request.post('/instantiate/latedeliveryandpenalty-instantiate')
+            .send({ keystore: {
+                type: 'wrong type',
+                value: p12File,
+            },
+            passphrase: 'password',
+            signatory: 'Magneto Corp' })
+            .expect(500);
+    });
+
+    it('/should fail to sign a contract without signatory name', async () => {
+        return request.post('/instantiate/latedeliveryandpenalty-instantiate')
+            .send({ keystore: {
+                type: 'inline',
+                value: p12File,
+            },
+            passphrase: 'password' })
+            .expect(500);
+    });
+
+    it('/should fail to sign a contract without passphrase', async () => {
+        return request.post('/instantiate/latedeliveryandpenalty-instantiate')
+            .send({ keystore: {
+                type: 'inline',
+                value: p12File,
+            },
+            signatory: 'Magneto Corp' })
+            .expect(500);
+    });
+
+    it('/should sign a contract using keystore file', async () => {
+        return request.post('/sign/latedeliveryandpenalty-instantiate')
+            .send({
+                keystore: {
+                    type: 'file',
+                    value: 'keystore',
+                },
+                passphrase: 'password',
+                signatory: 'Acme Corp'
+            })
+            .expect(200)
+            .expect('Content-Type',/json/)
+            .then(response => {
+                response.body.contractSignatures.length.should.equal(1);
+            });
+    });
+
+    it('/should sign a contract using inline keystore value', async () => {
+        return request.post('/sign/latedeliveryandpenalty-instantiate')
+            .send({
+                keystore: {
+                    type: 'inline',
+                    value: p12File,
+                },
+                passphrase: 'password',
+                signatory: 'Magneto Corp'
+            })
+            .expect(200)
+            .expect('Content-Type',/json/)
+            .then(response => {
+                response.body.contractSignatures.length.should.equal(2);
+            });
+    });
+
+    it('/should fail to sign a contract without keystore', async () => {
+        return request.post('/sign/latedeliveryandpenalty-instantiate')
+            .send({
+                passphrase: 'password',
+                signatory: 'Magneto Corp'
+            })
+            .expect(500);
+    });
+
+    it('/should fail to sign a contract without type not defined of either file/inline type', async () => {
+        delete process.env.CICERO_KEYSTORES;
+        return request.post('/sign/latedeliveryandpenalty-instantiate')
+            .send({
+                keystore: {
+                    type: 'foobar',
+                    value: 'keystore',
+                },
+                passphrase: 'password',
+                signatory: 'Magneto Corp'
+            })
+            .expect(500);
+    });
+
+    it('/should export a smart legal contract to markdown', async () => {
+        return request.post('/export/latedeliveryandpenalty-instantiate')
+            .send({
+                format: 'markdown',
+                partyName: 'Acme Corp',
+                utcOffset: 10
+            })
+            .expect(200)
+            .then(response => {
+                response.text.should.equal(exportResponseText);
+            });
+    });
+
+    it('/should export a smart legal contract to ciceromark', async () => {
+        return request.post('/export/latedeliveryandpenalty-instantiate')
+            .send({
+                format: 'ciceromark',
+                partyName: 'Acme Corp',
+                utcOffset: 10
+            })
+            .expect(200)
+            .then(response => {
+                const result = JSON.parse(response.text);
+                result.$class.should.equal('org.accordproject.commonmark.Document');
+            });
+    });
+
+    it('/should export a smart legal contract to pdf', async () => {
+        return request.post('/export/latedeliveryandpenalty-instantiate')
+            .send({
+                format: 'pdf',
+                partyName: 'Acme Corp',
+                utcOffset: 10
+            })
+            .expect(200)
+            .then(response => {
+                response.body.should.not.be.null;
+            });
+    });
+
+    it('/should fail to export a smart legal contract to pdf because of missing format', async () => {
+        return request.post('/export/latedeliveryandpenalty-instantiate')
+            .send({
+                partyName: 'Acme Corp',
+                utcOffset: 10
+            })
+            .expect(500);
+    });
+
+    it('/should fail to sign a contract without CICERO_KEYSTORES defined', async () => {
+        delete process.env.CICERO_KEYSTORES;
+        return request.post('/sign/latedeliveryandpenalty-instantiate')
+            .send({
+                keystore: {
+                    type: 'file',
+                    value: 'keystore',
+                },
+                passphrase: 'password',
+                signatory: 'Magneto Corp'
+            })
+            .expect(500);
+    });
+
+    it('/should fail to export a smart legal contract without CICERO_CONTRACTS defined', async () => {
+        delete process.env.CICERO_CONTRACTS;
+        return request.post('/export/latedeliveryandpenalty-instantiate')
+            .send({
+                format: 'pdf',
+                partyName: 'Acme Corp',
+                utcOffset: 10
+            })
+            .expect(500)
+            .then(() => {
+                fs.unlinkSync('./test/data/contracts/latedeliveryandpenalty-instantiate.slc');
             });
     });
 

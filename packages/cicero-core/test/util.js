@@ -16,8 +16,11 @@
 
 const Util = require('../lib/util');
 const FileLoader = require('@accordproject/ergo-compiler').FileLoader;
+const Template = require('../lib/template');
+const ContractInstance = require('../lib/contractinstance');
 
 const chai = require('chai');
+const fs = require('fs');
 
 chai.should();
 chai.use(require('chai-things'));
@@ -41,6 +44,23 @@ describe('Util', () => {
         it('should throw for corrupted png', async () => {
             const buffer = await FileLoader.loadFileBuffer('./test/data', 'logo_corrupted.png', true);
             (() => Util.checkImage(buffer)).should.throw('not a valid png file');
+        });
+    });
+
+    describe('#addHistory', () => {
+        it('should add initaial state to the history property after instantiating', async () => {
+            const dataJson = JSON.parse(fs.readFileSync('./test/data/latedeliveryandpenalty@0.17.0-cicero/data.json', 'utf8'));
+            const template = await Template.fromDirectory('./test/data/latedeliveryandpenalty@0.17.0-cicero');
+            const instance = await ContractInstance.fromTemplateWithData(template, dataJson, 'resource:org.accordproject.party.Party#Dan');
+            instance.history[0].currentState.operation.should.equal('instantiate');
+        });
+        it('should add a new state to history after a party signs the contract', async () => {
+            const buffer = fs.readFileSync('./test/data/signContract/latedeliveryandpenalty@0.17.0.slc');
+            const instance = await ContractInstance.fromArchive(buffer);
+            const p12File = fs.readFileSync('./test/data/signContract/keystore.p12', { encoding: 'base64' });
+            const signatory = 'resource:org.accordproject.party.Party#Dan';
+            await instance.signContract(p12File, 'password', signatory);
+            instance.history[1].currentState.operation.should.equal('sign');
         });
     });
 });

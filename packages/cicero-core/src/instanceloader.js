@@ -38,9 +38,10 @@ class InstanceLoader extends FileLoader {
      * @param {*} Instance - the type to construct
      * @param {Template} template  - the template for the instance
      * @param {object} data - the contract data
+     * @param {string} instantiator - name of the person/party which instantiates the contract instance
      * @return {object} - the contract instance
      */
-    static fromTemplateWithData(Instance, template, data) {
+    static fromTemplateWithData(Instance, template, data, instantiator) {
         const metadata = InstanceMetadata.createMetadataFromTemplate(template.getMetadata());
         const logicManager = template.getLogicManager();
         const grammar = template.getParserManager().getTemplate();
@@ -53,9 +54,21 @@ class InstanceLoader extends FileLoader {
             logicManager,
             grammar,
             template,
+            instantiator
         ));
 
         instance.setData(data);
+
+        //grab the parties
+        const contractModel = Util.getContractModel(instance.logicManager, instance.instanceKind);
+        const properties = contractModel.getProperties();
+        properties.map((property) => property.getDecorators().map((decorator) => {
+            if (decorator.getName() === 'ContractParty') {
+                const data = instance.data;
+                const partyName = data[property.name];
+                instance.parties.push(partyName);
+            }
+        }));
         return instance;
     }
 
@@ -115,6 +128,12 @@ class InstanceLoader extends FileLoader {
         // add contract data
         const data = await InstanceLoader.loadZipFileContents(zip, 'data.json', true, true);
 
+        // add contract history
+        const history = await InstanceLoader.loadZipFileContents(zip, 'history.json', true, true);
+
+        //grab instantiator
+        const instantiator = history.length !== 0 ? history[0].currentState.instatiator : null;
+
         // add template grammar (.md form)
         const grammar = await InstanceLoader.loadZipFileContents(zip, 'text/grammar.tem.md', false, false);
 
@@ -151,7 +170,14 @@ class InstanceLoader extends FileLoader {
             logicManager,
             grammar,
             null, // XXX No template reference here for now
+            instantiator
         ));
+
+        //grab contract history
+        instance.history = history;
+
+        //grab the author/developer's signature
+        instance.authorSignature = await InstanceLoader.loadZipFileContents(zip, 'signature.json', true, false);
 
         instance.setData(data);
 
@@ -161,9 +187,6 @@ class InstanceLoader extends FileLoader {
             let signature = JSON.parse(signatureFile.contents);
             instance.contractSignatures.push(signature);
         });
-
-        //grab the author/developer signature
-        this.authorSignature = await InstanceLoader.loadZipFileContents(zip, 'signature.json', true, false);
 
         //grab the parties
         const contractModel = Util.getContractModel(instance.logicManager, instance.instanceKind);

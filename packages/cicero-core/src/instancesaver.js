@@ -50,6 +50,11 @@ class InstanceSaver {
 
         zip.file('data.json', dataContents, options);
 
+        // save the contract state
+        const historyContents = JSON.stringify(instance.history);
+
+        zip.file('history.json', historyContents, options);
+
         // save the grammar
         zip.file('text/', null, Object.assign({}, options, {
             dir: true

@@ -14,6 +14,9 @@
 
 'use strict';
 
+const crypto = require('crypto');
+const stringify = require('json-stable-stringify');
+
 const TemplateMarkTransformer = require('@accordproject/markdown-template').TemplateMarkTransformer;
 
 const getMimeType = require('./mimetype');
@@ -194,6 +197,59 @@ function parseText(parserManager, ciceroMarkTransformer, input, currentTime, utc
 }
 
 /**
+ * add a new state after execution of an operation
+ * @param {object} instance - the contract instance
+ * @param {string} partyName - name of the party that executed the operation
+ * @param {string} operation - name of the operation that was executed
+ * @param {*} output - result of the operation
+ * @param {string} lifecycleState - current state in instance's lifecycle
+ */
+function addHistory(instance, partyName, operation, output, lifecycleState) {
+    const previousHash = instance.history.length !== 0 ? instance.history[instance.history.length-1].currentHash : null;
+    const timestamp = new Date().toISOString();
+    const currentState =  {
+        previousHash: previousHash,
+        partyName: partyName,
+        operation: operation,
+        result: output,
+        timestamp,
+        lifecycleState: lifecycleState
+    };
+    const content = {};
+    content.metadata = instance.metadata;
+    content.history = instance.history;
+    if(instance.parserManager.getTemplate()) {
+        content.grammar = instance.parserManager.getTemplate();
+    }
+    content.models = {};
+    content.scripts = {};
+
+    let modelFiles = instance.getModelManager().getModels();
+    modelFiles.forEach(function (file) {
+        content.models[file.namespace] = file.content;
+    });
+
+    let scriptManager = instance.getScriptManager();
+    let scriptFiles = scriptManager.getScripts();
+    scriptFiles.forEach(function (file) {
+        content.scripts[file.getIdentifier()] = file.contents;
+    });
+
+    content.data = instance.getData();
+
+    content.signatures = instance.contractSignatures;
+
+    const hasher = crypto.createHash('sha256');
+    hasher.update(stringify(content));
+    const currentHash =  hasher.digest('hex');
+    const state = {
+        currentState: currentState,
+        currentHash: currentHash
+    };
+    instance.history.push(state);
+}
+
+/**
  * Checks if dimensions for the image are correct.
  * @param {Buffer} buffer the buffer object
  * @param {string} mimeType the mime type of the object
@@ -249,4 +305,4 @@ function isValidName(name) {
     return true;
 }
 
-module.exports = { getContractModel, ciceroFormulaEval, initParser, rebuildParser, parseText, checkImage, isValidName, templateTypes };
+module.exports = { getContractModel, ciceroFormulaEval, initParser, rebuildParser, parseText, checkImage, isValidName, addHistory, templateTypes };

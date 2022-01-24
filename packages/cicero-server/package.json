@@ -58,6 +58,7 @@
   "dependencies": {
     "@accordproject/cicero-core": "0.22.2",
     "@accordproject/cicero-engine": "0.22.2",
+    "@accordproject/cicero-transform": "0.22.2",
     "express": "4.16.2"
   },
   "license-check-config": {

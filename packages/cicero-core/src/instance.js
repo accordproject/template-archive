@@ -45,8 +45,9 @@ class Instance {
      * @param {number} logicManager - the logic manager
      * @param {string} grammar - the initial grammar
      * @param {Template} [template] - the template for the instance
+     * @param {string} instantiator - name of the person/party which instantiates the contract instance
      */
-    constructor(metadata, logicManager, grammar, template) {
+    constructor(metadata, logicManager, grammar, template, instantiator) {
         if (this.constructor === Instance) {
             throw new TypeError('Abstract class "Instance" cannot be instantiated directly.');
         }
@@ -57,6 +58,7 @@ class Instance {
         this.logicManager = logicManager;
         this.runtime = metadata.getRuntime();
         this.template = template;
+        this.instantiator = instantiator;
 
         this.ciceroMarkTransformer = new CiceroMarkTransformer();
         this.templateMarkTransformer = new TemplateMarkTransformer();
@@ -68,6 +70,7 @@ class Instance {
         this.authorSignature = null;
         this.contractSignatures = [];
         this.parties = [];
+        this.history = [];
 
         // Initialize the parser
         Util.initParser(
@@ -180,7 +183,20 @@ class Instance {
 
         // Draft
         const ciceroMark = this.templateMarkTransformer.draftCiceroMark(data, this.parserManager, kind, {});
-        return this.formatCiceroMark(ciceroMark,options);
+        const draft =  this.formatCiceroMark(ciceroMark,options);
+
+        //Add state
+        if (kind === 'contract') {
+            Util.addHistory(
+                this,
+                'some-party',
+                'draft',
+                draft,
+                'Draft'
+            );
+        }
+
+        return draft;
     }
 
     /**

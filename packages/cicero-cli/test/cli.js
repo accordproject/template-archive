@@ -66,7 +66,7 @@ const stateErr = path.resolve(__dirname, 'data/latedeliveryandpenalty/', 'state_
 const requestErr = path.resolve(__dirname, 'data/latedeliveryandpenalty/', 'request_err.json');
 const paramsErr = path.resolve(__dirname, 'data/latedeliveryandpenalty/', 'params_err.json');
 
-const slcArchive = path.resolve(__dirname, 'data/installment-sale@0.1.0-316a9177c6d52bfd4e1df6d543ddab775cc217cdb44f92120e2f24bd11f8381b.slc');
+const slcArchive = path.resolve(__dirname, 'data/installment-sale@0.1.0-9d19db02620e3a51a4b44b22526f02a614ec19165f5d4aedad44f60489836f80.slc');
 const slcRequest = path.resolve(__dirname, 'data/installment-sale-ergo/', 'request.json');
 const slcParams = path.resolve(__dirname, 'data/installment-sale-ergo/', 'params.json');
 const slcState = path.resolve(__dirname, 'data/installment-sale-ergo/', 'state.json');
@@ -511,6 +511,16 @@ describe('#validateTriggerArgs', () => {
         args.sample.should.match(/latedeliveryandpenalty[/\\]text[/\\]sample.md$/);
         args.state.should.match(/latedeliveryandpenalty[/\\]state.json$/);
     });
+    it('party not defined', () => {
+        process.chdir(path.resolve(__dirname, 'data/contractsigning/'));
+        (() => Commands.validateTriggerArgs({
+            contract: 'latedeliveryandpenalty@0.17.0-d0c1a14e8a7af52e0927a23b8b30af3b5a75bee1ab788a15736e603b88a6312c.slc',
+            sample: 'latedeliveryandpenalty/text/sample.md',
+            state: 'latedeliveryandpenalty/state.json',
+            data: 'latedeliveryandpenalty/data.json',
+            _: ['trigger']
+        })).should.throw('No party name name provided. Try the --party flag to provide a party to be triggred.');
+    });
     it('all args specified, parent folder, no sample, no data, no state', () => {
         process.chdir(path.resolve(__dirname, 'data/'));
         (() => Commands.validateTriggerArgs({
@@ -589,7 +599,8 @@ describe('#validateTriggerArgs', () => {
         const args  = Commands.validateTriggerArgs({
             _: ['trigger'],
             contract: 'installment-sale@0.1.0-316a9177c6d52bfd4e1df6d543ddab775cc217cdb44f92120e2f24bd11f8381b.slc',
-            request: ['installment-sale-ergo/request.json']
+            request: ['installment-sale-ergo/request.json'],
+            party: 'Acme Corp'
         });
         args.contract.should.match(/.slc$/);
     });
@@ -660,8 +671,8 @@ describe('#trigger', () => {
     it('should trigger a clause using a template (with currentTime set)', async () => {
         const response = await Commands.trigger(template, null, sample, data, [request], state, '2017-12-19T17:38:01Z');
         response.response.$class.should.be.equal('org.accordproject.latedeliveryandpenalty.LateDeliveryAndPenaltyResponse');
-        response.response.penalty.should.be.equal(3.1111111111111107);
-        response.response.buyerMayTerminate.should.be.equal(false);
+        response.response.penalty.should.be.equal(4);
+        response.response.buyerMayTerminate.should.be.equal(true);
     });
 });
 
@@ -685,7 +696,8 @@ describe('#trigger-javascript', () => {
 
 describe('#trigger-slc', () => {
     it('should trigger a smart legal contract in ergo', async () => {
-        const response = await Commands.trigger(null, slcArchive, null, null, [slcRequest], slcState);
+        const partyName = 'Acme Corp';
+        const response = await Commands.trigger(null, slcArchive, null, null, [slcRequest], slcState, partyName);
         response.response.$class.should.be.equal('org.accordproject.installmentsale.Balance');
         response.response.balance.should.be.equal(7612.499999999999);
         response.state.$class.should.be.equal('org.accordproject.installmentsale.InstallmentSaleState');
@@ -731,6 +743,17 @@ describe('#validateInvokeArgs', () => {
         args.state.should.match(/state.json$/);
         args.clauseName.should.match(/latedeliveryandpenalty$/);
         args.params.should.match(/params.json$/);
+    });
+    it('party not defined', () => {
+        process.chdir(path.resolve(__dirname, 'data/contractsigning/'));
+        (() => Commands.validateInvokeArgs({
+            contract: 'latedeliveryandpenalty@0.17.0-d0c1a14e8a7af52e0927a23b8b30af3b5a75bee1ab788a15736e603b88a6312c.slc',
+            sample: 'latedeliveryandpenalty/text/sample.md',
+            state: 'latedeliveryandpenalty/state.json',
+            params: 'latedeliveryandpenalty/params.json',
+            clauseName: 'latedeliveryandpenalty',
+            _: ['invoke']
+        })).should.throw('No party name name provided. Try the --party flag to provide a party to be invoked.');
     });
     it('all args specified using sample only, no clauseName', () => {
         process.chdir(path.resolve(__dirname, 'data/latedeliveryandpenalty/'));
@@ -881,7 +904,8 @@ describe('#validateInvokeArgs', () => {
             _: ['trigger'],
             contract: 'installment-sale@0.1.0-316a9177c6d52bfd4e1df6d543ddab775cc217cdb44f92120e2f24bd11f8381b.slc',
             clauseName: 'latedeliveryandpenalty',
-            params: 'installment-sale-ergo/params.json'
+            params: 'installment-sale-ergo/params.json',
+            party: 'Acme Corp'
         });
         args.contract.should.match(/.slc$/);
     });
@@ -943,8 +967,18 @@ describe('#invoke', () => {
     it('should invoke a clause using a template (with currentTime set)', async () => {
         const response = await Commands.invoke(template, null, sample, data,'latedeliveryandpenalty', params, state, '2017-12-19T17:38:01Z');
         response.response.$class.should.be.equal('org.accordproject.latedeliveryandpenalty.LateDeliveryAndPenaltyResponse');
-        response.response.penalty.should.be.equal(3.1111111111111107);
-        response.response.buyerMayTerminate.should.be.equal(false);
+        response.response.penalty.should.be.equal(4);
+        response.response.buyerMayTerminate.should.be.equal(true);
+    });
+});
+
+describe('#invoke-slc', () => {
+    it('should invoke a smart legal contract in ergo', async () => {
+        const partyName = 'Acme Corp';
+        const response = await Commands.invoke(null, slcArchive, null, null, 'PayInstallment', slcParams, slcState, partyName, '2017-12-19T17:38:01Z');
+        response.response.$class.should.be.equal('org.accordproject.installmentsale.Balance');
+        response.response.balance.should.be.equal(7612.499999999999);
+        response.state.$class.should.be.equal('org.accordproject.installmentsale.InstallmentSaleState');
     });
 });
 
@@ -985,6 +1019,14 @@ describe('#validateInitializeArgs', () => {
         });
         args.template.should.match(/cicero-cli[/\\]test[/\\]data[/\\]latedeliveryandpenalty$/);
         args.sample.should.match(/text[/\\]sample.md$/);
+    });
+    it('party not defined', () => {
+        process.chdir(path.resolve(__dirname, 'data/contractsigning/'));
+        (() => Commands.validateInitializeArgs({
+            contract: 'latedeliveryandpenalty@0.17.0-d0c1a14e8a7af52e0927a23b8b30af3b5a75bee1ab788a15736e603b88a6312c.slc',
+            sample: 'latedeliveryandpenalty/text/sample.md',
+            _: ['initialize']
+        })).should.throw('No party name name provided. Try the --party flag to provide a party to be initialized.');
     });
     it('all args specified, parent folder, no sample, no state', () => {
         process.chdir(path.resolve(__dirname, 'data/'));
@@ -1048,7 +1090,8 @@ describe('#validateInitializeArgs', () => {
         process.chdir(path.resolve(__dirname, 'data'));
         const args  = Commands.validateInitializeArgs({
             _: ['trigger'],
-            contract: 'installment-sale@0.1.0-316a9177c6d52bfd4e1df6d543ddab775cc217cdb44f92120e2f24bd11f8381b.slc'
+            contract: 'installment-sale@0.1.0-316a9177c6d52bfd4e1df6d543ddab775cc217cdb44f92120e2f24bd11f8381b.slc',
+            party: 'Acme Corp'
         });
         args.contract.should.match(/.slc$/);
     });
@@ -1106,7 +1149,8 @@ describe('#initialize', () => {
 
 describe('#intialize-slc', () => {
     it('should intialize a smart legal contract in ergo', async () => {
-        const response = await Commands.initialize(null, slcArchive, null);
+        const partyName =  'Acme Corp';
+        const response = await Commands.initialize(null, slcArchive, null, partyName);
         response.response.$class.should.be.equal('org.accordproject.runtime.Response');
         response.state.$class.should.be.equal('org.accordproject.installmentsale.InstallmentSaleState');
         response.state.balance_remaining.should.be.equal(10000);
@@ -1315,7 +1359,7 @@ describe('#validateSignArgs', () => {
             contract: 'latedeliveryandpenalty@0.17.0-d0c1a14e8a7af52e0927a23b8b30af3b5a75bee1ab788a15736e603b88a6312c.slc',
             keystore: 'keystore.p12',
             passphrase: 'password',
-            signatory: 'partyA',
+            signatory: 'Acme Corp',
             _: ['sign']
         });
         args.contract.should.match(/.slc$/);
@@ -1325,18 +1369,18 @@ describe('#validateSignArgs', () => {
         (() => Commands.validateSignArgs({
             contract: 'latedeliveryandpenalty@0.17.0-d0c1a14e8a7af52e0927a23b8b30af3b5a75bee1ab788a15736e603b88a6312c.slc',
             passphrase: 'password',
-            signatory: 'partyA',
+            signatory: 'Acme Corp',
             _: ['sign']
-        })).should.throw('Please define path of the keystore using --keystore');
+        })).should.throw('Please enter the keystore\'s path. Try the --keystore flag to enter keystore\'s path.');
     });
     it('passphrase not defined', () => {
         process.chdir(path.resolve(__dirname, 'data/contractsigning/'));
         (() => Commands.validateSignArgs({
             contract: 'latedeliveryandpenalty@0.17.0-d0c1a14e8a7af52e0927a23b8b30af3b5a75bee1ab788a15736e603b88a6312c.slc',
             keystore: 'keystore.p12',
-            signatory: 'partyA',
+            signatory: 'Acme Corp',
             _: ['sign']
-        })).should.throw('Please define the passphrase of the keystore using --pasphrase');
+        })).should.throw('Please enter the passphrase of the keystore. Try the --passphrase flag to enter passphrase.');
     });
     it('signatory not defined', () => {
         process.chdir(path.resolve(__dirname, 'data/contractsigning/'));
@@ -1345,7 +1389,7 @@ describe('#validateSignArgs', () => {
             keystore: 'keystore.p12',
             passphrase: 'password',
             _: ['sign']
-        })).should.throw('Please define the signatory signing the contract using --signatory');
+        })).should.throw('Please enter the signatory\'s name. Try the --signatory flag to enter signatory\'s name.');
     });
     it('verbose flag specified', () => {
         process.chdir(path.resolve(__dirname, 'data/contractsigning/'));
@@ -1353,7 +1397,7 @@ describe('#validateSignArgs', () => {
             contract: 'latedeliveryandpenalty@0.17.0-d0c1a14e8a7af52e0927a23b8b30af3b5a75bee1ab788a15736e603b88a6312c.slc',
             keystore: 'keystore.p12',
             passphrase: 'password',
-            signatory: 'partyA',
+            signatory: 'Acme Corp',
             _: ['sign'],
             verbose: true
         });
@@ -1369,9 +1413,9 @@ describe('#validateSignArgs', () => {
 describe('#sign', async () => {
     it('should sign the contract for a party/individual', async () => {
         const archiveName = 'test.slc';
-        const slcPath = path.resolve(__dirname, 'data/contractsigning/latedeliveryandpenalty@0.17.0-d0c1a14e8a7af52e0927a23b8b30af3b5a75bee1ab788a15736e603b88a6312c.slc');
+        const signatory = 'Acme Corp';
+        const slcPath = path.resolve(__dirname, 'data/contractsigning/latedeliveryandpenalty@0.17.0.slc');
         const keystore = path.resolve(__dirname, 'data/contractsigning/keystore.p12');
-        const signatory = 'partyA';
         const result = await Commands.sign(slcPath, keystore, 'password', signatory, archiveName);
         result.should.eql(true);
         const newInstance = await ContractInstance.fromArchive(fs.readFileSync(archiveName));
@@ -1380,12 +1424,12 @@ describe('#sign', async () => {
         fs.unlinkSync(archiveName);
     });
     it('should sign the contract for a party/individual without specifying output path', async () => {
-        const slcPath = path.resolve(__dirname, 'data/contractsigning/latedeliveryandpenalty@0.17.0-d0c1a14e8a7af52e0927a23b8b30af3b5a75bee1ab788a15736e603b88a6312c.slc');
+        const slcPath = path.resolve(__dirname, 'data/contractsigning/latedeliveryandpenalty@0.17.0.slc');
         const keystore = path.resolve(__dirname, 'data/contractsigning/keystore.p12');
-        const signatory = 'partyA';
+        const signatory = 'Acme Corp';
         const result = await Commands.sign(slcPath, keystore, 'password', signatory);
         result.should.eql(true);
-        fs.unlinkSync('latedeliveryandpenalty@0.17.0-d0c1a14e8a7af52e0927a23b8b30af3b5a75bee1ab788a15736e603b88a6312c.slc');
+        fs.unlinkSync('latedeliveryandpenalty@0.17.0-bb3e944894500a0c41a25a6e995d6c0ee7c5af6d9e453f7bfd562da5057dcc5d.slc');
     });
 });
 
@@ -1416,7 +1460,7 @@ describe('#validateVerifyArgs', () => {
 
 describe('#verify', async () => {
     it('should verify contract signatures', async () => {
-        const slcPath = path.resolve(__dirname, 'data/contractsigning/latedeliveryandpenalty@0.17.0-d0c1a14e8a7af52e0927a23b8b30af3b5a75bee1ab788a15736e603b88a6312c.v1.slc');
+        const slcPath = path.resolve(__dirname, 'data/contractsigning/latedeliveryandpenalty@0.17.0-verifysignatures.slc');
         return Commands.verify(null, slcPath).should.be.fulfilled;
     });
 });
@@ -1425,14 +1469,22 @@ describe('#validateInstantiateArgs', () => {
     it('no args specified', () => {
         process.chdir(path.resolve(__dirname, 'data/latedeliveryandpenalty/'));
         const args  = Commands.validateInstantiateArgs({
+            instantiator: 'some-party',
             _: ['instantiate']
         });
         args.template.should.match(/cicero-cli[/\\]test[/\\]data[/\\]latedeliveryandpenalty$/);
         args.target.should.match(/ergo/);
     });
+    it('instantiator not defined', () => {
+        process.chdir(path.resolve(__dirname, 'data/latedeliveryandpenalty/'));
+        (() => Commands.validateInstantiateArgs({
+            _: ['instantiate']
+        })).should.throw('Please enter the instantiator\'s name. Try the --instantiator flag to enter instantiator\'s name.');
+    });
     it('only target arg specified', () => {
         process.chdir(path.resolve(__dirname, 'data/latedeliveryandpenalty/'));
         const args  = Commands.validateInstantiateArgs({
+            instantiator: 'some-party',
             _: ['instantiate'],
             target: 'ergo'
         });
@@ -1442,6 +1494,7 @@ describe('#validateInstantiateArgs', () => {
     it('template arg specified', () => {
         process.chdir(path.resolve(__dirname));
         const args  = Commands.validateInstantiateArgs({
+            instantiator: 'some-party',
             _: ['instantiate', 'data/latedeliveryandpenalty/']
         });
         args.template.should.match(/cicero-cli[/\\]test[/\\]data[/\\]latedeliveryandpenalty$/);
@@ -1450,6 +1503,7 @@ describe('#validateInstantiateArgs', () => {
     it('verbose flag specified', () => {
         process.chdir(path.resolve(__dirname, 'data/latedeliveryandpenalty/'));
         Commands.validateInstantiateArgs({
+            instantiator: 'some-party',
             _: ['instantiate'],
             verbose: true
         });
@@ -1583,6 +1637,7 @@ describe('#validateExportArgs', () => {
         const args  = Commands.validateExportArgs({
             _: ['export'],
             contract: 'installment-sale@0.1.0-316a9177c6d52bfd4e1df6d543ddab775cc217cdb44f92120e2f24bd11f8381b.slc',
+            party: 'Acme Corp',
             format: 'pdf'
         });
         args.contract.should.match(/.slc$/);
@@ -1594,45 +1649,62 @@ describe('#validateExportArgs', () => {
             _: ['export'],
             contract: 'installment-sale@0.1.0-316a9177c6d52bfd4e1df6d543ddab775cc217cdb44f92120e2f24bd11f8381b.slc',
             format: 'pdf',
+            party: 'Acme Corp',
             verbose: true,
         });
         args.contract.should.match(/.slc$/);
+    });
+
+    it('party not defined', () => {
+        process.chdir(path.resolve(__dirname, 'data/contractsigning/'));
+        (() => Commands.validateExportArgs({
+            contract: 'latedeliveryandpenalty@0.17.0-d0c1a14e8a7af52e0927a23b8b30af3b5a75bee1ab788a15736e603b88a6312c.slc',
+            format: 'pdf',
+            verbose: true,
+            _: ['export']
+        })).should.throw('No party name name provided. Try the --party flag to provide a party to be exported.');
     });
 });
 
 describe('#export', async () => {
     it('should export a smart legal contract to markdown', async () => {
-        const result = await Commands.export(slcArchive, null, null, null, { format: 'markdown' });
+        const partyName = 'Acme Corp';
+        const result = await Commands.export(slcArchive, partyName, null, null, null, { format: 'markdown' });
         result.should.equal('"Dan" agrees to pay to "Ned" the total sum e10000.0, in the manner following:\n\nE500.0 is to be paid at closing, and the remaining balance of E9500.0 shall be paid as follows:\n\nE500.0 or more per month on the first day of each and every month, and continuing until the entire balance, including both principal and interest, shall be paid in full -- provided, however, that the entire balance due plus accrued interest and any other amounts due here-under shall be paid in full on or before 24 months.\n\nMonthly payments, which shall start on month 3, include both principal and interest with interest at the rate of 1.5%, computed monthly on the remaining balance from time to time unpaid.');
     });
 
     it('should export a smart legal contract to ciceromark', async () => {
-        const result = await Commands.export(slcArchive, null, null, null, { format: 'ciceromark' });
+        const partyName = 'Acme Corp';
+        const result = await Commands.export(slcArchive, partyName, null, null, null, { format: 'ciceromark' });
         result.$class.should.equal('org.accordproject.commonmark.Document');
     });
 
     it('should export a smart legal contract to ciceromark (output file)', async () => {
+        const partyName = 'Acme Corp';
         const tmpFile = await tmp.file();
         const tmpJson = tmpFile.path + '.json';
-        const result = await Commands.export(slcArchive, tmpJson, null, null, { format: 'ciceromark' });
+        const result = await Commands.export(slcArchive, partyName, tmpJson, null, null, { format: 'ciceromark' });
         result.$class.should.equal('org.accordproject.commonmark.Document');
         tmpFile.cleanup();
     });
 
     it('should export a smart legal contract to pdf', async () => {
-        const result = await Commands.export(slcArchive, null, null, null, { format: 'pdf' });
+        const partyName = 'Acme Corp';
+        const result = await Commands.export(slcArchive, partyName, null, null, null, { format: 'pdf' });
         result.should.not.be.null;
     });
 
     it('should export a smart legal contract to pdf (output file)', async () => {
+        const partyName = 'Acme Corp';
         const tmpFile = await tmp.file();
         const tmpPdf = tmpFile.path + '.pdf';
-        const result = await Commands.export(slcArchive, tmpPdf, null, null, { format: 'pdf' });
+        const result = await Commands.export(slcArchive, partyName, tmpPdf, null, null, { format: 'pdf' });
         result.should.not.be.null;
         tmpFile.cleanup();
     });
 
     it('should throw for an unknown format', async () => {
-        expect(await Commands.export(slcArchive, null, null, null, { format: 'foobar' })).to.be.undefined;
+        const partyName = 'Acme Corp';
+        expect(await Commands.export(slcArchive, partyName, null, null, null, { format: 'foobar' })).to.be.undefined;
     });
 });
