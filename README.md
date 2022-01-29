@@ -7,9 +7,7 @@
 <p align="center">
   <a href="./LICENSE"><img src="https://img.shields.io/github/license/accordproject/cicero?color=bright-green" alt="GitHub license"></a>
   <a href="https://badge.fury.io/js/%40accordproject%2Fcicero-cli"><img src="https://badge.fury.io/js/%40accordproject%2Fcicero-cli.svg" alt="npm version"></a>
-  <a href="https://accord-project-slack-signup.herokuapp.com/">
-    <img src="https://img.shields.io/badge/Accord%20Project-Join%20Slack-blue" alt="Join the Accord Project Slack"/>
-  </a>
+
 </p>
 
 ## Introduction
@@ -57,9 +55,7 @@ npm install -g @accordproject/cicero-cli
   <a href="./LICENSE">
     <img src="https://img.shields.io/github/license/accordproject/cicero?color=bright-green" alt="GitHub license">
   </a>
-  <a href="https://accord-project-slack-signup.herokuapp.com/">
-    <img src="https://img.shields.io/badge/Accord%20Project-Join%20Slack-blue" alt="Join the Accord Project Slack"/>
-  </a>
+ 
 </p>
 
 Accord Project is an open source, non-profit, initiative working to transform contract management and contract automation by digitizing contracts. Accord Project operates under the umbrella of the [Linux Foundation][linuxfound]. The technical charter for the Accord Project can be found [here][charter].
@@ -76,7 +72,7 @@ The Accord Project technology is being developed as open source. All the softwar
 
 Find out what’s coming on our [blog][apblog].
 
-Join the Accord Project Technology Working Group [Slack channel][apslack] to get involved!
+Join the Accord Project Technology Working Group [Discord channel][apdisc] to get involved!
 
 For code contributions, read our [CONTRIBUTING guide][contributing] and information for [DEVELOPERS][developers].
 
@@ -101,6 +97,7 @@ Copyright 2018-2019 Clause, Inc. All trademarks are the property of their respec
 [apblog]: https://medium.com/@accordhq
 [apdoc]: https://docs.accordproject.org/
 [apslack]: https://accord-project-slack-signup.herokuapp.com
+[apdisc]: https://discord.gg/Zm99SKhhtA
 
 [contributing]: https://github.com/accordproject/cicero/blob/master/CONTRIBUTING.md
 [developers]: https://github.com/accordproject/cicero/blob/master/DEVELOPERS.md
