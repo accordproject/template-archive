@@ -18,7 +18,7 @@
 const semver = require('semver');
 const targetVersion = process.argv[2];
 
-if (!semver.valid(targetVersion)) {
+if ( !semver.valid(targetVersion) ) {
     console.error(`Error: the version "${targetVersion}" is invalid!`);
     process.exit(1);
 }
