@@ -24,7 +24,7 @@ const copyFilePromise = util.promisify(fs.copyFile);
 const glob = require('glob');
 
 function copyFiles(files, destDir) {
-    if (!fs.existsSync('coverage')){
+    if ( !fs.existsSync('coverage') ){
         fs.mkdirSync('coverage');
     }
     return Promise.all(files.map(f => {
