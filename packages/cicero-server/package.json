@@ -52,7 +52,6 @@
     "mocha": "6.1.4",
     "mockery": "2.0.0",
     "nyc": "14.1.1",
-    "sinon": "4.0.1",
     "supertest": "3.0.0"
   },
   "dependencies": {

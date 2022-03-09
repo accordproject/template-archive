@@ -15,12 +15,14 @@
 'use strict';
 
 const Metadata = require('./metadata');
-const Logger = require('@accordproject/concerto-core').Logger;
-const ParserManager = require('@accordproject/markdown-template').ParserManager;
 const crypto = require('crypto');
 const forge = require('node-forge');
 const stringify = require('json-stable-stringify');
+
+const Logger = require('@accordproject/ergo-compiler').Logger;
+const ParserManager = require('@accordproject/markdown-template').ParserManager;
 const LogicManager = require('@accordproject/ergo-compiler').LogicManager;
+
 const TemplateLoader = require('./templateloader');
 const TemplateSaver = require('./templatesaver');
 
