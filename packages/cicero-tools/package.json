@@ -49,15 +49,13 @@
     "license-check": "1.1.5",
     "mocha": "6.1.4",
     "nyc": "14.1.1",
-    "sinon": "4.0.1",
-    "sinon-chai": "3.2.0",
     "tmp-promise": "2.0.2",
     "webpack": "^4.35.0",
     "webpack-cli": "^3.3.5"
   },
   "dependencies": {
-    "@accordproject/concerto-core": "1.2.1",
-    "@accordproject/concerto-tools": "1.2.1"
+    "@accordproject/concerto-core": "1.2.2-20220301153534",
+    "@accordproject/concerto-tools": "1.2.2-20220301153534"
   },
   "license-check-config": {
     "src": [

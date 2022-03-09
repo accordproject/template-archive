@@ -21,8 +21,9 @@ const JSZip = require('jszip');
 const xregexp = require('xregexp');
 const languageTagRegex = require('ietf-language-tag-regex');
 const DefaultArchiveLoader = require('./loaders/defaultarchiveloader');
+
+const Logger = require('@accordproject/ergo-compiler').Logger;
 const FileLoader = require('@accordproject/ergo-compiler').FileLoader;
-const Logger = require('@accordproject/concerto-core').Logger;
 
 // Matches 'sample.md' or 'sample_TAG.md' where TAG is an IETF language tag (BCP 47)
 const IETF_REGEXP = languageTagRegex({ exact: false }).toString().slice(1,-2);

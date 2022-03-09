@@ -14,9 +14,9 @@
 
 'use strict';
 
-const Logger = require('@accordproject/concerto-core').Logger;
 const crypto = require('crypto');
 
+const Logger = require('@accordproject/ergo-compiler').Logger;
 const CiceroMarkTransformer = require('@accordproject/markdown-cicero').CiceroMarkTransformer;
 const SlateTransformer = require('@accordproject/markdown-slate').SlateTransformer;
 const TemplateMarkTransformer = require('@accordproject/markdown-template').TemplateMarkTransformer;

@@ -75,15 +75,15 @@
     "webpack-cli": "^3.3.5"
   },
   "dependencies": {
-    "@accordproject/concerto-core": "1.2.1",
-    "@accordproject/ergo-compiler": "0.22.2",
-    "@accordproject/ergo-engine": "0.22.2",
-    "@accordproject/markdown-cicero": "0.14.1",
-    "@accordproject/markdown-common": "0.14.1",
-    "@accordproject/markdown-html": "0.14.1",
-    "@accordproject/markdown-slate": "0.14.1",
-    "@accordproject/markdown-template": "0.14.1",
-    "axios": "0.21.2",
+    "@accordproject/concerto-core": "1.2.2-20220301153534",
+    "@accordproject/ergo-compiler": "0.22.3-20220308215053",
+    "@accordproject/ergo-engine": "0.22.3-20220308215053",
+    "@accordproject/markdown-cicero": "0.14.2-20220301185845",
+    "@accordproject/markdown-common": "0.14.2-20220301185845",
+    "@accordproject/markdown-html": "0.14.2-20220301185845",
+    "@accordproject/markdown-slate": "0.14.2-20220301185845",
+    "@accordproject/markdown-template": "0.14.2-20220301185845",
+    "axios": "0.23.0",
     "debug": "4.1.0",
     "ietf-language-tag-regex": "0.0.5",
     "json-stable-stringify": "1.0.1",
@@ -93,7 +93,6 @@
     "request": "2.88.0",
     "semver": "6.3.0",
     "slash": "3.0.0",
-    "uuid": "3.3.2",
     "xregexp": "4.2.4"
   },
   "license-check-config": {
