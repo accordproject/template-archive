@@ -15,7 +15,7 @@
 
 'use strict';
 
-const Logger = require('@accordproject/concerto-core').Logger;
+const Logger = require('@accordproject/concerto-util').Logger;
 const Commands = require('./lib/commands');
 
 require('yargs')
@@ -170,7 +170,7 @@ require('yargs')
             };
             return Commands.verify(argv.template, options)
                 .then((result) => {
-                    if(result) {Logger.info(`Author/developer's signature for ${argv.template} template is verified`);}
+                    Logger.info(`Author/developer's signature for ${argv.template} template is verified`);
                 })
                 .catch((err) => {
                     Logger.error(err.message);
