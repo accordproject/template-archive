@@ -27,23 +27,23 @@ module.exports = {
     output: {
         path: path.join(__dirname, 'umd'),
         filename: 'cicero.js',
-        library: 'cicero',
-        libraryTarget: 'umd',
-        umdNamedDefine: true
+        library: {
+            name: 'cicero',
+            type: 'umd',
+        },
+        umdNamedDefine: true,
     },
     plugins: [
-        new webpack.BannerPlugin(`Accord Project, Cicero v${packageJson.version} http://accordproject.org. Copyright 2018, Clause Inc.
-Licensed under the Apache License, Version 2.0 (the "License");
-you may not use this file except in compliance with the License.
-You may obtain a copy of the License at
-
-http://www.apache.org/licenses/LICENSE-2.0
-
-Unless required by applicable law or agreed to in writing, software
-distributed under the License is distributed on an "AS IS" BASIS,
-WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-See the License for the specific language governing permissions and
-limitations under the License.`),
+        new webpack.BannerPlugin(`Cicero v${packageJson.version}
+        Licensed under the Apache License, Version 2.0 (the "License");
+        you may not use this file except in compliance with the License.
+        You may obtain a copy of the License at
+        http://www.apache.org/licenses/LICENSE-2.0
+        Unless required by applicable law or agreed to in writing, software
+        distributed under the License is distributed on an "AS IS" BASIS,
+        WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+        See the License for the specific language governing permissions and
+        limitations under the License.`),
         new webpack.DefinePlugin({
             'process.env': {
                 'NODE_ENV': JSON.stringify('production')
@@ -56,12 +56,7 @@ limitations under the License.`),
             {
                 test: /\.js$/,
                 include: [path.join(__dirname, 'src')],
-                use: {
-                    loader: 'babel-loader',
-                    options: {
-                        presets: ['@babel/preset-env']
-                    }
-                }
+                use: ['babel-loader']
             },
             {
                 test: /\.ne$/,
@@ -69,9 +64,15 @@ limitations under the License.`),
             }
         ]
     },
-    node: {
-        fs: 'empty',
-        net: 'empty',
-        tls: 'empty'
+    resolve: {
+        fallback: {
+            'fs': false,
+            'tls': false,
+            'net': false,
+            'path': false,
+            'os': false,
+            'util': false,
+            'url': false,
+        }
     }
 };

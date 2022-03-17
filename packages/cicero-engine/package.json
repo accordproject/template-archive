@@ -15,7 +15,7 @@
     "lint": "eslint .",
     "postlint": "npm run licchk",
     "licchk": "license-check",
-    "test:mocha": "mocha",
+    "test:mocha": "mocha --timeout 15000",
     "test:windows": "npm run test:all",
     "test:all": "npm run test:mocha",
     "test:cov": "nyc npm run test:all",
@@ -40,14 +40,15 @@
   },
   "homepage": "https://github.com/accordproject/cicero#readme",
   "devDependencies": {
-    "chai": "4.2.0",
+    "chai": "4.3.6",
+    "chai-as-promised": "7.1.1",
     "chai-things": "0.2.0",
     "cucumber": "5.1.0",
-    "eslint": "8.1.0",
-    "jsdoc": "^3.6.7",
+    "eslint": "8.2.0",
+    "jsdoc": "^3.6.10",
     "license-check": "1.1.5",
-    "mocha": "6.1.4",
-    "nyc": "14.1.1"
+    "mocha": "8.3.2",
+    "nyc": "15.1.0"
   },
   "dependencies": {
     "@accordproject/cicero-core": "0.22.2",

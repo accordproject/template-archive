@@ -423,7 +423,7 @@ describe('Metadata', () => {
                 version: '1.0.0',
                 accordproject: {template: 'contract',ergo:'0.22.0-alpha.2',cicero:'^0.22.0-alpha.1'}
             }, null, {});
-            md.ciceroVersion = '^0.11.0';
+            md.ciceroVersion = '^0.12.0';
             md.satisfiesCiceroVersion('0.12.0-20190114233635').should.be.equal(true);
         });
         it('should satisfy when cicero version is a prerelease for a version with patch number higher than 0', () => {
@@ -444,14 +444,14 @@ describe('Metadata', () => {
             md.ciceroVersion = '^0.11.0';
             md.satisfiesCiceroVersion(ciceroVersion).should.be.equal(false);
         });
-        it('should not satisfy when cicero version has a higher minor number than current cicero version (with prerelease tag)', () => {
+        it('should satisfy when cicero version has a higher minor number than current cicero version (with prerelease tag)', () => {
             const md = new Metadata({
                 name: 'template',
                 version: '1.0.0',
                 accordproject: {template: 'contract',ergo:'0.20.0-alpha.2',cicero:caretRange(ciceroVersion)}
             }, null, {});
             md.ciceroVersion = caretRange(ciceroVersion);
-            md.satisfiesCiceroVersion(`${trimPreRelease(ciceroVersion)}-20190114233635`).should.be.equal(false);
+            md.satisfiesCiceroVersion(`${trimPreRelease(ciceroVersion)}-20190114233635`).should.be.equal(true);
         });
     });
 

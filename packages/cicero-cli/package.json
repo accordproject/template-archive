@@ -19,7 +19,7 @@
     "postlint": "npm run licchk",
     "licchk": "license-check",
     "test:cucumber": "cucumber-js test/features --require .cucumber.js --world-parameters \"{\\\"rootdir\\\":\\\"./test\\\"}\"",
-    "test:mocha": "mocha",
+    "test:mocha": "mocha --timeout 30000",
     "test:all": "npm run test:mocha && npm run test:cucumber",
     "test:windows": "npm run test:all",
     "test:cov": "nyc npm run test",
@@ -52,15 +52,15 @@
     "yargs": "17.3.1"
   },
   "devDependencies": {
-    "chai": "4.2.0",
+    "chai": "4.3.6",
     "chai-as-promised": "7.1.1",
     "chai-things": "0.2.0",
     "cucumber": "5.1.0",
-    "eslint": "8.1.0",
-    "jsdoc": "^3.6.7",
+    "eslint": "8.2.0",
+    "jsdoc": "^3.6.10",
     "license-check": "1.1.5",
-    "mocha": "6.1.4",
-    "nyc": "14.1.1",
+    "mocha": "8.3.2",
+    "nyc": "15.1.0",
     "tmp-promise": "2.0.2"
   },
   "license-check-config": {
