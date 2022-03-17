@@ -49,7 +49,10 @@ module.exports = {
                 'NODE_ENV': JSON.stringify('production')
             }
         }),
-        new webpack.IgnorePlugin(/jsdom$/),
+        new webpack.IgnorePlugin({
+            resourceRegExp: /^\.$/,
+            contextRegExp: /jsdom$/,
+        }),
     ],
     module: {
         rules: [
@@ -73,6 +76,14 @@ module.exports = {
             'os': false,
             'util': false,
             'url': false,
+            'child_process': false,
+            'assert': require.resolve('assert/'),
+            'constants': require.resolve('constants-browserify'),
+            'crypto': require.resolve('crypto-browserify'),
+            'stream': require.resolve('stream-browserify'),
+            'http': require.resolve('stream-http'),
+            'https': require.resolve('https-browserify'),
+            'zlib': require.resolve('browserify-zlib'),
         }
     }
 };
