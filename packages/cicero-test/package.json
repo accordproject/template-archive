@@ -40,17 +40,17 @@
   },
   "homepage": "https://github.com/accordproject/cicero#readme",
   "devDependencies": {
-    "eslint": "8.1.0",
-    "jsdoc": "^3.6.7",
+    "eslint": "8.2.0",
+    "jsdoc": "^3.6.10",
     "license-check": "1.1.5",
-    "mocha": "6.1.4",
-    "nyc": "14.1.1"
+    "mocha": "8.3.2",
+    "nyc": "15.1.0"
   },
   "dependencies": {
     "@accordproject/cicero-core": "0.22.2",
     "@accordproject/cicero-engine": "0.22.2",
     "@accordproject/ergo-test": "0.23.0-alpha.2",
-    "chai": "4.2.0",
+    "chai": "4.3.6",
     "chai-things": "0.2.0",
     "cucumber": "5.1.0"
   },

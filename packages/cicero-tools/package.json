@@ -11,12 +11,11 @@
   },
   "main": "index.js",
   "scripts": {
-    "webpack": "webpack --config webpack.config.js --mode production",
     "pretest": "npm run lint",
     "lint": "eslint .",
     "postlint": "npm run licchk",
     "licchk": "license-check",
-    "test:mocha": "mocha --recursive",
+    "test:mocha": "mocha --recursive --timeout 10000",
     "test:windows": "npm run test:mocha",
     "test": "npm run test:mocha",
     "test:cov": "nyc npm run test"
@@ -38,20 +37,15 @@
   },
   "homepage": "https://github.com/accordproject/cicero#readme",
   "devDependencies": {
-    "@babel/cli": "7.4.4",
-    "@babel/core": "7.4.5",
-    "@babel/preset-env": "7.4.5",
-    "chai": "4.2.0",
+    "chai": "4.3.6",
     "chai-as-promised": "7.1.1",
     "chai-things": "0.2.0",
-    "eslint": "8.1.0",
-    "jsdoc": "^3.6.7",
+    "eslint": "8.2.0",
+    "jsdoc": "^3.6.10",
     "license-check": "1.1.5",
-    "mocha": "6.1.4",
-    "nyc": "14.1.1",
-    "tmp-promise": "2.0.2",
-    "webpack": "^4.35.0",
-    "webpack-cli": "^3.3.5"
+    "mocha": "8.3.2",
+    "nyc": "15.1.0",
+    "tmp-promise": "2.0.2"
   },
   "dependencies": {
     "@accordproject/concerto-core": "2.0.0-alpha.2",
