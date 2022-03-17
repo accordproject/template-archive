@@ -14,15 +14,17 @@
 
 'use strict';
 
+const fs = require('fs');
+const path = require('path');
+const mkdirp = require('mkdirp');
+
 const Logger = require('@accordproject/concerto-util').Logger;
+const FileWriter = require('@accordproject/concerto-util').FileWriter;
 const Template = require('@accordproject/cicero-core').Template;
 const Clause = require('@accordproject/cicero-core').Clause;
 const Engine = require('@accordproject/cicero-engine').Engine;
 const CodeGen = require('@accordproject/cicero-tools').CodeGen;
-const FileWriter = CodeGen.FileWriter;
-const fs = require('fs');
-const path = require('path');
-const mkdirp = require('mkdirp');
+
 const GoLangVisitor = CodeGen.GoLangVisitor;
 const JavaVisitor = CodeGen.JavaVisitor;
 const CordaVisitor = CodeGen.CordaVisitor;

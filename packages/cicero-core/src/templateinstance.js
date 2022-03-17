@@ -23,7 +23,7 @@ const TemplateMarkTransformer = require('@accordproject/markdown-template').Temp
 const HtmlTransformer = require('@accordproject/markdown-html').HtmlTransformer;
 
 // For formulas evaluation
-const ErgoEngine = require('@accordproject/ergo-engine/index.browser.js').EvalEngine;
+const ErgoEngine = require('@accordproject/ergo-engine/index.dist.js').EvalEngine;
 
 /**
  * A TemplateInstance is an instance of a Clause or Contract template. It is executable business logic, linked to
