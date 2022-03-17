@@ -1170,7 +1170,7 @@ describe('#validateArchiveArgs', () => {
 describe('#archive', async () => {
     it('should create signed archive', async () => {
         const archiveName = 'test.cta';
-        const p12path = path.resolve(__dirname, 'data/keystore.p12');
+        const p12path = path.resolve(__dirname, 'data/keystore/keystore.p12');
         const keystore = {
             path: p12path,
             passphrase: 'password'
@@ -1327,7 +1327,7 @@ describe('#verify', async () => {
         const templatePath = path.resolve(__dirname, 'data/signedArchive/');
         return Commands.verify(templatePath).should.be.fulfilled;
     });
-    it('should throw error when signture is invalid', async () => {
+    it('should throw error when signature is invalid', async () => {
         const templatePath = path.resolve(__dirname, 'data/signedArchiveFail/');
         return Commands.verify(templatePath).should.be.rejectedWith('Template\'s author signature is invalid!');
     });

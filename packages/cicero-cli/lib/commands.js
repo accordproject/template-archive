@@ -661,9 +661,8 @@ class Commands {
      */
     static verify(templatePath, options) {
         return Commands.loadTemplate(templatePath, options)
-            .then(async(template) => {
-                const result = await template.verifyTemplateSignature();
-                return result;
+            .then((template) => {
+                return template.verifyTemplateSignature();
             });
     }
 
