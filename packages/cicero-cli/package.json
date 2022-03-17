@@ -46,8 +46,8 @@
     "@accordproject/cicero-engine": "0.22.2",
     "@accordproject/cicero-test": "0.22.2",
     "@accordproject/cicero-tools": "0.22.2",
-    "@accordproject/concerto-core": "1.2.2-20220301153534",
-    "@accordproject/concerto-util": "1.2.2-20220301153534",
+    "@accordproject/concerto-core": "2.0.0-alpha.2",
+    "@accordproject/concerto-util": "2.0.0-alpha.2",
     "mkdirp": "1.0.4",
     "yargs": "17.3.1"
   },

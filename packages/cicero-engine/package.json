@@ -51,7 +51,7 @@
   },
   "dependencies": {
     "@accordproject/cicero-core": "0.22.2",
-    "@accordproject/ergo-engine": "0.22.3-20220308215053"
+    "@accordproject/ergo-engine": "0.23.0-alpha.2"
   },
   "license-check-config": {
     "src": [

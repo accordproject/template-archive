@@ -17,9 +17,10 @@
 const fs = require('fs');
 
 const ModelManager = require('@accordproject/concerto-core').ModelManager;
+const FileWriter = require('@accordproject/concerto-util').FileWriter;
+
 const CodeGen = require('./codegen/codegen');
 
-const FileWriter = CodeGen.FileWriter;
 const GoLangVisitor = CodeGen.GoLangVisitor;
 const JavaVisitor = CodeGen.JavaVisitor;
 const CordaVisitor = CodeGen.CordaVisitor;
