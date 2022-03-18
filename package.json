@@ -12,8 +12,8 @@
     "source-map-support": "0.5.12"
   },
   "engines": {
-    "node": ">=12",
-    "npm": ">=5"
+    "node": ">=14",
+    "npm": ">=6"
   },
   "name": "cicero",
   "description": "You must install [Lerna](https://lernajs.io) to build this multi-package repository.",

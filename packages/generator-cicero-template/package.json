@@ -3,8 +3,8 @@
   "version": "0.23.0-alpha.1",
   "description": "Code generator for a Cicero Template",
   "engines": {
-    "node": ">=12",
-    "npm": ">=5"
+    "node": ">=14",
+    "npm": ">=6"
   },
   "publishConfig": {
     "access": "public"
