@@ -48,9 +48,9 @@
     "tmp-promise": "2.0.2"
   },
   "dependencies": {
-    "@accordproject/concerto-core": "2.0.0-alpha.2",
-    "@accordproject/concerto-tools": "2.0.0-alpha.2",
-    "@accordproject/concerto-util": "2.0.0-alpha.2"
+    "@accordproject/concerto-core": "2.0.0",
+    "@accordproject/concerto-tools": "2.0.0",
+    "@accordproject/concerto-util": "2.0.0"
   },
   "license-check-config": {
     "src": [
