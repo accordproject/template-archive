@@ -49,32 +49,27 @@ curl --request POST \
   --header 'accept: application/json' \
   --header 'content-type: application/json' \
   --data '{
-    "data": {
-        "$class": "org.accordproject.latedeliveryandpenalty.LateDeliveryAndPenaltyContract",
-        "contractId": "ecd6257e-2ffe-4ef1-8a5c-38ca9084a829",
-        "buyer": {
-            "$class": "org.accordproject.cicero.contract.AccordParty",
-            "partyId": "Dan"
-        },
-        "seller": {
-            "$class": "org.accordproject.cicero.contract.AccordParty",
-            "partyId": "Steve"
-        },
-        "forceMajeure": true,
-        "penaltyDuration": {
-            "$class": "org.accordproject.time.Duration",
-            "amount": 9,
-            "unit": "days"
-        },
-        "penaltyPercentage": 1000.5,
-        "capPercentage": 88,
-        "termination": {
-            "$class": "org.accordproject.time.Duration",
-            "amount": 5,
-            "unit": "weeks"
-        },
-        "fractionalPart": "days"
+    "data":{
+    "$class": "org.accordproject.latedeliveryandpenalty.LateDeliveryAndPenaltyContract",
+    "buyer": "resource:org.accordproject.party.Party#Steve",
+    "seller": "resource:org.accordproject.party.Party#Dan",
+    "forceMajeure": true,
+    "penaltyDuration": {
+        "$class": "org.accordproject.time.Duration",
+        "amount": 2,
+        "unit": "days"
     },
+    "penaltyPercentage": 10.5,
+    "capPercentage": 55,
+    "termination": {
+        "$class": "org.accordproject.time.Duration",
+        "amount": 15,
+        "unit": "days"
+    },
+    "fractionalPart": "days",
+    "contractId": "c538755a-6c9e-43ff-8767-f8915d0336a0",
+    "$identifier": "c538755a-6c9e-43ff-8767-f8915d0336a0"
+},
     "options": {
         "unquoteVariables": true
     }
@@ -97,34 +92,29 @@ curl --request POST \
         "goodsValue": 200.00
     },
     "state": {
-        "$class": "org.accordproject.cicero.contract.AccordContractState",
-        "stateId": "org.accordproject.cicero.contract.AccordContractState#1"
+        "$class": "org.accordproject.runtime.State",
+        "$identifier": "81fc1750-a77b-11eb-9770-7ddd576a12c2"
     },
     "data": {
         "$class": "org.accordproject.latedeliveryandpenalty.LateDeliveryAndPenaltyContract",
-        "contractId": "ecd6257e-2ffe-4ef1-8a5c-38ca9084a829",
-        "buyer": {
-            "$class": "org.accordproject.cicero.contract.AccordParty",
-            "partyId": "Dan"
-        },
-        "seller": {
-            "$class": "org.accordproject.cicero.contract.AccordParty",
-            "partyId": "Steve"
-        },
+        "buyer": "resource:org.accordproject.party.Party#Steve",
+        "seller": "resource:org.accordproject.party.Party#Dan",
         "forceMajeure": true,
         "penaltyDuration": {
             "$class": "org.accordproject.time.Duration",
-            "amount": 9,
+            "amount": 2,
             "unit": "days"
         },
-        "penaltyPercentage": 1000.5,
-        "capPercentage": 99,
+        "penaltyPercentage": 10.5,
+        "capPercentage": 55,
         "termination": {
             "$class": "org.accordproject.time.Duration",
-            "amount": 2,
-            "unit": "weeks"
+            "amount": 15,
+            "unit": "days"
         },
-        "fractionalPart": "days"
+        "fractionalPart": "days",
+        "contractId": "c538755a-6c9e-43ff-8767-f8915d0336a0",
+        "$identifier": "c538755a-6c9e-43ff-8767-f8915d0336a0"
     }
 }'
 ```
@@ -152,29 +142,24 @@ curl --request POST \
     },
     "data": {
         "$class": "org.accordproject.latedeliveryandpenalty.LateDeliveryAndPenaltyContract",
-        "contractId": "ecd6257e-2ffe-4ef1-8a5c-38ca9084a829",
-        "buyer": {
-            "$class": "org.accordproject.cicero.contract.AccordParty",
-            "partyId": "Dan"
-        },
-        "seller": {
-            "$class": "org.accordproject.cicero.contract.AccordParty",
-            "partyId": "Steve"
-        },
+        "buyer": "resource:org.accordproject.party.Party#Steve",
+        "seller": "resource:org.accordproject.party.Party#Dan",
         "forceMajeure": true,
         "penaltyDuration": {
             "$class": "org.accordproject.time.Duration",
-            "amount": 9,
+            "amount": 2,
             "unit": "days"
         },
-        "penaltyPercentage": 1000.5,
-        "capPercentage": 99,
+        "penaltyPercentage": 10.5,
+        "capPercentage": 55,
         "termination": {
             "$class": "org.accordproject.time.Duration",
-            "amount": 2,
-            "unit": "weeks"
+            "amount": 15,
+            "unit": "days"
         },
-        "fractionalPart": "days"
+        "fractionalPart": "days",
+        "contractId": "c538755a-6c9e-43ff-8767-f8915d0336a0",
+        "$identifier": "c538755a-6c9e-43ff-8767-f8915d0336a0"
     }
 }'
 ```
