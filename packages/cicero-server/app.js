@@ -162,6 +162,21 @@ app.post('/draft/:template', async function (req, httpResponse, next) {
     }
 });
 
+app.post('/archive/:template', async function(req, httpResponse, next) {
+
+    // to do : options
+
+    try {
+
+        
+
+    } catch (err) {
+        return next(err);
+    } 
+
+
+})
+
 /**
  * Helper function to initialise the template.
  * @param {req} req The request passed in from endpoint.
