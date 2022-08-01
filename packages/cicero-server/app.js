@@ -16,6 +16,10 @@
 
 'use strict';
 
+const fs = require('fs');
+const path = require('path');
+const mkdirp = require('mkdirp');
+
 const app = require('express')();
 const bodyParser = require('body-parser');
 const Template = require('@accordproject/cicero-core').Template;
@@ -162,6 +166,21 @@ app.post('/draft/:template', async function (req, httpResponse, next) {
     }
 });
 
+app.post('/get/:template', async function (req, httpResponse, next) {
+    try {
+        loadTemplate(req).then((template) => {
+            const modelManager = template.getModelManager();
+            let output = req.body['output']
+            mkdirp.sync(output);
+            modelManager.writeModelsToFileSystem(output);
+            httpResponse.send(`Loaded external models in '${output}'.`);
+        })
+    } catch (err) {
+        return next(err);
+    }
+
+})
+
 /**
  * Helper function to initialise the template.
  * @param {req} req The request passed in from endpoint.
@@ -171,6 +190,11 @@ async function initTemplateInstance(req) {
     const template = await Template.fromDirectory(`${process.env.CICERO_DIR}/${req.params.template}`);
     return new Clause(template);
 }
+
+async function loadTemplate(req) {
+    const template = await Template.fromDirectory(`${process.env.CICERO_DIR}/${req.params.template}`);
+    return template
+} 
 
 const server = app.listen(app.get('port'), function () {
     console.log('Server listening on port: ', app.get('port'));
