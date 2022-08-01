@@ -16,6 +16,10 @@
 
 'use strict';
 
+const fs = require('fs');
+const path = require('path');
+const mkdirp = require('mkdirp');
+
 const app = require('express')();
 const bodyParser = require('body-parser');
 const Template = require('@accordproject/cicero-core').Template;
@@ -165,9 +169,30 @@ app.post('/draft/:template', async function (req, httpResponse, next) {
 app.post('/archive/:template', async function(req, httpResponse, next) {
 
     // to do : options
+    // to do : keystore
+
 
     try {
+        loadTemplate(req).then(async (template) => {
+            let target = req.body['target']
+            let outputPath = req.body['outputPath']
 
+            let keystore = null;
+
+            const archive = await template.toArchive(target, {keystore});
+            let file;
+            if (outputPath) {
+                file = outputPath;
+            }
+            else {
+                const templateName = template.getMetadata().getName();
+                const templateVersion = template.getMetadata().getVersion();
+                file = `${templateName}@${templateVersion}.cta`;
+            }
+            console.log('Creating archive: ' + file);
+            fs.writeFileSync(file, archive);
+            httpResponse.send(true);    
+        })
         
 
     } catch (err) {
@@ -186,6 +211,11 @@ async function initTemplateInstance(req) {
     const template = await Template.fromDirectory(`${process.env.CICERO_DIR}/${req.params.template}`);
     return new Clause(template);
 }
+
+async function loadTemplate(req) {
+    const template = await Template.fromDirectory(`${process.env.CICERO_DIR}/${req.params.template}`);
+    return template
+} 
 
 const server = app.listen(app.get('port'), function () {
     console.log('Server listening on port: ', app.get('port'));
