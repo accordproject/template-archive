@@ -16,6 +16,9 @@
 
 'use strict';
 
+const fs = require('fs');
+const path = require('path');
+
 const app = require('express')();
 const bodyParser = require('body-parser');
 const Template = require('@accordproject/cicero-core').Template;
@@ -162,6 +165,32 @@ app.post('/draft/:template', async function (req, httpResponse, next) {
     }
 });
 
+app.post('/initialize/:template', async function(req, httpResponse, next) {
+
+    try {
+        // to do - add optional paramJson
+        let sampleText;
+        let dataJson;
+        let samplePath = req.body['samplePath']
+        let paramsPath = req.body['paramsPath']
+        if (samplePath) {
+            sampleText = fs.readFileSync(samplePath, 'utf8');
+        } else {
+            dataJson = JSON.parse(fs.readFileSync(dataPath, 'utf8'));
+        }
+        const engine = new Engine();
+        initTemplateInstance(req).then((clause) => {
+            if (sampleText) {
+                clause.parse(sampleText);
+            } else {
+                clause.setData(dataJson);
+            }
+            httpResponse.send(engine.init(clause))
+        })
+    } catch (err) {
+        return next(err);
+    }
+})
 /**
  * Helper function to initialise the template.
  * @param {req} req The request passed in from endpoint.
