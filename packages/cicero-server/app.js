@@ -21,6 +21,15 @@ const bodyParser = require('body-parser');
 const Template = require('@accordproject/cicero-core').Template;
 const Clause = require('@accordproject/cicero-core').Clause;
 const Engine = require('@accordproject/cicero-engine').Engine;
+const CodeGen = require('@accordproject/cicero-tools').CodeGen;
+const FileWriter = require('@accordproject/concerto-util').FileWriter;
+
+const GoLangVisitor = CodeGen.GoLangVisitor;
+const JavaVisitor = CodeGen.JavaVisitor;
+const CordaVisitor = CodeGen.CordaVisitor;
+const JSONSchemaVisitor = CodeGen.JSONSchemaVisitor;
+const PlantUMLVisitor = CodeGen.PlantUMLVisitor;
+const TypescriptVisitor = CodeGen.TypescriptVisitor;
 
 if(!process.env.CICERO_DIR) {
     throw new Error('You must set the CICERO_DIR environment variable.');
@@ -143,6 +152,7 @@ app.post('/parse/:template', async function (req, httpResponse, next) {
  */
 app.post('/draft/:template', async function (req, httpResponse, next) {
     try {
+        console.log(req.data)
         const clause = await initTemplateInstance(req);
         if(Object.keys(req.body).length === 1 &&
            Object.prototype.hasOwnProperty.call(req.body,'data')) {
@@ -180,13 +190,15 @@ app.post('/compile/:template', async function(req, httpResponse, next) {
     try {
         loadTemplate(req).then((template) => {
             let visitor = null;
-
-            if(Object.keys(req.body).length >= 2 &&
+            console.log("Template loaded.\n")
+            if(Object.keys(req.body).length === 2 &&
             Object.prototype.hasOwnProperty.call(req.body,'target') &&
             Object.prototype.hasOwnProperty.call(req.body,'outputPath')) {
             
                 let target = req.body['target']
                 let outputPath = req.body['outputPath']
+                console.log(target)
+                console.log(outputPath)
 
                 switch(target) {
                     case 'Go':
@@ -199,6 +211,7 @@ app.post('/compile/:template', async function(req, httpResponse, next) {
                         visitor = new TypescriptVisitor();
                         break;
                     case 'Java':
+                        console.log("Java selected\n")
                         visitor = new JavaVisitor();
                         break;
                     case 'Corda':
@@ -210,11 +223,14 @@ app.post('/compile/:template', async function(req, httpResponse, next) {
                     default:
                         throw new Error ('Unrecognized code generator: ' + target);
                 }
-        
+                
                 let parameters = {};
                 parameters.fileWriter = new FileWriter(outputPath);
                 template.getModelManager().accept(visitor, parameters);
-
+                console.log("Completed operations...\n")
+                httpResponse.send("200");
+            } else {
+                throw new Error('Missing target or output path in /compile body');
             }
         })
     } catch (err) {
