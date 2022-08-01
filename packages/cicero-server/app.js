@@ -162,6 +162,68 @@ app.post('/draft/:template', async function (req, httpResponse, next) {
     }
 });
 
+
+app.post('/normalize/:template', async function(req, httpResponse, next) {
+
+
+    try {
+
+    } catch (err) {
+        return next(err);
+    }
+
+})
+
+
+app.post('/compile/:template', async function(req, httpResponse, next) {
+
+    try {
+        loadTemplate(req).then((template) => {
+            let visitor = null;
+
+            if(Object.keys(req.body).length >= 2 &&
+            Object.prototype.hasOwnProperty.call(req.body,'target') &&
+            Object.prototype.hasOwnProperty.call(req.body,'outputPath')) {
+            
+                let target = req.body['target']
+                let outputPath = req.body['outputPath']
+
+                switch(target) {
+                    case 'Go':
+                        visitor = new GoLangVisitor();
+                        break;
+                    case 'PlantUML':
+                        visitor = new PlantUMLVisitor();
+                        break;
+                    case 'Typescript':
+                        visitor = new TypescriptVisitor();
+                        break;
+                    case 'Java':
+                        visitor = new JavaVisitor();
+                        break;
+                    case 'Corda':
+                        visitor = new CordaVisitor();
+                        break;
+                    case 'JSONSchema':
+                        visitor = new JSONSchemaVisitor();
+                        break;
+                    default:
+                        throw new Error ('Unrecognized code generator: ' + target);
+                }
+        
+                let parameters = {};
+                parameters.fileWriter = new FileWriter(outputPath);
+                template.getModelManager().accept(visitor, parameters);
+
+            }
+        })
+    } catch (err) {
+        return next(err);
+    }
+
+})
+
+
 /**
  * Helper function to initialise the template.
  * @param {req} req The request passed in from endpoint.
@@ -171,6 +233,11 @@ async function initTemplateInstance(req) {
     const template = await Template.fromDirectory(`${process.env.CICERO_DIR}/${req.params.template}`);
     return new Clause(template);
 }
+
+async function loadTemplate(req) {
+    const template = await Template.fromDirectory(`${process.env.CICERO_DIR}/${req.params.template}`);
+    return template
+} 
 
 const server = app.listen(app.get('port'), function () {
     console.log('Server listening on port: ', app.get('port'));
