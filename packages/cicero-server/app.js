@@ -16,6 +16,12 @@
 
 'use strict';
 
+const fs = require('fs');
+const path = require('path');
+const mkdirp = require('mkdirp');
+
+const Logger = require('@accordproject/concerto-util').Logger;
+const FileWriter = require('@accordproject/concerto-util').FileWriter;
 const app = require('express')();
 const bodyParser = require('body-parser');
 const Template = require('@accordproject/cicero-core').Template;
@@ -161,6 +167,41 @@ app.post('/draft/:template', async function (req, httpResponse, next) {
         return next(err);
     }
 });
+
+app.post('/normalize/:template', async function(req, httpResponse, next) {
+
+
+    try {
+
+        const clause = await initTemplateInstance(req);
+        
+        let samplePath = req.body['samplePath']
+        let outputPath1 = req.body['outputPath1']
+        let outputPath2 = req.body['outputPath2']
+
+        const sampleText = fs.readFileSync(samplePath, 'utf8');
+
+        clause.parse(sampleText);
+        
+        if (outputPath1) {
+            Logger.info('Creating file: ' + outputPath1);
+            fs.writeFileSync(outputPath1, JSON.stringify(clause.getData(),null,2));
+        }
+
+        const text = clause.draft();
+        if (outputPath2) {
+            Logger.info('Creating file: ' + outputPath2);
+            fs.writeFileSync(outputPath2, text);
+        }
+
+        httpResponse.send(text)
+
+
+    } catch (err) {
+
+        return next(err);
+    }
+})
 
 /**
  * Helper function to initialise the template.
