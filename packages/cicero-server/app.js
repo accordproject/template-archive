@@ -16,6 +16,12 @@
 
 'use strict';
 
+const fs = require('fs');
+const path = require('path');
+const mkdirp = require('mkdirp');
+
+const Logger = require('@accordproject/concerto-util').Logger;
+const FileWriter = require('@accordproject/concerto-util').FileWriter;
 const app = require('express')();
 const bodyParser = require('body-parser');
 const Template = require('@accordproject/cicero-core').Template;
@@ -161,6 +167,58 @@ app.post('/draft/:template', async function (req, httpResponse, next) {
         return next(err);
     }
 });
+
+app.post('/invoke/:template', async function(req, httpResponse, next) {
+
+    try {
+        let samplePath = req.body['samplePath']
+        let dataPath = req.body['dataPath']
+        let paramsPath = req.body['paramsPath']
+        let statePath = req.body['statePath']
+        let clauseName = req.body['clauseName']
+        
+        let currentTime = "2018-01-02T16:34:00Z"
+        
+        let sampleText;
+        let dataJson;
+
+        if (samplePath) {
+            sampleText = fs.readFileSync(samplePath, 'utf8');
+        } else {
+            dataJson = JSON.parse(fs.readFileSync(dataPath, 'utf8'));
+        }
+        const paramsJson = JSON.parse(fs.readFileSync(paramsPath, 'utf8'));
+        console.log(paramsJson)
+        const engine = new Engine();
+        const clause = await initTemplateInstance(req);
+
+        if (sampleText) {
+            clause.parse(sampleText, currentTime);
+        } else {
+            clause.setData(dataJson);
+        }
+
+        let stateJson;
+        if(!fs.existsSync(statePath)) {
+            Logger.warn('A state file was not provided, initializing state. Try the --state flag or create a state.json in the root folder of your template.');
+            const initResult = await engine.init(clause, currentTime);
+            stateJson = initResult.state;
+        } else {
+            stateJson = JSON.parse(fs.readFileSync(statePath, 'utf8'));
+        }
+        //return true;
+        const result = await engine.invoke(clause, clauseName, paramsJson, stateJson, currentTime)
+        console.log(result)
+        return httpResponse.send(result)
+
+    } catch(err) {
+        return next(err)
+    }
+
+
+
+
+})
 
 /**
  * Helper function to initialise the template.
