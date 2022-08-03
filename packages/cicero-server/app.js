@@ -173,18 +173,6 @@ app.post('/draft/:template', async function (req, httpResponse, next) {
 });
 
 
-app.post('/normalize/:template', async function(req, httpResponse, next) {
-
-
-    try {
-
-    } catch (err) {
-        return next(err);
-    }
-
-})
-
-
 app.post('/compile/:template', async function(req, httpResponse, next) {
 
     try {
