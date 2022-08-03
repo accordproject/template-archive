@@ -171,7 +171,6 @@ app.post('/archive/:template', async function(req, httpResponse, next) {
     // to do : options
     // to do : keystore
 
-
     try {
         loadTemplate(req).then(async (template) => {
             let target = req.body['target']
@@ -179,7 +178,7 @@ app.post('/archive/:template', async function(req, httpResponse, next) {
 
             let keystore = null;
 
-            const archive = await template.toArchive(target, {keystore});
+            const archive = await template.toArchive(target);
             let file;
             if (outputPath) {
                 file = outputPath;
