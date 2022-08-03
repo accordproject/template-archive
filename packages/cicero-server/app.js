@@ -176,26 +176,25 @@ app.post('/normalize/:template', async function(req, httpResponse, next) {
         const clause = await initTemplateInstance(req);
         
         let samplePath = req.body['samplePath']
-        let outputPath1 = req.body['outputPath1']
-        let outputPath2 = req.body['outputPath2']
+        let dataOutputPath = req.body['dataOutputPath']
+        let outputPath = req.body['outputPath']
 
         const sampleText = fs.readFileSync(samplePath, 'utf8');
 
         clause.parse(sampleText);
         
-        if (outputPath1) {
-            Logger.info('Creating file: ' + outputPath1);
-            fs.writeFileSync(outputPath1, JSON.stringify(clause.getData(),null,2));
+        if (dataOutputPath) {
+            Logger.info('Creating file: ' + dataOutputPath);
+            fs.writeFileSync(dataOutputPath, JSON.stringify(clause.getData(),null,2));
         }
 
         const text = clause.draft();
-        if (outputPath2) {
-            Logger.info('Creating file: ' + outputPath2);
-            fs.writeFileSync(outputPath2, text);
+        if (outputPath) {
+            Logger.info('Creating file: ' + outputPath);
+            fs.writeFileSync(outputPath, text);
         }
 
         httpResponse.send(text)
-
 
     } catch (err) {
 
