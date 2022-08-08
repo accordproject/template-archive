@@ -168,56 +168,78 @@ app.post('/draft/:template', async function (req, httpResponse, next) {
     }
 });
 
+/**
+ * Handle POST requests to /invoke/:template
+ * The body of the POST should contain the params, data and state.
+ * The clause is created using the template and the data.
+ * The call returns the output of requested clause.
+ * 
+ * Template
+ * ----------
+ * The template parameter is the name of a directory under CICERO_DIR that contains
+ * the template to use.
+ *
+ * Request
+ * ----------
+ * The POST body contains six properties:
+ *  - sample or data
+ *  - parameters
+ *  - clause name
+ *  - state path
+ *  - currentTime
+ *  - utcOffset
+ * 
+ * Response
+ * ----------
+ * Output of the given clause from contract
+ *
+ */
 app.post('/invoke/:template', async function(req, httpResponse, next) {
 
     try {
-        let samplePath = req.body['samplePath']
-        let dataPath = req.body['dataPath']
-        let paramsPath = req.body['paramsPath']
-        let statePath = req.body['statePath']
-        let clauseName = req.body['clauseName']
-        
-        let currentTime = "2018-01-02T16:34:00Z"
-        
-        let sampleText;
-        let dataJson;
-
-        if (samplePath) {
-            sampleText = fs.readFileSync(samplePath, 'utf8');
-        } else {
-            dataJson = JSON.parse(fs.readFileSync(dataPath, 'utf8'));
-        }
-        const paramsJson = JSON.parse(fs.readFileSync(paramsPath, 'utf8'));
-        console.log(paramsJson)
         const engine = new Engine();
         const clause = await initTemplateInstance(req);
 
-        if (sampleText) {
-            clause.parse(sampleText, currentTime);
+        let paramsJson
+        if (req.body['paramsPath']) {
+            paramsJson = JSON.parse(fs.readFileSync(req.body.paramsPath, 'utf8'));
         } else {
-            clause.setData(dataJson);
+            throw new Error('Missing paramsPath in /draft body')
         }
 
-        let stateJson;
-        if(!fs.existsSync(statePath)) {
-            Logger.warn('A state file was not provided, initializing state. Try the --state flag or create a state.json in the root folder of your template.');
-            const initResult = await engine.init(clause, currentTime);
+        let clauseName
+        if (req.body['clauseName']) {
+            clauseName = req.body['clauseName']
+        } else  {
+            throw new Error("Missing clause name in /draft body")
+        }
+
+        let currentTime = req.body['currentTime'] ? req.body['currentTime'] : new Date().toISOString() 
+        let utcOffset = req.body['utcOffset'] ? req.body['utcOffset'] : new Date().getTimezoneOffset()
+
+        if (req.body['samplePath']) {
+            let sampleText = fs.readFileSync(req.body.samplePath, 'utf8');
+            clause.parse(sampleText, currentTime, utcOffset);
+        } else if (req.body['dataPath']) {  
+            let dataJson = JSON.parse(fs.readFileSync(req.body.dataPath, 'utf8'));
+            clause.setData(dataJson);
+        } else {
+            throw new Error("Missing sample or data in /draft body")
+        }
+
+        let stateJson
+        if(!fs.existsSync(req.body['statePath'])) {
+            const initResult = await engine.init(clause, currentTime, utcOffset);
             stateJson = initResult.state;
         } else {
-            stateJson = JSON.parse(fs.readFileSync(statePath, 'utf8'));
+            stateJson = JSON.parse(fs.readFileSync(req.body.statePath, 'utf8'));
         }
-        //return true;
-        const result = await engine.invoke(clause, clauseName, paramsJson, stateJson, currentTime)
-        console.log(result)
+        
+        const result = await engine.invoke(clause, clauseName, paramsJson, stateJson, currentTime, utcOffset)
         return httpResponse.send(result)
-
     } catch(err) {
         return next(err)
     }
-
-
-
-
 })
 
 /**
