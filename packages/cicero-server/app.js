@@ -16,8 +16,6 @@
 
 'use strict';
 
-const fs = require('fs');
-const path = require('path');
 const mkdirp = require('mkdirp');
 
 const app = require('express')();
@@ -166,20 +164,37 @@ app.post('/draft/:template', async function (req, httpResponse, next) {
     }
 });
 
+/**
+ * Handle POST requests to /draft/:template
+ *
+ * Template
+ * ----------
+ *
+ * Request
+ * ----------
+ *
+ * Response
+ * ----------
+ *
+ */
 app.post('/get/:template', async function (req, httpResponse, next) {
     try {
         loadTemplate(req).then((template) => {
             const modelManager = template.getModelManager();
-            let output = req.body['output']
+            let output;
+            if (req.body.output) {
+                output = req.body.output;
+            } else {
+                // TODO: Resolve model path from template path by controlling whether the template archived or not
+            }
             mkdirp.sync(output);
             modelManager.writeModelsToFileSystem(output);
             httpResponse.send(`Loaded external models in '${output}'.`);
-        })
+        });
     } catch (err) {
         return next(err);
     }
-
-})
+});
 
 /**
  * Helper function to initialise the template.
@@ -191,10 +206,15 @@ async function initTemplateInstance(req) {
     return new Clause(template);
 }
 
+/**
+ * Helper function to load a template without initializing clause.
+ * @param {req} req The request passed in from endpoint.
+ * @returns {object} The template instance object.
+ */
 async function loadTemplate(req) {
     const template = await Template.fromDirectory(`${process.env.CICERO_DIR}/${req.params.template}`);
-    return template
-} 
+    return template;
+}
 
 const server = app.listen(app.get('port'), function () {
     console.log('Server listening on port: ', app.get('port'));
