@@ -255,6 +255,17 @@ describe('cicero-server', () => {
             });
     });
 
+    it('/should invoke a clause from contract', async () => {
+        return request.post('/invoke/latedeliveryandpenalty')
+            .send({
+                'samplePath':'./test/data/latedeliveryandpenalty/text/sample.md',
+                'paramsPath':'./test/data/latedeliveryandpenalty/params.json',
+                'statePath' :'./test/data/src/latedeliveryandpenalty/state.json',
+                'clauseName':'latedeliveryandpenalty'
+            })
+            .expect(200);
+    });
+
     after(() => {
         server.close();
     });

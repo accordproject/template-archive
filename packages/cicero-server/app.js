@@ -17,11 +17,7 @@
 'use strict';
 
 const fs = require('fs');
-const path = require('path');
-const mkdirp = require('mkdirp');
 
-const Logger = require('@accordproject/concerto-util').Logger;
-const FileWriter = require('@accordproject/concerto-util').FileWriter;
 const app = require('express')();
 const bodyParser = require('body-parser');
 const Template = require('@accordproject/cicero-core').Template;
@@ -173,7 +169,7 @@ app.post('/draft/:template', async function (req, httpResponse, next) {
  * The body of the POST should contain the params, data and state.
  * The clause is created using the template and the data.
  * The call returns the output of requested clause.
- * 
+ *
  * Template
  * ----------
  * The template parameter is the name of a directory under CICERO_DIR that contains
@@ -188,7 +184,7 @@ app.post('/draft/:template', async function (req, httpResponse, next) {
  *  - state path
  *  - currentTime
  *  - utcOffset
- * 
+ *
  * Response
  * ----------
  * Output of the given clause from contract
@@ -200,47 +196,46 @@ app.post('/invoke/:template', async function(req, httpResponse, next) {
         const engine = new Engine();
         const clause = await initTemplateInstance(req);
 
-        let paramsJson
-        if (req.body['paramsPath']) {
+        let currentTime = req.body.currentTime ? req.body.currentTime : new Date().toISOString();
+        let utcOffset = req.body.utcOffset ? req.body.utcOffset : new Date().getTimezoneOffset();
+
+        let clauseName;
+        if (req.body.clauseName) {
+            clauseName = req.body.clauseName;
+        } else  {
+            throw new Error('Missing clause name in /draft body');
+        }
+
+        let paramsJson;
+        if (req.body.paramsPath) {
             paramsJson = JSON.parse(fs.readFileSync(req.body.paramsPath, 'utf8'));
         } else {
-            throw new Error('Missing paramsPath in /draft body')
+            throw new Error('Missing paramsPath in /draft body');
         }
 
-        let clauseName
-        if (req.body['clauseName']) {
-            clauseName = req.body['clauseName']
-        } else  {
-            throw new Error("Missing clause name in /draft body")
-        }
-
-        let currentTime = req.body['currentTime'] ? req.body['currentTime'] : new Date().toISOString() 
-        let utcOffset = req.body['utcOffset'] ? req.body['utcOffset'] : new Date().getTimezoneOffset()
-
-        if (req.body['samplePath']) {
+        if (req.body.samplePath) {
             let sampleText = fs.readFileSync(req.body.samplePath, 'utf8');
             clause.parse(sampleText, currentTime, utcOffset);
-        } else if (req.body['dataPath']) {  
+        } else if (req.body.dataPath) {
             let dataJson = JSON.parse(fs.readFileSync(req.body.dataPath, 'utf8'));
             clause.setData(dataJson);
         } else {
-            throw new Error("Missing sample or data in /draft body")
+            throw new Error('Missing sample or data in /draft body');
         }
 
-        let stateJson
-        if(!fs.existsSync(req.body['statePath'])) {
+        let stateJson;
+        if(!fs.existsSync(req.body.statePath)) {
             const initResult = await engine.init(clause, currentTime, utcOffset);
             stateJson = initResult.state;
         } else {
             stateJson = JSON.parse(fs.readFileSync(req.body.statePath, 'utf8'));
         }
-        
-        const result = await engine.invoke(clause, clauseName, paramsJson, stateJson, currentTime, utcOffset)
-        return httpResponse.send(result)
+        const result = await engine.invoke(clause, clauseName, paramsJson, stateJson, currentTime, utcOffset);
+        return httpResponse.send(result);
     } catch(err) {
-        return next(err)
+        return next(err);
     }
-})
+});
 
 /**
  * Helper function to initialise the template.
