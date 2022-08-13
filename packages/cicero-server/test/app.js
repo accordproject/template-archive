@@ -255,6 +255,17 @@ describe('cicero-server', () => {
             });
     });
 
+    it('/should normalize given sample and re-draft', async () => {
+        return request.post('/normalize/copyright-license')
+            .send({
+                'samplePath':'./test/data/copyright-license/text/sample.md'
+            })
+            .expect(200)
+            .expect('Content-Type', /text/)
+            .then(response => {response.text.should.equal(draftCopyrightText);
+            });
+    });
+
     after(() => {
         server.close();
     });

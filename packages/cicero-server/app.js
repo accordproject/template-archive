@@ -17,11 +17,7 @@
 'use strict';
 
 const fs = require('fs');
-const path = require('path');
-const mkdirp = require('mkdirp');
 
-const Logger = require('@accordproject/concerto-util').Logger;
-const FileWriter = require('@accordproject/concerto-util').FileWriter;
 const app = require('express')();
 const bodyParser = require('body-parser');
 const Template = require('@accordproject/cicero-core').Template;
@@ -170,37 +166,32 @@ app.post('/draft/:template', async function (req, httpResponse, next) {
 
 app.post('/normalize/:template', async function(req, httpResponse, next) {
 
-
     try {
-
         const clause = await initTemplateInstance(req);
-        
-        let samplePath = req.body['samplePath']
-        let dataOutputPath = req.body['dataOutputPath']
-        let outputPath = req.body['outputPath']
 
-        const sampleText = fs.readFileSync(samplePath, 'utf8');
+        let currentTime = req.body.currentTime ? req.body.currentTime : new Date().toISOString();
+        let utcOffset = req.body.utcOffset ? req.body.utcOffset : new Date().getTimezoneOffset();
 
-        clause.parse(sampleText);
-        
-        if (dataOutputPath) {
-            Logger.info('Creating file: ' + dataOutputPath);
-            fs.writeFileSync(dataOutputPath, JSON.stringify(clause.getData(),null,2));
-        }
+        if (req.body.samplePath) {
+            const sampleText = fs.readFileSync(req.body.samplePath, 'utf8');
+            clause.parse(sampleText, currentTime, utcOffset, req.body.samplePath);
 
-        const text = clause.draft();
-        if (outputPath) {
-            Logger.info('Creating file: ' + outputPath);
+            const text = clause.draft();
+            let outputPath;
+            if (req.body.outputPath) {
+                outputPath = req.body.outputPath;
+            } else {
+                outputPath = req.body.samplePath;
+            }
             fs.writeFileSync(outputPath, text);
+            httpResponse.send(text);
+        } else {
+            throw new Error('Missing sample in /normalize body');
         }
-
-        httpResponse.send(text)
-
     } catch (err) {
-
         return next(err);
     }
-})
+});
 
 /**
  * Helper function to initialise the template.
