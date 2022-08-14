@@ -176,51 +176,42 @@ app.post('/draft/:template', async function (req, httpResponse, next) {
 app.post('/compile/:template', async function(req, httpResponse, next) {
 
     try {
-        loadTemplate(req).then((template) => {
-            let visitor = null;
-            console.log("Template loaded.\n")
-            if(Object.keys(req.body).length === 2 &&
-            Object.prototype.hasOwnProperty.call(req.body,'target') &&
-            Object.prototype.hasOwnProperty.call(req.body,'outputPath')) {
-            
-                let target = req.body['target']
-                let outputPath = req.body['outputPath']
-                console.log(target)
-                console.log(outputPath)
+        const template = await loadTemplate(req);
+        let visitor = null;
 
-                switch(target) {
-                    case 'Go':
-                        visitor = new GoLangVisitor();
-                        break;
-                    case 'PlantUML':
-                        visitor = new PlantUMLVisitor();
-                        break;
-                    case 'Typescript':
-                        visitor = new TypescriptVisitor();
-                        break;
-                    case 'Java':
-                        console.log("Java selected\n")
-                        visitor = new JavaVisitor();
-                        break;
-                    case 'Corda':
-                        visitor = new CordaVisitor();
-                        break;
-                    case 'JSONSchema':
-                        visitor = new JSONSchemaVisitor();
-                        break;
-                    default:
-                        throw new Error ('Unrecognized code generator: ' + target);
-                }
-                
-                let parameters = {};
-                parameters.fileWriter = new FileWriter(outputPath);
-                template.getModelManager().accept(visitor, parameters);
-                console.log("Completed operations...\n")
-                httpResponse.send("200");
-            } else {
-                throw new Error('Missing target or output path in /compile body');
+        if(req.body.target) {
+            switch(req.body.target) {
+                case 'Go':
+                    visitor = new GoLangVisitor();
+                    break;
+                case 'PlantUML':
+                    visitor = new PlantUMLVisitor();
+                    break;
+                case 'Typescript':
+                    visitor = new TypescriptVisitor();
+                    break;
+                case 'Java':
+                    console.log("Java selected\n")
+                    visitor = new JavaVisitor();
+                    break;
+                case 'Corda':
+                    visitor = new CordaVisitor();
+                    break;
+                case 'JSONSchema':
+                    visitor = new JSONSchemaVisitor();
+                    break;
+                default:
+                    throw new Error ('Unrecognized code generator: ' + target);
             }
-        })
+            let outputPath = req.body.outputPath ? req.body.outputPath : './';
+            let parameters = {};
+            parameters.fileWriter = new FileWriter(outputPath);
+            template.getModelManager().accept(visitor, parameters);
+            httpResponse.send("Compiled files at " + outputPath + " for " + req.body.target + ".");
+        } else {
+            throw new Error('Missing target in /compile body');
+        }
+        
     } catch (err) {
         return next(err);
     }
