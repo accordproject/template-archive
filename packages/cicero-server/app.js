@@ -168,32 +168,35 @@ app.post('/draft/:template', async function (req, httpResponse, next) {
 
 app.post('/archive/:template', async function(req, httpResponse, next) {
 
-    // to do : options
-    // to do : keystore
-
     try {
-        loadTemplate(req).then(async (template) => {
-            let target = req.body['target']
-            let outputPath = req.body['outputPath']
-
-            let keystore = null;
-
-            const archive = await template.toArchive(target);
+        const template = await loadTemplate(req);
+        
+        if (req.body.target) {
             let file;
-            if (outputPath) {
-                file = outputPath;
-            }
-            else {
+            if (req.body.outputPath) {
+                file = req.body.outputPath;
+            } else {
                 const templateName = template.getMetadata().getName();
                 const templateVersion = template.getMetadata().getVersion();
                 file = `${templateName}@${templateVersion}.cta`;
             }
-            console.log('Creating archive: ' + file);
+
+            let keystore = null;
+            if (req.body.options.keystore) {
+                const p12File = fs.readFileSync(options.keystore.path, { encoding: 'base64' });
+                const inputKeystore = {
+                    p12File: p12File,
+                    passphrase: options.keystore.passphrase
+                };
+                keystore = inputKeystore;
+            }
+            const archive = await template.toArchive(req.body.target, {keystore}, req.body.options);
+
             fs.writeFileSync(file, archive);
             httpResponse.send(true);    
-        })
-        
-
+        } else {
+            throw new Error("Missing target in /archive body.")
+        }
     } catch (err) {
         return next(err);
     } 
