@@ -16,6 +16,8 @@
 
 'use strict';
 
+const fs = require('fs');
+const path = require('path');
 const mkdirp = require('mkdirp');
 
 const app = require('express')();
@@ -180,12 +182,15 @@ app.post('/draft/:template', async function (req, httpResponse, next) {
 app.post('/get/:template', async function (req, httpResponse, next) {
     try {
         loadTemplate(req).then((template) => {
+            let templatePath = `${process.env.CICERO_DIR}/${req.params.template}`;
             const modelManager = template.getModelManager();
             let output;
             if (req.body.output) {
                 output = req.body.output;
+            } else if (isTemplateArchive(templatePath)){
+                output = './model';
             } else {
-                // TODO: Resolve model path from template path by controlling whether the template archived or not
+                output = path.resolve(templatePath,'model');
             }
             mkdirp.sync(output);
             modelManager.writeModelsToFileSystem(output);
@@ -214,6 +219,15 @@ async function initTemplateInstance(req) {
 async function loadTemplate(req) {
     const template = await Template.fromDirectory(`${process.env.CICERO_DIR}/${req.params.template}`);
     return template;
+}
+
+/**
+ * Helper function to determine whether the given template archived.
+ * @param {string} templatePath the path of the template
+ * @returns {boolean} True if template is archived
+ */
+function isTemplateArchive(templatePath) {
+    return fs.lstatSync(templatePath).isFile();
 }
 
 const server = app.listen(app.get('port'), function () {

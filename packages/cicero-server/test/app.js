@@ -257,7 +257,7 @@ describe('cicero-server', () => {
 
     it('/should get the dependencies of a template', async () => {
         return request.post('/get/copyright-license')
-            .send({output:'./test/data/copyright-license/depends'})
+            .send()
             .expect(200);
     });
 
