@@ -16,8 +16,6 @@
 
 'use strict';
 
-const fs = require('fs');
-
 const app = require('express')();
 const bodyParser = require('body-parser');
 const Template = require('@accordproject/cicero-core').Template;
@@ -181,7 +179,7 @@ app.post('/draft/:template', async function (req, httpResponse, next) {
  *  - sample or data
  *  - parameters
  *  - clause name
- *  - state path
+ *  - state
  *  - currentTime
  *  - utcOffset
  *
@@ -195,45 +193,44 @@ app.post('/invoke/:template', async function(req, httpResponse, next) {
     try {
         const engine = new Engine();
         const clause = await initTemplateInstance(req);
+        let clauseName;
+        let params;
+        let state;
 
         let currentTime = req.body.currentTime ? req.body.currentTime : new Date().toISOString();
         let utcOffset = req.body.utcOffset ? req.body.utcOffset : new Date().getTimezoneOffset();
 
-        let clauseName;
         if (req.body.clauseName) {
-            clauseName = req.body.clauseName;
+            clauseName = req.body.clauseName.toString();
         } else  {
-            throw new Error('Missing clause name in /draft body');
+            throw new Error('Missing clause name in /invoke body');
         }
 
-        let paramsJson;
-        if (req.body.paramsPath) {
-            paramsJson = JSON.parse(fs.readFileSync(req.body.paramsPath, 'utf8'));
+        if (req.body.params) {
+            params = req.body.params;
         } else {
-            throw new Error('Missing paramsPath in /draft body');
+            throw new Error('Missing params in /invoke body');
         }
 
-        if (req.body.samplePath) {
-            let sampleText = fs.readFileSync(req.body.samplePath, 'utf8');
-            clause.parse(sampleText, currentTime, utcOffset);
-        } else if (req.body.dataPath) {
-            let dataJson = JSON.parse(fs.readFileSync(req.body.dataPath, 'utf8'));
-            clause.setData(dataJson);
+        if (req.body.sample) {
+            clause.parse(req.body.sample.toString(), currentTime, utcOffset);
+        } else if (req.body.data) {
+            clause.setData(req.body.data);
         } else {
-            throw new Error('Missing sample or data in /draft body');
+            throw new Error('Missing sample or data in /invoke body');
         }
 
-        let stateJson;
-        if(!fs.existsSync(req.body.statePath)) {
+        if(req.body.state) {
+            state = req.body.state;
+        } else {
             const initResult = await engine.init(clause, currentTime, utcOffset);
-            stateJson = initResult.state;
-        } else {
-            stateJson = JSON.parse(fs.readFileSync(req.body.statePath, 'utf8'));
+            state = initResult.state;
         }
-        const result = await engine.invoke(clause, clauseName, paramsJson, stateJson, currentTime, utcOffset);
-        return httpResponse.send(result);
+
+        const result = await engine.invoke(clause, clauseName, params, state, currentTime, utcOffset);
+        httpResponse.send(result);
     } catch(err) {
-        return next(err);
+        httpResponse.status(400).send({error: err.message});
     }
 });
 
