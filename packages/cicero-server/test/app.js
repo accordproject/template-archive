@@ -23,6 +23,7 @@ let server;
 chai.should();
 
 const body = require('./data/latedeliveryandpenalty/request.json');
+const params = require('./data/latedeliveryandpenalty/params.json');
 const state = require('./data/latedeliveryandpenalty/state.json');
 const triggerData = require('./data/latedeliveryandpenalty/data.json');
 const responseBody = {
@@ -252,6 +253,48 @@ describe('cicero-server', () => {
             .expect('Content-Type',/text/)
             .then(response => {
                 response.text.should.equal(draftCopyrightTextUnquoted);
+            });
+    });
+
+    it('should initialize a clause using a template with sample (copyright-notice)', async () => {
+        return request.post('/initialize/copyright-license')
+            .send({ sample: draftCopyrightText})
+            .expect(200)
+            .expect('Content-Type',/json/)
+            .then(response => {
+                response.body.state.$class.should.equal('org.accordproject.runtime.State');
+            });
+    });
+
+    it('should initialize a clause using a template with sample and params (latedeliveryandpenalty)', async () => {
+        return request.post('/initialize/latedeliveryandpenalty')
+            .send({ sample: draftLateText, params: params})
+            .expect(200)
+            .expect('Content-Type',/json/)
+            .then(response => {
+                response.body.state.$class.should.be.equal('org.accordproject.runtime.State');
+                response.body.params.request.$class.should.be.equal('org.accordproject.latedeliveryandpenalty.LateDeliveryAndPenaltyRequest');
+            });
+    });
+
+    it('should initialize a clause using a template with data (latedeliveryandpenalty)', async () => {
+        return request.post('/initialize/latedeliveryandpenalty')
+            .send({ data: parseBody})
+            .expect(200)
+            .expect('Content-Type',/json/)
+            .then(response => {
+                response.body.state.$class.should.be.equal('org.accordproject.runtime.State');
+            });
+    });
+
+    it('should initialize a clause using a template with data and params (latedeliveryandpenalty)', async () => {
+        return request.post('/initialize/latedeliveryandpenalty')
+            .send({ data: parseBody, params: params})
+            .expect(200)
+            .expect('Content-Type',/json/)
+            .then(response => {
+                response.body.state.$class.should.be.equal('org.accordproject.runtime.State');
+                response.body.params.request.$class.should.be.equal('org.accordproject.latedeliveryandpenalty.LateDeliveryAndPenaltyRequest');
             });
     });
 

@@ -17,7 +17,6 @@
 'use strict';
 
 const fs = require('fs');
-const path = require('path');
 
 const app = require('express')();
 const bodyParser = require('body-parser');
@@ -165,39 +164,83 @@ app.post('/draft/:template', async function (req, httpResponse, next) {
     }
 });
 
+/**
+ * Handle POST requests to /initialize/:template
+ *
+ * Template
+ * ----------
+ * The template parameter is the name of a directory under CICERO_DIR that contains
+ * the template to use.
+ *
+ * Request
+ * ----------
+ * The POST body contains six properties:
+ *  - data or sample
+ *  - params (optional)
+ *  - options (optional)
+ *  - current time (optional)
+ *  - utc offset
+ *
+ * Response
+ * ----------
+ * Initialized information of the template
+ *
+ */
 app.post('/initialize/:template', async function(req, httpResponse, next) {
-
     try {
-        // to do - add optional paramJson
-        let sampleText;
-        let dataJson;
-        let samplePath = req.body['samplePath']
-        let paramsPath = req.body['paramsPath']
-        if (samplePath) {
-            sampleText = fs.readFileSync(samplePath, 'utf8');
-        } else {
-            dataJson = JSON.parse(fs.readFileSync(dataPath, 'utf8'));
-        }
+        const currentTime = req.body.currentTime ? req.body.currentTime : new Date().toISOString();
+        const utcOffset = req.body.utcOffset ? req.body.utcOffset : new Date().getTimezoneOffset();
+        const options = req.body.options ? req.body.options : {};
+        const params = req.body.params ? req.body.params : {};
+
         const engine = new Engine();
-        initTemplateInstance(req).then((clause) => {
-            if (sampleText) {
-                clause.parse(sampleText);
-            } else {
-                clause.setData(dataJson);
-            }
-            httpResponse.send(engine.init(clause))
-        })
+        const clause = await initTemplateInstance(req, options);
+        if (req.body.sample) {
+            clause.parse(req.body.sample.toString(), currentTime, utcOffset);
+        } else if (req.body.data) {
+            clause.setData(req.body.data);
+        } else {
+            throw new Error('Missing sample or data in /initialize body');
+        }
+        const result = await engine.init(clause, currentTime, utcOffset, params);
+        httpResponse.status(200).send(result);
     } catch (err) {
-        return next(err);
+        httpResponse.status(400).send({error: err.message});
     }
-})
+});
+
+/**
+ * Helper function to determine whether the templated archived or not
+ * @param {string} templateName Name of the template directory or archive
+ * @returns {boolean} True or false to indicate whether the template is archived
+ */
+function isTemplateArchive(templateName) {
+    return fs.lstatSync(`${process.env.CICERO_DIR}/${templateName}`).isFile();
+}
+
+/**
+ * Helper function to load a template from disk
+ * @param {string} templateName Name of the template directory or archive
+ * @param {object} options an optional set of options
+ * @returns {object} The template instance object.
+ */
+async function loadTemplate(templateName, options) {
+    if (isTemplateArchive(templateName)) {
+        const buffer = fs.readFileSync(`${process.env.CICERO_DIR}/${templateName}`);
+        return await Template.fromArchive(buffer, options);
+    } else {
+        return await Template.fromDirectory(`${process.env.CICERO_DIR}/${templateName}`, options);
+    }
+}
+
 /**
  * Helper function to initialise the template.
  * @param {req} req The request passed in from endpoint.
- * @returns {object} The template instance object.
+ * @param {object} options an optional set of options
+ * @returns {object} The clause instance object.
  */
-async function initTemplateInstance(req) {
-    const template = await Template.fromDirectory(`${process.env.CICERO_DIR}/${req.params.template}`);
+async function initTemplateInstance(req, options) {
+    const template = await loadTemplate(req.params.template, options);
     return new Clause(template);
 }
 
