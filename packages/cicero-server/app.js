@@ -167,39 +167,56 @@ app.post('/draft/:template', async function (req, httpResponse, next) {
 app.post('/normalize/:template', async function(req, httpResponse, next) {
 
     try {
-        const clause = await initTemplateInstance(req);
+        const options = req.body.options ? req.body.options : {};
+        const clause = await initTemplateInstance(req, options);
 
         let currentTime = req.body.currentTime ? req.body.currentTime : new Date().toISOString();
         let utcOffset = req.body.utcOffset ? req.body.utcOffset : new Date().getTimezoneOffset();
 
-        if (req.body.samplePath) {
-            const sampleText = fs.readFileSync(req.body.samplePath, 'utf8');
-            clause.parse(sampleText, currentTime, utcOffset, req.body.samplePath);
-
+        if (req.body.sample) {
+            clause.parse(req.body.sample, currentTime, utcOffset);
             const text = clause.draft();
-            let outputPath;
-            if (req.body.outputPath) {
-                outputPath = req.body.outputPath;
-            } else {
-                outputPath = req.body.samplePath;
-            }
-            fs.writeFileSync(outputPath, text);
-            httpResponse.send(text);
+            httpResponse.send({result: text});
         } else {
             throw new Error('Missing sample in /normalize body');
         }
     } catch (err) {
-        return next(err);
+        httpResponse.status(400).send({error:err.message});
     }
 });
 
 /**
- * Helper function to initialise the template.
- * @param {req} req The request passed in from endpoint.
+ * Helper function to determine whether the templated archived or not
+ * @param {string} templateName Name of the template directory or archive
+ * @returns {boolean} True or false to indicate whether the template is archived
+ */
+function isTemplateArchive(templateName) {
+    return fs.lstatSync(`${process.env.CICERO_DIR}/${templateName}`).isFile();
+}
+
+/**
+ * Helper function to load a template from disk
+ * @param {string} templateName Name of the template directory or archive
+ * @param {object} options an optional set of options
  * @returns {object} The template instance object.
  */
-async function initTemplateInstance(req) {
-    const template = await Template.fromDirectory(`${process.env.CICERO_DIR}/${req.params.template}`);
+async function loadTemplate(templateName, options) {
+    if (isTemplateArchive(templateName)) {
+        const buffer = fs.readFileSync(`${process.env.CICERO_DIR}/${templateName}`);
+        return await Template.fromArchive(buffer, options);
+    } else {
+        return await Template.fromDirectory(`${process.env.CICERO_DIR}/${templateName}`, options);
+    }
+}
+
+/**
+ * Helper function to initialise the template.
+ * @param {req} req The request passed in from endpoint.
+ * @param {object} options an optional set of options
+ * @returns {object} The clause instance object.
+ */
+async function initTemplateInstance(req, options) {
+    const template = await loadTemplate(req.params.template, options);
     return new Clause(template);
 }
 

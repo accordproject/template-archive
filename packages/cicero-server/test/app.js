@@ -255,14 +255,12 @@ describe('cicero-server', () => {
             });
     });
 
-    it('/should normalize given sample and re-draft', async () => {
+    it('should normalize a clause using a template', async () => {
         return request.post('/normalize/copyright-license')
-            .send({
-                'samplePath':'./test/data/copyright-license/text/sample.md'
-            })
+            .send({sample:draftCopyrightText})
             .expect(200)
-            .expect('Content-Type', /text/)
-            .then(response => {response.text.should.equal(draftCopyrightText);
+            .expect('Content-Type', /json/)
+            .then(response => {response.body.result.should.equal(draftCopyrightText);
             });
     });
 
