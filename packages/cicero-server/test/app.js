@@ -17,6 +17,8 @@
 let request = require('supertest');
 const decache = require('decache');
 const chai = require('chai');
+const tmp = require('tmp-promise');
+const fs = require('fs');
 
 let server;
 
@@ -252,6 +254,36 @@ describe('cicero-server', () => {
             .expect('Content-Type',/text/)
             .then(response => {
                 response.text.should.equal(draftCopyrightTextUnquoted);
+            });
+    });
+
+    it('should create an Ergo archive (copyright-notice)', async () => {
+        const tmpFile = await tmp.file();
+        const tmpArchive = tmpFile.path + '.cta';
+        return request.post('/archive/copyright-license')
+            .send({output:tmpArchive, target:'ergo'})
+            .expect(200)
+            .then(response => {
+                fs.readFileSync(tmpArchive).length.should.be.above(0);
+                tmpFile.cleanup();
+            });
+    });
+
+    it('should create a valid ergo archive with a default name (copyright-notice)', async () => {
+        return request.post('/archive/latedeliveryandpenalty')
+            .send({target:'ergo'})
+            .expect(200);
+    });
+
+    it('should create an Ergo archive (copyright-notice)', async () => {
+        const tmpFile = await tmp.file();
+        const tmpArchive = tmpFile.path + '.cta';
+        return request.post('/archive/copyright-license')
+            .send({output:tmpArchive, target:'ergo'})
+            .expect(200)
+            .then(response => {
+                fs.readFileSync(tmpArchive).length.should.be.above(0);
+                tmpFile.cleanup();
             });
     });
 

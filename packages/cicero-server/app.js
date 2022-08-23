@@ -17,8 +17,6 @@
 'use strict';
 
 const fs = require('fs');
-const path = require('path');
-const mkdirp = require('mkdirp');
 
 const app = require('express')();
 const bodyParser = require('body-parser');
@@ -169,20 +167,19 @@ app.post('/draft/:template', async function (req, httpResponse, next) {
 app.post('/archive/:template', async function(req, httpResponse, next) {
 
     try {
+        const options = req.body.options ? req.body.options : {};
         const template = await loadTemplate(req);
-        
         if (req.body.target) {
             let file;
-            if (req.body.outputPath) {
-                file = req.body.outputPath;
+            if (req.body.output) {
+                file = req.body.output;
             } else {
                 const templateName = template.getMetadata().getName();
                 const templateVersion = template.getMetadata().getVersion();
                 file = `${templateName}@${templateVersion}.cta`;
             }
-
             let keystore = null;
-            if (req.body.options.keystore) {
+            if (options.keystore) {
                 const p12File = fs.readFileSync(options.keystore.path, { encoding: 'base64' });
                 const inputKeystore = {
                     p12File: p12File,
@@ -190,19 +187,17 @@ app.post('/archive/:template', async function(req, httpResponse, next) {
                 };
                 keystore = inputKeystore;
             }
-            const archive = await template.toArchive(req.body.target, {keystore}, req.body.options);
-
+            console.log('jere');
+            const archive = await template.toArchive(req.body.target, {keystore}, options);
             fs.writeFileSync(file, archive);
-            httpResponse.send(true);    
+            httpResponse.send({result:'Archive file has been created at '+ file});
         } else {
-            throw new Error("Missing target in /archive body.")
+            throw new Error('Missing target in /archive body.');
         }
     } catch (err) {
-        return next(err);
-    } 
-
-
-})
+        httpResponse.status(400).send({error: err.message});
+    }
+});
 
 /**
  * Helper function to initialise the template.
@@ -214,10 +209,15 @@ async function initTemplateInstance(req) {
     return new Clause(template);
 }
 
+/**
+ * Helper function to initialise the template.
+ * @param {req} req The request passed in from endpoint.
+ * @returns {object} The template instance object.
+ */
 async function loadTemplate(req) {
     const template = await Template.fromDirectory(`${process.env.CICERO_DIR}/${req.params.template}`);
-    return template
-} 
+    return template;
+}
 
 const server = app.listen(app.get('port'), function () {
     console.log('Server listening on port: ', app.get('port'));
