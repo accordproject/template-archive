@@ -16,6 +16,8 @@
 
 'use strict';
 
+const fs = require('fs');
+
 const app = require('express')();
 const bodyParser = require('body-parser');
 const Template = require('@accordproject/cicero-core').Template;
@@ -152,7 +154,6 @@ app.post('/parse/:template', async function (req, httpResponse, next) {
  */
 app.post('/draft/:template', async function (req, httpResponse, next) {
     try {
-        console.log(req.data)
         const clause = await initTemplateInstance(req);
         if(Object.keys(req.body).length === 1 &&
            Object.prototype.hasOwnProperty.call(req.body,'data')) {
@@ -172,67 +173,83 @@ app.post('/draft/:template', async function (req, httpResponse, next) {
     }
 });
 
-
 app.post('/compile/:template', async function(req, httpResponse, next) {
 
     try {
-        const template = await loadTemplate(req);
-        let visitor = null;
+        const options = req.body.options ? req.body.options : {};
+        const template = await loadTemplate(req.params.template, options);
 
+        let visitor = null;
         if(req.body.target) {
             switch(req.body.target) {
-                case 'Go':
-                    visitor = new GoLangVisitor();
-                    break;
-                case 'PlantUML':
-                    visitor = new PlantUMLVisitor();
-                    break;
-                case 'Typescript':
-                    visitor = new TypescriptVisitor();
-                    break;
-                case 'Java':
-                    console.log("Java selected\n")
-                    visitor = new JavaVisitor();
-                    break;
-                case 'Corda':
-                    visitor = new CordaVisitor();
-                    break;
-                case 'JSONSchema':
-                    visitor = new JSONSchemaVisitor();
-                    break;
-                default:
-                    throw new Error ('Unrecognized code generator: ' + target);
+            case 'Go':
+                visitor = new GoLangVisitor();
+                break;
+            case 'PlantUML':
+                visitor = new PlantUMLVisitor();
+                break;
+            case 'Typescript':
+                visitor = new TypescriptVisitor();
+                break;
+            case 'Java':
+                visitor = new JavaVisitor();
+                break;
+            case 'Corda':
+                visitor = new CordaVisitor();
+                break;
+            case 'JSONSchema':
+                visitor = new JSONSchemaVisitor();
+                break;
+            default:
+                throw new Error ('Unrecognized code generator: ' + req.body.target);
             }
-            let outputPath = req.body.outputPath ? req.body.outputPath : './';
+            let output = req.body.output ? req.body.output : './';
             let parameters = {};
-            parameters.fileWriter = new FileWriter(outputPath);
+            parameters.fileWriter = new FileWriter(output);
             template.getModelManager().accept(visitor, parameters);
-            httpResponse.send("Compiled files at " + outputPath + " for " + req.body.target + ".");
+            httpResponse.send({result: 'Compiled files at ' + output + ' for ' + req.body.target + '.'});
         } else {
             throw new Error('Missing target in /compile body');
         }
-        
     } catch (err) {
-        return next(err);
+        httpResponse.status(400).send({error: err.message});
     }
+});
 
-})
+/**
+ * Helper function to determine whether the templated archived or not
+ * @param {string} templateName Name of the template directory or archive
+ * @returns {boolean} True or false to indicate whether the template is archived
+ */
+function isTemplateArchive(templateName) {
+    return fs.lstatSync(`${process.env.CICERO_DIR}/${templateName}`).isFile();
+}
 
+/**
+ * Helper function to load a template from disk
+ * @param {string} templateName Name of the template directory or archive
+ * @param {object} options an optional set of options
+ * @returns {object} The template instance object.
+ */
+async function loadTemplate(templateName, options) {
+    if (isTemplateArchive(templateName)) {
+        const buffer = fs.readFileSync(`${process.env.CICERO_DIR}/${templateName}`);
+        return await Template.fromArchive(buffer, options);
+    } else {
+        return await Template.fromDirectory(`${process.env.CICERO_DIR}/${templateName}`, options);
+    }
+}
 
 /**
  * Helper function to initialise the template.
  * @param {req} req The request passed in from endpoint.
- * @returns {object} The template instance object.
+ * @param {object} options an optional set of options
+ * @returns {object} The clause instance object.
  */
-async function initTemplateInstance(req) {
-    const template = await Template.fromDirectory(`${process.env.CICERO_DIR}/${req.params.template}`);
+async function initTemplateInstance(req, options) {
+    const template = await loadTemplate(req.params.template, options);
     return new Clause(template);
 }
-
-async function loadTemplate(req) {
-    const template = await Template.fromDirectory(`${process.env.CICERO_DIR}/${req.params.template}`);
-    return template
-} 
 
 const server = app.listen(app.get('port'), function () {
     console.log('Server listening on port: ', app.get('port'));

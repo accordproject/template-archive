@@ -17,6 +17,8 @@
 let request = require('supertest');
 const decache = require('decache');
 const chai = require('chai');
+const tmp = require('tmp-promise');
+const fs = require('fs');
 
 let server;
 
@@ -252,6 +254,84 @@ describe('cicero-server', () => {
             .expect('Content-Type',/text/)
             .then(response => {
                 response.text.should.equal(draftCopyrightTextUnquoted);
+            });
+    });
+
+    it('should compile to a Go model (copyright-notice)', async () => {
+        const dir = await tmp.dir({ unsafeCleanup: true });
+        return request.post('/compile/copyright-license')
+            .send({output:dir.path, target:'Go'})
+            .expect(200)
+            .then(response => {
+                fs.readdirSync(dir.path).length.should.be.above(0);
+                dir.cleanup();
+            });
+    });
+
+    it('should compile to a PlantUML model (copyright-notice)', async () => {
+        const dir = await tmp.dir({ unsafeCleanup: true });
+        return request.post('/compile/copyright-license')
+            .send({output:dir.path, target:'PlantUML'})
+            .expect(200)
+            .then(response => {
+                fs.readdirSync(dir.path).length.should.be.above(0);
+                dir.cleanup();
+            });
+    });
+
+    it('should compile to a Typescript model (copyright-notice)', async () => {
+        const dir = await tmp.dir({ unsafeCleanup: true });
+        return request.post('/compile/copyright-license')
+            .send({output:dir.path, target:'Typescript'})
+            .expect(200)
+            .then(response => {
+                fs.readdirSync(dir.path).length.should.be.above(0);
+                dir.cleanup();
+            });
+    });
+
+    it('should compile to a Corda model (copyright-notice)', async () => {
+        const dir = await tmp.dir({ unsafeCleanup: true });
+        return request.post('/compile/copyright-license')
+            .send({output:dir.path, target:'Corda'})
+            .expect(200)
+            .then(response => {
+                fs.readdirSync(dir.path).length.should.be.above(0);
+                dir.cleanup();
+            });
+    });
+
+    it('should compile to a JSONSchema model (copyright-notice)', async () => {
+        const dir = await tmp.dir({ unsafeCleanup: true });
+        return request.post('/compile/copyright-license')
+            .send({output:dir.path, target:'JSONSchema'})
+            .expect(200)
+            .then(response => {
+                fs.readdirSync(dir.path).length.should.be.above(0);
+                dir.cleanup();
+            });
+    });
+
+    it('should not compile to an unknown model (copyright-notice)', async () => {
+        const dir = await tmp.dir({ unsafeCleanup: true });
+        return request.post('/compile/copyright-license')
+            .send({output:dir.path, target:'BLAH'})
+            .expect(400)
+            .then(response => {
+                fs.readdirSync(dir.path).length.should.be.equal(0);
+                dir.cleanup();
+            });
+    });
+
+    it('should compile to a Go model (copyright-notice)', async () => {
+        const dir = await tmp.dir({ unsafeCleanup: true });
+        console.log(dir.path);
+        return request.post('/compile/copyright-license')
+            .send({output:dir.path, target:'Go'})
+            .expect(200)
+            .then(response => {
+                fs.readdirSync(dir.path).length.should.be.above(0);
+                dir.cleanup();
             });
     });
 
