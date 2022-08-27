@@ -191,14 +191,15 @@ app.post('/draft/:template', async function (req, httpResponse, next) {
 app.post('/invoke/:template', async function(req, httpResponse, next) {
 
     try {
+        const options = req.body.options ? req.body.options : {};
+        const currentTime = req.body.currentTime ? req.body.currentTime : new Date().toISOString();
+        const utcOffset = req.body.utcOffset ? req.body.utcOffset : new Date().getTimezoneOffset();
+
         const engine = new Engine();
-        const clause = await initTemplateInstance(req);
+        const clause = await initTemplateInstance(req, options);
         let clauseName;
         let params;
         let state;
-
-        let currentTime = req.body.currentTime ? req.body.currentTime : new Date().toISOString();
-        let utcOffset = req.body.utcOffset ? req.body.utcOffset : new Date().getTimezoneOffset();
 
         if (req.body.clauseName) {
             clauseName = req.body.clauseName.toString();
@@ -228,20 +229,50 @@ app.post('/invoke/:template', async function(req, httpResponse, next) {
         }
 
         const result = await engine.invoke(clause, clauseName, params, state, currentTime, utcOffset);
-        httpResponse.send(result);
+        httpResponse.status(200).send(result);
     } catch(err) {
         httpResponse.status(400).send({error: err.message});
     }
 });
 
 /**
- * Helper function to initialise the template.
- * @param {req} req The request passed in from endpoint.
+ * Helper function to determine whether the template archived or not
+ * @param {string} templateName Name of the template directory or archive file
+ * @returns {boolean} True if the given template is a cta file
+ */
+ function isTemplateArchive(templateName) {
+    return fs.lstatSync(`${process.env.CICERO_DIR}/${templateName}`).isFile();
+}
+
+/**
+ * Helper function to load a template from disk
+ * @param {string} templateName Name of the template directory or archive file
+ * @param {object} options an optional set of options
  * @returns {object} The template instance object.
  */
-async function initTemplateInstance(req) {
-    const template = await Template.fromDirectory(`${process.env.CICERO_DIR}/${req.params.template}`);
-    return new Clause(template);
+async function loadTemplate(templateName, options) {
+    if (isTemplateArchive(templateName)) {
+        const buffer = fs.readFileSync(`${process.env.CICERO_DIR}/${templateName}`);
+        return await Template.fromArchive(buffer, options);
+    } else {
+        return await Template.fromDirectory(`${process.env.CICERO_DIR}/${templateName}`, options);
+    }
+}
+
+/**
+ * Helper function to initialise the template.
+ * @param {req} req The request passed in from endpoint.
+ * @param {object} options an optional set of options
+ * @returns {object} The clause instance object.
+ */
+async function initTemplateInstance(req, options) {
+    if (process.env.CICERO_URL) {
+        const template = await Template.fromUrl(`${process.env.CICERO_URL}/${req.params.template}.cta`);
+        return new Clause(template);
+    } else {
+        const template = await loadTemplate(req.params.template, options);
+        return new Clause(template);
+    }
 }
 
 const server = app.listen(app.get('port'), function () {
