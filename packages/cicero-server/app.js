@@ -179,11 +179,11 @@ app.post('/draft/:template', async function (req, httpResponse, next) {
  *  - params (optional)
  *  - options (optional)
  *  - current time (optional)
- *  - utc offset
+ *  - utc offset (optional)
  *
  * Response
  * ----------
- * Initialized information of the template
+ * Initialized state information of template
  *
  */
 app.post('/initialize/:template', async function(req, httpResponse, next) {
@@ -210,23 +210,28 @@ app.post('/initialize/:template', async function(req, httpResponse, next) {
 });
 
 /**
- * Helper function to determine whether the templated archived or not
- * @param {string} templateName Name of the template directory or archive
- * @returns {boolean} True or false to indicate whether the template is archived
+ * Helper function to determine whether the template is archived or not
+ * @param {string} templateName Name of the template
+ * @returns {boolean} True if the given template is a .cta file
  */
 function isTemplateArchive(templateName) {
-    return fs.lstatSync(`${process.env.CICERO_DIR}/${templateName}`).isFile();
+    try {
+        fs.lstatSync(`${process.env.CICERO_DIR}/${templateName}.cta`).isFile();
+        return true;
+    } catch(err) {
+        return false;
+    }
 }
 
 /**
  * Helper function to load a template from disk
- * @param {string} templateName Name of the template directory or archive
+ * @param {string} templateName Name of the template
  * @param {object} options an optional set of options
  * @returns {object} The template instance object.
  */
 async function loadTemplate(templateName, options) {
     if (isTemplateArchive(templateName)) {
-        const buffer = fs.readFileSync(`${process.env.CICERO_DIR}/${templateName}`);
+        const buffer = fs.readFileSync(`${process.env.CICERO_DIR}/${templateName}.cta`);
         return await Template.fromArchive(buffer, options);
     } else {
         return await Template.fromDirectory(`${process.env.CICERO_DIR}/${templateName}`, options);
@@ -240,8 +245,13 @@ async function loadTemplate(templateName, options) {
  * @returns {object} The clause instance object.
  */
 async function initTemplateInstance(req, options) {
-    const template = await loadTemplate(req.params.template, options);
-    return new Clause(template);
+    if (process.env.CICERO_URL) {
+        const template = await Template.fromUrl(`${process.env.CICERO_URL}/${req.params.template}.cta`);
+        return new Clause(template);
+    } else {
+        const template = await loadTemplate(req.params.template, options);
+        return new Clause(template);
+    }
 }
 
 const server = app.listen(app.get('port'), function () {
