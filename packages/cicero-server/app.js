@@ -16,6 +16,8 @@
 
 'use strict';
 
+const fs = require('fs');
+
 const app = require('express')();
 const bodyParser = require('body-parser');
 const Template = require('@accordproject/cicero-core').Template;
@@ -236,23 +238,28 @@ app.post('/invoke/:template', async function(req, httpResponse, next) {
 });
 
 /**
- * Helper function to determine whether the template archived or not
- * @param {string} templateName Name of the template directory or archive file
- * @returns {boolean} True if the given template is a cta file
+ * Helper function to determine whether the template is archived or not
+ * @param {string} templateName Name of the template
+ * @returns {boolean} True if the given template is a .cta file
  */
  function isTemplateArchive(templateName) {
-    return fs.lstatSync(`${process.env.CICERO_DIR}/${templateName}`).isFile();
+    try {
+        fs.lstatSync(`${process.env.CICERO_DIR}/${templateName}.cta`).isFile();
+        return true;
+    } catch(err) {
+        return false;
+    }
 }
 
 /**
  * Helper function to load a template from disk
- * @param {string} templateName Name of the template directory or archive file
+ * @param {string} templateName Name of the template
  * @param {object} options an optional set of options
  * @returns {object} The template instance object.
  */
 async function loadTemplate(templateName, options) {
     if (isTemplateArchive(templateName)) {
-        const buffer = fs.readFileSync(`${process.env.CICERO_DIR}/${templateName}`);
+        const buffer = fs.readFileSync(`${process.env.CICERO_DIR}/${templateName}.cta`);
         return await Template.fromArchive(buffer, options);
     } else {
         return await Template.fromDirectory(`${process.env.CICERO_DIR}/${templateName}`, options);
