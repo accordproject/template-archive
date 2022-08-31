@@ -242,7 +242,7 @@ app.post('/invoke/:template', async function(req, httpResponse, next) {
  * @param {string} templateName Name of the template
  * @returns {boolean} True if the given template is a .cta file
  */
- function isTemplateArchive(templateName) {
+function isTemplateArchive(templateName) {
     try {
         fs.lstatSync(`${process.env.CICERO_DIR}/${templateName}.cta`).isFile();
         return true;
