@@ -17,7 +17,7 @@
   },
   "name": "cicero",
   "description": "You must install [Lerna](https://lernajs.io) to build this multi-package repository.",
-  "version": "0.23.0-alpha.1",
+  "version": "0.23.0",
   "private": true,
   "scripts": {
     "coverage": "node ./scripts/coverage.js \"packages/cicero-*\" && nyc report -t coverage --cwd . --report-dir coverage --reporter=lcov && cat ./coverage/lcov.info",
