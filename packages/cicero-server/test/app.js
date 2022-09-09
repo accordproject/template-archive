@@ -24,6 +24,7 @@ chai.should();
 
 const body = require('./data/latedeliveryandpenalty/request.json');
 const params = require('./data/latedeliveryandpenalty/params.json');
+const params_err = require('./data/latedeliveryandpenalty/params_err.json');
 const state = require('./data/latedeliveryandpenalty/state.json');
 const triggerData = require('./data/latedeliveryandpenalty/data.json');
 const responseBody = {
@@ -256,7 +257,7 @@ describe('cicero-server', () => {
             });
     });
 
-    it('/should invoke a clause from contract', async () => {
+    it('/should invoke a clause from contract with data', async () => {
         return request.post('/invoke/latedeliveryandpenalty')
             .send({
                 data: parseBody,
@@ -267,6 +268,28 @@ describe('cicero-server', () => {
             .expect(200);
     });
 
+    it('/should invoke a clause from contract with sample', async () => {
+        return request.post('/invoke/latedeliveryandpenalty')
+            .send({
+                sample: draftLateText,
+                state: state,
+                params: params,
+                clauseName: 'latedeliveryandpenalty'
+            })
+            .expect(200);
+    });
+
+    it('/should fail to invoke a with errornous params', async () => {
+        return request.post('/invoke/latedeliveryandpenalty')
+            .send({
+                sample: draftLateText,
+                state: state,
+                params: params_err,
+                clauseName: 'latedeliveryandpenalty'
+            })
+            .expect(500);
+    });
+
     it('/should fail to invoke without clause name', async () => {
         return request.post('/invoke/latedeliveryandpenalty')
             .send({
@@ -274,10 +297,10 @@ describe('cicero-server', () => {
                 state: state,
                 params: params,
             })
-            .expect(400)
+            .expect(422)
             .expect('Content-Type',/json/)
             .then(response => {
-                response.body.error.should.equal('Missing clause name in /invoke body');
+                response.body.error.should.equal('Missing `clauseName` in /invoke body');
             });
     });
 
@@ -288,10 +311,10 @@ describe('cicero-server', () => {
                 params: params,
                 clauseName: 'latedeliveryandpenalty'
             })
-            .expect(400)
+            .expect(422)
             .expect('Content-Type',/json/)
             .then(response => {
-                response.body.error.should.equal('Missing sample or data in /invoke body');
+                response.body.error.should.equal('Missing `sample` or `data` in /invoke body');
             });
     });
 
@@ -302,10 +325,10 @@ describe('cicero-server', () => {
                 state: state,
                 clauseName: 'latedeliveryandpenalty'
             })
-            .expect(400)
+            .expect(422)
             .expect('Content-Type',/json/)
             .then(response => {
-                response.body.error.should.equal('Missing params in /invoke body');
+                response.body.error.should.equal('Missing `params` in /invoke body');
             });
     });
 
