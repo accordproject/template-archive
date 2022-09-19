@@ -23,6 +23,8 @@ let server;
 chai.should();
 
 const body = require('./data/latedeliveryandpenalty/request.json');
+const params = require('./data/latedeliveryandpenalty/params.json');
+const params_err = require('./data/latedeliveryandpenalty/params_err.json');
 const state = require('./data/latedeliveryandpenalty/state.json');
 const triggerData = require('./data/latedeliveryandpenalty/data.json');
 const responseBody = {
@@ -254,6 +256,82 @@ describe('cicero-server', () => {
                 response.text.should.equal(draftCopyrightTextUnquoted);
             });
     });
+
+    it('/should invoke a clause from contract with data', async () => {
+        return request.post('/invoke/latedeliveryandpenalty')
+            .send({
+                data: parseBody,
+                state: state,
+                params: params,
+                clauseName: 'latedeliveryandpenalty'
+            })
+            .expect(200);
+    });
+
+    it('/should invoke a clause from contract with sample', async () => {
+        return request.post('/invoke/latedeliveryandpenalty')
+            .send({
+                sample: draftLateText,
+                state: state,
+                params: params,
+                clauseName: 'latedeliveryandpenalty'
+            })
+            .expect(200);
+    });
+
+    it('/should fail to invoke a with errornous params', async () => {
+        return request.post('/invoke/latedeliveryandpenalty')
+            .send({
+                sample: draftLateText,
+                state: state,
+                params: params_err,
+                clauseName: 'latedeliveryandpenalty'
+            })
+            .expect(500);
+    });
+
+    it('/should fail to invoke without clause name', async () => {
+        return request.post('/invoke/latedeliveryandpenalty')
+            .send({
+                data: parseBody,
+                state: state,
+                params: params,
+            })
+            .expect(422)
+            .expect('Content-Type',/json/)
+            .then(response => {
+                response.body.error.should.equal('Missing `clauseName` in /invoke body');
+            });
+    });
+
+    it('/should fail to invoke without sample or data', async () => {
+        return request.post('/invoke/latedeliveryandpenalty')
+            .send({
+                state: state,
+                params: params,
+                clauseName: 'latedeliveryandpenalty'
+            })
+            .expect(422)
+            .expect('Content-Type',/json/)
+            .then(response => {
+                response.body.error.should.equal('Missing `sample` or `data` in /invoke body');
+            });
+    });
+
+    it('/should fail to invoke without params', async () => {
+        return request.post('/invoke/latedeliveryandpenalty')
+            .send({
+                data: parseBody,
+                state: state,
+                clauseName: 'latedeliveryandpenalty'
+            })
+            .expect(422)
+            .expect('Content-Type',/json/)
+            .then(response => {
+                response.body.error.should.equal('Missing `params` in /invoke body');
+            });
+    });
+
 
     after(() => {
         server.close();

@@ -46,10 +46,10 @@
     "chai-as-promised": "7.1.1",
     "chai-things": "0.2.0",
     "decache": "4.4.0",
-    "eslint": "8.2.0",
+    "eslint": "^8.23.1",
     "jsdoc": "^3.6.10",
     "license-check": "1.1.5",
-    "mocha": "8.3.2",
+    "mocha": "^8.4.0",
     "mockery": "2.0.0",
     "nyc": "15.1.0",
     "supertest": "3.0.0"
