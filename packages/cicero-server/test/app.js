@@ -17,9 +17,6 @@
 let request = require('supertest');
 const decache = require('decache');
 const chai = require('chai');
-const tmp = require('tmp-promise');
-const fs = require('fs');
-
 let server;
 
 chai.should();
@@ -334,34 +331,48 @@ describe('cicero-server', () => {
             });
     });
 
-
-    it('should create an Ergo archive (copyright-notice)', async () => {
-        const tmpFile = await tmp.file();
-        const tmpArchive = tmpFile.path + '.cta';
+    it('should create a valid ergo archive (copyright-notice)', async () => {
         return request.post('/archive/copyright-license')
-            .send({output:tmpArchive, target:'ergo'})
+            .send({target:'ergo'})
             .expect(200)
             .then(response => {
-                fs.readFileSync(tmpArchive).length.should.be.above(0);
-                tmpFile.cleanup();
+                response.headers['content-type'].should.have.string('application/octet-stream');
+                response.body.length.should.above(250);
             });
     });
 
-    it('should create a valid ergo archive with a default name (copyright-notice)', async () => {
+    it('should create a valid ergo archive (latedeliveryandpenalty)', async () => {
         return request.post('/archive/latedeliveryandpenalty')
             .send({target:'ergo'})
-            .expect(200);
-    });
-
-    it('should create an Ergo archive (copyright-notice)', async () => {
-        const tmpFile = await tmp.file();
-        const tmpArchive = tmpFile.path + '.cta';
-        return request.post('/archive/copyright-license')
-            .send({output:tmpArchive, target:'ergo'})
             .expect(200)
             .then(response => {
-                fs.readFileSync(tmpArchive).length.should.be.above(0);
-                tmpFile.cleanup();
+                response.headers['content-type'].should.have.string('application/octet-stream');
+                response.body.length.should.above(250);
+            });
+    });
+
+    it('should create a JavaScript archive (latedeliveryandpenalty)', async () => {
+        return request.post('/archive/latedeliveryandpenalty')
+            .send({target:'es6'})
+            .expect(200)
+            .then(response => {
+                response.headers['content-type'].should.have.string('application/octet-stream');
+                response.body.length.should.above(250);
+            });
+    });
+
+    it('should not create an unknown archive (latedeliveryandpenalty)', async () => {
+        return request.post('/archive/latedeliveryandpenalty')
+            .send({target:'foo'})
+            .expect(500);
+    });
+
+    it('should fail to archive when target is missing (latedeliveryandpenalty)', async () => {
+        return request.post('/archive/latedeliveryandpenalty')
+            .send()
+            .expect(422)
+            .then(response => {
+                response.body.error.should.equal('Missing `target` in /archive body');
             });
     });
 

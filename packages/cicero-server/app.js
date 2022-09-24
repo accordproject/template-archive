@@ -173,32 +173,6 @@ app.post('/draft/:template', async function (req, httpResponse, next) {
     }
 });
 
-app.get('/archive/:template', async function(req, httpResponse, next) {
-    try {
-        if (req.body.target) {
-            // throw new MissingArgumentError('Missing `target` in /archive body');
-        } else {
-            const options = req.body.options ? req.body.options : {};
-            const template = await loadTemplate(req);
-            const file = `${template.getMetadata().getName()}@${template.getMetadata().getVersion()}.cta`
-            let keystore = null;
-            if (options.keystore) {
-                const p12File = fs.readFileSync(options.keystore.path, { encoding: 'base64' });
-                const inputKeystore = {
-                    p12File: p12File,
-                    passphrase: options.keystore.passphrase
-                };
-                keystore = inputKeystore;
-            }
-            const archive = await template.toArchive(req.body.target, {keystore}, options);
-            httpResponse.contentType('file');
-            httpResponse.set('Content-Disposition', `attachment; filename="${file}"`);
-            httpResponse.status(200).send(Buffer.from(archive, 'utf8'))
-        }
-    } catch (err) {
-        httpResponse.status(400).send({error: err.message});
-    }
-});
 
 /**
  * Handle POST requests to /invoke/:template
@@ -277,6 +251,37 @@ app.post('/invoke/:template', async function(req, httpResponse, next) {
     }
 });
 
+app.post('/archive/:template', async function(req, httpResponse, next) {
+    try {
+        if (req.body.target) {
+            const options = req.body.options ? req.body.options : {};
+            const template = await loadTemplate(req.params.template);
+            const file = `${template.getMetadata().getName()}@${template.getMetadata().getVersion()}.cta`;
+            let keystore = null;
+            if (options.keystore) {
+                const p12File = fs.readFileSync(options.keystore.path, { encoding: 'base64' });
+                const inputKeystore = {
+                    p12File: p12File,
+                    passphrase: options.keystore.passphrase
+                };
+                keystore = inputKeystore;
+            }
+            const archive = await template.toArchive(req.body.target, {keystore}, options);
+            httpResponse.contentType('application/octet-stream');
+            httpResponse.set('Content-Disposition', `attachment; filename="${file}"`);
+            httpResponse.status(200).send(Buffer.from(archive, 'utf8'));
+        } else {
+            throw new MissingArgumentError('Missing `target` in /archive body');
+        }
+    } catch (err) {
+        if (err.name === 'MissingArgumentError') {
+            httpResponse.status(422).send({error: err.message});
+        } else {
+            httpResponse.status(500).send({error: err.message});
+        }
+    }
+});
+
 /**
  * Helper function to determine whether the template is archived or not
  * @param {string} templateName Name of the template
@@ -317,16 +322,6 @@ async function loadTemplate(templateName, options) {
 async function initTemplateInstance(req, options) {
     const template = await loadTemplate(req.params.template, options);
     return new Clause(template);
-}
-
-/**
- * Helper function to initialise the template.
- * @param {req} req The request passed in from endpoint.
- * @returns {object} The template instance object.
- */
-async function loadTemplate(req) {
-    const template = await Template.fromDirectory(`${process.env.CICERO_DIR}/${req.params.template}`);
-    return template;
 }
 
 const server = app.listen(app.get('port'), function () {
