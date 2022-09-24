@@ -354,6 +354,12 @@ describe('cicero-server', () => {
             });
     });
 
+    it('/should fail to get when template is unknown', async () => {
+        return request.post('/get/unknowntemplate')
+            .send()
+            .expect(500);
+    });
+
     after(() => {
         server.close();
     });
