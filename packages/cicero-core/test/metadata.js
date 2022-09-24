@@ -451,7 +451,7 @@ describe('Metadata', () => {
                 accordproject: {template: 'contract',ergo:'0.20.0-alpha.2',cicero:caretRange(ciceroVersion)}
             }, null, {});
             md.ciceroVersion = caretRange(ciceroVersion);
-            md.satisfiesCiceroVersion(`${trimPreRelease(ciceroVersion)}-20190114233635`).should.be.equal(false);
+            md.satisfiesCiceroVersion(`${trimPreRelease(ciceroVersion)}-20190114233635`).should.be.equal(true);
         });
     });
 
