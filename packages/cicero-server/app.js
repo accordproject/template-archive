@@ -251,6 +251,29 @@ app.post('/invoke/:template', async function(req, httpResponse, next) {
     }
 });
 
+/**
+ * Handle POST requests to /archive/:template
+ * The body of the POST should contain the target (es6, ergo)
+ * and optional keystore to sign the file
+ * The template is loaded using the template name
+ * The call returns encoded .cta archive file
+ *
+ * Template
+ * ----------
+ * The template parameter is the name of a directory under CICERO_DIR that contains
+ * the template to use.
+ *
+ * Request
+ * ----------
+ * The POST body contains two properties:
+ *  - target
+ *  - keystore (optional)
+ *
+ * Response
+ * ----------
+ * Output stream of created archive file
+ *
+ */
 app.post('/archive/:template', async function(req, httpResponse, next) {
     try {
         if (req.body.target) {
