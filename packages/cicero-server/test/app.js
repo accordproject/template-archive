@@ -21,11 +21,13 @@ let server;
 
 chai.should();
 
+const Template = require('@accordproject/cicero-core').Template;
 const body = require('./data/latedeliveryandpenalty/request.json');
 const params = require('./data/latedeliveryandpenalty/params.json');
 const params_err = require('./data/latedeliveryandpenalty/params_err.json');
 const state = require('./data/latedeliveryandpenalty/state.json');
 const triggerData = require('./data/latedeliveryandpenalty/data.json');
+const path = require('path');
 const responseBody = {
     '$class': 'org.accordproject.latedeliveryandpenalty.LateDeliveryAndPenaltyResponse',
     penalty: 4,
@@ -358,6 +360,18 @@ describe('cicero-server', () => {
             .then(response => {
                 response.headers['content-type'].should.have.string('application/octet-stream');
                 response.body.length.should.above(250);
+            });
+    });
+
+    it('should create signed archive (latedeliveryandpenalty)', async () => {
+        return request.post('/archive/latedeliveryandpenalty')
+            .send({target:'ergo', options:{keystore:{path:path.resolve(__dirname, 'data/keystore/keystore.p12'), passphrase:'password'}}})
+            .expect(200)
+            .then(async response => {
+                response.headers['content-type'].should.have.string('application/octet-stream');
+                response.body.length.should.above(250);
+                const template = await Template.fromArchive(response.body);
+                template.should.have.own.property('authorSignature');
             });
     });
 
