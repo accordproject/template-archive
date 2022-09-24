@@ -164,20 +164,14 @@ app.post('/draft/:template', async function (req, httpResponse, next) {
     }
 });
 
-app.post('/archive/:template', async function(req, httpResponse, next) {
-
+app.get('/archive/:template', async function(req, httpResponse, next) {
     try {
-        const options = req.body.options ? req.body.options : {};
-        const template = await loadTemplate(req);
         if (req.body.target) {
-            let file;
-            if (req.body.output) {
-                file = req.body.output;
-            } else {
-                const templateName = template.getMetadata().getName();
-                const templateVersion = template.getMetadata().getVersion();
-                file = `${templateName}@${templateVersion}.cta`;
-            }
+            // throw new MissingArgumentError('Missing `target` in /archive body');
+        } else {
+            const options = req.body.options ? req.body.options : {};
+            const template = await loadTemplate(req);
+            const file = `${template.getMetadata().getName()}@${template.getMetadata().getVersion()}.cta`
             let keystore = null;
             if (options.keystore) {
                 const p12File = fs.readFileSync(options.keystore.path, { encoding: 'base64' });
@@ -187,12 +181,10 @@ app.post('/archive/:template', async function(req, httpResponse, next) {
                 };
                 keystore = inputKeystore;
             }
-            console.log('jere');
             const archive = await template.toArchive(req.body.target, {keystore}, options);
-            fs.writeFileSync(file, archive);
-            httpResponse.send({result:'Archive file has been created at '+ file});
-        } else {
-            throw new Error('Missing target in /archive body.');
+            httpResponse.contentType('file');
+            httpResponse.set('Content-Disposition', `attachment; filename="${file}"`);
+            httpResponse.status(200).send(Buffer.from(archive, 'utf8'))
         }
     } catch (err) {
         httpResponse.status(400).send({error: err.message});
