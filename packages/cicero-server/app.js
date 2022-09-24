@@ -36,6 +36,15 @@ app.use(bodyParser.json());
 // set the port for Express
 app.set('port', PORT);
 
+/** @template [T=object] */
+class MissingArgumentError extends Error {
+    /** @param {T} message Error message */
+    constructor(message) {
+        super(message);
+        this.name = 'MissingArgumentError';
+    }
+}
+
 /**
  * Handle POST requests to /trigger/:template
  * The clause is created using the template and the data.
@@ -165,6 +174,83 @@ app.post('/draft/:template', async function (req, httpResponse, next) {
 });
 
 /**
+ * Handle POST requests to /invoke/:template
+ * The body of the POST should contain the params, data and state.
+ * The clause is created using the template and the data.
+ * The call returns the output of requested clause.
+ *
+ * Template
+ * ----------
+ * The template parameter is the name of a directory under CICERO_DIR that contains
+ * the template to use.
+ *
+ * Request
+ * ----------
+ * The POST body contains six properties:
+ *  - sample or data
+ *  - parameters
+ *  - clause name
+ *  - state
+ *  - currentTime
+ *  - utcOffset
+ *
+ * Response
+ * ----------
+ * Output of the given clause from contract
+ *
+ */
+app.post('/invoke/:template', async function(req, httpResponse, next) {
+
+    try {
+        const options = req.body.options ?? {};
+        const currentTime = req.body.currentTime ?? new Date().toISOString();
+        const utcOffset = req.body.utcOffset ?? new Date().getTimezoneOffset();
+
+        const engine = new Engine();
+        const clause = await initTemplateInstance(req, options);
+        let clauseName;
+        let params;
+        let state;
+
+        if (req.body.clauseName) {
+            clauseName = req.body.clauseName.toString();
+        } else  {
+            throw new MissingArgumentError('Missing `clauseName` in /invoke body');
+        }
+
+        if (req.body.params) {
+            params = req.body.params;
+        } else {
+            throw new MissingArgumentError('Missing `params` in /invoke body');
+        }
+
+        if (req.body.sample) {
+            clause.parse(req.body.sample.toString(), currentTime, utcOffset);
+        } else if (req.body.data) {
+            clause.setData(req.body.data);
+        } else {
+            throw new MissingArgumentError('Missing `sample` or `data` in /invoke body');
+        }
+
+        if(req.body.state) {
+            state = req.body.state;
+        } else {
+            const initResult = await engine.init(clause, currentTime, utcOffset);
+            state = initResult.state;
+        }
+
+        const result = await engine.invoke(clause, clauseName, params, state, currentTime, utcOffset);
+        httpResponse.status(200).send(result);
+    } catch(err) {
+        if (err.name === 'MissingArgumentError') {
+            httpResponse.status(422).send({error: err.message});
+        } else {
+            httpResponse.status(500).send({error: err.message});
+        }
+    }
+});
+
+/**
  * Handle POST requests to /initialize/:template
  *
  * Template
@@ -188,24 +274,30 @@ app.post('/draft/:template', async function (req, httpResponse, next) {
  */
 app.post('/initialize/:template', async function(req, httpResponse, next) {
     try {
-        const currentTime = req.body.currentTime ? req.body.currentTime : new Date().toISOString();
-        const utcOffset = req.body.utcOffset ? req.body.utcOffset : new Date().getTimezoneOffset();
-        const options = req.body.options ? req.body.options : {};
-        const params = req.body.params ? req.body.params : {};
+        const options = req.body.options ?? {};
+        const currentTime = req.body.currentTime ?? new Date().toISOString();
+        const utcOffset = req.body.utcOffset ?? new Date().getTimezoneOffset();
+        const params = req.body.params ?? {};
 
         const engine = new Engine();
         const clause = await initTemplateInstance(req, options);
+
         if (req.body.sample) {
             clause.parse(req.body.sample.toString(), currentTime, utcOffset);
         } else if (req.body.data) {
             clause.setData(req.body.data);
         } else {
-            throw new Error('Missing sample or data in /initialize body');
+            throw new MissingArgumentError('Missing `sample` or `data` in /invoke body');
         }
+
         const result = await engine.init(clause, currentTime, utcOffset, params);
         httpResponse.status(200).send(result);
-    } catch (err) {
-        httpResponse.status(400).send({error: err.message});
+    } catch(err) {
+        if (err.name === 'MissingArgumentError') {
+            httpResponse.status(422).send({error: err.message});
+        } else {
+            httpResponse.status(500).send({error: err.message});
+        }
     }
 });
 
@@ -230,7 +322,9 @@ function isTemplateArchive(templateName) {
  * @returns {object} The template instance object.
  */
 async function loadTemplate(templateName, options) {
-    if (isTemplateArchive(templateName)) {
+    if (process.env.CICERO_URL) {
+        return await Template.fromUrl(`${process.env.CICERO_URL}/${templateName}.cta`, options);
+    } else if (isTemplateArchive(templateName)) {
         const buffer = fs.readFileSync(`${process.env.CICERO_DIR}/${templateName}.cta`);
         return await Template.fromArchive(buffer, options);
     } else {
@@ -245,13 +339,8 @@ async function loadTemplate(templateName, options) {
  * @returns {object} The clause instance object.
  */
 async function initTemplateInstance(req, options) {
-    if (process.env.CICERO_URL) {
-        const template = await Template.fromUrl(`${process.env.CICERO_URL}/${req.params.template}.cta`);
-        return new Clause(template);
-    } else {
-        const template = await loadTemplate(req.params.template, options);
-        return new Clause(template);
-    }
+    const template = await loadTemplate(req.params.template, options);
+    return new Clause(template);
 }
 
 const server = app.listen(app.get('port'), function () {
