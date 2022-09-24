@@ -17,8 +17,6 @@
 let request = require('supertest');
 const decache = require('decache');
 const chai = require('chai');
-const tmp = require('tmp-promise');
-const fs = require('fs');
 
 let server;
 
@@ -258,81 +256,63 @@ describe('cicero-server', () => {
     });
 
     it('should compile to a Go model (copyright-notice)', async () => {
-        const dir = await tmp.dir({ unsafeCleanup: true });
         return request.post('/compile/copyright-license')
-            .send({output:dir.path, target:'Go'})
+            .send({target:'Go'})
             .expect(200)
             .then(response => {
-                fs.readdirSync(dir.path).length.should.be.above(0);
-                dir.cleanup();
+                response.body.result.should.have.property('main.go');
             });
     });
 
     it('should compile to a PlantUML model (copyright-notice)', async () => {
-        const dir = await tmp.dir({ unsafeCleanup: true });
         return request.post('/compile/copyright-license')
-            .send({output:dir.path, target:'PlantUML'})
+            .send({target:'PlantUML'})
             .expect(200)
             .then(response => {
-                fs.readdirSync(dir.path).length.should.be.above(0);
-                dir.cleanup();
+                response.body.result.should.have.property('model.puml');
             });
     });
 
     it('should compile to a Typescript model (copyright-notice)', async () => {
-        const dir = await tmp.dir({ unsafeCleanup: true });
         return request.post('/compile/copyright-license')
-            .send({output:dir.path, target:'Typescript'})
+            .send({target:'Typescript'})
             .expect(200)
             .then(response => {
-                fs.readdirSync(dir.path).length.should.be.above(0);
-                dir.cleanup();
+                response.body.result.should.have.property('concerto.ts');
             });
     });
 
     it('should compile to a Corda model (copyright-notice)', async () => {
-        const dir = await tmp.dir({ unsafeCleanup: true });
         return request.post('/compile/copyright-license')
-            .send({output:dir.path, target:'Corda'})
+            .send({target:'Corda'})
             .expect(200)
             .then(response => {
-                fs.readdirSync(dir.path).length.should.be.above(0);
-                dir.cleanup();
+                response.body.result.should.have.property('org');
             });
     });
 
     it('should compile to a JSONSchema model (copyright-notice)', async () => {
-        const dir = await tmp.dir({ unsafeCleanup: true });
         return request.post('/compile/copyright-license')
-            .send({output:dir.path, target:'JSONSchema'})
+            .send({target:'JSONSchema'})
             .expect(200)
             .then(response => {
-                fs.readdirSync(dir.path).length.should.be.above(0);
-                dir.cleanup();
+                response.body.result.should.have.property('schema.json');
+            });
+    });
+
+    it('should compile to a Java model (copyright-notice)', async () => {
+        return request.post('/compile/copyright-license')
+            .send({target:'Java'})
+            .expect(200)
+            .then(response => {
+                response.body.result.should.have.property('org');
             });
     });
 
     it('should not compile to an unknown model (copyright-notice)', async () => {
-        const dir = await tmp.dir({ unsafeCleanup: true });
         return request.post('/compile/copyright-license')
-            .send({output:dir.path, target:'BLAH'})
-            .expect(400)
-            .then(response => {
-                fs.readdirSync(dir.path).length.should.be.equal(0);
-                dir.cleanup();
-            });
-    });
-
-    it('should compile to a Go model (copyright-notice)', async () => {
-        const dir = await tmp.dir({ unsafeCleanup: true });
-        console.log(dir.path);
-        return request.post('/compile/copyright-license')
-            .send({output:dir.path, target:'Go'})
-            .expect(200)
-            .then(response => {
-                fs.readdirSync(dir.path).length.should.be.above(0);
-                dir.cleanup();
-            });
+            .send({target:'BLAH'})
+            .expect(400);
     });
 
     after(() => {

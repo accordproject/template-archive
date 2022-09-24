@@ -20,6 +20,7 @@ const fs = require('fs');
 
 const app = require('express')();
 const bodyParser = require('body-parser');
+const tmp = require('tmp-promise');
 const Template = require('@accordproject/cicero-core').Template;
 const Clause = require('@accordproject/cicero-core').Clause;
 const Engine = require('@accordproject/cicero-engine').Engine;
@@ -173,6 +174,26 @@ app.post('/draft/:template', async function (req, httpResponse, next) {
     }
 });
 
+/**
+ * Handle POST requests to /compile/:template
+ * The body of the POST does not contain any argument
+ * The template is loaded using the template name
+ * The call returns the dict of compiled files in target language
+ *
+ * Template
+ * ----------
+ * The template parameter is the name of a directory under CICERO_DIR that contains
+ * the template to use.
+ *
+ * Request
+ * ----------
+ * The POST body does not contain any property.
+ *
+ * Response
+ * ----------
+ * A dictionary of compiled files in targeted language
+ *
+ */
 app.post('/compile/:template', async function(req, httpResponse, next) {
 
     try {
@@ -203,11 +224,14 @@ app.post('/compile/:template', async function(req, httpResponse, next) {
             default:
                 throw new Error ('Unrecognized code generator: ' + req.body.target);
             }
-            let output = req.body.output ? req.body.output : './';
+            const dir = await tmp.dir({ unsafeCleanup: true });
+            const output = dir.path;
             let parameters = {};
             parameters.fileWriter = new FileWriter(output);
             template.getModelManager().accept(visitor, parameters);
-            httpResponse.send({result: 'Compiled files at ' + output + ' for ' + req.body.target + '.'});
+            const result = parseDirectory(output, req.body.target);
+            dir.cleanup();
+            httpResponse.send({result: result});
         } else {
             throw new Error('Missing target in /compile body');
         }
@@ -215,6 +239,32 @@ app.post('/compile/:template', async function(req, httpResponse, next) {
         httpResponse.status(400).send({error: err.message});
     }
 });
+
+/**
+ * Helper function to reading the content of a directory recursively
+ * @param {string} directory Absolute path to directory
+ * @param {string} visitor Type of visitor for compile method
+ * @returns {dictionary} Nested key value pairs for files in path
+ */
+function parseDirectory(directory, visitor) {
+    return fs.readdirSync(directory).reduce((out, item) => {
+        let itemPath = `${directory}/${item}`;
+
+        if (fs.statSync(itemPath).isDirectory()) {
+            out[item] = parseDirectory(itemPath, visitor);
+        } else {
+            const data = fs.readFileSync(itemPath, 'utf8');
+            if (visitor === 'Java' || visitor === 'Corda') {
+                const relPath =  itemPath.indexOf('org');
+                itemPath = itemPath.slice(relPath);
+            } else {
+                itemPath = item;
+            }
+            out[item] = {'path' : itemPath, 'content' : data};
+        }
+        return out;
+    }, {});
+}
 
 /**
  * Helper function to determine whether the templated archived or not
