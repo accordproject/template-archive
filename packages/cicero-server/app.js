@@ -46,6 +46,15 @@ app.use(bodyParser.json());
 // set the port for Express
 app.set('port', PORT);
 
+/** @template [T=object] */
+class MissingArgumentError extends Error {
+    /** @param {T} message Error message */
+    constructor(message) {
+        super(message);
+        this.name = 'MissingArgumentError';
+    }
+}
+
 /**
  * Handle POST requests to /trigger/:template
  * The clause is created using the template and the data.
@@ -175,6 +184,83 @@ app.post('/draft/:template', async function (req, httpResponse, next) {
 });
 
 /**
+ * Handle POST requests to /invoke/:template
+ * The body of the POST should contain the params, data and state.
+ * The clause is created using the template and the data.
+ * The call returns the output of requested clause.
+ *
+ * Template
+ * ----------
+ * The template parameter is the name of a directory under CICERO_DIR that contains
+ * the template to use.
+ *
+ * Request
+ * ----------
+ * The POST body contains six properties:
+ *  - sample or data
+ *  - parameters
+ *  - clause name
+ *  - state
+ *  - currentTime
+ *  - utcOffset
+ *
+ * Response
+ * ----------
+ * Output of the given clause from contract
+ *
+ */
+app.post('/invoke/:template', async function(req, httpResponse, next) {
+
+    try {
+        const options = req.body.options ?? {};
+        const currentTime = req.body.currentTime ?? new Date().toISOString();
+        const utcOffset = req.body.utcOffset ?? new Date().getTimezoneOffset();
+
+        const engine = new Engine();
+        const clause = await initTemplateInstance(req, options);
+        let clauseName;
+        let params;
+        let state;
+
+        if (req.body.clauseName) {
+            clauseName = req.body.clauseName.toString();
+        } else  {
+            throw new MissingArgumentError('Missing `clauseName` in /invoke body');
+        }
+
+        if (req.body.params) {
+            params = req.body.params;
+        } else {
+            throw new MissingArgumentError('Missing `params` in /invoke body');
+        }
+
+        if (req.body.sample) {
+            clause.parse(req.body.sample.toString(), currentTime, utcOffset);
+        } else if (req.body.data) {
+            clause.setData(req.body.data);
+        } else {
+            throw new MissingArgumentError('Missing `sample` or `data` in /invoke body');
+        }
+
+        if(req.body.state) {
+            state = req.body.state;
+        } else {
+            const initResult = await engine.init(clause, currentTime, utcOffset);
+            state = initResult.state;
+        }
+
+        const result = await engine.invoke(clause, clauseName, params, state, currentTime, utcOffset);
+        httpResponse.status(200).send(result);
+    } catch(err) {
+        if (err.name === 'MissingArgumentError') {
+            httpResponse.status(422).send({error: err.message});
+        } else {
+            httpResponse.status(500).send({error: err.message});
+        }
+    }
+});
+
+/**
  * Handle POST requests to /compile/:template
  * The body of the POST does not contain any argument
  * The template is loaded using the template name
@@ -203,26 +289,26 @@ app.post('/compile/:template', async function(req, httpResponse, next) {
         let visitor = null;
         if(req.body.target) {
             switch(req.body.target) {
-            case 'Go':
-                visitor = new GoLangVisitor();
-                break;
-            case 'PlantUML':
-                visitor = new PlantUMLVisitor();
-                break;
-            case 'Typescript':
-                visitor = new TypescriptVisitor();
-                break;
-            case 'Java':
-                visitor = new JavaVisitor();
-                break;
-            case 'Corda':
-                visitor = new CordaVisitor();
-                break;
-            case 'JSONSchema':
-                visitor = new JSONSchemaVisitor();
-                break;
-            default:
-                throw new Error ('Unrecognized code generator: ' + req.body.target);
+                case 'Go':
+                    visitor = new GoLangVisitor();
+                    break;
+                case 'PlantUML':
+                    visitor = new PlantUMLVisitor();
+                    break;
+                case 'Typescript':
+                    visitor = new TypescriptVisitor();
+                    break;
+                case 'Java':
+                    visitor = new JavaVisitor();
+                    break;
+                case 'Corda':
+                    visitor = new CordaVisitor();
+                    break;
+                case 'JSONSchema':
+                    visitor = new JSONSchemaVisitor();
+                    break;
+                default:
+                    throw new Error ('Unrecognized code generator: ' + req.body.target);
             }
             const dir = await tmp.dir({ unsafeCleanup: true });
             const output = dir.path;
@@ -267,23 +353,30 @@ function parseDirectory(directory, visitor) {
 }
 
 /**
- * Helper function to determine whether the templated archived or not
- * @param {string} templateName Name of the template directory or archive
- * @returns {boolean} True or false to indicate whether the template is archived
+ * Helper function to determine whether the template is archived or not
+ * @param {string} templateName Name of the template
+ * @returns {boolean} True if the given template is a .cta file
  */
 function isTemplateArchive(templateName) {
-    return fs.lstatSync(`${process.env.CICERO_DIR}/${templateName}`).isFile();
+    try {
+        fs.lstatSync(`${process.env.CICERO_DIR}/${templateName}.cta`).isFile();
+        return true;
+    } catch(err) {
+        return false;
+    }
 }
 
 /**
  * Helper function to load a template from disk
- * @param {string} templateName Name of the template directory or archive
+ * @param {string} templateName Name of the template
  * @param {object} options an optional set of options
  * @returns {object} The template instance object.
  */
 async function loadTemplate(templateName, options) {
-    if (isTemplateArchive(templateName)) {
-        const buffer = fs.readFileSync(`${process.env.CICERO_DIR}/${templateName}`);
+    if (process.env.CICERO_URL) {
+        return await Template.fromUrl(`${process.env.CICERO_URL}/${templateName}.cta`, options);
+    } else if (isTemplateArchive(templateName)) {
+        const buffer = fs.readFileSync(`${process.env.CICERO_DIR}/${templateName}.cta`);
         return await Template.fromArchive(buffer, options);
     } else {
         return await Template.fromDirectory(`${process.env.CICERO_DIR}/${templateName}`, options);
