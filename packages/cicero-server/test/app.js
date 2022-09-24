@@ -380,7 +380,7 @@ describe('cicero-server', () => {
             });
     });
 
-    it('should normalize a edited markdown text', async () => {
+    it('should normalize a edited sample text', async () => {
         return request.post('/normalize/copyright-license')
             .send({sample:editedDraftCopyrightText})
             .expect(200)

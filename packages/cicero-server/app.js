@@ -252,9 +252,9 @@ app.post('/invoke/:template', async function(req, httpResponse, next) {
 
 /**
  * Handle POST requests to /normalize/:template
- * The body of the POST should contain the sample.
+ * The body of the POST should contain the sample text.
  * The clause is created using the template and the sample.
- * The call returns the text of normalized template
+ * The call returns the re-drafted text of template
  *
  * Template
  * ----------
@@ -263,7 +263,7 @@ app.post('/invoke/:template', async function(req, httpResponse, next) {
  *
  * Request
  * ----------
- * The POST body contains six properties:
+ * The POST body contains four properties:
  *  - sample
  *  - clause name
  *  - currentTime (optional)
