@@ -332,11 +332,28 @@ describe('cicero-server', () => {
             });
     });
 
-    it('/should get the dependencies of a template', async () => {
+    it('/should get the dependencies of a template (copyright-license)', async () => {
         return request.post('/get/copyright-license')
             .send()
-            .expect(200);
+            .expect(200)
+            .expect('Content-Type',/json/)
+            .then(response => {
+                response.body.result.should.be.an('array');
+                response.body.result.should.lengthOf(11);
+            });
     });
+
+    it('/should get the dependencies of a template (latedeliveryandpenalty)', async () => {
+        return request.post('/get/latedeliveryandpenalty')
+            .send()
+            .expect(200)
+            .expect('Content-Type',/json/)
+            .then(response => {
+                response.body.result.should.be.an('array');
+                response.body.result.should.lengthOf(7);
+            });
+    });
+
     after(() => {
         server.close();
     });

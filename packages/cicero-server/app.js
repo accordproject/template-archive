@@ -173,40 +173,6 @@ app.post('/draft/:template', async function (req, httpResponse, next) {
     }
 });
 
-/**
- * Handle POST requests to /draft/:template
- *
- * Template
- * ----------
- *
- * Request
- * ----------
- *
- * Response
- * ----------
- *
- */
-app.post('/get/:template', async function (req, httpResponse, next) {
-    try {
-        loadTemplate(req).then((template) => {
-            let templatePath = `${process.env.CICERO_DIR}/${req.params.template}`;
-            const modelManager = template.getModelManager();
-            let output;
-            if (req.body.output) {
-                output = req.body.output;
-            } else if (isTemplateArchive(templatePath)){
-                output = './model';
-            } else {
-                output = path.resolve(templatePath,'model');
-            }
-            mkdirp.sync(output);
-            modelManager.writeModelsToFileSystem(output);
-            httpResponse.send(`Loaded external models in '${output}'.`);
-        });
-    } catch (err) {
-        return next(err);
-    }
-});
 
 /**
  * Handle POST requests to /invoke/:template
@@ -282,6 +248,37 @@ app.post('/invoke/:template', async function(req, httpResponse, next) {
         } else {
             httpResponse.status(500).send({error: err.message});
         }
+    }
+});
+
+/**
+ * Handle POST requests to /get/:template
+ * The body of the POST does not contain any argument
+ * The template is loaded using the template name
+ * The call returns the list of model files with their name and content
+ *
+ * Template
+ * ----------
+ * The template parameter is the name of a directory under CICERO_DIR that contains
+ * the template to use.
+ *
+ * Request
+ * ----------
+ * The POST body does not contain any property.
+ *
+ * Response
+ * ----------
+ * The list of models containing the names and content of .cto model file.
+ *
+ */
+app.post('/get/:template', async function (req, httpResponse, next) {
+    try {
+        const options = req.body.options ?? {};
+        let template = await loadTemplate(req.params.template, options);
+        const modelManager = template.getModelManager();
+        httpResponse.send({result: modelManager.getModels({})});
+    } catch (err) {
+        httpResponse.status(500).send({error:err.message});
     }
 });
 
