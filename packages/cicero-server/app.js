@@ -289,26 +289,26 @@ app.post('/compile/:template', async function(req, httpResponse, next) {
         let visitor = null;
         if(req.body.target) {
             switch(req.body.target) {
-                case 'Go':
-                    visitor = new GoLangVisitor();
-                    break;
-                case 'PlantUML':
-                    visitor = new PlantUMLVisitor();
-                    break;
-                case 'Typescript':
-                    visitor = new TypescriptVisitor();
-                    break;
-                case 'Java':
-                    visitor = new JavaVisitor();
-                    break;
-                case 'Corda':
-                    visitor = new CordaVisitor();
-                    break;
-                case 'JSONSchema':
-                    visitor = new JSONSchemaVisitor();
-                    break;
-                default:
-                    throw new Error ('Unrecognized code generator: ' + req.body.target);
+            case 'Go':
+                visitor = new GoLangVisitor();
+                break;
+            case 'PlantUML':
+                visitor = new PlantUMLVisitor();
+                break;
+            case 'Typescript':
+                visitor = new TypescriptVisitor();
+                break;
+            case 'Java':
+                visitor = new JavaVisitor();
+                break;
+            case 'Corda':
+                visitor = new CordaVisitor();
+                break;
+            case 'JSONSchema':
+                visitor = new JSONSchemaVisitor();
+                break;
+            default:
+                throw new Error('Unrecognized code generator: ' + req.body.target);
             }
             const dir = await tmp.dir({ unsafeCleanup: true });
             const output = dir.path;
@@ -319,10 +319,14 @@ app.post('/compile/:template', async function(req, httpResponse, next) {
             dir.cleanup();
             httpResponse.send({result: result});
         } else {
-            throw new Error('Missing target in /compile body');
+            throw new MissingArgumentError('Missing `target` in /invoke body');
         }
     } catch (err) {
-        httpResponse.status(400).send({error: err.message});
+        if (err.name === 'MissingArgumentError') {
+            httpResponse.status(422).send({error: err.message});
+        } else {
+            httpResponse.status(500).send({error: err.message});
+        }
     }
 });
 

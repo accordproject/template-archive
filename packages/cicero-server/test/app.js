@@ -389,7 +389,16 @@ describe('cicero-server', () => {
     it('should not compile to an unknown model (copyright-notice)', async () => {
         return request.post('/compile/copyright-license')
             .send({target:'BLAH'})
-            .expect(400);
+            .expect(500);
+    });
+
+    it('should not compile when target is missing (copyright-notice)', async () => {
+        return request.post('/compile/copyright-license')
+            .send()
+            .expect(422)
+            .then(response => {
+                response.body.error.should.equal('Missing `target` in /invoke body');
+            });
     });
 
     after(() => {
