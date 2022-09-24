@@ -375,6 +375,26 @@ describe('cicero-server', () => {
             });
     });
 
+    it('should fail to initialize a clause without data (latedeliveryandpenalty)', async () => {
+        return request.post('/initialize/latedeliveryandpenalty')
+            .send({ params: params})
+            .expect(422)
+            .expect('Content-Type',/json/)
+            .then(response => {
+                response.body.error.should.equal('Missing `sample` or `data` in /invoke body');
+            });
+    });
+
+    it('should fail to initialize when there is no argument (latedeliveryandpenalty)', async () => {
+        return request.post('/initialize/latedeliveryandpenalty')
+            .send({})
+            .expect(422)
+            .expect('Content-Type',/json/)
+            .then(response => {
+                response.body.error.should.equal('Missing `sample` or `data` in /invoke body');
+            });
+    });
+
     after(() => {
         server.close();
     });
