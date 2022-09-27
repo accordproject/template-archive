@@ -28,7 +28,7 @@ if(!process.env.CICERO_DIR) {
     throw new Error('You must set the CICERO_DIR environment variable.');
 }
 
-const PORT = process.env.CICERO_PORT | 6001;
+const PORT = process.env.CICERO_PORT || 6001;
 
 // to automatically decode JSON POST
 app.use(bodyParser.json());
@@ -290,6 +290,57 @@ app.post('/normalize/:template', async function(req, httpResponse, next) {
             throw new MissingArgumentError('Missing `sample` in /normalize body');
         }
     } catch (err) {
+        if (err.name === 'MissingArgumentError') {
+            httpResponse.status(422).send({error: err.message});
+        } else {
+            httpResponse.status(500).send({error: err.message});
+        }
+    }
+});
+
+/**
+ * Handle POST requests to /initialize/:template
+ *
+ * Template
+ * ----------
+ * The template parameter is the name of a directory under CICERO_DIR that contains
+ * the template to use.
+ *
+ * Request
+ * ----------
+ * The POST body contains six properties:
+ *  - data or sample
+ *  - params (optional)
+ *  - options (optional)
+ *  - current time (optional)
+ *  - utc offset (optional)
+ *
+ * Response
+ * ----------
+ * Initialized state information of template
+ *
+ */
+app.post('/initialize/:template', async function(req, httpResponse, next) {
+    try {
+        const options = req.body.options ?? {};
+        const currentTime = req.body.currentTime ?? new Date().toISOString();
+        const utcOffset = req.body.utcOffset ?? new Date().getTimezoneOffset();
+        const params = req.body.params ?? {};
+
+        const engine = new Engine();
+        const clause = await initTemplateInstance(req, options);
+
+        if (req.body.sample) {
+            clause.parse(req.body.sample.toString(), currentTime, utcOffset);
+        } else if (req.body.data) {
+            clause.setData(req.body.data);
+        } else {
+            throw new MissingArgumentError('Missing `sample` or `data` in /invoke body');
+        }
+
+        const result = await engine.init(clause, currentTime, utcOffset, params);
+        httpResponse.status(200).send(result);
+    } catch(err) {
         if (err.name === 'MissingArgumentError') {
             httpResponse.status(422).send({error: err.message});
         } else {
