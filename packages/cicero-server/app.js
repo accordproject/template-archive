@@ -251,6 +251,54 @@ app.post('/invoke/:template', async function(req, httpResponse, next) {
 });
 
 /**
+ * Handle POST requests to /normalize/:template
+ * The body of the POST should contain the sample text.
+ * The clause is created using the template and the sample.
+ * The call returns the re-drafted text of template
+ *
+ * Template
+ * ----------
+ * The template parameter is the name of a directory under CICERO_DIR that contains
+ * the template to use.
+ *
+ * Request
+ * ----------
+ * The POST body contains four properties:
+ *  - sample
+ *  - clause name
+ *  - currentTime (optional)
+ *  - utcOffset (optional)
+ *
+ * Response
+ * ----------
+ * Re-drafted text of the template
+ *
+ */
+app.post('/normalize/:template', async function(req, httpResponse, next) {
+
+    try {
+        const options = req.body.options ?? {};
+        const currentTime = req.body.currentTime ?? new Date().toISOString();
+        const utcOffset = req.body.utcOffset ?? new Date().getTimezoneOffset();
+
+        const clause = await initTemplateInstance(req, options);
+
+        if (req.body.sample) {
+            clause.parse(req.body.sample, currentTime, utcOffset);
+            httpResponse.status(200).send({result: clause.draft()});
+        } else {
+            throw new MissingArgumentError('Missing `sample` in /normalize body');
+        }
+    } catch (err) {
+        if (err.name === 'MissingArgumentError') {
+            httpResponse.status(422).send({error: err.message});
+        } else {
+            httpResponse.status(500).send({error: err.message});
+        }
+    }
+});
+
+/**
  * Handle POST requests to /initialize/:template
  *
  * Template
