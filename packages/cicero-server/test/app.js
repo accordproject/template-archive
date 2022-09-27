@@ -333,6 +333,68 @@ describe('cicero-server', () => {
     });
 
 
+    it('should initialize a clause using a template with sample (copyright-notice)', async () => {
+        return request.post('/initialize/copyright-license')
+            .send({ sample: draftCopyrightText})
+            .expect(200)
+            .expect('Content-Type',/json/)
+            .then(response => {
+                response.body.state.$class.should.equal('org.accordproject.runtime.State');
+            });
+    });
+
+    it('should initialize a clause using a template with sample and params (latedeliveryandpenalty)', async () => {
+        return request.post('/initialize/latedeliveryandpenalty')
+            .send({ sample: draftLateText, params: params})
+            .expect(200)
+            .expect('Content-Type',/json/)
+            .then(response => {
+                response.body.state.$class.should.be.equal('org.accordproject.runtime.State');
+                response.body.params.request.$class.should.be.equal('org.accordproject.latedeliveryandpenalty.LateDeliveryAndPenaltyRequest');
+            });
+    });
+
+    it('should initialize a clause using a template with data (latedeliveryandpenalty)', async () => {
+        return request.post('/initialize/latedeliveryandpenalty')
+            .send({ data: parseBody})
+            .expect(200)
+            .expect('Content-Type',/json/)
+            .then(response => {
+                response.body.state.$class.should.be.equal('org.accordproject.runtime.State');
+            });
+    });
+
+    it('should initialize a clause using a template with data and params (latedeliveryandpenalty)', async () => {
+        return request.post('/initialize/latedeliveryandpenalty')
+            .send({ data: parseBody, params: params})
+            .expect(200)
+            .expect('Content-Type',/json/)
+            .then(response => {
+                response.body.state.$class.should.be.equal('org.accordproject.runtime.State');
+                response.body.params.request.$class.should.be.equal('org.accordproject.latedeliveryandpenalty.LateDeliveryAndPenaltyRequest');
+            });
+    });
+
+    it('should fail to initialize a clause without data (latedeliveryandpenalty)', async () => {
+        return request.post('/initialize/latedeliveryandpenalty')
+            .send({ params: params})
+            .expect(422)
+            .expect('Content-Type',/json/)
+            .then(response => {
+                response.body.error.should.equal('Missing `sample` or `data` in /invoke body');
+            });
+    });
+
+    it('should fail to initialize when there is no argument (latedeliveryandpenalty)', async () => {
+        return request.post('/initialize/latedeliveryandpenalty')
+            .send({})
+            .expect(422)
+            .expect('Content-Type',/json/)
+            .then(response => {
+                response.body.error.should.equal('Missing `sample` or `data` in /invoke body');
+            });
+    });
+
     after(() => {
         server.close();
     });
