@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-'use strict';
+
 
 const fs = require('fs');
 
@@ -322,6 +322,50 @@ app.post('/compile/:template', async function(req, httpResponse, next) {
             throw new MissingArgumentError('Missing `target` in /invoke body');
         }
     } catch (err) {
+        if (err.name === 'MissingArgumentError') {
+            httpResponse.status(422).send({error: err.message});
+        } else {
+            httpResponse.status(500).send({error: err.message});
+        }
+    }
+});
+
+/**
+ * Handle POST requests to /initialize/:template
+ *
+ * The POST body contains six properties:
+ *  - data or sample
+ *  - params (optional)
+ *  - options (optional)
+ *  - current time (optional)
+ *  - utc offset (optional)
+ *
+ * Response
+ * ----------
+ * Initialized state information of template
+ *
+ */
+app.post('/initialize/:template', async function(req, httpResponse, next) {
+    try {
+        const options = req.body.options ?? {};
+        const currentTime = req.body.currentTime ?? new Date().toISOString();
+        const utcOffset = req.body.utcOffset ?? new Date().getTimezoneOffset();
+        const params = req.body.params ?? {};
+
+        const engine = new Engine();
+        const clause = await initTemplateInstance(req, options);
+
+        if (req.body.sample) {
+            clause.parse(req.body.sample.toString(), currentTime, utcOffset);
+        } else if (req.body.data) {
+            clause.setData(req.body.data);
+        } else {
+            throw new MissingArgumentError('Missing `sample` or `data` in /invoke body');
+        }
+
+        const result = await engine.init(clause, currentTime, utcOffset, params);
+        httpResponse.status(200).send(result);
+    } catch(err) {
         if (err.name === 'MissingArgumentError') {
             httpResponse.status(422).send({error: err.message});
         } else {
