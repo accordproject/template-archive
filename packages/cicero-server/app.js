@@ -28,7 +28,7 @@ if(!process.env.CICERO_DIR) {
     throw new Error('You must set the CICERO_DIR environment variable.');
 }
 
-const PORT = process.env.CICERO_PORT | 6001;
+const PORT = process.env.CICERO_PORT || 6001;
 
 // to automatically decode JSON POST
 app.use(bodyParser.json());
