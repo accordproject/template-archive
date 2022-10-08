@@ -14,15 +14,25 @@
  * limitations under the License.
  */
 
-'use strict';
 
+'use strict';
 const fs = require('fs');
 
 const app = require('express')();
 const bodyParser = require('body-parser');
+const tmp = require('tmp-promise');
 const Template = require('@accordproject/cicero-core').Template;
 const Clause = require('@accordproject/cicero-core').Clause;
 const Engine = require('@accordproject/cicero-engine').Engine;
+const CodeGen = require('@accordproject/cicero-tools').CodeGen;
+const FileWriter = require('@accordproject/concerto-util').FileWriter;
+
+const GoLangVisitor = CodeGen.GoLangVisitor;
+const JavaVisitor = CodeGen.JavaVisitor;
+const CordaVisitor = CodeGen.CordaVisitor;
+const JSONSchemaVisitor = CodeGen.JSONSchemaVisitor;
+const PlantUMLVisitor = CodeGen.PlantUMLVisitor;
+const TypescriptVisitor = CodeGen.TypescriptVisitor;
 
 if(!process.env.CICERO_DIR) {
     throw new Error('You must set the CICERO_DIR environment variable.');
@@ -299,7 +309,10 @@ app.post('/normalize/:template', async function(req, httpResponse, next) {
 });
 
 /**
- * Handle POST requests to /initialize/:template
+ * Handle POST requests to /compile/:template
+ * The body of the POST does not contain any argument
+ * The template is loaded using the template name
+ * The call returns the dict of compiled files in target language
  *
  * Template
  * ----------
@@ -308,6 +321,66 @@ app.post('/normalize/:template', async function(req, httpResponse, next) {
  *
  * Request
  * ----------
+ * The POST body does not contain any property.
+ *
+ * Response
+ * ----------
+ * A dictionary of compiled files in targeted language
+ *
+ */
+app.post('/compile/:template', async function(req, httpResponse, next) {
+
+    try {
+        const options = req.body.options ? req.body.options : {};
+        const template = await loadTemplate(req.params.template, options);
+
+        let visitor = null;
+        if(req.body.target) {
+            switch(req.body.target) {
+            case 'Go':
+                visitor = new GoLangVisitor();
+                break;
+            case 'PlantUML':
+                visitor = new PlantUMLVisitor();
+                break;
+            case 'Typescript':
+                visitor = new TypescriptVisitor();
+                break;
+            case 'Java':
+                visitor = new JavaVisitor();
+                break;
+            case 'Corda':
+                visitor = new CordaVisitor();
+                break;
+            case 'JSONSchema':
+                visitor = new JSONSchemaVisitor();
+                break;
+            default:
+                throw new Error('Unrecognized code generator: ' + req.body.target);
+            }
+            const dir = await tmp.dir({ unsafeCleanup: true });
+            const output = dir.path;
+            let parameters = {};
+            parameters.fileWriter = new FileWriter(output);
+            template.getModelManager().accept(visitor, parameters);
+            const result = parseDirectory(output, req.body.target);
+            dir.cleanup();
+            httpResponse.send({result: result});
+        } else {
+            throw new MissingArgumentError('Missing `target` in /invoke body');
+        }
+    } catch (err) {
+        if (err.name === 'MissingArgumentError') {
+            httpResponse.status(422).send({error: err.message});
+        } else {
+            httpResponse.status(500).send({error: err.message});
+        }
+    }
+});
+
+/**
+ * Handle POST requests to /initialize/:template
+ *
  * The POST body contains six properties:
  *  - data or sample
  *  - params (optional)
@@ -348,6 +421,32 @@ app.post('/initialize/:template', async function(req, httpResponse, next) {
         }
     }
 });
+
+/**
+ * Helper function to reading the content of a directory recursively
+ * @param {string} directory Absolute path to directory
+ * @param {string} visitor Type of visitor for compile method
+ * @returns {dictionary} Nested key value pairs for files in path
+ */
+function parseDirectory(directory, visitor) {
+    return fs.readdirSync(directory).reduce((out, item) => {
+        let itemPath = `${directory}/${item}`;
+
+        if (fs.statSync(itemPath).isDirectory()) {
+            out[item] = parseDirectory(itemPath, visitor);
+        } else {
+            const data = fs.readFileSync(itemPath, 'utf8');
+            if (visitor === 'Java' || visitor === 'Corda') {
+                const relPath =  itemPath.indexOf('org');
+                itemPath = itemPath.slice(relPath);
+            } else {
+                itemPath = item;
+            }
+            out[item] = {'path' : itemPath, 'content' : data};
+        }
+        return out;
+    }, {});
+}
 
 /**
  * Helper function to determine whether the template is archived or not

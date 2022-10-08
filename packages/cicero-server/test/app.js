@@ -370,6 +370,75 @@ describe('cicero-server', () => {
             });
     });
 
+    it('should compile to a Go model (copyright-notice)', async () => {
+        return request.post('/compile/copyright-license')
+            .send({target:'Go'})
+            .expect(200)
+            .then(response => {
+                response.body.result.should.have.property('main.go');
+            });
+    });
+
+    it('should compile to a PlantUML model (copyright-notice)', async () => {
+        return request.post('/compile/copyright-license')
+            .send({target:'PlantUML'})
+            .expect(200)
+            .then(response => {
+                response.body.result.should.have.property('model.puml');
+            });
+    });
+
+    it('should compile to a Typescript model (copyright-notice)', async () => {
+        return request.post('/compile/copyright-license')
+            .send({target:'Typescript'})
+            .expect(200)
+            .then(response => {
+                response.body.result.should.have.property('concerto.ts');
+            });
+    });
+
+    it('should compile to a Corda model (copyright-notice)', async () => {
+        return request.post('/compile/copyright-license')
+            .send({target:'Corda'})
+            .expect(200)
+            .then(response => {
+                response.body.result.should.have.property('org');
+            });
+    });
+
+    it('should compile to a JSONSchema model (copyright-notice)', async () => {
+        return request.post('/compile/copyright-license')
+            .send({target:'JSONSchema'})
+            .expect(200)
+            .then(response => {
+                response.body.result.should.have.property('schema.json');
+            });
+    });
+
+    it('should compile to a Java model (copyright-notice)', async () => {
+        return request.post('/compile/copyright-license')
+            .send({target:'Java'})
+            .expect(200)
+            .then(response => {
+                response.body.result.should.have.property('org');
+            });
+    });
+
+    it('should not compile to an unknown model (copyright-notice)', async () => {
+        return request.post('/compile/copyright-license')
+            .send({target:'BLAH'})
+            .expect(500);
+    });
+
+    it('should not compile when target is missing (copyright-notice)', async () => {
+        return request.post('/compile/copyright-license')
+            .send()
+            .expect(422)
+            .then(response => {
+                response.body.error.should.equal('Missing `target` in /invoke body');
+            });
+    });
+
     it('should normalize a sample text', async () => {
         return request.post('/normalize/copyright-license')
             .send({sample:draftCopyrightText})
