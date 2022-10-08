@@ -436,9 +436,9 @@ describe('cicero-server', () => {
             .expect(422)
             .then(response => {
                 response.body.error.should.equal('Missing `target` in /invoke body');
-        });
+            });
     });
-    
+
     it('should normalize a sample text', async () => {
         return request.post('/normalize/copyright-license')
             .send({sample:draftCopyrightText})

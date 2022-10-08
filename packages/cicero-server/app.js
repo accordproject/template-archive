@@ -15,7 +15,7 @@
  */
 
 
-
+'use strict';
 const fs = require('fs');
 
 const app = require('express')();
