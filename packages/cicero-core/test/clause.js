@@ -534,6 +534,7 @@ Assignment. Licensee may freely assign or otherwise transfer all or any of its r
             const template = await Template.fromDirectory('./test/data/copyright-license', options);
             const clause = new Clause(template);
             const text = `<html>
+<head><meta charset="UTF-8"></head>
 <body>
 <div class="document">
 <p>Copyright License Agreement</p>

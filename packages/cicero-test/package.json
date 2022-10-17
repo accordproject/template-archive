@@ -40,10 +40,10 @@
   },
   "homepage": "https://github.com/accordproject/cicero#readme",
   "devDependencies": {
-    "eslint": "8.2.0",
+    "eslint": "^8.23.1",
     "jsdoc": "^3.6.10",
     "license-check": "1.1.5",
-    "mocha": "8.3.2",
+    "mocha": "^8.4.0",
     "nyc": "15.1.0"
   },
   "dependencies": {
