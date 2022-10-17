@@ -92,7 +92,7 @@ describe('EngineLatePenalty', () => {
             request.goodsValue = 200.00;
             const state = {};
             state.$class = 'org.accordproject.runtime.State';
-            return engine.trigger(clause, request, state, 'foobar').should.be.rejectedWith('Cannot set current time to \'foobar\' with UTC offset \'undefined\'');
+            return engine.trigger(clause, request, state, 'foobar').should.be.rejectedWith('Current time \'foobar\' is not in standard UTC format');
         });
 
         it('should trigger a late delivery and penalty smart clause with a time period', async function () {
@@ -147,7 +147,7 @@ describe('EngineLatePenalty', () => {
             params.request.goodsValue = 200.00;
             const state = {};
             state.$class = 'org.accordproject.runtime.State';
-            return engine.invoke(clause, 'latedeliveryandpenalty', params, state, 'foobar').should.be.rejectedWith('Cannot set current time to \'foobar\' with UTC offset \'undefined\'');
+            return engine.invoke(clause, 'latedeliveryandpenalty', params, state, 'foobar').should.be.rejectedWith('Current time \'foobar\' is not in standard UTC format');
         });
 
         it('should invoke a late delivery and penalty smart clause with a time period', async function () {
@@ -218,7 +218,7 @@ describe('EngineLatePenalty (JavaScript)', () => {
             request.goodsValue = 200.00;
             const state = {};
             state.$class = 'org.accordproject.runtime.State';
-            return engine.trigger(clause, request, state, 'foobar').should.be.rejectedWith('Cannot set current time to \'foobar\' with UTC offset \'undefined\'');
+            return engine.trigger(clause, request, state, 'foobar').should.be.rejectedWith('Current time \'foobar\' is not in standard UTC format');
         });
     });
 });

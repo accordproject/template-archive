@@ -3,7 +3,7 @@
     "colors": "1.4.0",
     "coveralls": "3.1.0",
     "dayjs": "1.10.8",
-    "eslint": "8.2.0",
+    "eslint": "^8.23.1",
     "jsdoc": "^3.6.10",
     "lerna": "^4.0.0",
     "license-check-and-add": "2.3.6",
