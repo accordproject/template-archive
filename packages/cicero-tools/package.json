@@ -1,6 +1,6 @@
 {
   "name": "@accordproject/cicero-tools",
-  "version": "0.23.0",
+  "version": "0.24.0",
   "description": "Cicero Tools",
   "engines": {
     "node": ">=14",
