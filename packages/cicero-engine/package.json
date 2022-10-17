@@ -44,15 +44,15 @@
     "chai-as-promised": "7.1.1",
     "chai-things": "0.2.0",
     "cucumber": "5.1.0",
-    "eslint": "8.2.0",
+    "eslint": "^8.23.1",
     "jsdoc": "^3.6.10",
     "license-check": "1.1.5",
-    "mocha": "8.3.2",
+    "mocha": "^8.4.0",
     "nyc": "15.1.0"
   },
   "dependencies": {
     "@accordproject/cicero-core": "0.23.0",
-    "@accordproject/ergo-engine": "0.23.1"
+    "@accordproject/ergo-engine": "0.24.0"
   },
   "license-check-config": {
     "src": [

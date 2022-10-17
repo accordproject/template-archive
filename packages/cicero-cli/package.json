@@ -46,7 +46,7 @@
     "@accordproject/cicero-engine": "0.23.0",
     "@accordproject/cicero-test": "0.23.0",
     "@accordproject/cicero-tools": "0.23.0",
-    "@accordproject/concerto-util": "2.0.0",
+    "@accordproject/concerto-util": "3.0.0",
     "mkdirp": "1.0.4",
     "yargs": "17.3.1"
   },
@@ -55,10 +55,10 @@
     "chai-as-promised": "7.1.1",
     "chai-things": "0.2.0",
     "cucumber": "5.1.0",
-    "eslint": "8.2.0",
+    "eslint": "^8.23.1",
     "jsdoc": "^3.6.10",
     "license-check": "1.1.5",
-    "mocha": "8.3.2",
+    "mocha": "^8.4.0",
     "nyc": "15.1.0",
     "tmp-promise": "2.0.2"
   },
