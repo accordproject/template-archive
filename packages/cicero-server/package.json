@@ -55,9 +55,9 @@
     "supertest": "3.0.0"
   },
   "dependencies": {
-    "@accordproject/cicero-core": "0.23.0",
-    "@accordproject/cicero-engine": "0.23.0",
-    "@accordproject/cicero-tools": "^0.23.0",
+    "@accordproject/cicero-core": "0.24.0",
+    "@accordproject/cicero-engine": "0.24.0",
+    "@accordproject/cicero-tools": "^0.24.0",
     "express": "4.16.2",
     "tmp-promise": "^3.0.3"
   },
