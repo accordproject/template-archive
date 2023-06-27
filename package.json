@@ -26,7 +26,7 @@
     "pretest": "npm run licchk",
     "test": "lerna exec -- npm run test:cov",
     "repoclean": "lerna clean",
-    "licchk": "lerna exec -- npm run lickchk"
+    "licchk": "lerna exec -- npm run licchk"
   },
   "repository": {
     "type": "git",
