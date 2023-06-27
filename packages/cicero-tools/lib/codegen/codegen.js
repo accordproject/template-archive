@@ -14,15 +14,15 @@
 
 'use strict';
 
-module.exports.AbstractPlugin = require('@accordproject/concerto-tools').CodeGen.AbstractPlugin;
+module.exports.AbstractPlugin = require('@accordproject/concerto-codegen').CodeGen.AbstractPlugin;
 
-module.exports.GoLangVisitor = require('@accordproject/concerto-tools').CodeGen.GoLangVisitor;
-module.exports.JSONSchemaVisitor = require('@accordproject/concerto-tools').CodeGen.JSONSchemaVisitor;
-module.exports.XmlSchemaVisitor = require('@accordproject/concerto-tools').CodeGen.XmlSchemaVisitor;
-module.exports.PlantUMLVisitor = require('@accordproject/concerto-tools').CodeGen.PlantUMLVisitor;
-module.exports.TypescriptVisitor = require('@accordproject/concerto-tools').CodeGen.TypescriptVisitor;
-module.exports.JavaVisitor = require('@accordproject/concerto-tools').CodeGen.JavaVisitor;
-module.exports.FileWriter = require('@accordproject/concerto-tools').FileWriter;
+module.exports.GoLangVisitor = require('@accordproject/concerto-codegen').CodeGen.GoLangVisitor;
+module.exports.JSONSchemaVisitor = require('@accordproject/concerto-codegen').CodeGen.JSONSchemaVisitor;
+module.exports.XmlSchemaVisitor = require('@accordproject/concerto-codegen').CodeGen.XmlSchemaVisitor;
+module.exports.PlantUMLVisitor = require('@accordproject/concerto-codegen').CodeGen.PlantUMLVisitor;
+module.exports.TypescriptVisitor = require('@accordproject/concerto-codegen').CodeGen.TypescriptVisitor;
+module.exports.JavaVisitor = require('@accordproject/concerto-codegen').CodeGen.JavaVisitor;
+module.exports.FileWriter = require('@accordproject/concerto-codegen').FileWriter;
 
 module.exports.CordaVisitor = require('./fromcto/corda/cordavisitor');
 

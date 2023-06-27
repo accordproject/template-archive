@@ -7,7 +7,7 @@
     "license": "Apache-2.0",
     "accordproject": {
         "template": "clause",
-        "cicero": "^0.23.0"
+        "cicero": "^0.24.0"
     },
     "keywords": ["hello", "world", "greet"]
 }

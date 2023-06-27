@@ -375,7 +375,7 @@ describe('cicero-server', () => {
             .send({target:'Go'})
             .expect(200)
             .then(response => {
-                response.body.result.should.have.property('main.go');
+                response.body.result.should.have.property('org.accordproject.copyrightlicense.go');
             });
     });
 

@@ -1,6 +1,6 @@
 {
   "name": "@accordproject/generator-cicero-template",
-  "version": "0.23.0",
+  "version": "0.24.0",
   "description": "Code generator for a Cicero Template",
   "engines": {
     "node": ">=14",
@@ -14,7 +14,7 @@
     "pretest": "npm run lint",
     "lint": "eslint .",
     "postlint": "npm run licchk",
-    "licchk": "license-check",
+    "licchk": "license-check-and-add check -f ../../license.config.json",
     "test": "mocha --timeout 10000",
     "test:windows": "echo 'No Windows tests for this package'",
     "test:cov": "nyc npm run test"
@@ -42,35 +42,22 @@
     "yeoman-generator"
   ],
   "devDependencies": {
-    "chai": "4.3.6",
+    "chai": "4.3.7",
     "chai-as-promised": "7.1.1",
     "chai-things": "0.2.0",
-    "eslint": "^8.23.1",
-    "jsdoc": "^3.6.10",
-    "license-check": "1.1.5",
-    "mocha": "^8.4.0",
-    "mockery": "2.0.0",
+    "eslint": "^8.43.0",
+    "jsdoc": "^4.0.2",
+    "license-check-and-add": "4.0.5",
+    "mocha": "^10.2.0",
+    "mockery": "2.1.0",
     "nyc": "15.1.0",
-    "yeoman-assert": "3.1.0",
-    "yeoman-test": "2.1.0"
-  },
-  "license-check-config": {
-    "src": [
-      "**/*.js",
-      "!./test/data/**/*",
-      "!./coverage/**/*",
-      "!./node_modules/**/*",
-      "!./generatos/app/template/**/*"
-    ],
-    "path": "header.txt",
-    "blocking": true,
-    "logInfo": false,
-    "logError": true
+    "yeoman-assert": "3.1.1",
+    "yeoman-test": "6.3.0"
   },
   "dependencies": {
-    "chalk": "2.3.2",
-    "yeoman-generator": "^3.1.1",
-    "yosay": "2.0.1"
+    "chalk": "4.1.2",
+    "yeoman-generator": "^5.9.0",
+    "yosay": "2.0.2"
   },
   "nyc": {
     "produce-source-map": "true",

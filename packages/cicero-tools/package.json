@@ -1,6 +1,6 @@
 {
   "name": "@accordproject/cicero-tools",
-  "version": "0.23.0",
+  "version": "0.24.0",
   "description": "Cicero Tools",
   "engines": {
     "node": ">=14",
@@ -14,7 +14,7 @@
     "pretest": "npm run lint",
     "lint": "eslint .",
     "postlint": "npm run licchk",
-    "licchk": "license-check",
+    "licchk": "license-check-and-add check -f ../../license.config.json",
     "test:mocha": "mocha --recursive --timeout 10000",
     "test:windows": "npm run test:mocha",
     "test": "npm run test:mocha",
@@ -37,35 +37,22 @@
   },
   "homepage": "https://github.com/accordproject/cicero#readme",
   "devDependencies": {
-    "chai": "4.3.6",
+    "chai": "4.3.7",
     "chai-as-promised": "7.1.1",
     "chai-things": "0.2.0",
-    "eslint": "^8.23.1",
-    "jsdoc": "^3.6.10",
-    "license-check": "1.1.5",
-    "mocha": "^8.4.0",
-    "nyc": "15.1.0",
-    "tmp-promise": "2.0.2"
+    "eslint": "^8.43.0",
+    "jsdoc": "^4.0.2",
+    "license-check-and-add": "4.0.5",
+    "mocha": "^10.2.0",
+    "nyc": "^15.1.0",
+    "tmp-promise": "3.0.3"
   },
   "dependencies": {
-    "@accordproject/concerto-core": "3.0.0",
-    "@accordproject/concerto-tools": "3.0.0",
-    "@accordproject/concerto-util": "3.0.0"
+    "@accordproject/concerto-codegen": "^3.14.0",
+    "@accordproject/concerto-core": "^3.8.2",
+    "@accordproject/concerto-util": "3.8.2"
   },
-  "license-check-config": {
-    "src": [
-      "**/*.js",
-      "!./test/data/**/*",
-      "!./coverage/**/*",
-      "!./node_modules/**/*",
-      "!./out/**/*",
-      "!index.js"
-    ],
-    "path": "header.txt",
-    "blocking": true,
-    "logInfo": false,
-    "logError": true
-  },
+  
   "nyc": {
     "produce-source-map": "true",
     "sourceMap": "inline",

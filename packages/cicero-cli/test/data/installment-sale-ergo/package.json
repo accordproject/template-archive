@@ -6,6 +6,6 @@
     "license": "Apache-2.0",
     "accordproject": {
         "template": "contract",
-        "cicero": "^0.23.0"
+        "cicero": "^0.24.0"
     }
 }
