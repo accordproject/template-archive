@@ -3,8 +3,8 @@
   "version": "0.24.0",
   "description": "Cicero Server - wraps the Cicero Engine and exposes it as a RESTful service",
   "engines": {
-    "node": ">=14",
-    "npm": ">=6"
+    "node": ">=16",
+    "npm": ">=8"
   },
   "publishConfig": {
     "access": "public"
