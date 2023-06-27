@@ -81,10 +81,8 @@ jobs:
         with:
           node-version: 18.x
     
-      - run: npm ci
-
       - name: Build
-        run: lerna bootstrap
+        run: npm ci
 
       - name: timestamp
         id: timestamp
