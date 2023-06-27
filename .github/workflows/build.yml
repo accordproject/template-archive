@@ -76,13 +76,15 @@ jobs:
       - name: git checkout
         uses: actions/checkout@v2
 
-      - name: Use Node.js 14.x
+      - name: Use Node.js 18.x
         uses: actions/setup-node@v1
         with:
-          node-version: 14.x
+          node-version: 18.x
     
+      - run: npm ci
+
       - name: Build
-        run: npx lerna bootstrap
+        run: lerna bootstrap
 
       - name: timestamp
         id: timestamp
@@ -93,5 +95,5 @@ jobs:
         run: |
           npm config set //registry.npmjs.org/:_authToken ${{ secrets.NPM_TOKEN }}
           npm version --no-git-tag-version --yes --exact ${{ steps.timestamp.outputs.stamp }}
-          npx lerna version --no-git-tag-version --yes --exact ${{ steps.timestamp.outputs.stamp }}
-          npx lerna exec -- npm publish --access public --ignore-scripts --tag=unstable 2>&1
+          lerna version --no-git-tag-version --yes --exact ${{ steps.timestamp.outputs.stamp }}
+          lerna exec -- npm publish --access public --ignore-scripts --tag=unstable 2>&1
