@@ -15,7 +15,7 @@
 'use strict';
 
 const CordaPlugin = require('./cordaplugin.js');
-const JavaVisitor = require('@accordproject/concerto-tools').CodeGen.JavaVisitor;
+const JavaVisitor = require('@accordproject/concerto-codegen').CodeGen.JavaVisitor;
 
 /**
  * Convert the contents of a ModelManager to Java code for Corda.
@@ -24,7 +24,7 @@ const JavaVisitor = require('@accordproject/concerto-tools').CodeGen.JavaVisitor
  *
  * @private
  * @class
- * @memberof module:concerto-tools
+ * @memberof module:concerto-codegen
  */
 class CordaVisitor extends JavaVisitor {
     /**
