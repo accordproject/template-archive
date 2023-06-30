@@ -26,7 +26,6 @@ describe('generator-cicero-template:app', () => {
             .withPrompts({ templateName: 'test' }, { modeNamespace: 'foo' });
         assert.file('./test/text/sample.md');
         assert.file('./test/text/grammar.tem.md');
-        assert.file('./test/logic/logic.ergo');
         assert.file('./test/package.json');
         assert.file('./test/logo.png');
         assert.file('./test/test/logic_default.feature');

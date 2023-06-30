@@ -19,17 +19,16 @@ const crypto = require('crypto');
 const forge = require('node-forge');
 const stringify = require('json-stable-stringify');
 
-const Logger = require('@accordproject/ergo-compiler').Logger;
+const Introspector = require('@accordproject/concerto-core').Introspector;
 const ParserManager = require('@accordproject/markdown-template').ParserManager;
-const LogicManager = require('@accordproject/ergo-compiler').LogicManager;
 
 const TemplateLoader = require('./templateloader');
 const TemplateSaver = require('./templatesaver');
+const APModelManager = require('./apmodelmanager');
 
 /**
- * A template for a legal clause or contract. A Template has a template model, request/response transaction types,
- * a template grammar (natural language for the template) as well as Ergo code for the business logic of the
- * template.
+ * A template for a legal clause or contract. A Template has a template model request/response transaction types,
+ * and a template grammar (natural language for the template).
  * @class
  * @public
  * @abstract
@@ -50,7 +49,8 @@ class Template {
      */
     constructor(packageJson, readme, samples, request, logo, options, authorSignature) {
         this.metadata = new Metadata(packageJson, readme, samples, request, logo);
-        this.logicManager = new LogicManager('es6', null, options);
+        this.modelManager = new APModelManager();
+        this.introspector = new Introspector(this.modelManager);
         const templateKind = this.getMetadata().getTemplateType() !== 0 ? 'clause' : 'contract';
         this.parserManager = new ParserManager(this.getModelManager(),null,templateKind);
         this.authorSignature = authorSignature ? authorSignature : null;
@@ -58,7 +58,6 @@ class Template {
 
     /**
      * Verifies that the template is well formed.
-     * Compiles the Ergo logic.
      * Throws an exception with the details of any validation errors.
      * @param {Object} options  - e.g., { verify: true }
      */
@@ -68,11 +67,6 @@ class Template {
         }
         this.getModelManager().validateModelFiles();
         this.getTemplateModel();
-        if (this.getMetadata().getRuntime() === 'ergo') {
-            this.getLogicManager().compileLogicSync(true);
-        } else {
-            this.getLogicManager().registerCompiledLogicSync();
-        }
     }
 
     /**
@@ -170,12 +164,6 @@ class Template {
             content.models[file.namespace] = file.content;
         });
 
-        let scriptManager = this.getScriptManager();
-        let scriptFiles = scriptManager.getScripts();
-        scriptFiles.forEach(function (file) {
-            content.scripts[file.getIdentifier()] = file.contents;
-        });
-
         const hasher = crypto.createHash('sha256');
         hasher.update(stringify(content));
         return hasher.digest('hex');
@@ -251,7 +239,7 @@ class Template {
 
     /**
      * Persists this template to a Cicero Template Archive (cta) file.
-     * @param {string} [language] - target language for the archive (should be 'ergo')
+     * @param {string} [language] - target language for the archive
      * @param {Object} [options] - JSZip options and keystore object containing path and passphrase for the keystore
      * @return {Promise<Buffer>} the zlib buffer
      */
@@ -318,22 +306,12 @@ class Template {
     }
 
     /**
-     * Provides access to the template logic for this template.
-     * The template logic encapsulate the code necessary to
-     * execute the clause or contract.
-     * @return {LogicManager} the LogicManager for this template
-     */
-    getLogicManager() {
-        return this.logicManager;
-    }
-
-    /**
      * Provides access to the Introspector for this template. The Introspector
      * is used to reflect on the types defined within this template.
      * @return {Introspector} the Introspector for this template
      */
     getIntrospector() {
-        return this.logicManager.getIntrospector();
+        return this.introspector;
     }
 
     /**
@@ -355,23 +333,13 @@ class Template {
     }
 
     /**
-     * Provides access to the ScriptManager for this template. The ScriptManager
-     * manage access to the scripts that have been defined within this template.
-     * @return {ScriptManager} the ScriptManager for this template
-     * @private
-     */
-    getScriptManager() {
-        return this.logicManager.getScriptManager();
-    }
-
-    /**
      * Provides access to the ModelManager for this template. The ModelManager
      * manage access to the models that have been defined within this template.
      * @return {ModelManager} the ModelManager for this template
      * @private
      */
     getModelManager() {
-        return this.logicManager.getModelManager();
+        return this.modelManager;
     }
 
     /**
@@ -423,11 +391,26 @@ class Template {
     }
 
     /**
+     * Returns a list of a fully-qualified types that are concrete sub-classes of the parameter.
+     * Includes the parameter if it is not abstract.
+     * @param {String} type The fully-qualified type to search for
+     * @return {String[]} An array of fully-qualified types
+     * @private
+     */
+    findConcreteSubclassNames(type) {
+        return this.getModelManager()
+            .getType(type)
+            .getAssignableClassDeclarations()
+            .filter(subclass => !subclass.isAbstract())
+            .map(decl => decl.getFullyQualifiedName());
+    }
+
+    /**
      * Provides a list of the input types that are accepted by this Template. Types use the fully-qualified form.
      * @return {Array} a list of the request types
      */
     getRequestTypes() {
-        return this.extractFuncDeclParameter(1);
+        return this.findConcreteSubclassNames('org.accordproject.runtime.Request');
     }
 
     /**
@@ -435,7 +418,7 @@ class Template {
      * @return {Array} a list of the response types
      */
     getResponseTypes() {
-        return this.extractFuncDeclParameter(2);
+        return this.findConcreteSubclassNames('org.accordproject.runtime.Response');
     }
 
     /**
@@ -443,7 +426,7 @@ class Template {
      * @return {Array} a list of the emit types
      */
     getEmitTypes() {
-        return this.extractFuncDeclParameter(3);
+        return this.findConcreteSubclassNames('org.accordproject.runtime.Obligation');
     }
 
     /**
@@ -451,38 +434,7 @@ class Template {
      * @return {Array} a list of the state types
      */
     getStateTypes() {
-        return this.extractFuncDeclParameter(4);
-    }
-
-    /**
-     * Helper method to retrieve types from a function declarations
-     * @param {number} index the parameter index for the function declaration
-     *  1 - Request Types
-     *  2 - Return Types
-     *  3 - Emit Types
-     *  4 - State Types
-     * @returns {Array} a list of types
-     * @private
-     */
-    extractFuncDeclParameter(index) {
-        const functionDeclarations = this.getScriptManager().allFunctionDeclarations();
-        let types = [];
-        functionDeclarations.forEach((ele, n) => {
-            const type = ele.getParameterTypes()[index];
-            if (type) {
-                types.push(type);
-            }
-        });
-        Logger.debug(types);
-        return types;
-    }
-
-    /**
-     * Returns true if the template has logic, i.e. has more than one script file.
-     * @return {boolean} true if the template has logic
-     */
-    hasLogic() {
-        return this.getScriptManager().getAllScripts().length > 0;
+        return this.findConcreteSubclassNames('org.accordproject.runtime.State');
     }
 
     /**

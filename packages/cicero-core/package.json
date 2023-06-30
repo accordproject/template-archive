@@ -26,6 +26,7 @@
     "postlint": "npm run licchk",
     "licchk": "license-check-and-add check -f ../../license.config.json",
     "test:mocha": "mocha --timeout 40000",
+    "test:watch": "npm run test:mocha -- --watch",
     "test:windows": "npm run test:mocha",
     "test": "npm run test:mocha",
     "test:cov": "nyc npm run test",
@@ -80,8 +81,6 @@
   },
   "dependencies": {
     "@accordproject/concerto-core": "3.8.2",
-    "@accordproject/ergo-compiler": "0.24.0",
-    "@accordproject/ergo-engine": "0.24.0",
     "@accordproject/markdown-cicero": "0.16.5",
     "@accordproject/markdown-common": "0.16.5",
     "@accordproject/markdown-html": "0.16.5",

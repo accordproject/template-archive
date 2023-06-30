@@ -21,7 +21,7 @@ const crypto = require('crypto');
 const stringify = require('json-stable-stringify');
 const semver = require('semver');
 
-const Logger = require('@accordproject/ergo-compiler').Logger;
+const Logger = require('@accordproject/concerto-util').Logger;
 
 const globalTemplateCache = new NodeCache({ stdTTL: 600, useClones: false });
 const globalTemplateIndexCache = new NodeCache({ stdTTL: 600, useClones: false });

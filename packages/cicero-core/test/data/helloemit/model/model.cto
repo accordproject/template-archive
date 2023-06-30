@@ -11,7 +11,7 @@ transaction MyResponse extends Response {
   o String output
 }
 
-event Greeting {
+event Greeting extends Obligation {
   o String message
 }
 

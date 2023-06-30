@@ -14,7 +14,6 @@
 
 'use strict';
 
-const fsPath = require('path');
 const JSZip = require('jszip');
 
 /**
@@ -28,7 +27,7 @@ class TemplateSaver {
     /**
      * Persists this template to a Cicero Template Archive (cta) file.
      * @param {Template} template - the template to persist
-     * @param {string} [language] - target language for the archive (should be 'ergo')
+     * @param {string} [language] - target language for the archive
      * @param {Object} [options] - JSZip options
      * @param {Buffer} logoBuffer - Bytes data of the PNG file
      * @return {Promise<Buffer>} the zlib buffer
@@ -103,16 +102,6 @@ class TemplateSaver {
         }));
         modelFiles.forEach(function (file) {
             zip.file('model/' + file.name, file.content, options);
-        });
-
-        zip.file('logic/', null, Object.assign({}, options, {
-            dir: true
-        }));
-        const scriptFiles = template.getScriptManager().getScriptsForTarget(language);
-        scriptFiles.forEach(function (file) {
-            let fileIdentifier = file.getIdentifier();
-            let fileName = fsPath.basename(fileIdentifier);
-            zip.file('logic/' + fileName, file.contents, options);
         });
 
         return zip.generateAsync({
