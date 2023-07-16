@@ -12,17 +12,21 @@
  * limitations under the License.
  */
 
-'use strict';
+concerto version ">= 1.0.0"
 
-const path = require('path');
+namespace org.accordproject.contract
 
-const scriptDir = path.join(__dirname,'..','..');
-const ergoModels = require('./ergo.json');
+/**
+ * Contract Data
+ * -- Describes the structure of contracts and clauses
+ */
 
-const { process } = require('./processExternals');
-
-async function run() {
-    await process(scriptDir, ergoModels, true); // Add models to markdown-common
-    console.log('DONE!');
+/* A contract is a asset -- This contains the contract data */
+abstract asset Contract identified by contractId {
+  o String contractId
 }
-run();
+
+/* A clause is an asset -- This contains the clause data */
+abstract asset Clause identified by clauseId {
+  o String clauseId
+}

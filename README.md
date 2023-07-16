@@ -31,7 +31,6 @@ Using Cicero you can take any existing natural language text (typically a clause
 Top level repository (cicero), with sub packages. Each sub-package is published as an independent npm module using `lerna`:
 * [cicero-cli](https://github.com/accordproject/cicero/tree/master/packages/cicero-cli) : Command line interface (for parsing, execution, creating archives) for Accord Project legal templates
 * [cicero-core](https://github.com/accordproject/cicero/tree/master/packages/cicero-core) : Core classes to manage the grammar, models and logic of Accord Project legal templates
-* [cicero-test](https://github.com/accordproject/cicero/tree/master/packages/cicero-test) : Cucumber based testing for Accord Project legal templates
 * [cicero-tools](https://github.com/accordproject/cicero/tree/master/packages/cicero-tools) : Tools for generating code (UML, Java, etc.) from Accord Project legal templates
 * [generator-cicero-template](https://github.com/accordproject/cicero/tree/master/packages/generator-cicero-template): Utility to create a self-contained directory for a new Accord Project legal template
 

@@ -14,8 +14,7 @@
 
 'use strict';
 
-const Template = require('../lib/template');
-
+const Template = require('../src/template');
 const fs = require('fs');
 const archiver = require('archiver');
 const forge = require('node-forge');
@@ -200,7 +199,7 @@ describe('Template', () => {
         it('should roundtrip a template with a logo', async () => {
             const template = await Template.fromDirectory('./test/data/template-logo', options);
             template.getIdentifier().should.equal('logo@0.0.1');
-            template.getHash().should.be.equal('cd024363c153f238294cbf95c6502423c9a9fe4219461eb0ca18585e5aaef0fc');
+            template.getHash().should.be.equal('3085d14ab6390d08ad003899ad540c2edefe088da0ef816dbcdc0189ed36f3cc');
             template.getMetadata().getLogo().should.be.an.instanceof(Buffer);
             template.getMetadata().getSample().should.equal('"Aman" "Sharma" added the support for logo and hence created this template for testing!\n');
             const buffer = await template.toArchive('ergo');
@@ -230,7 +229,7 @@ In case of delayed delivery except for Force Majeure cases, the Seller shall pay
 1. Any fractional part of a days is to be considered a full days.
 2. The total amount of penalty shall not however, exceed 2.0% of the total value of the Equipment involved in late delivery.
 3. If the delay is more than 2 weeks, the Buyer is entitled to terminate this Contract.`);
-            template.getHash().should.equal('31a8a67b474089a02d29bd96b05a3d9a039345e2d064ced086187c8c17546ae8');
+            template.getHash().should.equal('b47e292b631abea989056e5b88f453c485ccbbff8d09c4661bd71cd4595a0014');
             const buffer = await template.toArchive('ergo');
             buffer.should.not.be.null;
             const template2 = await Template.fromArchive(buffer);
@@ -257,7 +256,7 @@ In case of delayed delivery except for Force Majeure cases, the Seller shall pay
             template.getDescription().should.equal('Late Delivery and Penalty. In case of delayed delivery except for Force Majeure cases, the Seller shall pay to the Buyer for every 9 DAY of delay penalty amounting to 7.0% of the total value of the Equipment whose delivery has been delayed. Any fractional part of a DAY is to be considered a full DAY. The total amount of penalty shall not however, exceed 2.0% of the total value of the Equipment involved in late delivery. If the delay is more than 2 WEEK, the Buyer is entitled to terminate this Contract.');
             template.getVersion().should.equal('0.0.1');
             template.getMetadata().getSample().should.equal('Late Delivery and Penalty.\n\nIn case of delayed delivery except for Force Majeure cases, the Seller shall pay to the Buyer for every 9 days of delay penalty amounting to 7.0% of the total value of the Equipment whose delivery has been delayed. Any fractional part of a days is to be considered a full days. The total amount of penalty shall not however, exceed 2.0% of the total value of the Equipment involved in late delivery. If the delay is more than 2 weeks, the Buyer is entitled to terminate this Contract.\n');
-            template.getHash().should.equal('bdb7e6d34d7cc9db13ac2d3d2a8a1cdd02aacb3a0f2dc9d38fee5195152035e4');
+            template.getHash().should.equal('3a8eba7180db736bb727409b1868381035d40c74390095a3595d76c65197a692');
             const buffer = await template.toArchive('ergo');
             buffer.should.not.be.null;
             const template2 = await Template.fromArchive(buffer);
@@ -283,7 +282,7 @@ In case of delayed delivery except for Force Majeure cases, the Seller shall pay
             template.getDescription().should.equal('Late Delivery and Penalty. In case of delayed delivery except for Force Majeure cases, the Seller shall pay to the Buyer for every 9 DAY of delay penalty amounting to 7% of the total value of the Equipment whose delivery has been delayed. Any fractional part of a DAY is to be considered a full DAY. The total amount of penalty shall not however, exceed 2% of the total value of the Equipment involved in late delivery. If the delay is more than 2 WEEK, the Buyer is entitled to terminate this Contract.');
             template.getVersion().should.equal('0.0.1');
             template.getMetadata().getSample().should.equal('Late Delivery and Penalty. In case of delayed delivery except for Force Majeure cases, the Seller shall pay to the Buyer for every 9 days of delay penalty amounting to 7% of the total value of the Equipment whose delivery has been delayed. Any fractional part of a days is to be considered a full days. The total amount of penalty shall not however, exceed 2% of the total value of the Equipment involved in late delivery. If the delay is more than 2 weeks, the Buyer is entitled to terminate this Contract.');
-            template.getHash().should.equal('e9685ec00a0b4822551e7c18c661294d732372cfa33dbf49e69c2ca17c4fb511');
+            template.getHash().should.equal('ab74261377b4abdf1c04dcca12972cb7d83c901a9f1f22620dc581be7d06b72a');
             const buffer = await template.toArchive('es6');
             buffer.should.not.be.null;
             const template2 = await Template.fromArchive(buffer);
@@ -593,7 +592,7 @@ In case of delayed delivery except for Force Majeure cases, the Seller shall pay
     describe('#getHash', () => {
         it('should return a SHA-256 hash', async () => {
             const template = await Template.fromDirectory('./test/data/latedeliveryandpenalty', options);
-            template.getHash().should.equal('31a8a67b474089a02d29bd96b05a3d9a039345e2d064ced086187c8c17546ae8');
+            template.getHash().should.equal('b47e292b631abea989056e5b88f453c485ccbbff8d09c4661bd71cd4595a0014');
         });
     });
 

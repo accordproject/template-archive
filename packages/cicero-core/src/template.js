@@ -19,12 +19,11 @@ const crypto = require('crypto');
 const forge = require('node-forge');
 const stringify = require('json-stable-stringify');
 
-const Introspector = require('@accordproject/concerto-core').Introspector;
 const ParserManager = require('@accordproject/markdown-template').ParserManager;
 
 const TemplateLoader = require('./templateloader');
 const TemplateSaver = require('./templatesaver');
-const APModelManager = require('./apmodelmanager');
+const LogicManager = require('./logicmanager');
 
 /**
  * A template for a legal clause or contract. A Template has a template model request/response transaction types,
@@ -49,8 +48,7 @@ class Template {
      */
     constructor(packageJson, readme, samples, request, logo, options, authorSignature) {
         this.metadata = new Metadata(packageJson, readme, samples, request, logo);
-        this.modelManager = new APModelManager();
-        this.introspector = new Introspector(this.modelManager);
+        this.logicManager = new LogicManager('es6', null, options);
         const templateKind = this.getMetadata().getTemplateType() !== 0 ? 'clause' : 'contract';
         this.parserManager = new ParserManager(this.getModelManager(),null,templateKind);
         this.authorSignature = authorSignature ? authorSignature : null;
@@ -162,6 +160,12 @@ class Template {
         let modelFiles = this.getModelManager().getModels();
         modelFiles.forEach(function (file) {
             content.models[file.namespace] = file.content;
+        });
+
+        let scriptManager = this.getScriptManager();
+        let scriptFiles = scriptManager.getScripts();
+        scriptFiles.forEach(function (file) {
+            content.scripts[file.getIdentifier()] = file.contents;
         });
 
         const hasher = crypto.createHash('sha256');
@@ -306,12 +310,22 @@ class Template {
     }
 
     /**
+     * Provides access to the template logic for this template.
+     * The template logic encapsulate the code necessary to
+     * execute the clause or contract.
+     * @return {LogicManager} the LogicManager for this template
+     */
+    getLogicManager() {
+        return this.logicManager;
+    }
+
+    /**
      * Provides access to the Introspector for this template. The Introspector
      * is used to reflect on the types defined within this template.
      * @return {Introspector} the Introspector for this template
      */
     getIntrospector() {
-        return this.introspector;
+        return this.logicManager.getIntrospector();
     }
 
     /**
@@ -333,13 +347,23 @@ class Template {
     }
 
     /**
+     * Provides access to the ScriptManager for this template. The ScriptManager
+     * manage access to the scripts that have been defined within this template.
+     * @return {ScriptManager} the ScriptManager for this template
+     * @private
+     */
+    getScriptManager() {
+        return this.logicManager.getScriptManager();
+    }
+
+    /**
      * Provides access to the ModelManager for this template. The ModelManager
      * manage access to the models that have been defined within this template.
      * @return {ModelManager} the ModelManager for this template
      * @private
      */
     getModelManager() {
-        return this.modelManager;
+        return this.logicManager.getModelManager();
     }
 
     /**
@@ -435,6 +459,14 @@ class Template {
      */
     getStateTypes() {
         return this.findConcreteSubclassNames('org.accordproject.runtime.State');
+    }
+
+    /**
+     * Returns true if the template has logic, i.e. has more than one script file.
+     * @return {boolean} true if the template has logic
+     */
+    hasLogic() {
+        return this.getScriptManager().getAllScripts().length > 0;
     }
 
     /**

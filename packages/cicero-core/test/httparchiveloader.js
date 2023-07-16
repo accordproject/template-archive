@@ -14,7 +14,7 @@
 
 'use strict';
 
-let HTTPArchiveLoader = require('../lib/loaders/httparchiveloader');
+let HTTPArchiveLoader = require('../src/loaders/httparchiveloader');
 
 const chai = require('chai');
 const mock = require('mock-require');
@@ -39,7 +39,7 @@ describe('HTTPArchiveLoader', () => {
 
         it('should load an archive from an unauthenticated URL', async function() {
             mock('axios', mockAxios);
-            HTTPArchiveLoader = mock.reRequire('../lib/loaders/httparchiveloader');
+            HTTPArchiveLoader = mock.reRequire('../src/loaders/httparchiveloader');
             const loader = new HTTPArchiveLoader();
 
             loader.load('https://templates.accordproject.org/archives/ip-payment@0.13.0.cta');
@@ -50,7 +50,7 @@ describe('HTTPArchiveLoader', () => {
 
         it('should load an archive from an authenticated URL', async function() {
             mock('axios', mockAxios);
-            HTTPArchiveLoader = mock.reRequire('../lib/loaders/httparchiveloader');
+            HTTPArchiveLoader = mock.reRequire('../src/loaders/httparchiveloader');
             const loader = new HTTPArchiveLoader();
 
             loader.load('https://templates.accordproject.org/archives/ip-payment@0.13.0.cta', { httpAuthHeader: 'Basic TOKEN' });
@@ -70,7 +70,7 @@ describe('HTTPArchiveLoader', () => {
                     }
                 });
             });
-            HTTPArchiveLoader = mock.reRequire('../lib/loaders/httparchiveloader');
+            HTTPArchiveLoader = mock.reRequire('../src/loaders/httparchiveloader');
             const loader = new HTTPArchiveLoader();
 
             loader.load('https://templates.accordproject.org/archives/ip-payment@0.13.0.cta').should.be.rejected;

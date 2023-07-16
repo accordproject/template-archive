@@ -16,11 +16,11 @@
 
 const slash = require('slash');
 const fsPath = require('path');
+const fs = require('fs');
 
 const Parser = require('@accordproject/concerto-cto').Parser;
 const ModelManager = require('@accordproject/concerto-core').ModelManager;
 const ModelFile = require('@accordproject/concerto-core').ModelFile;
-const Builtin = require('./builtin');
 
 const processModelFiles = (modelFiles) => {
     let models = [];
@@ -45,7 +45,7 @@ const processModelFiles = (modelFiles) => {
  * @class
  * @public
  * @abstract
- * @memberof module:ergo-compiler
+ * @memberof module:cicero-core
  */
 class APModelManager extends ModelManager {
 
@@ -53,11 +53,18 @@ class APModelManager extends ModelManager {
      */
     constructor() {
         super();
-        this.addCTOModel(Builtin.TimeModel, '@models.accordproject.org.time@0.2.0.cto');
-        this.addCTOModel(Builtin.MoneyModel, '@models.accordproject.org.accordproject.money@0.2.0.cto');
-        this.addCTOModel(Builtin.ContractModel, '@models.accordproject.org.accordproject.contract.cto');
-        this.addCTOModel(Builtin.RuntimeModel, '@models.accordproject.org.accordproject.runtime.cto');
-        this.addCTOModel(Builtin.OptionsModel, '@org.accordproject.ergo.options.cto');
+
+        const readAndAddModelFile = (fileName) => {
+            const modelFile = fsPath.resolve(__dirname, fileName);
+            const modelFileContent = fs.readFileSync(modelFile, 'utf8');
+            const name = slash(fileName);
+            this.addCTOModel(modelFileContent, name);
+        };
+        readAndAddModelFile('./external/@models.accordproject.org.time@0.2.0.cto');
+        readAndAddModelFile('./external/@models.accordproject.org.money@0.2.0.cto');
+        readAndAddModelFile('./external/@models.accordproject.org.accordproject.contract.cto');
+        readAndAddModelFile('./external/@models.accordproject.org.accordproject.runtime.cto');
+
         this.validateModelFiles();
         this.builtInNamespaces = this.getNamespaces();
     }
@@ -86,7 +93,7 @@ class APModelManager extends ModelManager {
 
     /**
      * Add a set of model files to the TemplateLogic
-     * @param {string[]} modelFiles - An array of Composer files as
+     * @param {string[]} modelFiles - An array of Concerto files as
      * strings.
      * @param {string[]} [modelFileNames] - An optional array of file names to
      * associate with the model files
@@ -103,34 +110,6 @@ class APModelManager extends ModelManager {
         } else {
             const externalModelFiles = await this.updateExternalModels();
             return processModelFiles(externalModelFiles);
-        }
-    }
-
-    /**
-     * Update of a given model
-     * @param {string} content - the model content
-     * @param {string} name - the model name
-     */
-    updateModel(content, name) {
-        const currentModels = this.getModelFiles();
-        // Is this a new model?
-        if (!currentModels.some(x => x.getName() === name)) {
-            this.addCTOModel(content, name);
-        } else {
-            const previousModelFile =
-                  (currentModels.filter(x => x.getName() === name))[0];
-            const previousContent = previousModelFile.getDefinitions();
-            if (content !== previousContent) {
-                const previousNamespace = previousModelFile.getNamespace();
-                const ast = Parser.parse(content, name);
-                const newNamespace = new ModelFile(this, ast, content, name).getNamespace();
-                if (previousNamespace === newNamespace) {
-                    this.updateModelFile(content, name, true);
-                } else {
-                    this.deleteModelFile(previousNamespace);
-                    this.addCTOModel(content, name, true);
-                }
-            }
         }
     }
 }

@@ -17,8 +17,8 @@
 const ciceroVersion = require('../package.json').version;
 const semver = require('semver');
 
-const Metadata = require('../lib/metadata');
-const TemplateLoader = require('../lib/templateloader');
+const Metadata = require('../src/metadata');
+const TemplateLoader = require('../src/templateloader');
 
 const chai = require('chai');
 

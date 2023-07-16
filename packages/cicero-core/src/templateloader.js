@@ -385,9 +385,9 @@ class TemplateLoader {
     }
 
     /**
-     * Prepare the text for parsing (normalizes new lines, etc)
-     * @param {string} input - the text for the clause
-     * @return {string} - the normalized text for the clause
+     * Normalizes new lines
+     * @param {string} input - the text
+     * @return {string} - the normalized text
      */
     static normalizeNLs(input) {
         // we replace all \r and \n with \n

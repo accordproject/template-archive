@@ -14,7 +14,7 @@
 
 'use strict';
 
-let TemplateLibrary = require('../lib/templatelibrary');
+let TemplateLibrary = require('../src/templatelibrary');
 
 const chai = require('chai');
 const mock = require('mock-require');
@@ -214,8 +214,8 @@ describe('TemplateLibrary', () => {
 
         it('should retrieve a template without authentication', async () => {
             mock('axios', mockAxios);
-            mock('../lib/template', mockTemplateInstance);
-            TemplateLibrary = mock.reRequire('../lib/templatelibrary');
+            mock('../src/template', mockTemplateInstance);
+            TemplateLibrary = mock.reRequire('../src/templatelibrary');
 
             const templateLibrary = new TemplateLibrary();
             await templateLibrary.getTemplateIndex();
@@ -230,8 +230,8 @@ describe('TemplateLibrary', () => {
 
         it('should retrieve a template with authentication', async () => {
             mock('axios', mockAxios);
-            mock('../lib/template', mockTemplateInstance);
-            TemplateLibrary = mock.reRequire('../lib/templatelibrary');
+            mock('../src/template', mockTemplateInstance);
+            TemplateLibrary = mock.reRequire('../src/templatelibrary');
 
             const templateLibrary = new TemplateLibrary(null, 'Bearer TOKEN');
             await templateLibrary.getTemplateIndex();

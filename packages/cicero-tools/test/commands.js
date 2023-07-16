@@ -23,7 +23,7 @@ chai.should();
 chai.use(require('chai-things'));
 chai.use(require('chai-as-promised'));
 
-const Commands = require('../lib/commands');
+const Commands = require('../src/commands');
 
 describe('cicero-tools', () => {
     const models = [path.resolve(__dirname, 'models/dom.cto'),path.resolve(__dirname, 'models/money.cto')];
