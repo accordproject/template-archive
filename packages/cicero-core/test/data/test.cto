@@ -1,0 +1,13 @@
+namespace org.accordproject.copyrightlicense
+
+transaction PaymentRequest {
+  o String input
+}
+
+transaction PayOut {
+  o Double amount
+}
+
+concept Contract {
+  o Double amount
+}

@@ -39,8 +39,6 @@ class Script {
         this.contractName = contractName;
         this.language = language;
         this.contents = contents;
-        this.functions = [];
-        this.tokens = [];
 
         if(!contents) {
             throw new Error('Empty script contents');
@@ -78,25 +76,6 @@ class Script {
     getContents() {
         return this.contents;
     }
-
-    /**
-     * Returns the FunctionDeclaration for all functions that have been defined in this
-     * Script.
-     *
-     * @return {FunctionDeclaration[]} The array of FunctionDeclarations
-     */
-    getFunctionDeclarations() {
-        return this.functions;
-    }
-
-    /**
-     * Returns the tokens of the script
-     * @return {Object[]} the tokens of the script
-     */
-    getTokens() {
-        return this.tokens;
-    }
-
 }
 
 module.exports = Script;

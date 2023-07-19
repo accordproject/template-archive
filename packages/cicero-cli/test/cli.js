@@ -115,6 +115,13 @@ describe('#compile', () => {
         fs.readdirSync(dir.path).length.should.be.equal(0);
         dir.cleanup();
     });
+    it('should compile a template archive to a Typescript model', async () => {
+        const dir = await tmp.dir({ unsafeCleanup: true });
+        await Commands.compile(path.resolve(__dirname, 'data/helloworldstate@0.14.0.cta'), 'Typescript', dir.path, true);
+        // console.log(dir.path);
+        fs.readdirSync(dir.path).length.should.be.above(0);
+        dir.cleanup();
+    });
 });
 
 describe('#validateArchiveArgs', () => {

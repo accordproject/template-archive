@@ -128,13 +128,12 @@ class ScriptManager {
      * @private
      */
     getScriptsForTarget(target) {
-        const scripts = this.getAllScripts();
-        let keys = Object.keys(scripts);
+        let keys = Object.keys(this.scripts);
         let result = [];
 
         for(let n=0; n < keys.length;n++) {
-            if (scripts[keys[n]].getLanguage() === target)  {
-                result.push(scripts[keys[n]]);
+            if (this.scripts[keys[n]].getLanguage() === target)  {
+                result.push(this.scripts[keys[n]]);
             }
         }
         return result;

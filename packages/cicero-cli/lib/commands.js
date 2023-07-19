@@ -29,7 +29,6 @@ const CordaVisitor = CodeGen.CordaVisitor;
 const JSONSchemaVisitor = CodeGen.JSONSchemaVisitor;
 const PlantUMLVisitor = CodeGen.PlantUMLVisitor;
 const TypescriptVisitor = CodeGen.TypescriptVisitor;
-const defaultSample = 'text/sample.md';
 
 /**
  * Utility class that implements the commands exposed by the Cicero CLI.
@@ -94,74 +93,6 @@ class Commands {
         }
 
         return argv;
-    }
-
-    /**
-     * Check data params used by initialize, invoke and trigger commands.
-     * Data must be provided to these commands either via a "sample.md" file or via a "data.json" file.
-     * Function checks if params exist, if not then attempts to locate default "./text/sample.md" or "./data.json" files.
-     * If neither found then throws exception.
-     *
-     * @param {object} argv - the inbound argument values object
-     * @returns {object} a modfied argument object
-     */
-    static validateDataArgs(argv) {
-        if (argv.sample) {
-            if (!fs.existsSync(argv.sample)) {
-                throw new Error(`A sample file was specified as "${argv.sample}" but does not exist at this location.`);
-            }
-        } else if (argv.data) {
-            if (!fs.existsSync(argv.data)) {
-                throw new Error(`A data file was specified as "${argv.data}" but does not exist at this location.`);
-            }
-        } else {
-            if (fs.existsSync(defaultSample)) {
-                argv.sample = defaultSample;
-                Logger.warn('A data file was not provided. Loading data from default "/text/sample.md" file.');
-            } else {
-                throw new Error('A data file was not provided. Try the --sample flag to provide a data file in markdown format or the --data flag to provide a data file in JSON format.');
-            }
-        }
-
-        return argv;
-    }
-
-    /**
-     * Set a default for a file argument
-     *
-     * @param {object} argv - the inbound argument values object
-     * @param {string} argName - the argument name
-     * @param {string} argDefaultName - the argument default name
-     * @param {Function} argDefaultFun - how to compute the argument default
-     * @param {object} argDefaultValue - an optional default value if all else fails
-     * @returns {object} a modified argument object
-     */
-    static setDefaultFileArg(argv, argName, argDefaultName, argDefaultFun) {
-        if(!argv[argName]){
-            Logger.info(`Loading a default ${argDefaultName} file.`);
-            argv[argName] = argDefaultFun(argv, argDefaultName);
-        }
-
-        let argExists = true;
-        if (Array.isArray(argv[argName])) {
-            // All files should exist
-            for (let i = 0; i < argv[argName].length; i++) {
-                if (fs.existsSync(argv[argName][i]) && argExists) {
-                    argExists = true;
-                } else {
-                    argExists = false;
-                }
-            }
-        } else {
-            // This file should exist
-            argExists = fs.existsSync(argv[argName]);
-        }
-
-        if (!argExists){
-            throw new Error(`A ${argDefaultName} file is required. Try the --${argName} flag or create a ${argDefaultName} in your template.`);
-        } else {
-            return argv;
-        }
     }
 
     /**
