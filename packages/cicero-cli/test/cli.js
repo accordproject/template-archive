@@ -25,7 +25,7 @@ chai.should();
 chai.use(require('chai-things'));
 chai.use(require('chai-as-promised'));
 
-const Commands = require('../src/commands');
+const Commands = require('../lib/commands');
 
 const template = path.resolve(__dirname, 'data/latedeliveryandpenalty/');
 const templateArchive = path.resolve(__dirname, 'data/latedeliveryandpenalty.cta');
