@@ -47,6 +47,7 @@
   },
   "homepage": "https://github.com/accordproject/cicero",
   "devDependencies": {
+    "@istanbuljs/nyc-config-babel": "3.0.0",
     "archiver": "5.3.1",
     "assert": "2.0.0",
     "browserify-zlib": "0.2.0",
