@@ -93,6 +93,7 @@ describe('Clause', () => {
             };
             clause.setData(data);
             clause.getData().should.eql(data);
+            clause.getIdentifier().should.equal('latedeliveryandpenalty@0.0.1-c57ba573028ae93c59716b21ff1341023f2aa86c1993b1ad13441a7c1d949cc4');
 
             // check that the concerto data is really a Concerto object
             clause.getDataAsConcertoObject().getFullyQualifiedType().should.be.equal('io.clause.latedeliveryandpenalty.TemplateModel');

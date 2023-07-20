@@ -466,7 +466,7 @@ class Template {
      * @return {boolean} true if the template has logic
      */
     hasLogic() {
-        return this.getScriptManager().getAllScripts().length > 0;
+        return this.getScriptManager().getScripts().length > 0;
     }
 
     /**

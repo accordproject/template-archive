@@ -94,40 +94,6 @@ class TemplateInstance {
     }
 
     /**
-     * Format CiceroMark
-     * @param {object} ciceroMarkParsed - the parsed CiceroMark DOM
-     * @param {object} options - parameters to the formatting
-     * @param {string} format - to the text generation
-     * @return {string} the result of parsing and printing back the text
-     */
-    formatCiceroMark(ciceroMarkParsed,options) {
-        const format = options && options.format ? options.format : 'markdown_cicero';
-        if (format === 'markdown_cicero') {
-            if (options && options.unquoteVariables) {
-                ciceroMarkParsed = this.ciceroMarkTransformer.unquote(ciceroMarkParsed);
-            }
-            const ciceroMark = this.ciceroMarkTransformer.toCiceroMarkUnwrapped(ciceroMarkParsed);
-            return this.ciceroMarkTransformer.toMarkdownCicero(ciceroMark);
-        } else if (format === 'ciceromark_parsed'){
-            return ciceroMarkParsed;
-        } else if (format === 'html'){
-            if (options && options.unquoteVariables) {
-                ciceroMarkParsed = this.ciceroMarkTransformer.unquote(ciceroMarkParsed);
-            }
-            const htmlTransformer = new HtmlTransformer();
-            return htmlTransformer.toHtml(ciceroMarkParsed);
-        } else if (format === 'slate'){
-            if (options && options.unquoteVariables) {
-                ciceroMarkParsed = this.ciceroMarkTransformer.unquote(ciceroMarkParsed);
-            }
-            const slateTransformer = new SlateTransformer();
-            return slateTransformer.fromCiceroMark(ciceroMarkParsed);
-        } else {
-            throw new Error('Unsupported format: ' + format);
-        }
-    }
-
-    /**
      * Returns the identifier for this clause. The identifier is the identifier of
      * the template plus '-' plus a hash of the data for the clause (if set).
      * @return {String} the identifier of this clause
