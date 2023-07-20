@@ -72,8 +72,6 @@
     "@accordproject/concerto-core": "3.8.2",
     "@accordproject/markdown-cicero": "0.16.5",
     "@accordproject/markdown-common": "0.16.5",
-    "@accordproject/markdown-html": "0.16.5",
-    "@accordproject/markdown-slate": "0.16.5",
     "@accordproject/markdown-template": "0.16.5",
     "axios": "1.4.0",
     "debug": "4.3.4",
