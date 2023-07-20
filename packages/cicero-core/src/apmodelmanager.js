@@ -98,7 +98,7 @@ class APModelManager extends ModelManager {
      * @param {string[]} [modelFileNames] - An optional array of file names to
      * associate with the model files
      * @param {boolean} offline - do not update external models
-     * @return {Array<{name:string, namespace: string, content:string}>} 
+     * @return {Array<{name:string, namespace: string, content:string}>}
      * A list of external non-system model files added in addition to the source set.
      */
     async addAPModelFiles(modelFiles, modelFileNames, offline) {
