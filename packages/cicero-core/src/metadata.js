@@ -14,8 +14,8 @@
 
 'use strict';
 
-const Logger = require('@accordproject/ergo-compiler').Logger;
-const ErgoCompiler = require('@accordproject/ergo-compiler').Compiler;
+const Logger = require('@accordproject/concerto-util').Logger;
+require('@accordproject/concerto-util').Logger;
 const ciceroVersion = require('../package.json').version;
 const semver = require('semver');
 
@@ -105,9 +105,7 @@ class Metadata {
         }
 
         // the runtime property is optional, and is only mandatory for templates that have been compiled
-        if (packageJson.accordproject.runtime && packageJson.accordproject.runtime !== 'ergo') {
-            ErgoCompiler.isValidTarget(packageJson.accordproject.runtime);
-        } else {
+        if (!packageJson.accordproject.runtime){
             packageJson.accordproject.runtime = 'ergo';
         }
         this.runtime = packageJson.accordproject.runtime;

@@ -19,8 +19,8 @@
  * @module cicero-core
  */
 
-module.exports.Clause = require('./lib/clause');
-module.exports.Template = require('./lib/template');
-module.exports.TemplateLoader = require('./lib/templateloader');
-module.exports.TemplateLibrary = require('./lib/templatelibrary');
+module.exports.Clause = require('./src/clause');
+module.exports.Template = require('./src/template');
+module.exports.TemplateLoader = require('./src/templateloader');
+module.exports.TemplateLibrary = require('./src/templatelibrary');
 module.exports.version = require('./package.json');

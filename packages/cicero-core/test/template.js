@@ -14,9 +14,7 @@
 
 'use strict';
 
-const Template = require('../lib/template');
-const Clause = require('../lib/clause');
-
+const Template = require('../src/template');
 const fs = require('fs');
 const archiver = require('archiver');
 const forge = require('node-forge');
@@ -164,8 +162,7 @@ describe('Template', () => {
         });
 
         it('should create a template from a directory with no logic', async () => {
-            const template = await Template.fromDirectory('./test/data/text-only', options);
-            template.hasLogic().should.equal(false);
+            return Template.fromDirectory('./test/data/text-only', options);
         });
 
         it('should create a template from a directory and download external models by default', async () => {
@@ -182,15 +179,6 @@ describe('Template', () => {
 
         it('should throw error when the template signature is tampered', async () => {
             return Template.fromDirectory('./test/data/verifying-template-signature/helloworldstateTamperSign', options).should.be.rejectedWith('Template\'s author signature is invalid!');
-        });
-
-        it('should throw error when Ergo logic does not parse', async () => {
-            return Template.fromDirectory('./test/data/bad-logic', options).should.be.rejectedWith('Parse error (at file logic/logic.ergo line 14 col 4). \n    define agreed = request.agreedDelivery;\n    ^^^^^^                                 ');
-        });
-
-        it('should throw an error if archive language is not a valid target', async () => {
-            const templatePromise = Template.fromDirectory('./test/data/latedeliveryandpenalty', options);
-            return templatePromise.then((template) => template.toArchive('foo')).should.be.rejectedWith('Unknown target: foo (available: es6,java)');
         });
 
         it('should throw an error if archive language is is absent', async () => {
@@ -211,7 +199,7 @@ describe('Template', () => {
         it('should roundtrip a template with a logo', async () => {
             const template = await Template.fromDirectory('./test/data/template-logo', options);
             template.getIdentifier().should.equal('logo@0.0.1');
-            template.getHash().should.be.equal('cd024363c153f238294cbf95c6502423c9a9fe4219461eb0ca18585e5aaef0fc');
+            template.getHash().should.be.equal('3085d14ab6390d08ad003899ad540c2edefe088da0ef816dbcdc0189ed36f3cc');
             template.getMetadata().getLogo().should.be.an.instanceof(Buffer);
             template.getMetadata().getSample().should.equal('"Aman" "Sharma" added the support for logo and hence created this template for testing!\n');
             const buffer = await template.toArchive('ergo');
@@ -225,12 +213,8 @@ describe('Template', () => {
 
         it('should roundtrip a source template (Ergo)', async function() {
             const template = await Template.fromDirectory('./test/data/latedeliveryandpenalty', options);
-            template.hasLogic().should.equal(true);
             template.getIdentifier().should.equal('latedeliveryandpenalty@0.0.1');
             template.getModelManager().getModelFile('io.clause.latedeliveryandpenalty').should.not.be.null;
-            template.getParserManager().getTemplateMark().should.not.be.null;
-            template.getScriptManager().getScripts().length.should.equal(1);
-            template.getScriptManager().getLogic().length.should.equal(1);
             template.getMetadata().getREADME().should.not.be.null;
             template.getMetadata().getRequest().should.not.be.null;
             template.getMetadata().getKeywords().should.not.be.null;
@@ -245,15 +229,12 @@ In case of delayed delivery except for Force Majeure cases, the Seller shall pay
 1. Any fractional part of a days is to be considered a full days.
 2. The total amount of penalty shall not however, exceed 2.0% of the total value of the Equipment involved in late delivery.
 3. If the delay is more than 2 weeks, the Buyer is entitled to terminate this Contract.`);
-            template.getHash().should.equal('79aee75d5c3d3991f456d493b92239e7be0bb1a92e0ee857dbdbcf5188828ebf');
+            template.getHash().should.equal('b47e292b631abea989056e5b88f453c485ccbbff8d09c4661bd71cd4595a0014');
             const buffer = await template.toArchive('ergo');
             buffer.should.not.be.null;
             const template2 = await Template.fromArchive(buffer);
             template2.getIdentifier().should.equal(template.getIdentifier());
             template2.getModelManager().getModelFile('io.clause.latedeliveryandpenalty').should.not.be.null;
-            template2.getParserManager().getTemplateMark().should.not.be.null;
-            template2.getParserManager().getTemplate().should.equal(template.getParserManager().getTemplate());
-            template2.getScriptManager().getScripts().length.should.equal(template.getScriptManager().getScripts().length);
             template2.getMetadata().getREADME().should.equal(template.getMetadata().getREADME());
             template2.getMetadata().getKeywords().should.eql(template.getMetadata().getKeywords());
             template2.getMetadata().getSamples().should.eql(template.getMetadata().getSamples());
@@ -265,12 +246,8 @@ In case of delayed delivery except for Force Majeure cases, the Seller shall pay
 
         it('should roundtrip a source template (CR)', async function() {
             const template = await Template.fromDirectory('./test/data/latedeliveryandpenalty-cr', options);
-            template.hasLogic().should.equal(true);
             template.getIdentifier().should.equal('latedeliveryandpenalty@0.0.1');
             template.getModelManager().getModelFile('io.clause.latedeliveryandpenalty').should.not.be.null;
-            template.getParserManager().getTemplateMark().should.not.be.null;
-            template.getScriptManager().getScripts().length.should.equal(1);
-            template.getScriptManager().getLogic().length.should.equal(1);
             template.getMetadata().getREADME().should.not.be.null;
             template.getMetadata().getRequest().should.not.be.null;
             template.getMetadata().getKeywords().should.not.be.null;
@@ -279,15 +256,12 @@ In case of delayed delivery except for Force Majeure cases, the Seller shall pay
             template.getDescription().should.equal('Late Delivery and Penalty. In case of delayed delivery except for Force Majeure cases, the Seller shall pay to the Buyer for every 9 DAY of delay penalty amounting to 7.0% of the total value of the Equipment whose delivery has been delayed. Any fractional part of a DAY is to be considered a full DAY. The total amount of penalty shall not however, exceed 2.0% of the total value of the Equipment involved in late delivery. If the delay is more than 2 WEEK, the Buyer is entitled to terminate this Contract.');
             template.getVersion().should.equal('0.0.1');
             template.getMetadata().getSample().should.equal('Late Delivery and Penalty.\n\nIn case of delayed delivery except for Force Majeure cases, the Seller shall pay to the Buyer for every 9 days of delay penalty amounting to 7.0% of the total value of the Equipment whose delivery has been delayed. Any fractional part of a days is to be considered a full days. The total amount of penalty shall not however, exceed 2.0% of the total value of the Equipment involved in late delivery. If the delay is more than 2 weeks, the Buyer is entitled to terminate this Contract.\n');
-            template.getHash().should.equal('83180d9d0817b9e8ea4b522c86dbd1841c9a905130031945830ce011da56fe80');
+            template.getHash().should.equal('3a8eba7180db736bb727409b1868381035d40c74390095a3595d76c65197a692');
             const buffer = await template.toArchive('ergo');
             buffer.should.not.be.null;
             const template2 = await Template.fromArchive(buffer);
             template2.getIdentifier().should.equal(template.getIdentifier());
             template2.getModelManager().getModelFile('io.clause.latedeliveryandpenalty').should.not.be.null;
-            template2.getParserManager().getTemplateMark().should.not.be.null;
-            template2.getParserManager().getTemplate().should.equal(template.getParserManager().getTemplate());
-            template2.getScriptManager().getScripts().length.should.equal(template.getScriptManager().getScripts().length);
             template2.getMetadata().getREADME().should.equal(template.getMetadata().getREADME());
             template2.getMetadata().getKeywords().should.eql(template.getMetadata().getKeywords());
             template2.getMetadata().getSamples().should.eql(template.getMetadata().getSamples());
@@ -301,8 +275,6 @@ In case of delayed delivery except for Force Majeure cases, the Seller shall pay
             const template = await Template.fromDirectory('./test/data/latedeliveryandpenalty_js', options);
             template.getIdentifier().should.equal('latedeliveryandpenalty@0.0.1');
             template.getModelManager().getModelFile('io.clause.latedeliveryandpenalty').should.not.be.null;
-            template.getParserManager().getTemplateMark().should.not.be.null;
-            template.getScriptManager().getScripts().length.should.equal(1);
             template.getMetadata().getREADME().should.not.be.null;
             template.getMetadata().getRequest().should.not.be.null;
             template.getMetadata().getKeywords().should.not.be.null;
@@ -310,15 +282,12 @@ In case of delayed delivery except for Force Majeure cases, the Seller shall pay
             template.getDescription().should.equal('Late Delivery and Penalty. In case of delayed delivery except for Force Majeure cases, the Seller shall pay to the Buyer for every 9 DAY of delay penalty amounting to 7% of the total value of the Equipment whose delivery has been delayed. Any fractional part of a DAY is to be considered a full DAY. The total amount of penalty shall not however, exceed 2% of the total value of the Equipment involved in late delivery. If the delay is more than 2 WEEK, the Buyer is entitled to terminate this Contract.');
             template.getVersion().should.equal('0.0.1');
             template.getMetadata().getSample().should.equal('Late Delivery and Penalty. In case of delayed delivery except for Force Majeure cases, the Seller shall pay to the Buyer for every 9 days of delay penalty amounting to 7% of the total value of the Equipment whose delivery has been delayed. Any fractional part of a days is to be considered a full days. The total amount of penalty shall not however, exceed 2% of the total value of the Equipment involved in late delivery. If the delay is more than 2 weeks, the Buyer is entitled to terminate this Contract.');
-            template.getHash().should.equal('b3633a8bc588092d7a12b1a7120c1f2ef75526b2cb6a778129966963ba252a0c');
+            template.getHash().should.equal('ab74261377b4abdf1c04dcca12972cb7d83c901a9f1f22620dc581be7d06b72a');
             const buffer = await template.toArchive('es6');
             buffer.should.not.be.null;
             const template2 = await Template.fromArchive(buffer);
             template2.getIdentifier().should.equal(template.getIdentifier());
             template2.getModelManager().getModelFile('io.clause.latedeliveryandpenalty').should.not.be.null;
-            template2.getParserManager().getTemplateMark().should.not.be.null;
-            template2.getParserManager().getTemplate().should.equal(template.getParserManager().getTemplate());
-            template2.getScriptManager().getScripts().length.should.equal(template.getScriptManager().getScripts().length);
             template2.getMetadata().getREADME().should.equal(template.getMetadata().getREADME());
             template2.getMetadata().getKeywords().should.eql(template.getMetadata().getKeywords());
             template2.getMetadata().getSamples().should.eql(template.getMetadata().getSamples());
@@ -385,10 +354,6 @@ In case of delayed delivery except for Force Majeure cases, the Seller shall pay
         it('should create an archive for a template with two Ergo modules', async () => {
             return Template.fromDirectory('./test/data/hellomodule', options).should.be.fulfilled;
         });
-
-        it('should fail creating an archive for a template for a wrong Ergo module call', async () => {
-            return Template.fromDirectory('./test/data/hellomodule-bug', options).should.be.rejectedWith('Type error (at file logic/logic.ergo line 23 col 11). This operator received unexpected arguments');
-        });
     });
 
     describe('#fromArchive', () => {
@@ -429,66 +394,6 @@ In case of delayed delivery except for Force Majeure cases, the Seller shall pay
             return Template.fromArchive(buffer).should.be.fulfilled;
         });
 
-        it('should create a template from a compiled archive and parse', async () => {
-            const buffer = fs.readFileSync('./test/data/fixed-interests@0.6.0.cta');
-            const template = await Template.fromArchive(buffer);
-
-            const sampleText = `## Fixed rate loan
-
-This is a _fixed interest_ loan to the amount of £100,000.00
-at the yearly interest rate of 2.5%
-with a loan term of 15,
-and monthly payments of {{%I'm not sure which amount right now%}}
-`;
-            const clause = new Clause(template);
-            clause.parse(sampleText);
-            const result = clause.getData();
-            delete result.clauseId;
-            delete result.$identifier;
-
-            const expected = {
-                '$class': 'org.accordproject.interests.TemplateModel',
-                'loanAmount': {
-                    '$class': 'org.accordproject.money.MonetaryAmount',
-                    'doubleValue': 100000,
-                    'currencyCode': 'GBP'
-                },
-                'rate': 2.5,
-                'loanDuration': 15
-            };
-            result.should.deep.equal(expected);
-        });
-
-        // XXX Disable draft with formulas -- need to update calculate engine call through the markdown-transform stack
-        it.skip('should create a template from a compiled archive and draft', async () => {
-            const buffer = fs.readFileSync('./test/data/fixed-interests@0.6.0.cta');
-            const template = await Template.fromArchive(buffer);
-
-            const data = {
-                '$class': 'org.accordproject.interests.TemplateModel',
-                'loanAmount': {
-                    '$class': 'org.accordproject.money.MonetaryAmount',
-                    'doubleValue': 100000,
-                    'currencyCode': 'GBP'
-                },
-                'rate': 2.5,
-                'loanDuration': 15,
-                'clauseId': '0bb38858-24b3-4853-b8c2-2fa3b93dce8d'
-            };
-
-            const clause = new Clause(template);
-            clause.setData(data);
-            const result = clause.draft();
-
-            const expected = `Fixed rate loan
-----
-
-This is a *fixed interest* loan to the amount of £100,000.00
-at the yearly interest rate of 2.5%
-with a loan term of 15,
-and monthly payments of {{%"£667.00"%}}`;
-            result.should.equal(expected);
-        });
     });
 
     describe.skip('#fromUrl', () => {
@@ -598,14 +503,18 @@ and monthly payments of {{%"£667.00"%}}`;
             const template = await Template.fromDirectory('./test/data/latedeliveryandpenalty', options);
             const types = template.getRequestTypes();
             types.should.be.eql([
+                'org.accordproject.runtime.Request',
                 'io.clause.latedeliveryandpenalty.LateDeliveryAndPenaltyRequest',
             ]);
         });
 
-        it('should return empty array when no logic is defined', async () => {
+        it('should return request types when no logic is defined', async () => {
             const template = await Template.fromDirectory('./test/data/no-logic', options);
             const types = template.getRequestTypes();
-            types.should.be.eql([]);
+            types.should.be.eql([
+                'org.accordproject.runtime.Request',
+                'io.clause.latedeliveryandpenalty.LateDeliveryAndPenaltyRequest'
+            ]);
         });
     });
 
@@ -615,14 +524,17 @@ and monthly payments of {{%"£667.00"%}}`;
             const template = await Template.fromDirectory('./test/data/latedeliveryandpenalty', options);
             const types = template.getResponseTypes();
             types.should.be.eql([
+                'org.accordproject.runtime.Response',
                 'io.clause.latedeliveryandpenalty.LateDeliveryAndPenaltyResponse',
             ]);
         });
 
-        it('should return empty array when no logic is defined', async () => {
+        it('should return response type when no logic is defined', async () => {
             const template = await Template.fromDirectory('./test/data/no-logic');
-            const types = template.getRequestTypes();
-            types.should.be.eql([]);
+            const types = template.getResponseTypes();
+            types.should.be.eql([
+                'org.accordproject.runtime.Response',
+                'io.clause.latedeliveryandpenalty.LateDeliveryAndPenaltyResponse',]);
         });
     });
 
@@ -631,9 +543,7 @@ and monthly payments of {{%"£667.00"%}}`;
         it('should return the default emit type for a clause without emit type declaration', async () => {
             const template = await Template.fromDirectory('./test/data/latedeliveryandpenalty', options);
             const types = template.getEmitTypes();
-            types.should.be.eql([
-                'concerto.Event',
-            ]);
+            types.should.be.eql([]);
         });
 
         it('should return emit type when declared in a clause', async () => {
@@ -666,28 +576,23 @@ and monthly payments of {{%"£667.00"%}}`;
             const types = template.getStateTypes();
             types.should.be.eql([
                 'org.accordproject.runtime.State',
+                'org.accordproject.helloemit.HelloWorldState'
             ]);
         });
 
-        it('should return empty array when no logic is defined', async () => {
+        it('should return state type when no logic is defined', async () => {
             const template = await Template.fromDirectory('./test/data/no-logic', options);
             const types = template.getStateTypes();
-            types.should.be.eql([]);
+            types.should.be.eql([
+                'org.accordproject.runtime.State',
+            ]);
         });
     });
 
     describe('#getHash', () => {
         it('should return a SHA-256 hash', async () => {
             const template = await Template.fromDirectory('./test/data/latedeliveryandpenalty', options);
-            template.getHash().should.equal('79aee75d5c3d3991f456d493b92239e7be0bb1a92e0ee857dbdbcf5188828ebf');
-        });
-    });
-
-    describe('#getLogicManager', () => {
-        it('should return a Template Logic', async () => {
-            const LogicManager = require('@accordproject/ergo-compiler').LogicManager;
-            const template = await Template.fromDirectory('./test/data/latedeliveryandpenalty', options);
-            template.getLogicManager('es6').should.be.an.instanceof(LogicManager);
+            template.getHash().should.equal('b47e292b631abea989056e5b88f453c485ccbbff8d09c4661bd71cd4595a0014');
         });
     });
 
@@ -743,14 +648,6 @@ and monthly payments of {{%"£667.00"%}}`;
         });
     });
 
-    describe('#getLogic', () => {
-
-        it('should return all Ergo scripts', async () => {
-            const template = await Template.fromDirectory('./test/data/latedeliveryandpenalty', options);
-            template.getScriptManager().getLogic().length.should.equal(1);
-        });
-    });
-
     describe('#accept', () => {
 
         it('should accept a visitor', async () => {
@@ -759,81 +656,6 @@ and monthly payments of {{%"£667.00"%}}`;
             };
             const template = await Template.fromDirectory('./test/data/latedeliveryandpenalty', options);
             return (() => template.accept(visitor,{})).should.not.throw();
-        });
-    });
-
-    describe('#markdown', () => {
-
-        it('should load latedeliveryandpenalty markdown template and parse', async () => {
-            const template = await Template.fromDirectory('./test/data/latedeliveryandpenalty', options);
-            template.getParserManager().getParser().should.not.be.null;
-
-            const sampleText = fs.readFileSync('./test/data/latedeliveryandpenalty/text/sample.md', 'utf8');
-            const clause = new Clause(template);
-            clause.parse(sampleText);
-            const result = clause.getData();
-            delete result.clauseId;
-            delete result.$identifier;
-
-            const expected = {
-                '$class': 'io.clause.latedeliveryandpenalty.TemplateModel',
-                'forceMajeure': true,
-                'penaltyDuration': {
-                    '$class': 'org.accordproject.time.Duration',
-                    'amount': 9,
-                    'unit': 'days'
-                },
-                'penaltyPercentage': 7,
-                'capPercentage': 2,
-                'termination': {
-                    '$class': 'org.accordproject.time.Duration',
-                    'amount': 2,
-                    'unit': 'weeks'
-                },
-                'fractionalPart': 'days'
-            };
-            result.should.deep.equal(expected);
-        });
-
-        it('should load copyright-license markdown template and parse', async () => {
-            const template = await Template.fromDirectory('./test/data/copyright-license', options);
-            template.getParserManager().getParser().should.not.be.null;
-
-            const sampleText = fs.readFileSync('./test/data/copyright-license/text/sample.md', 'utf8');
-            const clause = new Clause(template);
-            clause.parse(sampleText);
-            const result = clause.getData();
-            delete result.contractId;
-            delete result.$identifier;
-            delete result.paymentClause.clauseId;
-            delete result.paymentClause.$identifier;
-            delete result.effectiveDate;
-
-            const expected = {
-                '$class': 'org.accordproject.copyrightlicense.CopyrightLicenseContract',
-                'licensee': 'resource:org.accordproject.party.Party#Me',
-                'licenseeState': 'NY',
-                'licenseeEntityType': 'Company',
-                'licenseeAddress': '1 Broadway',
-                'licensor': 'resource:org.accordproject.party.Party#Myself',
-                'licensorState': 'NY',
-                'licensorEntityType': 'Company',
-                'licensorAddress': '2 Broadway',
-                'territory': 'United States',
-                'purposeDescription': 'stuff',
-                'workDescription': 'other stuff',
-                'paymentClause': {
-                    '$class': 'org.accordproject.copyrightlicense.PaymentClause',
-                    'amountText': 'one hundred US Dollars',
-                    'amount': {
-                        '$class': 'org.accordproject.money.MonetaryAmount',
-                        'doubleValue': 100,
-                        'currencyCode': 'USD'
-                    },
-                    'paymentProcedure': 'bank transfer'
-                }
-            };
-            result.should.deep.equal(expected);
         });
     });
 });

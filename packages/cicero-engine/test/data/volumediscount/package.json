@@ -1,9 +1,0 @@
-{
-    "name": "volumediscount",
-    "version": "0.0.6",
-    "description": "A sample volume discount clause.",
-    "accordproject": {
-        "template": "clause",
-        "cicero": "^0.24.0"
-    }
-}

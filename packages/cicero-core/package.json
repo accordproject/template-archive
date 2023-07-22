@@ -10,22 +10,19 @@
     "access": "public"
   },
   "files": [
-    "lib",
+    "src",
     "umd"
   ],
   "main": "index.js",
   "scripts": {
     "webpack": "webpack --config webpack.config.js --mode production",
-    "build": "babel src -d lib --copy-files",
-    "build:dist": "NODE_ENV=production babel src -d lib --copy-files",
-    "build:watch": "babel src -d lib --copy-files --watch",
-    "prepublishOnly": "npm run build:dist && npm run webpack",
-    "prepare": "npm run build",
-    "pretest": "npm run lint && npm run build",
+    "prepublishOnly": " npm run webpack",
+    "pretest": "npm run lint",
     "lint": "eslint .",
     "postlint": "npm run licchk",
     "licchk": "license-check-and-add check -f ../../license.config.json",
     "test:mocha": "mocha --timeout 40000",
+    "test:watch": "npm run test:mocha -- --watch",
     "test:windows": "npm run test:mocha",
     "test": "npm run test:mocha",
     "test:cov": "nyc npm run test",
@@ -50,15 +47,8 @@
   },
   "homepage": "https://github.com/accordproject/cicero",
   "devDependencies": {
-    "@babel/cli": "7.22.5",
-    "@babel/core": "7.22.5",
-    "@babel/preset-env": "7.22.5",
-    "@babel/register": "7.22.5",
-    "@istanbuljs/nyc-config-babel": "3.0.0",
     "archiver": "5.3.1",
     "assert": "2.0.0",
-    "babel-loader": "9.1.2",
-    "babel-plugin-istanbul": "6.1.1",
     "browserify-zlib": "0.2.0",
     "chai": "4.3.7",
     "chai-as-promised": "7.1.1",
@@ -80,12 +70,8 @@
   },
   "dependencies": {
     "@accordproject/concerto-core": "3.8.2",
-    "@accordproject/ergo-compiler": "0.24.0",
-    "@accordproject/ergo-engine": "0.24.0",
     "@accordproject/markdown-cicero": "0.16.5",
     "@accordproject/markdown-common": "0.16.5",
-    "@accordproject/markdown-html": "0.16.5",
-    "@accordproject/markdown-slate": "0.16.5",
     "@accordproject/markdown-template": "0.16.5",
     "axios": "1.4.0",
     "debug": "4.3.4",
@@ -118,10 +104,10 @@
     ],
     "all": true,
     "check-coverage": true,
-    "statements": 88,
+    "statements": 84,
     "branches": 76,
-    "functions": 84,
-    "lines": 88
+    "functions": 81,
+    "lines": 84
   },
   "gitHead": "514fd02f46752e018aedb77e1716a212ef4a59e5"
 }

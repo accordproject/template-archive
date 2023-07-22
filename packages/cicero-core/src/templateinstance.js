@@ -16,14 +16,9 @@
 
 const crypto = require('crypto');
 
-const Logger = require('@accordproject/ergo-compiler').Logger;
+const Logger = require('@accordproject/concerto-util').Logger;
 const CiceroMarkTransformer = require('@accordproject/markdown-cicero').CiceroMarkTransformer;
-const SlateTransformer = require('@accordproject/markdown-slate').SlateTransformer;
 const TemplateMarkTransformer = require('@accordproject/markdown-template').TemplateMarkTransformer;
-const HtmlTransformer = require('@accordproject/markdown-html').HtmlTransformer;
-
-// For formulas evaluation
-const ErgoEngine = require('@accordproject/ergo-engine/index.dist.js').EvalEngine;
 
 /**
  * A TemplateInstance is an instance of a Clause or Contract template. It is executable business logic, linked to
@@ -50,16 +45,6 @@ class TemplateInstance {
         this.concertoData = null;
         this.ciceroMarkTransformer = new CiceroMarkTransformer();
         this.templateMarkTransformer = new TemplateMarkTransformer();
-        this.parserManager = this.template.getParserManager();
-        this.ergoEngine = new ErgoEngine();
-
-        // Set formula evaluation in parser manager
-        this.parserManager.setFormulaEval((name) => TemplateInstance.ciceroFormulaEval(
-            this.getLogicManager(),
-            this.getIdentifier(),
-            this.getEngine(),
-            name
-        ));
     }
 
     /**
@@ -98,105 +83,12 @@ class TemplateInstance {
     }
 
     /**
-     * Get the current Ergo engine
-     * @return {object} - the data for the clause, or null if it has not been set
-     */
-    getEngine() {
-        return this.ergoEngine;
-    }
-
-    /**
      * Get the data for the clause. This is a Concerto object. To retrieve the
      * plain JS object suitable for serialization call toJSON() and retrieve the `data` property.
      * @return {object} - the data for the clause, or null if it has not been set
      */
     getDataAsConcertoObject() {
         return this.concertoData;
-    }
-
-    /**
-     * Set the data for the clause by parsing natural language text.
-     * @param {string} input - the text for the clause
-     * @param {string} [currentTime] - the definition of 'now', defaults to current time
-     * @param {number} [utcOffset] - UTC Offset for this execution, defaults to local offset
-     * @param {string} [fileName] - the fileName for the text (optional)
-     */
-    parse(input, currentTime, utcOffset, fileName) {
-        // Setup
-        const templateMarkTransformer = new TemplateMarkTransformer();
-
-        // Transform text to ciceromark
-        const inputCiceroMark = this.ciceroMarkTransformer.fromMarkdownCicero(input);
-
-        // Set current time
-        this.parserManager.setCurrentTime(currentTime, utcOffset);
-
-        // Parse
-        const data = templateMarkTransformer.dataFromCiceroMark({ fileName:fileName, content:inputCiceroMark }, this.parserManager, {});
-        this.setData(data);
-    }
-
-    /**
-     * Generates the natural language text for a contract or clause clause; combining the text from the template
-     * and the instance data.
-     * @param {*} [options] text generation options.
-     * @param {string} [currentTime] - the definition of 'now', defaults to current time
-     * @param {number} [utcOffset] - UTC Offset for this execution, defaults to local offset
-     * @returns {string} the natural language text for the contract or clause; created by combining the structure of
-     * the template with the JSON data for the clause.
-     */
-    draft(options, currentTime, utcOffset) {
-        if(!this.concertoData) {
-            throw new Error('Data has not been set. Call setData or parse before calling this method.');
-        }
-
-        // Setup
-        const metadata = this.getTemplate().getMetadata();
-        const templateKind = metadata.getTemplateType() !== 0 ? 'clause' : 'contract';
-
-        // Get the data
-        const data = this.getData();
-
-        // Set current time
-        this.parserManager.setCurrentTime(currentTime, utcOffset);
-
-        // Draft
-        const ciceroMark = this.templateMarkTransformer.draftCiceroMark(data, this.parserManager, templateKind, {});
-        return this.formatCiceroMark(ciceroMark,options);
-    }
-
-    /**
-     * Format CiceroMark
-     * @param {object} ciceroMarkParsed - the parsed CiceroMark DOM
-     * @param {object} options - parameters to the formatting
-     * @param {string} format - to the text generation
-     * @return {string} the result of parsing and printing back the text
-     */
-    formatCiceroMark(ciceroMarkParsed,options) {
-        const format = options && options.format ? options.format : 'markdown_cicero';
-        if (format === 'markdown_cicero') {
-            if (options && options.unquoteVariables) {
-                ciceroMarkParsed = this.ciceroMarkTransformer.unquote(ciceroMarkParsed);
-            }
-            const ciceroMark = this.ciceroMarkTransformer.toCiceroMarkUnwrapped(ciceroMarkParsed);
-            return this.ciceroMarkTransformer.toMarkdownCicero(ciceroMark);
-        } else if (format === 'ciceromark_parsed'){
-            return ciceroMarkParsed;
-        } else if (format === 'html'){
-            if (options && options.unquoteVariables) {
-                ciceroMarkParsed = this.ciceroMarkTransformer.unquote(ciceroMarkParsed);
-            }
-            const htmlTransformer = new HtmlTransformer();
-            return htmlTransformer.toHtml(ciceroMarkParsed);
-        } else if (format === 'slate'){
-            if (options && options.unquoteVariables) {
-                ciceroMarkParsed = this.ciceroMarkTransformer.unquote(ciceroMarkParsed);
-            }
-            const slateTransformer = new SlateTransformer();
-            return slateTransformer.fromCiceroMark(ciceroMarkParsed);
-        } else {
-            throw new Error('Unsupported format: ' + format);
-        }
     }
 
     /**
@@ -225,14 +117,6 @@ class TemplateInstance {
     }
 
     /**
-     * Returns the template logic for this clause
-     * @return {LogicManager} the template for this clause
-     */
-    getLogicManager() {
-        return this.template.getLogicManager();
-    }
-
-    /**
      * Returns a JSON representation of the clause
      * @return {object} the JS object for serialization
      */
@@ -241,61 +125,6 @@ class TemplateInstance {
             template: this.getTemplate().getIdentifier(),
             data: this.getData()
         };
-    }
-
-    /**
-     * Constructs a function for formula evaluation based for this template instance
-     * @param {*} logicManager - the logic manager
-     * @param {string} clauseId - this instance identifier
-     * @param {*} ergoEngine - the evaluation engine
-     * @param {string} name - the name of the formula
-     * @return {*} A function from formula code + input data to result
-     */
-    static ciceroFormulaEval(logicManager, clauseId, ergoEngine, name) {
-        return (code,data, currentTime, utcOffset) => {
-            const result = ergoEngine.calculate(logicManager, clauseId, name, data, currentTime, utcOffset, null);
-            // console.log('Formula result: ' + JSON.stringify(result.response));
-            return result.response;
-        };
-    }
-
-    /**
-     * Utility to rebuild a parser when the grammar changes
-     * @param {*} parserManager - the parser manager
-     * @param {*} logicManager - the logic manager
-     * @param {*} ergoEngine - the evaluation engine
-     * @param {string} templateName - this template name
-     * @param {string} grammar - the new grammar
-     */
-    static rebuildParser(parserManager, logicManager, ergoEngine, templateName, grammar) {
-        // Update template in parser manager
-        parserManager.setTemplate(grammar);
-
-        // Rebuild parser
-        parserManager.buildParser();
-
-        // Process formulas
-        const oldFormulas = logicManager.getScriptManager().sourceTemplates;
-        const newFormulas = parserManager.getFormulas();
-
-        if (oldFormulas.length > 0 || newFormulas.length > 0) {
-            // Reset formulas
-            logicManager.getScriptManager().sourceTemplates = [];
-            newFormulas.forEach( (x) => {
-                logicManager.addTemplateFile(x.code, x.name);
-            });
-
-            // Re-set formula evaluation hook
-            parserManager.setFormulaEval((name) => TemplateInstance.ciceroFormulaEval(
-                logicManager,
-                templateName,
-                ergoEngine,
-                name
-            ));
-
-            // Re-compile formulas
-            logicManager.compileLogicSync(true);
-        }
     }
 }
 

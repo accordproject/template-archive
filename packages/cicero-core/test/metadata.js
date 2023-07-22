@@ -17,8 +17,8 @@
 const ciceroVersion = require('../package.json').version;
 const semver = require('semver');
 
-const Metadata = require('../lib/metadata');
-const FileLoader = require('@accordproject/ergo-compiler').FileLoader;
+const Metadata = require('../src/metadata');
+const TemplateLoader = require('../src/templateloader');
 
 const chai = require('chai');
 
@@ -515,15 +515,6 @@ describe('Metadata', () => {
             });
             md.getRuntime().should.be.equal('es6');
         });
-        it('should fail for an unknown target runtime', () => {
-            (() => new Metadata({
-                name: 'template',
-                version: '1.0.0',
-                accordproject: {ergo:'0.20.0-alpha.2',cicero:caretRange(ciceroVersion),runtime:'foo'}
-            }, null, {
-                en: 'sample'
-            })).should.throw('Unknown target: foo (available: es6,java)');
-        });
 
         it('should create a new metadata for the given target runtime', () => {
             const md = new Metadata({
@@ -538,33 +529,23 @@ describe('Metadata', () => {
             mdes5.getName().should.equal('template');
             mdes5.getRuntime().should.equal('es6');
         });
-        it('should fail to create a new metadata for an unknown target runtime', () => {
-            const md = new Metadata({
-                name: 'template',
-                version: '1.0.0',
-                accordproject: {ergo:'0.20.0-alpha.2',cicero:caretRange(ciceroVersion)}
-            }, null, {
-                en: 'sample'
-            });
-            (() => md.createTargetMetadata('foo')).should.throw('Unknown target: foo (available: es6,java)');
-        });
     });
 
     describe('#checkImage', () => {
         it('should not throw for correct png with correct dimensions', async () => {
-            const buffer = await FileLoader.loadFileBuffer('./test/data', 'logo_128_128.png', true);
+            const buffer = await TemplateLoader.loadFileBuffer('./test/data', 'logo_128_128.png', true);
             (() => Metadata.checkImage(buffer)).should.not.throw();
         });
         it('should throw for correct png without correct dimensions', async () => {
-            const buffer = await FileLoader.loadFileBuffer('./test/data', 'logo_256_256.png', true);
+            const buffer = await TemplateLoader.loadFileBuffer('./test/data', 'logo_256_256.png', true);
             (() => Metadata.checkImage(buffer)).should.throw('logo should be 128x128');
         });
         it('should throw for incorrect mime type', async () => {
-            const buffer = await FileLoader.loadFileBuffer('./test/data', 'logo_wrong_mime.png', true);
+            const buffer = await TemplateLoader.loadFileBuffer('./test/data', 'logo_wrong_mime.png', true);
             (() => Metadata.checkImage(buffer)).should.throw('the file type is not supported');
         });
         it('should throw for corrupted png', async () => {
-            const buffer = await FileLoader.loadFileBuffer('./test/data', 'logo_corrupted.png', true);
+            const buffer = await TemplateLoader.loadFileBuffer('./test/data', 'logo_corrupted.png', true);
             (() => Metadata.checkImage(buffer)).should.throw('not a valid png file');
         });
     });
