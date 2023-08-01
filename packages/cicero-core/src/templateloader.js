@@ -93,10 +93,7 @@ class TemplateLoader {
         if(!grammar) {
             throw new Error('A template must contain a grammar.tem.md file.');
         } else {
-            const templateKind = template.getMetadata().getTemplateType() !== 0 ? 'clause' : 'contract';
-            template.parserManager.setTemplate(grammar);
-            template.parserManager.setTemplateKind(templateKind);
-            template.parserManager.buildParser();
+            template.setTemplate(grammar);
         }
 
         // check the integrity of the model and logic of the template
@@ -186,10 +183,7 @@ class TemplateLoader {
         if(!grammar) {
             throw new Error('A template must either contain a grammar.tem.md file.');
         } else {
-            const templateKind = template.getMetadata().getTemplateType() !== 0 ? 'clause' : 'contract';
-            template.parserManager.setTemplate(grammar);
-            template.parserManager.setTemplateKind(templateKind);
-            template.parserManager.buildParser();
+            template.setTemplate(grammar);
             Logger.debug(method, 'Loaded grammar.tem.md', grammar);
         }
 

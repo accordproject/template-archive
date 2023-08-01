@@ -7,6 +7,7 @@ import org.accordproject.runtime.Response from https://models.accordproject.org/
 /**
  * Defines the data model for the Conga template.
  */
+@template
 asset TemplateModel extends Clause {
   o Double amount
   o String swag

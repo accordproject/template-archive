@@ -18,6 +18,7 @@ asset HelloWorldState extends State {
 /**
  * The template model
  */
+@template
 asset HelloWorldClause extends Clause {
   /**
    * The name for the clause

@@ -14,12 +14,12 @@
 
 'use strict';
 
+const { templatemarkutil } = require('@accordproject/markdown-template');
+
 const Metadata = require('./metadata');
 const crypto = require('crypto');
 const forge = require('node-forge');
 const stringify = require('json-stable-stringify');
-
-const ParserManager = require('@accordproject/markdown-template').ParserManager;
 
 const TemplateLoader = require('./templateloader');
 const TemplateSaver = require('./templatesaver');
@@ -49,9 +49,16 @@ class Template {
     constructor(packageJson, readme, samples, request, logo, options, authorSignature) {
         this.metadata = new Metadata(packageJson, readme, samples, request, logo);
         this.logicManager = new LogicManager('es6', null, options);
-        const templateKind = this.getMetadata().getTemplateType() !== 0 ? 'clause' : 'contract';
-        this.parserManager = new ParserManager(this.getModelManager(),null,templateKind);
         this.authorSignature = authorSignature ? authorSignature : null;
+        this.template = null;
+    }
+
+    /**
+     * Sets the grammar for the template
+     * @param {string} grammar the grammar for the template
+     */
+    setTemplate(grammar) {
+        this.template = grammar;
     }
 
     /**
@@ -73,23 +80,7 @@ class Template {
      * @returns {ClassDeclaration} the template model for the template
      */
     getTemplateModel() {
-
-        let modelType = 'org.accordproject.contract.Contract';
-
-        if(this.getMetadata().getTemplateType() !== 0) {
-            modelType = 'org.accordproject.contract.Clause';
-        }
-        const templateModels = this.getIntrospector().getClassDeclarations().filter((item) => {
-            return !item.isAbstract() && Template.instanceOf(item,modelType);
-        });
-
-        if (templateModels.length > 1) {
-            throw new Error(`Found multiple instances of ${modelType} in ${this.metadata.getName()}. The model for the template must contain a single asset that extends ${modelType}.`);
-        } else if (templateModels.length === 0) {
-            throw new Error(`Failed to find an asset that extends ${modelType} in ${this.metadata.getName()}. The model for the template must contain a single asset that extends ${modelType}.`);
-        } else {
-            return templateModels[0];
-        }
+        return templatemarkutil.findTemplateConcept(this.getIntrospector(), 'clause');
     }
 
     /**
@@ -297,16 +288,6 @@ class Template {
      */
     accept(visitor, parameters) {
         return visitor.visit(this, parameters);
-    }
-
-    /**
-     * Provides access to the parser manager for this template.
-     * The parser manager can convert template data to and from
-     * natural language text.
-     * @return {ParserManager} the ParserManager for this template
-     */
-    getParserManager() {
-        return this.parserManager;
     }
 
     /**

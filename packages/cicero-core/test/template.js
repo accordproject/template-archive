@@ -93,7 +93,7 @@ async function writeZip(template){
 }
 /* eslint-enable */
 
-const options = { offline: true };
+const options = { offline: false };
 
 describe('Template', () => {
 
@@ -163,6 +163,10 @@ describe('Template', () => {
 
         it('should create a template from a directory with no logic', async () => {
             return Template.fromDirectory('./test/data/text-only', options);
+        });
+
+        it('should create a template from a directory with a model using @template', async () => {
+            return Template.fromDirectory('./test/data/template-decorator', options);
         });
 
         it('should create a template from a directory and download external models by default', async () => {

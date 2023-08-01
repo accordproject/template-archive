@@ -19,6 +19,7 @@ concept Address {
 /**
  * Defines the data model for the template
  */
+@template
 asset TemplateModel extends Clause {
   o Double doubleProperty
   o Integer integerProperty
