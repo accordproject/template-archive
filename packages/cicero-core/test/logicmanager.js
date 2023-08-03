@@ -46,8 +46,8 @@ describe('LogicManager', () => {
             modelManager.getModels().map(x => x.name).should.deep.equal([
                 '@models.accordproject.org.time@0.2.0.cto',
                 '@models.accordproject.org.money@0.2.0.cto',
-                '@models.accordproject.org.accordproject.contract.cto',
-                '@models.accordproject.org.accordproject.runtime.cto',
+                '@models.accordproject.org.accordproject.contract@0.2.0.cto',
+                '@models.accordproject.org.accordproject.runtime@0.2.0.cto',
                 'test.cto'
             ]);
             modelManager.getModels()[4].content.length.should.equal(175);
@@ -60,8 +60,8 @@ describe('LogicManager', () => {
             modelManager.getModels().map(x => x.name).should.deep.equal([
                 '@models.accordproject.org.time@0.2.0.cto',
                 '@models.accordproject.org.money@0.2.0.cto',
-                '@models.accordproject.org.accordproject.contract.cto',
-                '@models.accordproject.org.accordproject.runtime.cto',
+                '@models.accordproject.org.accordproject.contract@0.2.0.cto',
+                '@models.accordproject.org.accordproject.runtime@0.2.0.cto',
                 'test.cto'
             ]);
             modelManager.getModels()[4].content.length.should.equal(175);

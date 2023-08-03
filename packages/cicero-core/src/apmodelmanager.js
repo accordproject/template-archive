@@ -60,10 +60,10 @@ class APModelManager extends ModelManager {
             const name = slash(fileName);
             this.addCTOModel(modelFileContent, name);
         };
-        readAndAddModelFile('./external/@models.accordproject.org.time@0.2.0.cto');
-        readAndAddModelFile('./external/@models.accordproject.org.money@0.2.0.cto');
-        readAndAddModelFile('./external/@models.accordproject.org.accordproject.contract.cto');
-        readAndAddModelFile('./external/@models.accordproject.org.accordproject.runtime.cto');
+        readAndAddModelFile('./external/@models.accordproject.org.time@0.3.0.cto');
+        readAndAddModelFile('./external/@models.accordproject.org.money@0.3.0.cto');
+        readAndAddModelFile('./external/@models.accordproject.org.accordproject.contract@0.2.0.cto');
+        readAndAddModelFile('./external/@models.accordproject.org.accordproject.runtime@0.2.0.cto');
 
         this.validateModelFiles();
         this.builtInNamespaces = this.getNamespaces();

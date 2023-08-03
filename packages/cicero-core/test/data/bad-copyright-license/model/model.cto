@@ -1,10 +1,10 @@
-namespace org.accordproject.copyrightlicense
+namespace org.accordproject.copyrightlicense@1.0.0
 
-import org.accordproject.contract.Contract from https://models.accordproject.org/accordproject/contract.cto
-import org.accordproject.contract.Clause from https://models.accordproject.org/accordproject/contract.cto
+import org.accordproject.contract@0.2.0.Contract from https://models.accordproject.org/accordproject/contract@0.2.0.cto
 
-import org.accordproject.runtime.Request from https://models.accordproject.org/accordproject/runtime.cto
-import org.accordproject.runtime.Response from https://models.accordproject.org/accordproject/runtime.cto
+import org.accordproject.contract@0.2.0.Clause from https://models.accordproject.org/accordproject/contract@0.2.0.cto
+
+import org.accordproject.runtime@0.2.0.{Request, Response} from https://models.accordproject.org/accordproject/runtime@0.2.0.cto
 
 /* Requesting a payment */
 transaction PaymentRequest extends Request {
@@ -16,6 +16,7 @@ transaction PayOut extends Response {
 }
 
 /* The template model  */
+@template
 asset CopyrightLicenseContract extends Contract {
   /* the effective date */
   o DateTime effectiveDate

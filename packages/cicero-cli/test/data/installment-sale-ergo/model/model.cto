@@ -1,8 +1,9 @@
-namespace org.accordproject.installmentsale
+namespace org.accordproject.installmentsale@1.0.0
 
-import org.accordproject.contract.* from https://models.accordproject.org/accordproject/contract.cto
-import org.accordproject.runtime.* from https://models.accordproject.org/accordproject/runtime.cto
-import org.accordproject.money.MonetaryAmount from https://models.accordproject.org/money@0.2.0.cto
+import org.accordproject.contract@0.2.0.Contract from https://models.accordproject.org/accordproject/contract@0.2.0.cto
+import org.accordproject.runtime@0.2.0.{Request, Response, Obligation, State} from https://models.accordproject.org/accordproject/runtime@0.2.0.cto
+import org.accordproject.money@0.3.0.MonetaryAmount from https://models.accordproject.org/money@0.3.0.cto
+
 
 transaction Installment extends Request {
   o Double amount
@@ -47,6 +48,7 @@ asset InstallmentSaleState extends State {
 /**
  * The template model
  */
+@template
 asset InstallmentSaleContract extends Contract {
   o String BUYER
 	o String SELLER

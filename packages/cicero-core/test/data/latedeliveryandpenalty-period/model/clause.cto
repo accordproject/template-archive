@@ -1,15 +1,16 @@
-namespace org.accordproject.simplelatedeliveryandpenalty
+namespace org.accordproject.simplelatedeliveryandpenalty@1.0.0
 
-import org.accordproject.contract.* from https://models.accordproject.org/accordproject/contract.cto
-import org.accordproject.party.* from https://models.accordproject.org/accordproject/party.cto
-import org.accordproject.runtime.* from https://models.accordproject.org/accordproject/runtime.cto
-import org.accordproject.time.* from https://models.accordproject.org/time@0.2.0.cto
+import org.accordproject.contract@0.2.0.{Clause, Contract} from https://models.accordproject.org/accordproject/contract@0.2.0.cto
+import org.accordproject.runtime@0.2.0.{Request, Response, State, Obligation} from https://models.accordproject.org/accordproject/runtime@0.2.0.cto
+import org.accordproject.time@0.3.0.Period from https://models.accordproject.org/time@0.3.0cto
+import org.accordproject.party@0.2.0.Party from https://models.accordproject.org/accordproject/party@0.2.0.cto
 
 /**
  * Defines the data model for the LateDeliveryAndPenalty template.
  * This defines the structure of the abstract syntax tree that the parser for the template
  * must generate from input source text.
  */
+@template
 asset SimpleLateDeliveryAndPenaltyContract extends Contract {
   --> Party buyer
   --> Party seller

@@ -53,6 +53,7 @@ abstract asset Element identified by id {
 /**
  * Root type for contract templates
  */
+@template
 asset ContractTemplate extends Element {
   o Metadata metadata
   o Section content optional
@@ -207,5 +208,6 @@ asset ElementExpression extends Expression{
 /**
  * An expression that returns true or false
  */
+@template
 asset BooleanExpression extends Expression{
 }

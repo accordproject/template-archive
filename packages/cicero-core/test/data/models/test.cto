@@ -1,4 +1,4 @@
-namespace org.accord.test
+namespace org.accord.test@1.0.0
 
 
 enum Status {

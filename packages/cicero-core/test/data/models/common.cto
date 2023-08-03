@@ -1,4 +1,4 @@
-namespace org.accordproject.common
+namespace org.accordproject.common@1.0.0
 
 /**
  * Contract data
@@ -6,6 +6,7 @@ namespace org.accordproject.common
  */
 
 /* A state is a concept with a contract status */
+@template
 asset ContractState identified by stateId {
   o String stateId
   --> ContractModel contract optional
