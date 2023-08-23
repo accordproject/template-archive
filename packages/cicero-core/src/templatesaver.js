@@ -58,8 +58,8 @@ class TemplateSaver {
             dir: true
         }));
 
-        if (template.getParserManager().getTemplate()) {
-            zip.file('text/grammar.tem.md', template.getParserManager().getTemplate(), options);
+        if (template.getTemplate()) {
+            zip.file('text/grammar.tem.md', template.getTemplate(), options);
         }
 
         // save the README.md if present
