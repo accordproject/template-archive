@@ -13,7 +13,7 @@ Thank you!
     Then the contract data should be
 """
 {
-  "$class": "org.accordproject.helloemit.TemplateModel",
+  "$class": "org.accordproject.helloemit@1.0.0.TemplateModel",
   "name": "John Doe"
 }
 """
@@ -22,14 +22,14 @@ Thank you!
     When it receives the request
 """
 {
-    "$class": "org.accordproject.helloemit.MyRequest",
+    "$class": "org.accordproject.helloemit@1.0.0.MyRequest",
     "input": "Le Monde"
 }
 """
     Then it should respond with
 """
 {
-  "$class": "org.accordproject.helloemit.MyResponse",
+  "$class": "org.accordproject.helloemit@1.0.0.MyResponse",
   "output": "Hello John Doe (Le Monde)"
 }
 """
@@ -38,14 +38,14 @@ Thank you!
     When it receives the request
 """
 {
-    "$class": "org.accordproject.helloemit.MyRequest",
+    "$class": "org.accordproject.helloemit@1.0.0.MyRequest",
     "input": "World"
 }
 """
     Then the following obligations should have been emitted
 """
 [{
-  "$class": "org.accordproject.helloemit.Greeting",
+  "$class": "org.accordproject.helloemit@1.0.0.Greeting",
   "message": "Voila!"
 }]
 """
@@ -54,21 +54,21 @@ Thank you!
     When it receives the request
 """
 {
-    "$class": "org.accordproject.helloemit.MyRequest",
+    "$class": "org.accordproject.helloemit@1.0.0.MyRequest",
     "input": "World"
 }
 """
     Then it should respond with
 """
 {
-  "$class": "org.accordproject.helloemit.MyResponse",
+  "$class": "org.accordproject.helloemit@1.0.0.MyResponse",
   "output": "Hello John Doe (World)"
 }
 """
     And the following obligations should have been emitted
 """
 [{
-  "$class": "org.accordproject.helloemit.Greeting",
+  "$class": "org.accordproject.helloemit@1.0.0.Greeting",
   "message": "Voila!"
 }]
 """

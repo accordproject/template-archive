@@ -9,7 +9,7 @@ Feature: HelloWorld+Emit contract for the default sample
     Then the contract data should be
 """
 {
-  "$class": "org.accordproject.helloemit.TemplateModel",
+  "$class": "org.accordproject.helloemit@1.0.0.TemplateModel",
   "name": "Fred Blogs"
 }
 """
@@ -19,7 +19,7 @@ Feature: HelloWorld+Emit contract for the default sample
     Then it should respond with
 """
 {
-  "$class": "org.accordproject.helloemit.MyResponse",
+  "$class": "org.accordproject.helloemit@1.0.0.MyResponse",
   "output": "Hello Fred Blogs (World)"
 }
 """

@@ -62,6 +62,14 @@ class Template {
     }
 
     /**
+     * Get the grammar for the template
+     * @returns {string} grammar the grammar for the template
+     */
+    getTemplate() {
+        return this.template;
+    }
+
+    /**
      * Verifies that the template is well formed.
      * Throws an exception with the details of any validation errors.
      * @param {Object} options  - e.g., { verify: true }
@@ -142,8 +150,8 @@ class Template {
     getHash() {
         const content = {};
         content.metadata = this.getMetadata().toJSON();
-        if(this.parserManager.getTemplate()) {
-            content.grammar = this.parserManager.getTemplate();
+        if(this.getTemplate()) {
+            content.grammar = this.getTemplate();
         }
         content.models = {};
         content.scripts = {};
@@ -415,7 +423,7 @@ class Template {
      * @return {Array} a list of the request types
      */
     getRequestTypes() {
-        return this.findConcreteSubclassNames('org.accordproject.runtime.Request');
+        return this.findConcreteSubclassNames('org.accordproject.runtime@0.2.0.Request');
     }
 
     /**
@@ -423,7 +431,7 @@ class Template {
      * @return {Array} a list of the response types
      */
     getResponseTypes() {
-        return this.findConcreteSubclassNames('org.accordproject.runtime.Response');
+        return this.findConcreteSubclassNames('org.accordproject.runtime@0.2.0.Response');
     }
 
     /**
@@ -431,7 +439,7 @@ class Template {
      * @return {Array} a list of the emit types
      */
     getEmitTypes() {
-        return this.findConcreteSubclassNames('org.accordproject.runtime.Obligation');
+        return this.findConcreteSubclassNames('org.accordproject.runtime@0.2.0.Obligation');
     }
 
     /**
@@ -439,7 +447,7 @@ class Template {
      * @return {Array} a list of the state types
      */
     getStateTypes() {
-        return this.findConcreteSubclassNames('org.accordproject.runtime.State');
+        return this.findConcreteSubclassNames('org.accordproject.runtime@0.2.0.State');
     }
 
     /**
