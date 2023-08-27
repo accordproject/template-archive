@@ -74,18 +74,15 @@ describe('Clause', () => {
 
             // check that we can set/get a valid template model
             const data = {
-                $class: 'io.clause.latedeliveryandpenalty.TemplateModel',
-                clauseId: 'c0884078-882d-42e0-87d6-4cc824b4f194',
+                $class: 'io.clause.latedeliveryandpenalty@1.0.0.TemplateModel',
                 forceMajeure: false,
                 penaltyDuration : {
-                    $class : 'org.accordproject.time.Duration',
                     amount : 1,
                     unit : 'days'
                 },
                 penaltyPercentage : 10,
                 capPercentage : 50,
                 termination : {
-                    $class : 'org.accordproject.time.Duration',
                     amount : 10,
                     unit : 'days'
                 },
@@ -93,10 +90,10 @@ describe('Clause', () => {
             };
             clause.setData(data);
             clause.getData().should.eql(data);
-            clause.getIdentifier().should.equal('latedeliveryandpenalty@0.0.1-c57ba573028ae93c59716b21ff1341023f2aa86c1993b1ad13441a7c1d949cc4');
+            clause.getIdentifier().should.equal('latedeliveryandpenalty@0.0.1-a3cd5a507d9d350d67f131be37015670e8eebe2a88813ba352f41e9e48240345');
 
             // check that the concerto data is really a Concerto object
-            clause.getDataAsConcertoObject().getFullyQualifiedType().should.be.equal('io.clause.latedeliveryandpenalty.TemplateModel');
+            clause.getDataAsConcertoObject().getFullyQualifiedType().should.be.equal('io.clause.latedeliveryandpenalty@1.0.0.TemplateModel');
         });
         it('should throw error for bad $class', async function() {
             const template = await Template.fromDirectory('./test/data/latedeliveryandpenalty', options);
@@ -104,7 +101,7 @@ describe('Clause', () => {
             const data = {
                 $class: 'bad.class.name'
             };
-            (()=> clause.setData(data)).should.throw('Invalid data, must be a valid instance of the template model io.clause.latedeliveryandpenalty.TemplateModel but got: {"$class":"bad.class.name"} ');
+            (()=> clause.setData(data)).should.throw('Invalid data, must be a valid instance of the template model io.clause.latedeliveryandpenalty@1.0.0.TemplateModel but got: {"$class":"bad.class.name"} ');
         });
     });
 
@@ -114,18 +111,15 @@ describe('Clause', () => {
             const template = await Template.fromDirectory('./test/data/latedeliveryandpenalty', options);
             const clause = new Clause(template);
             const data = {
-                $class: 'io.clause.latedeliveryandpenalty.TemplateModel',
-                clauseId: 'c0884078-882d-42e0-87d6-4cc824b4f194',
+                $class: 'io.clause.latedeliveryandpenalty@1.0.0.TemplateModel',
                 forceMajeure: false,
                 penaltyDuration : {
-                    $class : 'org.accordproject.time.Duration',
                     amount : 1,
                     unit : 'days'
                 },
                 penaltyPercentage : 10,
                 capPercentage : 50,
                 termination : {
-                    $class : 'org.accordproject.time.Duration',
                     amount : 10,
                     unit : 'days'
                 },
