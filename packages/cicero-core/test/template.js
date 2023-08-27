@@ -396,7 +396,6 @@ In case of delayed delivery except for Force Majeure cases, the Seller shall pay
         it.only('should create a template from a compiled archive', async () => {
             const buffer = fs.readFileSync('./test/data/fixed-interests@0.6.0.cta');
             try {
-
                 return Template.fromArchive(buffer);
             } catch (error) {
                 console.error(error);

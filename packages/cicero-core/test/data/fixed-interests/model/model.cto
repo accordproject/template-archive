@@ -12,7 +12,7 @@
  * limitations under the License.
  */
 
-namespace org.accordproject.interests@1.0.0
+namespace org.accordproject.interests@0.6.0
 
 import org.accordproject.contract@0.2.0.{Contract, Clause} from https://models.accordproject.org/accordproject/contract@0.2.0.cto
 import org.accordproject.runtime@0.2.0.{Request, Response, State} from https://models.accordproject.org/accordproject/runtime@0.2.0.cto
@@ -28,6 +28,7 @@ transaction Response {
   o String output
 }
 
+@template
 asset TemplateModel extends Clause {
   o MonetaryAmount loanAmount
   o Double rate
