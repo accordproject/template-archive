@@ -74,7 +74,8 @@ describe('Clause', () => {
 
             // check that we can set/get a valid template model
             const data = {
-                $class: 'io.clause.latedeliveryandpenalty@1.0.0.TemplateModel',
+                $class: 'io.clause.latedeliveryandpenalty@0.1.0.TemplateModel',
+                clauseId: '1234',
                 forceMajeure: false,
                 penaltyDuration : {
                     amount : 1,
@@ -90,10 +91,10 @@ describe('Clause', () => {
             };
             clause.setData(data);
             clause.getData().should.eql(data);
-            clause.getIdentifier().should.equal('latedeliveryandpenalty@0.0.1-a3cd5a507d9d350d67f131be37015670e8eebe2a88813ba352f41e9e48240345');
+            clause.getIdentifier().should.equal('latedeliveryandpenalty@0.0.1-8a8d5985cf049e318fc890162da22eb6d5c081412af20d4c1db20633644e2756');
 
             // check that the concerto data is really a Concerto object
-            clause.getDataAsConcertoObject().getFullyQualifiedType().should.be.equal('io.clause.latedeliveryandpenalty@1.0.0.TemplateModel');
+            clause.getDataAsConcertoObject().getFullyQualifiedType().should.be.equal('io.clause.latedeliveryandpenalty@0.1.0.TemplateModel');
         });
         it('should throw error for bad $class', async function() {
             const template = await Template.fromDirectory('./test/data/latedeliveryandpenalty', options);
@@ -101,7 +102,7 @@ describe('Clause', () => {
             const data = {
                 $class: 'bad.class.name'
             };
-            (()=> clause.setData(data)).should.throw('Invalid data, must be a valid instance of the template model io.clause.latedeliveryandpenalty@1.0.0.TemplateModel but got: {"$class":"bad.class.name"} ');
+            (()=> clause.setData(data)).should.throw('Invalid data, must be a valid instance of the template model io.clause.latedeliveryandpenalty@0.1.0.TemplateModel but got: {"$class":"bad.class.name"} ');
         });
     });
 
@@ -111,7 +112,8 @@ describe('Clause', () => {
             const template = await Template.fromDirectory('./test/data/latedeliveryandpenalty', options);
             const clause = new Clause(template);
             const data = {
-                $class: 'io.clause.latedeliveryandpenalty@1.0.0.TemplateModel',
+                $class: 'io.clause.latedeliveryandpenalty@0.1.0.TemplateModel',
+                clauseId: '1234',
                 forceMajeure: false,
                 penaltyDuration : {
                     amount : 1,

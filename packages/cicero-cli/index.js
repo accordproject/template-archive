@@ -65,7 +65,6 @@ require('yargs')
         yargs.option('target', {
             describe: 'the target language of the archive',
             type: 'string',
-            default: 'ergo'
         });
         yargs.option('output', {
             describe: 'file name for new archive',

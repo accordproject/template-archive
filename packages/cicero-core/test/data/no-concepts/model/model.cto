@@ -5,7 +5,6 @@ import org.accordproject.runtime@0.2.0.{Request, Response} from https://models.a
 /**
  * Defines the data model for the Conga template.
  */
-@template
 asset TemplateModel identified by id {
   o String id
   o Double amount

@@ -33,10 +33,6 @@ class TemplateSaver {
      * @return {Promise<Buffer>} the zlib buffer
      */
     static async toArchive(template, language, options) {
-        if(!language || typeof(language) !== 'string') {
-            throw new Error('language is required and must be a string');
-        }
-
         const metadata = template.getMetadata().createTargetMetadata(language);
 
         let zip = new JSZip();
