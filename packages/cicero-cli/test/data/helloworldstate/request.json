@@ -1,4 +1,1 @@
-{
-    "$class": "org.accordproject.helloworldstate.MyRequest",
-    "input": "Accord Project"
-}
+{"$class":"org.accordproject.helloworldstate.MyRequest","input":"Accord Project"}
