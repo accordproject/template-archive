@@ -173,7 +173,7 @@ describe('#archive', async () => {
         const options = {
             keystore: keystore
         };
-        const result = await Commands.archive(template, 'ergo', archiveName, options);
+        const result = await Commands.archive(template, null, archiveName, options);
         result.should.eql(true);
         const newTemplate = await Template.fromArchive(fs.readFileSync(archiveName));
         newTemplate.should.not.be.null;

@@ -33,7 +33,7 @@ class TemplateSaver {
      * @return {Promise<Buffer>} the zlib buffer
      */
     static async toArchive(template, language, options) {
-        const metadata = template.getMetadata().createTargetMetadata(language);
+        const metadata = language ? template.getMetadata().createTargetMetadata(language) : template.getMetadata();
 
         let zip = new JSZip();
 
