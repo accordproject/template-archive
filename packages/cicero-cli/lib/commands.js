@@ -102,18 +102,14 @@ class Commands {
      * @returns {object} a modfied argument object
      */
     static validateArchiveArgs(argv) {
-        argv = Commands.validateCommonArgs(argv);
-
-        argv.target = 'cicero';
-
-        return argv;
+        return Commands.validateCommonArgs(argv);
     }
 
     /**
      * Create an archive using a template
      *
      * @param {string} templatePath - path to the template directory or archive
-     * @param {string} target - target language for the archive (should be either 'ergo' or 'cicero')
+     * @param {string} target - target language for the archive
      * @param {string} outputPath - to the archive file
      * @param {Object} [options] - an optional set of options
      * @returns {object} Promise to the code creating an archive
