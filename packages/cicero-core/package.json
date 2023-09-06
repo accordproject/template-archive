@@ -70,9 +70,9 @@
   },
   "dependencies": {
     "@accordproject/concerto-core": "3.8.2",
-    "@accordproject/markdown-cicero": "0.16.5",
-    "@accordproject/markdown-common": "0.16.5",
-    "@accordproject/markdown-template": "0.16.5",
+    "@accordproject/markdown-cicero": "0.16.13",
+    "@accordproject/markdown-common": "0.16.13",
+    "@accordproject/markdown-template": "0.16.13",
     "axios": "1.4.0",
     "debug": "4.3.4",
     "ietf-language-tag-regex": "0.0.5",
@@ -81,7 +81,7 @@
     "node-cache": "5.1.2",
     "node-forge": "^1.3.1",
     "request": "2.88.0",
-    "semver": "7.5.2",
+    "semver": "7.5.3",
     "slash": "3.0.0",
     "xregexp": "5.1.1"
   },

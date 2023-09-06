@@ -33,11 +33,7 @@ class TemplateSaver {
      * @return {Promise<Buffer>} the zlib buffer
      */
     static async toArchive(template, language, options) {
-        if(!language || typeof(language) !== 'string') {
-            throw new Error('language is required and must be a string');
-        }
-
-        const metadata = template.getMetadata().createTargetMetadata(language);
+        const metadata = language ? template.getMetadata().createTargetMetadata(language) : template.getMetadata();
 
         let zip = new JSZip();
 
@@ -58,8 +54,8 @@ class TemplateSaver {
             dir: true
         }));
 
-        if (template.getParserManager().getTemplate()) {
-            zip.file('text/grammar.tem.md', template.getParserManager().getTemplate(), options);
+        if (template.getTemplate()) {
+            zip.file('text/grammar.tem.md', template.getTemplate(), options);
         }
 
         // save the README.md if present

@@ -12,12 +12,13 @@
  * limitations under the License.
  */
 
-namespace org.accordproject.interests
+namespace org.accordproject.interests@0.6.0
 
-import org.accordproject.contract.* from https://models.accordproject.org/accordproject/contract.cto
-import org.accordproject.runtime.* from https://models.accordproject.org/accordproject/runtime.cto
-import org.accordproject.time.* from https://models.accordproject.org/time@0.2.0.cto
-import org.accordproject.money.* from https://models.accordproject.org/money@0.2.0.cto
+import org.accordproject.contract@0.2.0.{Contract, Clause} from https://models.accordproject.org/accordproject/contract@0.2.0.cto
+import org.accordproject.runtime@0.2.0.{Request, Response, State} from https://models.accordproject.org/accordproject/runtime@0.2.0.cto
+import org.accordproject.time@0.3.0.{Month, Day, TemporalUnit, Duration, PeriodUnit, Period} from https://models.accordproject.org/time@0.3.0.cto
+import org.accordproject.money@0.3.0.MonetaryAmount from https://models.accordproject.org/money@0.3.0.cto
+
 
 transaction Request {
   o String input
@@ -27,6 +28,7 @@ transaction Response {
   o String output
 }
 
+@template
 asset TemplateModel extends Clause {
   o MonetaryAmount loanAmount
   o Double rate

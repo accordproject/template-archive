@@ -1,6 +1,6 @@
-namespace org.accordproject.volumediscountlist
+namespace org.accordproject.volumediscountlist@1.0.0
 
-import org.accordproject.contract.* from https://models.accordproject.org/accordproject/contract.cto
+import org.accordproject.contract@0.2.0.{Clause, Contract} from https://models.accordproject.org/accordproject/contract@0.2.0.cto
 
 concept RateRange {
  o Double rate

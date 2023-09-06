@@ -5,6 +5,7 @@ import org.accordproject.contract.Clause from https://models.accordproject.org/a
 /**
  * Defines the data model for the template
  */
+@template
 asset TemplateModel extends Clause {
   o Double amountProperty
 }

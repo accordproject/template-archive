@@ -1,30 +1,12 @@
-namespace org.accordproject.conga
-
-import org.accordproject.contract.Clause from https://models.accordproject.org/accordproject/contract.cto
-import org.accordproject.runtime.Request from https://models.accordproject.org/accordproject/runtime.cto
-import org.accordproject.runtime.Response from https://models.accordproject.org/accordproject/runtime.cto
+namespace org.accordproject.conga@1.0.0
 
 /**
  * Defines the data model for the Conga template.
  */
-asset TemplateModel extends Clause {
+@template
+asset TemplateModel {
   o Double amount
   o String swag
   --> Participant participant
   o String maybeThing optional
-}
-
-/**
- * Defines the input data required by the template
- */
-transaction Payup extends Request {
-  o String[] qualifierTest optional
-}
-
-/**
- * Defines the output data for the template
- */
-transaction CongaResponse extends Response {
-  o String name
-  o Double amount
 }

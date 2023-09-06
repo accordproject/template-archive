@@ -1,0 +1,41 @@
+namespace io.clause.latedeliveryandpenalty@1.0.0
+
+import org.accordproject.time@0.3.0.{TemporalUnit, Duration} from https://models.accordproject.org/time@0.3.0.cto
+
+/**
+ * Defines the data model for the LateDeliveryAndPenalty template.
+ * This defines the structure of the abstract syntax tree that the parser for the template
+ * must generate from input source text.
+ */
+@template
+asset TemplateModel {
+  /**
+   * Does the clause include a force majeure provision?
+   */
+  o Boolean forceMajeure
+
+  /**
+   * For every penaltyDuration that the goods are late
+   */
+  o Duration penaltyDuration
+
+  /**
+   * Seller pays the buyer penaltyPercentage % of the value of the goods
+   */
+  o Double penaltyPercentage
+
+  /**
+   * Up to capPercentage % of the value of the goods
+   */
+  o Double capPercentage
+
+  /**
+   * If the goods are >= termination late then the buyer may terminate the contract
+   */
+  o Duration termination
+
+  /**
+   * Fractional part of a ... is considered a whole ...
+   */
+  o TemporalUnit fractionalPart
+}

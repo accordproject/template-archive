@@ -1,30 +1,12 @@
-namespace org.accordproject.ippayment
+namespace org.accordproject.ippayment@1.0.0
 
-import org.accordproject.contract.* from https://models.accordproject.org/accordproject/contract.cto
-import org.accordproject.runtime.* from https://models.accordproject.org/accordproject/runtime.cto
-import org.accordproject.time.* from https://models.accordproject.org/time@0.2.0.cto
-
-/**
- * Requesting a payment
- */
-transaction PaymentRequest extends Request {
-  o Double netSaleRevenue
-  o Double sublicensingRevenue
-  o DateTime permissionGrantedBy optional
-}
-
-/**
- * PayOut response
- */
-transaction PayOut extends Response {
-  o Double totalAmount
-  o DateTime dueBy
-}
+import org.accordproject.time@0.3.0.Duration from https://models.accordproject.org/time@0.3.0.cto
 
 /**
  * The template model
  */
-asset IntellectualPropertyPaymentClause extends Clause {
+@template
+asset IntellectualPropertyPaymentClause {
   /* royalty */
   o String royaltyText
   o Double royaltyRate

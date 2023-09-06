@@ -104,10 +104,6 @@ class Metadata {
             throw new Error(msg);
         }
 
-        // the runtime property is optional, and is only mandatory for templates that have been compiled
-        if (!packageJson.accordproject.runtime){
-            packageJson.accordproject.runtime = 'ergo';
-        }
         this.runtime = packageJson.accordproject.runtime;
 
         if(!samples || typeof(samples) !== 'object') {

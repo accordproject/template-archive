@@ -1,17 +1,18 @@
-namespace io.clause.latedeliveryandpenalty
+namespace io.clause.latedeliveryandpenalty@1.0.0
 
 import org.accordproject.time.TemporalUnit from https://models.accordproject.org/time@0.2.0.cto
 import org.accordproject.time.Duration from https://models.accordproject.org/time@0.2.0.cto
 
 import org.accordproject.contract.Clause from https://models.accordproject.org/accordproject/contract.cto
-import org.accordproject.runtime.Request from https://models.accordproject.org/accordproject/runtime.cto
-import org.accordproject.runtime.Response from https://models.accordproject.org/accordproject/runtime.cto
+import org.accordproject.runtime@0.2.0.Request from https://models.accordproject.org/accordproject/runtime.cto
+import org.accordproject.runtime@0.2.0.Response from https://models.accordproject.org/accordproject/runtime.cto
 
 /**
  * Defines the data model for the LateDeliveryAndPenalty template.
  * This defines the structure of the abstract syntax tree that the parser for the template
  * must generate from input source text.
  */
+@template
 asset TemplateModel extends Clause {
   /**
    * Does the clause include a force majeure provision?

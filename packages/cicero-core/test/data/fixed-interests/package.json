@@ -1,6 +1,6 @@
 {
     "name": "fixed-interests",
-    "version": "0.5.0",
+    "version": "0.6.0",
     "description": "A Fixed Interests Loan Clause, with a monthly Payment",
     "author": "Accord Project",
     "license": "Apache-2.0",
