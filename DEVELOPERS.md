@@ -20,9 +20,6 @@ cd template-archive
 
 # Add the main Template Archive repository as an upstream remote to your repository:
 git remote add upstream "https://github.com/accordproject/template-archive.git"
-
-# Install node.js dependencies:
-npm install -g lerna
 ```
 
 **Note:** Template Archive no longer uses `lerna bootstrap`, since `lerna bootstrap` was deprecated at lerne version 7.x.  Now `npm install` automatically resolves packages defined within the "Workspaces" definition inside `package.json`.
