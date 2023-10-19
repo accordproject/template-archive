@@ -178,30 +178,30 @@ require('yargs')
             type: 'string',
             default: null
         });
-        yargs.option('utcOffset', {
-            describe: 'set UTC offset',
-            type: 'number',
-            default: null
-        });
-        yargs.option('offline', {
-            describe: 'do not resolve external models',
-            type: 'boolean',
-            default: false
-        });
-        yargs.option('format', {
-            describe: 'target format',
-            type: 'string'
-        });
-        yargs.option('unquoteVariables', {
-            describe: 'remove variables quoting',
-            type: 'boolean',
-            default: false
-        });
-        yargs.option('warnings', {
-            describe: 'print warnings',
-            type: 'boolean',
-            default: false
-        });
+        // yargs.option('utcOffset', {
+        //     describe: 'set UTC offset',
+        //     type: 'number',
+        //     default: null
+        // });
+        // yargs.option('offline', {
+        //     describe: 'do not resolve external models',
+        //     type: 'boolean',
+        //     default: false
+        // });
+        // yargs.option('format', {
+        //     describe: 'target format',
+        //     type: 'string'
+        // });
+        // yargs.option('unquoteVariables', {
+        //     describe: 'remove variables quoting',
+        //     type: 'boolean',
+        //     default: false
+        // });
+        // yargs.option('warnings', {
+        //     describe: 'print warnings',
+        //     type: 'boolean',
+        //     default: false
+        // });
     }, (argv) => {
         if (argv.verbose) {
             Logger.info(`create contract from data ${argv.data} for template ${argv.template}`);
@@ -210,10 +210,10 @@ require('yargs')
         try {
             argv = Commands.validateDraftArgs(argv);
             const options = {
-                offline: argv.offline,
-                unquoteVariables: argv.unquoteVariables,
-                warnings: argv.warnings,
-                format: argv.format,
+                // offline: argv.offline,
+                // unquoteVariables: argv.unquoteVariables,
+                // warnings: argv.warnings,
+                // format: argv.format,
             };
             return Commands.draft(argv.template, argv.data, argv.output, argv.currentTime, argv.utcOffset, options)
                 .then((result) => {

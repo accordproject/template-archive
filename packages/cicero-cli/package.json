@@ -44,7 +44,10 @@
     "@accordproject/cicero-core": "^0.24.0",
     "@accordproject/cicero-tools": "^0.24.0",
     "@accordproject/concerto-util": "3.8.2",
+    "@accordproject/markdown-template": "^0.16.21",
+    "@accordproject/markdown-transform": "^0.16.21",
     "@accordproject/template-engine": "2.3.5",
+    "dayjs": "^1.10.8",
     "mkdirp": "3.0.1",
     "yargs": "17.7.2"
   },
@@ -59,7 +62,6 @@
     "nyc": "15.1.0",
     "tmp-promise": "3.0.3"
   },
-
   "nyc": {
     "produce-source-map": "true",
     "sourceMap": "inline",
