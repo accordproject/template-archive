@@ -22,6 +22,7 @@ const Logger = require('@accordproject/concerto-util').Logger;
 const FileWriter = require('@accordproject/concerto-util').FileWriter;
 const Template = require('@accordproject/cicero-core').Template;
 const CodeGen = require('@accordproject/cicero-tools').CodeGen;
+const TemplateMarkInterpreter = require('@accordproject/template-engine');
 
 const GoLangVisitor = CodeGen.GoLangVisitor;
 const JavaVisitor = CodeGen.JavaVisitor;
@@ -29,6 +30,7 @@ const CordaVisitor = CodeGen.CordaVisitor;
 const JSONSchemaVisitor = CodeGen.JSONSchemaVisitor;
 const PlantUMLVisitor = CodeGen.PlantUMLVisitor;
 const TypescriptVisitor = CodeGen.TypescriptVisitor;
+const defaultData = 'data.json';
 
 /**
  * Utility class that implements the commands exposed by the Cicero CLI.
@@ -266,6 +268,91 @@ class Commands {
                 return `Loaded external models in '${output}'.`;
             });
     }
+
+    /**
+     * Set default params before we draft a sample text using a template
+     *
+     * @param {object} argv - the inbound argument values object
+     * @returns {object} a modfied argument object
+     */
+    static validateDraftArgs(argv) {
+        argv = Commands.validateCommonArgs(argv);
+        argv = Commands.setDefaultFileArg(argv, 'data', defaultData, ((argv, argDefaultName) => { return path.resolve(argv.template,argDefaultName); }));
+
+        if(argv.verbose) {
+            Logger.info(`draft text from data ${argv.data} using a template ${argv.template}`);
+        }
+
+        return argv;
+    }
+
+    /**
+     * Draft a contract text from JSON data
+     *
+     * @param {string} templatePath - path to the template directory or archive
+     * @param {string} dataPath - path to the JSON data
+     * @param {string} outputPath - to the contract file
+     * @param {string} [currentTime] - the definition of 'now', defaults to current time
+     * @param {number} [utcOffset] - UTC Offset for this execution, defaults to local offset
+     * @param {Object} [options] - an optional set of options
+     * @returns {object} Promise to the result of parsing
+     */
+    static draft(templatePath, dataPath, outputPath, currentTime, utcOffset, options) {
+        let clause;
+        const dataJson = JSON.parse(fs.readFileSync(dataPath, 'utf8'));
+
+        return Commands.loadTemplate(templatePath, options)
+            .then(async function (template) {
+                const modelManager = template.getModelManager();
+                //
+                // Insert code for draft command here
+                //
+                return "";
+            })
+            .catch((err) => {
+                Logger.error(err.message);
+            });
+    }
+    
+
+    /**
+     * Set a default for a file argument
+     *
+     * @param {object} argv - the inbound argument values object
+     * @param {string} argName - the argument name
+     * @param {string} argDefaultName - the argument default name
+     * @param {Function} argDefaultFun - how to compute the argument default
+     * @param {object} argDefaultValue - an optional default value if all else fails
+     * @returns {object} a modified argument object
+     */
+        static setDefaultFileArg(argv, argName, argDefaultName, argDefaultFun) {
+            if(!argv[argName]){
+                Logger.info(`Loading a default ${argDefaultName} file.`);
+                argv[argName] = argDefaultFun(argv, argDefaultName);
+            }
+    
+            let argExists = true;
+            if (Array.isArray(argv[argName])) {
+                // All files should exist
+                for (let i = 0; i < argv[argName].length; i++) {
+                    if (fs.existsSync(argv[argName][i]) && argExists) {
+                        argExists = true;
+                    } else {
+                        argExists = false;
+                    }
+                }
+            } else {
+                // This file should exist
+                argExists = fs.existsSync(argv[argName]);
+            }
+    
+            if (!argExists){
+                throw new Error(`A ${argDefaultName} file is required. Try the --${argName} flag or create a ${argDefaultName} in your template.`);
+            } else {
+                return argv;
+            }
+        }
+
 }
 
 module.exports = Commands;
