@@ -5,7 +5,6 @@
     "dayjs": "1.11.8",
     "eslint": "^8.43.0",
     "jsdoc": "^4.0.2",
-    "lerna": "^7.3.1",
     "license-check-and-add": "4.0.5",
     "semver": "7.5.3",
     "sleep-promise": "9.1.0",
@@ -25,9 +24,8 @@
   "scripts": {
     "coverage": "node ./scripts/coverage.js \"packages/cicero-*\" && nyc report -t coverage --cwd . --report-dir coverage --reporter=lcov && cat ./coverage/lcov.info",
     "pretest": "npm run licchk",
-    "test": "lerna exec -- npm run test:cov",
-    "repoclean": "lerna clean",
-    "licchk": "lerna exec -- npm run licchk"
+    "test": "npm run test:cov --workspaces",
+    "licchk": "license-check-and-add check -f ./license.config.json"
   },
   "repository": {
     "type": "git",

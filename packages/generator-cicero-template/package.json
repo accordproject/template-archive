@@ -14,7 +14,7 @@
     "pretest": "npm run lint",
     "lint": "eslint .",
     "postlint": "npm run licchk",
-    "licchk": "license-check-and-add check -f ../../license.config.json",
+    "licchk": "license-check-and-add check -f ./license.config.json",
     "test": "mocha --timeout 10000",
     "test:windows": "echo 'No Windows tests for this package'",
     "test:cov": "nyc npm run test"

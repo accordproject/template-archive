@@ -20,7 +20,7 @@
     "pretest": "npm run lint",
     "lint": "eslint .",
     "postlint": "npm run licchk",
-    "licchk": "license-check-and-add check -f ../../license.config.json",
+    "licchk": "license-check-and-add check -f ./license.config.json",
     "test:mocha": "mocha --timeout 40000",
     "test:watch": "npm run test:mocha -- --watch",
     "test:windows": "npm run test:mocha",
