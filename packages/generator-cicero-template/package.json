@@ -49,7 +49,6 @@
     "jsdoc": "^4.0.2",
     "license-check-and-add": "4.0.5",
     "mocha": "^10.2.0",
-    "mockery": "2.1.0",
     "nyc": "15.1.0",
     "yeoman-assert": "3.1.1",
     "yeoman-test": "6.3.0"
