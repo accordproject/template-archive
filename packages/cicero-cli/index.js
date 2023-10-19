@@ -160,6 +160,73 @@ require('yargs')
             return;
         }
     })
+    .command('draft', 'create contract text from data', (yargs) => {
+        yargs.option('template', {
+            describe: 'path to the template',
+            type: 'string'
+        });
+        yargs.option('data', {
+            describe: 'path to the contract data',
+            type: 'string'
+        });
+        yargs.option('output', {
+            describe: 'path to the output file',
+            type: 'string'
+        });
+        yargs.option('currentTime', {
+            describe: 'set current time',
+            type: 'string',
+            default: null
+        });
+        yargs.option('utcOffset', {
+            describe: 'set UTC offset',
+            type: 'number',
+            default: null
+        });
+        yargs.option('offline', {
+            describe: 'do not resolve external models',
+            type: 'boolean',
+            default: false
+        });
+        yargs.option('format', {
+            describe: 'target format',
+            type: 'string'
+        });
+        yargs.option('unquoteVariables', {
+            describe: 'remove variables quoting',
+            type: 'boolean',
+            default: false
+        });
+        yargs.option('warnings', {
+            describe: 'print warnings',
+            type: 'boolean',
+            default: false
+        });
+    }, (argv) => {
+        if (argv.verbose) {
+            Logger.info(`create contract from data ${argv.data} for template ${argv.template}`);
+        }
+
+        try {
+            argv = Commands.validateDraftArgs(argv);
+            const options = {
+                offline: argv.offline,
+                unquoteVariables: argv.unquoteVariables,
+                warnings: argv.warnings,
+                format: argv.format,
+            };
+            return Commands.draft(argv.template, argv.data, argv.output, argv.currentTime, argv.utcOffset, options)
+                .then((result) => {
+                    if(result) {Logger.info(result);}
+                })
+                .catch((err) => {
+                    Logger.error(err.message);
+                });
+        } catch (err){
+            Logger.error(err.message);
+            return;
+        }
+    })
     .command('get', 'save local copies of external dependencies', (yargs) => {
         yargs.option('template', {
             describe: 'path to the template',

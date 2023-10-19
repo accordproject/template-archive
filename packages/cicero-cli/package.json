@@ -44,6 +44,7 @@
     "@accordproject/cicero-core": "^0.24.0",
     "@accordproject/cicero-tools": "^0.24.0",
     "@accordproject/concerto-util": "3.8.2",
+    "@accordproject/template-engine": "2.3.5",
     "mkdirp": "3.0.1",
     "yargs": "17.7.2"
   },
