@@ -74,7 +74,7 @@
     "@accordproject/markdown-cicero": "0.16.13",
     "@accordproject/markdown-common": "0.16.13",
     "@accordproject/markdown-template": "0.16.13",
-    "axios": "1.4.0",
+    "axios": "1.6.0",
     "debug": "4.3.4",
     "ietf-language-tag-regex": "0.0.5",
     "json-stable-stringify": "1.0.2",
