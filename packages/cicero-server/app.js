@@ -168,9 +168,14 @@ app.post('/draft/:template', async function (req, httpResponse, next) {
  * @returns {object} The template instance object.
  */
 async function initTemplateInstance(req) {
-    const template = await Template.fromDirectory(`${process.env.CICERO_DIR}/${req.params.template}`);
+    let options = {};
+    if (Object.prototype.hasOwnProperty.call(req.body, 'options')) {
+        options = req.body.options;
+    }
+    const template = await Template.fromDirectory(`${process.env.CICERO_DIR}/${req.params.template}`, options);
     return new Clause(template);
 }
+
 
 const server = app.listen(app.get('port'), function () {
     console.log('Server listening on port: ', app.get('port'));
