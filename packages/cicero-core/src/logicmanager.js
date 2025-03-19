@@ -16,8 +16,7 @@
 
 const slash = require('slash');
 
-const Introspector = require('@accordproject/concerto-core').Introspector;
-const APModelManager = require('./apmodelmanager');
+const {Introspector, ModelManager} = require('@accordproject/concerto-core');
 const ScriptManager = require('./scriptmanager');
 
 /**
@@ -35,7 +34,7 @@ class LogicManager {
      */
     constructor(options) {
         this.contractName = null;
-        this.modelManager = new APModelManager();
+        this.modelManager = new ModelManager(options);
         this.scriptManager = new ScriptManager(this.target, this.modelManager, options);
         this.introspector = new Introspector(this.modelManager);
     }

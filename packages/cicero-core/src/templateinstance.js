@@ -20,6 +20,9 @@ const Logger = require('@accordproject/concerto-util').Logger;
 const CiceroMarkTransformer = require('@accordproject/markdown-cicero').CiceroMarkTransformer;
 const TemplateMarkTransformer = require('@accordproject/markdown-template').TemplateMarkTransformer;
 
+const { TemplateMarkInterpreter } = require('@accordproject/template-engine');
+const { transform } = require('@accordproject/markdown-transform');
+
 /**
  * A TemplateInstance is an instance of a Clause or Contract template. It is executable business logic, linked to
  * a natural language (legally enforceable) template.
@@ -114,6 +117,40 @@ class TemplateInstance {
      */
     getTemplate() {
         return this.template;
+    }
+
+    /**
+     * Generates the natural language text for a contract or clause clause; combining the text from the template
+     * and the instance data.
+     * @param {string} format - the format to generate to
+     * @param {*} [options] text generation options.
+     * @param {string} [currentTime] - the definition of 'now', defaults to current time
+     * @param {number} [utcOffset] - UTC Offset for this execution, defaults to local offset
+     * @returns {string} the natural language text for the contract or clause; created by combining the structure of
+     * the template with the JSON data for the clause.
+     */
+    async draft(format, options, currentTime, utcOffset) {
+        if (!this.concertoData) {
+            throw new Error('Data has not been set. Call setData before calling this method.');
+        }
+
+        // Setup
+        const metadata = this.getTemplate().getMetadata();
+        const templateKind = metadata.getTemplateType() !== 0 ? 'clause' : 'contract';
+
+        // Get the data
+        const data = this.getData();
+        const modelManager = this.getTemplate().getModelManager();
+        const engine = new TemplateMarkInterpreter(modelManager, {});
+        const templateMarkTransformer = new TemplateMarkTransformer();
+        const templateMarkDom = templateMarkTransformer.fromMarkdownTemplate(
+            {content: this.getTemplate().getTemplate() }, modelManager, templateKind, options);
+        const now = currentTime ? currentTime : new Date().toISOString();
+        const ciceroMark = await engine.generate(templateMarkDom, data, {now});
+        console.log(JSON.stringify(ciceroMark));
+        const result = transform(ciceroMark.toJSON(), 'ciceromark', ['ciceromark_unquoted', format], null, options );
+        console.log(result);
+        return result;
     }
 
     /**

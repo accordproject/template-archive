@@ -136,7 +136,7 @@ describe('#validateArchiveArgs', () => {
         process.chdir(path.resolve(__dirname, 'data/latedeliveryandpenalty/'));
         const args  = Commands.validateArchiveArgs({
             _: ['archive'],
-            target: 'ergo'
+            target: 'typescript'
         });
         args.template.should.match(/cicero-cli[/\\]test[/\\]data[/\\]latedeliveryandpenalty$/);
     });
@@ -181,31 +181,31 @@ describe('#archive', async () => {
         fs.unlinkSync(archiveName);
     });
 
-    it('should create a valid ergo archive', async () => {
+    it('should create a valid typescript archive', async () => {
         const archiveName = 'test.cta';
         const options = {};
-        const result = await Commands.archive(template, 'ergo', archiveName, options);
+        const result = await Commands.archive(template, 'typescript', archiveName, options);
         result.should.eql(true);
         const newTemplate = await Template.fromArchive(fs.readFileSync(archiveName));
         newTemplate.should.not.be.null;
         fs.unlinkSync(archiveName);
     });
 
-    it('should create a valid ergo archive with a default name', async () => {
+    it('should create a valid typescript archive with a default name', async () => {
         const archiveName = 'latedeliveryandpenalty@0.0.1.cta';
         const options = {};
-        const result = await Commands.archive(template, 'ergo', null, options);
+        const result = await Commands.archive(template, 'typescript', null, options);
         result.should.eql(true);
         const newTemplate = await Template.fromArchive(fs.readFileSync(archiveName));
         newTemplate.should.not.be.null;
         fs.unlinkSync(archiveName);
     });
 
-    it('should create an Ergo archive', async () => {
+    it('should create an typescript archive', async () => {
         const tmpFile = await tmp.file();
         const tmpArchive = tmpFile.path + '.cta';
         const options = {};
-        await Commands.archive(template, 'ergo', tmpArchive, options);
+        await Commands.archive(template, 'typescript', tmpArchive, options);
         fs.readFileSync(tmpArchive).length.should.be.above(0);
         tmpFile.cleanup();
     });

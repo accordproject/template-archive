@@ -104,7 +104,7 @@ class APModelManager extends ModelManager {
     async addAPModelFiles(modelFiles, modelFileNames, offline) {
         modelFiles.map((modelFileContent, index) => {
             const modelFileName = modelFileNames[index];
-            this.addAPModelFile(modelFileContent, modelFileName);
+            this.addAPModelFile(modelFileContent, modelFileName, true);
         });
         if (offline) {
             this.validateModelFiles();

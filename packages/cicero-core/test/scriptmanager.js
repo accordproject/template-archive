@@ -23,9 +23,9 @@ chai.use(require('chai-as-promised'));
 const fs = require('fs');
 
 const ScriptManager = require('../src/scriptmanager');
-const APModelManager = require('../src/apmodelmanager');
+const { ModelManager } = require('@accordproject/concerto-core');
 
-const modelManager = new APModelManager();
+const modelManager = new ModelManager();
 const jsSample = fs.readFileSync('./test/data/test.js','utf8');
 const jsSample2 = fs.readFileSync('./test/data/test2.js','utf8');
 

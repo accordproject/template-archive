@@ -15,7 +15,7 @@
 'use strict';
 
 const Script = require('../src/script');
-const APModelManager = require('../src/apmodelmanager');
+const { ModelManager } = require('@accordproject/concerto-core');
 
 const chai = require('chai');
 const fs = require('fs');
@@ -31,7 +31,7 @@ describe('Script', () => {
     let modelManager;
 
     beforeEach(async function () {
-        modelManager = new APModelManager();
+        modelManager = new ModelManager();
         modelManager.addCTOModel(ctoSample,'test.cto',true);
     });
 

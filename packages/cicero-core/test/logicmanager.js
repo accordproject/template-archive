@@ -41,7 +41,7 @@ describe('LogicManager', () => {
 
         it('should load a model to the model manager', () => {
             const logicManager = new LogicManager('es6');
-            logicManager.getModelManager().addAPModelFile(ctoSample,'test.cto');
+            logicManager.getModelManager().addModelFile(ctoSample,'test.cto');
             const modelManager = logicManager.getModelManager();
             modelManager.getModels().map(x => x.name).should.deep.equal([
                 '@models.accordproject.org.time@0.3.0.cto',
@@ -55,7 +55,7 @@ describe('LogicManager', () => {
 
         it('should load a model to the model manager (bulk)', () => {
             const logicManager = new LogicManager('es6');
-            logicManager.getModelManager().addAPModelFiles([ctoSample],['test.cto']);
+            logicManager.getModelManager().addModelFiles([ctoSample],['test.cto']);
             const modelManager = logicManager.getModelManager();
             modelManager.getModels().map(x => x.name).should.deep.equal([
                 '@models.accordproject.org.time@0.3.0.cto',

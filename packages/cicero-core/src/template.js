@@ -72,13 +72,18 @@ class Template {
     /**
      * Verifies that the template is well formed.
      * Throws an exception with the details of any validation errors.
-     * @param {Object} options  - e.g., { verify: true }
+     * @param {Object} options  - e.g., { offline: true }
      */
     validate(options = {}) {
         if (options.verifySignature) {
             this.verifyTemplateSignature();
         }
-        this.getModelManager().validateModelFiles();
+        if(options && options.offline) {
+            this.getModelManager().validateModelFiles();
+        }
+        else {
+            this.getModelManager().updateExternalModels();
+        }
         this.getTemplateModel();
     }
 

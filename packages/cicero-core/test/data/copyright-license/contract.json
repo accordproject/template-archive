@@ -1,5 +1,5 @@
 {
-  "$class": "org.accordproject.copyrightlicense.CopyrightLicenseContract",
+  "$class": "org.accordproject.copyrightlicense@1.0.0.CopyrightLicenseContract",
   "contractId": "e2b426d7-7e7d-4ead-9b89-1f1a976b8c03",
   "effectiveDate": "2018-01-01T00:00:00.000-04:00",
   "licensee": "org.accordproject.party.Party#Me",
@@ -14,7 +14,7 @@
   "purposeDescription": "stuff",
   "workDescription": "other stuff",
   "paymentClause": {
-    "$class": "resource:org.accordproject.copyrightlicense.PaymentClause",
+    "$class": "resource:org.accordproject.copyrightlicense@1.0.0.PaymentClause",
     "clauseId": "115631d3-da8d-4484-989d-706621a22bbe",
     "amountText": "one hundred US Dollars",
     "amount": {

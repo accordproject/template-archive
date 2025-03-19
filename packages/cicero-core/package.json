@@ -74,6 +74,8 @@
     "@accordproject/markdown-cicero": "0.16.13",
     "@accordproject/markdown-common": "0.16.13",
     "@accordproject/markdown-template": "0.16.13",
+    "@accordproject/markdown-transform": "^0.16.25",
+    "@accordproject/template-engine": "^2.5.14",
     "axios": "1.4.0",
     "debug": "4.3.4",
     "ietf-language-tag-regex": "0.0.5",
