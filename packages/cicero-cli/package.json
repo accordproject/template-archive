@@ -1,10 +1,10 @@
 {
   "name": "@accordproject/cicero-cli",
-  "version": "0.24.0",
+  "version": "0.25.0",
   "description": "Cicero CLI",
   "engines": {
-    "node": ">=16",
-    "npm": ">=8"
+    "node": ">=20",
+    "npm": ">=10"
   },
   "publishConfig": {
     "access": "public"
