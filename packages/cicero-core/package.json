@@ -20,7 +20,7 @@
     "build": "npm run build:types",
     "postbuild": "npm run webpack",
     "webpack": "webpack --config webpack.config.js --mode production",
-    "prepublishOnly": " npm run webpack",
+    "prepublishOnly": "npm run build:types && npm run webpack",
     "pretest": "npm run lint",
     "lint": "eslint .",
     "postlint": "npm run licchk",
