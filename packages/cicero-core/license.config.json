@@ -52,7 +52,7 @@
     "types/**/*.d.ts"
   ],
    "licenseFormats": {
-    "js|njk|pegjs|cto|acl|qry": {
+    "js|njk|pegjs|cto|acl|qry|ts": {
       "prepend": "/*",
       "append": " */",
       "eachLine": {

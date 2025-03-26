@@ -12,13 +12,10 @@
  * limitations under the License.
  */
 
-'use strict';
-
 /**
  * Cicero Core - defines the core data types for Cicero.
  * @module cicero-core
  */
-
 import Clause from './clause';
 module.exports.Clause = Clause;
 

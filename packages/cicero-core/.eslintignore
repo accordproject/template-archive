@@ -7,3 +7,4 @@ test/data
 src/grammars
 scripts
 dist
+webpack.config.js
