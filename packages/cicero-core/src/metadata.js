@@ -32,6 +32,8 @@ const IMAGE_SIZE = {
     height: 128,
 };
 
+const RUNTIMES = ['es6', 'typescript'];
+
 /**
  * Defines the metadata for a Template, including the name, version, README markdown.
  * @class
@@ -105,6 +107,10 @@ class Metadata {
         }
 
         this.runtime = packageJson.accordproject.runtime;
+
+        if(this.runtime && !RUNTIMES.includes(this.runtime)) {
+            throw new Error('Unsupported runtime. The supported runtimes are: ' + RUNTIMES.join(', '));
+        }
 
         if(!samples || typeof(samples) !== 'object') {
             throw new Error('sample.md is required');
@@ -390,6 +396,9 @@ class Metadata {
      * @return {object} the new Metadata
      */
     createTargetMetadata(runtimeName) {
+        if(!RUNTIMES.includes(runtimeName)) {
+            throw new Error('Unsupported runtime. The supported runtimes are: ' + RUNTIMES.join(', '));
+        }
         const packageJson = JSON.parse(JSON.stringify(this.packageJson));
         packageJson.accordproject.runtime = runtimeName;
         return new Metadata(packageJson, this.readme, this.samples, this.request, this.logo);

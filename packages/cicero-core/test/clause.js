@@ -23,25 +23,25 @@ chai.should();
 chai.use(require('chai-things'));
 chai.use(require('chai-as-promised'));
 
-const options = { offline: true };
+const options = { offline: false };
 
 describe('Clause', () => {
 
     describe('#constructor', () => {
 
-        it('should create a clause for a latedeliveryandpenalty template', async function() {
+        it('should create a clause for a latedeliveryandpenalty template', async function () {
             const template = await Template.fromDirectory('./test/data/latedeliveryandpenalty', options);
             const clause = new Clause(template);
             clause.should.not.be.null;
         });
 
-        it('should create a clause for a conga template', async function() {
+        it('should create a clause for a conga template', async function () {
             const template = await Template.fromDirectory('./test/data/conga', options);
             const clause = new Clause(template);
             clause.should.not.be.null;
         });
 
-        it('should fail to create a clause for a template with a missing binding', async function() {
+        it('should fail to create a clause for a template with a missing binding', async function () {
             try {
                 await Template.fromDirectory('./test/data/bad-binding', options);
             } catch (err) {
@@ -49,7 +49,7 @@ describe('Clause', () => {
             }
         });
 
-        it('should fail to create a clause for a template with a wrongly typed boolean binding', async function() {
+        it('should fail to create a clause for a template with a wrongly typed boolean binding', async function () {
             try {
                 await Template.fromDirectory('./test/data/bad-boolean-binding', options);
             } catch (err) {
@@ -57,7 +57,7 @@ describe('Clause', () => {
             }
         });
 
-        it('should fail to create a clause for a template with a wrongly typed formatted binding', async function() {
+        it('should fail to create a clause for a template with a wrongly typed formatted binding', async function () {
             try {
                 await Template.fromDirectory('./test/data/bad-formatted-binding', options);
             } catch (err) {
@@ -68,7 +68,7 @@ describe('Clause', () => {
 
     describe('#setData', () => {
 
-        it('should be able to set data', async function() {
+        it('should be able to set data', async function () {
             const template = await Template.fromDirectory('./test/data/latedeliveryandpenalty', options);
             const clause = new Clause(template);
 
@@ -77,17 +77,17 @@ describe('Clause', () => {
                 $class: 'io.clause.latedeliveryandpenalty@0.1.0.TemplateModel',
                 clauseId: '1234',
                 forceMajeure: false,
-                penaltyDuration : {
-                    amount : 1,
-                    unit : 'days'
+                penaltyDuration: {
+                    amount: 1,
+                    unit: 'days'
                 },
-                penaltyPercentage : 10,
-                capPercentage : 50,
-                termination : {
-                    amount : 10,
-                    unit : 'days'
+                penaltyPercentage: 10,
+                capPercentage: 50,
+                termination: {
+                    amount: 10,
+                    unit: 'days'
                 },
-                fractionalPart : 'days'
+                fractionalPart: 'days'
             };
             clause.setData(data);
             clause.getData().should.eql(data);
@@ -96,36 +96,36 @@ describe('Clause', () => {
             // check that the concerto data is really a Concerto object
             clause.getDataAsConcertoObject().getFullyQualifiedType().should.be.equal('io.clause.latedeliveryandpenalty@0.1.0.TemplateModel');
         });
-        it('should throw error for bad $class', async function() {
+        it('should throw error for bad $class', async function () {
             const template = await Template.fromDirectory('./test/data/latedeliveryandpenalty', options);
             const clause = new Clause(template);
             const data = {
                 $class: 'bad.class.name'
             };
-            (()=> clause.setData(data)).should.throw('Invalid data, must be a valid instance of the template model io.clause.latedeliveryandpenalty@0.1.0.TemplateModel but got: {"$class":"bad.class.name"} ');
+            (() => clause.setData(data)).should.throw('Invalid data, must be a valid instance of the template model io.clause.latedeliveryandpenalty@0.1.0.TemplateModel but got: {"$class":"bad.class.name"} ');
         });
     });
 
     describe('#toJSON', () => {
 
-        it('should get a JSON representation of a clause', async function() {
+        it('should get a JSON representation of a clause', async function () {
             const template = await Template.fromDirectory('./test/data/latedeliveryandpenalty', options);
             const clause = new Clause(template);
             const data = {
                 $class: 'io.clause.latedeliveryandpenalty@0.1.0.TemplateModel',
                 clauseId: '1234',
                 forceMajeure: false,
-                penaltyDuration : {
-                    amount : 1,
-                    unit : 'days'
+                penaltyDuration: {
+                    amount: 1,
+                    unit: 'days'
                 },
-                penaltyPercentage : 10,
-                capPercentage : 50,
-                termination : {
-                    amount : 10,
-                    unit : 'days'
+                penaltyPercentage: 10,
+                capPercentage: 50,
+                termination: {
+                    amount: 10,
+                    unit: 'days'
                 },
-                fractionalPart : 'days'
+                fractionalPart: 'days'
             };
             clause.setData(data);
             clause.toJSON().should.eql({

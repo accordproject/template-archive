@@ -6,7 +6,7 @@
     "accordproject": {
         "template": "contract",
         "cicero": "^<%= data.engineVersion %>",
-        "runtime": "ergo"
+        "runtime": "es6"
     },
     "devDependencies": {
         "cucumber": "^5.1.0",

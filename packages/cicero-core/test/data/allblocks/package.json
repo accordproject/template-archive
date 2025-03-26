@@ -4,6 +4,6 @@
     "description": "Test all blocks",
     "accordproject": {
       "template": "clause",
-      "cicero": "^0.24.0"
+      "cicero": "^0.25.0"
     }
   }

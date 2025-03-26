@@ -21,14 +21,7 @@ const mkdirp = require('mkdirp');
 const Logger = require('@accordproject/concerto-util').Logger;
 const FileWriter = require('@accordproject/concerto-util').FileWriter;
 const Template = require('@accordproject/cicero-core').Template;
-const CodeGen = require('@accordproject/cicero-tools').CodeGen;
-
-const GoLangVisitor = CodeGen.GoLangVisitor;
-const JavaVisitor = CodeGen.JavaVisitor;
-const CordaVisitor = CodeGen.CordaVisitor;
-const JSONSchemaVisitor = CodeGen.JSONSchemaVisitor;
-const PlantUMLVisitor = CodeGen.PlantUMLVisitor;
-const TypescriptVisitor = CodeGen.TypescriptVisitor;
+const { CodeGen } = require('@accordproject/concerto-codegen');
 
 /**
  * Utility class that implements the commands exposed by the Cicero CLI.
@@ -196,32 +189,11 @@ class Commands {
 
         return Commands.loadTemplate(templatePath, options)
             .then((template) => {
-
-                let visitor = null;
-
-                switch(target) {
-                case 'Go':
-                    visitor = new GoLangVisitor();
-                    break;
-                case 'PlantUML':
-                    visitor = new PlantUMLVisitor();
-                    break;
-                case 'Typescript':
-                    visitor = new TypescriptVisitor();
-                    break;
-                case 'Java':
-                    visitor = new JavaVisitor();
-                    break;
-                case 'Corda':
-                    visitor = new CordaVisitor();
-                    break;
-                case 'JSONSchema':
-                    visitor = new JSONSchemaVisitor();
-                    break;
-                default:
+                const visitor = CodeGen.formats[target];
+                if(!visitor) {
                     throw new Error ('Unrecognized code generator: ' + target);
                 }
-
+                console.log('generating code...');
                 let parameters = {};
                 parameters.fileWriter = new FileWriter(outputPath);
                 template.getModelManager().accept(visitor, parameters);

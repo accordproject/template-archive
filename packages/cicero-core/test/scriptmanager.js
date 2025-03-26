@@ -23,9 +23,9 @@ chai.use(require('chai-as-promised'));
 const fs = require('fs');
 
 const ScriptManager = require('../src/scriptmanager');
-const APModelManager = require('../src/apmodelmanager');
+const { ModelManager } = require('@accordproject/concerto-core');
 
-const modelManager = new APModelManager();
+const modelManager = new ModelManager();
 const jsSample = fs.readFileSync('./test/data/test.js','utf8');
 const jsSample2 = fs.readFileSync('./test/data/test2.js','utf8');
 
@@ -43,7 +43,7 @@ describe('ScriptManager', () => {
             scriptManager.addScript(script1);
             scriptManager.getScript('test.js').should.not.be.null;
             scriptManager.getScripts().length.should.equal(1);
-            scriptManager.getScriptsForTarget('ergo').length.should.equal(0);
+            scriptManager.getScriptsForTarget('es6').length.should.equal(0);
             scriptManager.getScriptsForTarget('js').length.should.equal(1);
             scriptManager.getScriptsForTarget('java').length.should.equal(0);
         });
@@ -61,7 +61,7 @@ describe('ScriptManager', () => {
             const scriptManager = new ScriptManager('es6',modelManager);
             const script1 = scriptManager.createScript('test.js','.js',jsSample);
             scriptManager.addScript(script1);
-            return (() => scriptManager.deleteScript('test.ergo')).should.throw('Script file does not exist');
+            return (() => scriptManager.deleteScript('test.foo')).should.throw('Script file does not exist');
         });
 
         it('should get scripts identifiers', async function() {

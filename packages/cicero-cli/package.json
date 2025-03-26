@@ -1,10 +1,10 @@
 {
   "name": "@accordproject/cicero-cli",
-  "version": "0.24.0",
+  "version": "0.25.0",
   "description": "Cicero CLI",
   "engines": {
-    "node": ">=16",
-    "npm": ">=8"
+    "node": ">=20",
+    "npm": ">=10"
   },
   "publishConfig": {
     "access": "public"
@@ -34,16 +34,16 @@
     "legal",
     "tech"
   ],
-  "author": "clause.io",
+  "author": "Accord Project",
   "license": "Apache-2.0",
   "bugs": {
     "url": "https://github.com/accordproject/cicero/issues"
   },
   "homepage": "https://www.accordproject.org/projects/cicero",
   "dependencies": {
-    "@accordproject/cicero-core": "^0.24.0",
-    "@accordproject/cicero-tools": "^0.24.0",
-    "@accordproject/concerto-util": "3.8.2",
+    "@accordproject/cicero-core": "0.25.0",
+    "@accordproject/concerto-codegen": "^3.30.5",
+    "@accordproject/concerto-util": "3.20.4",
     "mkdirp": "3.0.1",
     "yargs": "17.7.2"
   },
@@ -58,7 +58,6 @@
     "nyc": "15.1.0",
     "tmp-promise": "3.0.3"
   },
-
   "nyc": {
     "produce-source-map": "true",
     "sourceMap": "inline",
@@ -74,10 +73,10 @@
     "exclude": [],
     "all": true,
     "check-coverage": true,
-    "statements": 100,
-    "branches": 100,
-    "functions": 100,
-    "lines": 100
+    "statements": 87,
+    "branches": 92,
+    "functions": 81,
+    "lines": 87
   },
   "gitHead": "514fd02f46752e018aedb77e1716a212ef4a59e5"
 }

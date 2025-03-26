@@ -1,11 +1,12 @@
 {
   "name": "@accordproject/cicero-core",
-  "version": "0.24.0",
+  "version": "0.25.0",
   "description": "Cicero Core - Implementation of Accord Protocol Template Specification",
   "engines": {
-    "node": ">=16",
-    "npm": ">=8"
+    "node": ">=20",
+    "npm": ">=10"
   },
+  "typings": "types/index.d.ts",
   "publishConfig": {
     "access": "public"
   },
@@ -15,6 +16,7 @@
   ],
   "main": "index.js",
   "scripts": {
+    "build": "npm run build:types",
     "webpack": "webpack --config webpack.config.js --mode production",
     "prepublishOnly": " npm run webpack",
     "pretest": "npm run lint",
@@ -27,7 +29,8 @@
     "test": "npm run test:mocha",
     "test:cov": "nyc npm run test",
     "jsdoc": "jsdoc -c jsdoc.json package.json",
-    "typescript": "jsdoc -t node_modules/tsd-jsdoc/dist -r ./src/"
+    "typescript": "jsdoc -t node_modules/tsd-jsdoc/dist -r ./src/",
+    "build:types": "tsc index.js --declaration --allowJs --emitDeclarationOnly --outDir types"
   },
   "repository": {
     "type": "git",
@@ -66,14 +69,18 @@
     "raw-loader": "^4.0.2",
     "stream-browserify": "3.0.0",
     "stream-http": "3.2.0",
+    "typescript": "5.6.3",
     "webpack": "5.88.0",
     "webpack-cli": "5.1.4"
   },
   "dependencies": {
-    "@accordproject/concerto-core": "3.8.2",
-    "@accordproject/markdown-cicero": "0.16.13",
-    "@accordproject/markdown-common": "0.16.13",
-    "@accordproject/markdown-template": "0.16.13",
+    "@accordproject/concerto-core": "3.20.4",
+    "@accordproject/markdown-cicero": "0.16.25",
+    "@accordproject/markdown-common": "0.16.25",
+    "@accordproject/markdown-template": "0.16.25",
+    "@accordproject/markdown-transform": "^0.16.25",
+    "@accordproject/template-engine": "^2.5.14",
+    "@types/node": "^22.13.13",
     "axios": "1.4.0",
     "debug": "4.3.4",
     "ietf-language-tag-regex": "0.0.5",
@@ -105,10 +112,10 @@
     ],
     "all": true,
     "check-coverage": true,
-    "statements": 84,
+    "statements": 79,
     "branches": 76,
-    "functions": 81,
-    "lines": 84
+    "functions": 76,
+    "lines": 79
   },
   "gitHead": "514fd02f46752e018aedb77e1716a212ef4a59e5"
 }

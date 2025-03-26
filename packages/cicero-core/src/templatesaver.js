@@ -15,6 +15,7 @@
 'use strict';
 
 const JSZip = require('jszip');
+const fsPath = require('path');
 
 /**
  * A utility to persist templates to data sources.
@@ -98,6 +99,16 @@ class TemplateSaver {
         }));
         modelFiles.forEach(function (file) {
             zip.file('model/' + file.name, file.content, options);
+        });
+
+        zip.file('logic/', null, Object.assign({}, options, {
+            dir: true
+        }));
+        const scriptFiles = template.getScriptManager().getScriptsForTarget(language);
+        scriptFiles.forEach(function (file) {
+            let fileIdentifier = file.getIdentifier();
+            let fileName = fsPath.basename(fileIdentifier);
+            zip.file('logic/' + fileName, file.contents, options);
         });
 
         return zip.generateAsync({

@@ -31,7 +31,7 @@ const stat = fs.stat ? promisify(fs.stat) : undefined;
 const ENCODING = 'utf8';
 
 // Matches 'sample.md' or 'sample_TAG.md' where TAG is an IETF language tag (BCP 47)
-const IETF_REGEXP = languageTagRegex({ exact: false }).toString().slice(1,-2);
+const IETF_REGEXP = languageTagRegex({ exact: false }).toString().slice(1, -2);
 const SAMPLE_FILE_REGEXP = xregexp('text[/\\\\]sample(_(' + IETF_REGEXP + '))?.md$');
 
 /**
@@ -60,11 +60,11 @@ class TemplateLoader {
         const readmeContents = await TemplateLoader.loadZipFileContents(zip, 'README.md');
         const logo = await TemplateLoader.loadZipFileBuffer(zip, 'logo.png');
         let sampleFiles = await TemplateLoader.loadZipFilesContents(zip, SAMPLE_FILE_REGEXP);
-        sampleFiles.forEach( async (sampleFile) => {
+        sampleFiles.forEach(async (sampleFile) => {
             let matches = sampleFile.name.match(SAMPLE_FILE_REGEXP);
             let locale = 'default';
             // Locale match found
-            if(matches !== null && matches[2]){
+            if (matches !== null && matches[2]) {
                 locale = matches[2];
             }
             sampleTextFiles[locale] = sampleFile.contents;
@@ -76,7 +76,7 @@ class TemplateLoader {
         const authorSignature = await TemplateLoader.loadZipFileContents(zip, 'signature.json', true, false);
 
         Logger.debug(method, 'Looking for model files');
-        let ctoFiles =  await TemplateLoader.loadZipFilesContents(zip, /model[/\\].*\.cto$/);
+        let ctoFiles = await TemplateLoader.loadZipFilesContents(zip, /model[/\\].*\.cto$/);
         ctoFiles.forEach(async (file) => {
             ctoModelFileNames.push(file.name);
             ctoModelFiles.push(file.contents);
@@ -87,17 +87,35 @@ class TemplateLoader {
 
         // add model files
         Logger.debug(method, 'Adding model files to model manager');
-        template.getModelManager().addAPModelFiles(ctoModelFiles, ctoModelFileNames, true); // Archives can always be loaded offline
+        const mm = template.getModelManager();
+        ctoModelFiles.forEach( (mf,index) => {
+            mm.addCTOModel(mf, ctoModelFileNames[index], true);
+        });
+
+        if(options && options.offline) {
+            mm.validateModelFiles();
+        }
+        else {
+            mm.updateExternalModels();
+        }
 
         Logger.debug(method, 'Setting grammar');
-        if(!grammar) {
+        if (!grammar) {
             throw new Error('A template must contain a grammar.tem.md file.');
         } else {
             template.setTemplate(grammar);
         }
 
+        // load and add the typescript files
+        if (template.getMetadata().getRuntime() === 'typescript') {
+            Logger.debug(method, 'Adding Typescript files to script manager');
+            const scriptFiles = await TemplateLoader.loadZipFilesContents(zip, /logic[/\\].*\.ts$/);
+            scriptFiles.forEach(function (obj) {
+                template.getLogicManager().addLogicFile(obj.contents, obj.name);
+            });
+        }
         // check the integrity of the model and logic of the template
-        authorSignature ? template.validate({verifySignature: true}) : template.validate();
+        authorSignature ? template.validate({ verifySignature: options && options.disableSignatureVerification ? false : true }) : template.validate();
 
         return template; // Returns template
     }
@@ -135,10 +153,10 @@ class TemplateLoader {
         const logo = await TemplateLoader.loadFileBuffer(path, 'logo.png');
 
         // grab the request.json
-        const requestJsonObject = await TemplateLoader.loadFileContents(path, 'request.json', true );
+        const requestJsonObject = await TemplateLoader.loadFileContents(path, 'request.json', true);
 
         // grab the package.json
-        const packageJsonObject = await TemplateLoader.loadFileContents(path, 'package.json', true, true );
+        const packageJsonObject = await TemplateLoader.loadFileContents(path, 'package.json', true, true);
 
         // grab the sample files
         Logger.debug(method, 'Looking for sample files');
@@ -150,7 +168,7 @@ class TemplateLoader {
 
             let locale = 'default';
             // Match found
-            if(matches !== null && matches[2]){
+            if (matches !== null && matches[2]) {
                 locale = matches[2];
             }
             Logger.debug(method, 'Using sample file locale', locale);
@@ -158,7 +176,7 @@ class TemplateLoader {
         });
 
         // grab the signature.json
-        const authorSignature = await TemplateLoader.loadFileContents(path, 'signature.json', true, false );
+        const authorSignature = await TemplateLoader.loadFileContents(path, 'signature.json', true, false);
 
         // create the template
         const template = new (Function.prototype.bind.call(Template, null, packageJsonObject, readmeContents, sampleTextFiles, requestJsonObject, logo, options, authorSignature));
@@ -170,27 +188,50 @@ class TemplateLoader {
             modelFiles.push(file.contents);
         });
 
-        const externalModelFiles = await template.getModelManager().addAPModelFiles(modelFiles, modelFileNames, options && options.offline);
-        if(!options || !options.offline){
-            externalModelFiles.forEach(function (file) {
-                fs.writeFileSync(path + '/model/' + file.name, file.content);
+        // add model files
+        Logger.debug(method, 'Adding model files to model manager');
+        const mm = template.getModelManager();
+        mm.addModelFiles(modelFiles, modelFileNames, true);
+
+        if(options && options.offline) {
+            mm.validateModelFiles();
+        }
+        else {
+            await mm.updateExternalModels();
+        }
+
+        if (!options || !options.offline) {
+            mm.getModelFiles().forEach(mf => {
+                if(mf.isExternal()) {
+                    fs.writeFileSync(path + '/model/' + mf.getName(), mf.getDefinitions());
+                }
             });
         }
 
         // load and add the template
         let grammar = await TemplateLoader.loadFileContents(path, 'text/grammar.tem.md', false, false);
 
-        if(!grammar) {
+        if (!grammar) {
             throw new Error('A template must either contain a grammar.tem.md file.');
         } else {
             template.setTemplate(grammar);
             Logger.debug(method, 'Loaded grammar.tem.md', grammar);
         }
 
-        Logger.debug(method, 'Loaded grammar.tem.md');
+        // load and add the typescript files
+        if(template.getMetadata().getRuntime() === 'typescript') {
+            const tsFiles = await TemplateLoader.loadFilesContents(path, /logic[/\\].*\.ts$/);
+            tsFiles.forEach((file) => {
+                const resolvedPath = slash(fsPath.resolve(path));
+                const resolvedFilePath = slash(fsPath.resolve(file.name));
+                const truncatedPath = resolvedFilePath.replace(resolvedPath+'/', '');
+                template.getLogicManager().addLogicFile(file.contents, truncatedPath);
+                Logger.debug(method, `Loaded ${truncatedPath}`, file.contents);
+            });
+        }
 
         // check the template
-        authorSignature ? template.validate({verifySignature: true}) : template.validate();
+        authorSignature ? template.validate({ verifySignature: options && options.disableSignatureVerification ? false : true }) : template.validate();
 
         return template;
     }
@@ -202,7 +243,7 @@ class TemplateLoader {
      */
     static normalizeText(input) {
         // we replace all \r and \n with \n
-        let text =  input.replace(/\r/gm,'');
+        let text = input.replace(/\r/gm, '');
         return text;
     }
 
@@ -216,17 +257,17 @@ class TemplateLoader {
      * @return {Promise<string>} a promise to the contents of the zip file or null if it does not exist and
      * required is false
      */
-    static async loadZipFileContents(zip, path, json=false, required=false) {
+    static async loadZipFileContents(zip, path, json = false, required = false) {
         Logger.debug('loadZipFileContents', 'Loading ' + path);
         let zipFile = zip.file(path);
-        if(!zipFile && required) {
+        if (!zipFile && required) {
             throw new Error(`Failed to find ${path} in archive file.`);
         }
 
-        if(zipFile) {
+        if (zipFile) {
             const content = await zipFile.async('string');
 
-            if(json && content) {
+            if (json && content) {
                 return JSON.parse(content);
             }
             else {
@@ -249,9 +290,9 @@ class TemplateLoader {
         let matchedFiles = zip.file(regex);
 
         // do not use forEach, because we need to call an async function!
-        for(let n=0; n < matchedFiles.length; n++) {
+        for (let n = 0; n < matchedFiles.length; n++) {
             const file = matchedFiles[n];
-            const result = {name: file.name};
+            const result = { name: file.name };
             result.contents = await TemplateLoader.loadZipFileContents(zip, file.name, false, true);
             results.push(result);
         }
@@ -268,14 +309,14 @@ class TemplateLoader {
      * @return {Promise<Buffer>} a promise to the Buffer of the zip file or null if it does not exist and
      * required is false
      */
-    static async loadZipFileBuffer(zip, path, required=false) {
+    static async loadZipFileBuffer(zip, path, required = false) {
         Logger.debug('loadZipFileBuffer', 'Loading ' + path);
         let zipFile = zip.file(path);
-        if(!zipFile && required) {
+        if (!zipFile && required) {
             throw new Error(`Failed to find ${path} in archive file.`);
         }
 
-        else if(zipFile) {
+        else if (zipFile) {
             return zipFile.async('nodebuffer');
         }
 
@@ -292,14 +333,14 @@ class TemplateLoader {
      * @return {Promise<string>} a promise to the contents of the file or null if it does not exist and
      * required is false
      */
-    static async loadFileContents(path, fileName, json=false, required=false) {
+    static async loadFileContents(path, fileName, json = false, required = false) {
 
         Logger.debug('loadFileContents', 'Loading ' + fileName);
         const filePath = fsPath.resolve(path, fileName);
 
         if (fs.existsSync(filePath)) {
             const contents = fs.readFileSync(filePath, ENCODING);
-            if(json && contents) {
+            if (json && contents) {
                 return JSON.parse(contents);
             }
             else {
@@ -307,7 +348,7 @@ class TemplateLoader {
             }
         }
         else {
-            if(required) {
+            if (required) {
                 throw new Error(`Failed to find ${fileName} in directory.`);
             }
         }
@@ -324,7 +365,7 @@ class TemplateLoader {
      * @return {Promise<Buffer>} a promise to the buffer of the file or null if
      * it does not exist and required is false
      */
-    static async loadFileBuffer(path, fileName, required=false) {
+    static async loadFileBuffer(path, fileName, required = false) {
 
         Logger.debug('loadFileBuffer', 'Loading ' + fileName);
         const filePath = fsPath.resolve(path, fileName);
@@ -333,7 +374,7 @@ class TemplateLoader {
             return fs.readFileSync(filePath);
         }
         else {
-            if(required) {
+            if (required) {
                 throw new Error(`Failed to find ${fileName} in directory`);
             }
         }
@@ -355,8 +396,8 @@ class TemplateLoader {
         const result = await Promise.all(subdirs.map(async (subdir) => {
             const res = fsPath.resolve(path, subdir);
 
-            if((await stat(res)).isDirectory()) {
-                if( /.*node_modules$/.test(res) === false) {
+            if ((await stat(res)).isDirectory()) {
+                if (/.*node_modules$/.test(res) === false) {
                     return TemplateLoader.loadFilesContents(res, regex);
                 }
                 else {
@@ -364,7 +405,7 @@ class TemplateLoader {
                 }
             }
             else {
-                if(regex.test(res)) {
+                if (regex.test(res)) {
                     return {
                         name: res,
                         contents: await TemplateLoader.loadFileContents(path, res, false, true)
@@ -385,7 +426,7 @@ class TemplateLoader {
      */
     static normalizeNLs(input) {
         // we replace all \r and \n with \n
-        let text =  input.replace(/\r/gm,'');
+        let text = input.replace(/\r/gm, '');
         return text;
     }
 

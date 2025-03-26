@@ -3,7 +3,7 @@ name: Publish
 on:
   release:
     types:
-      - released
+      - published
 
 jobs:
   publish:
@@ -13,12 +13,12 @@ jobs:
 
     steps:
       - name: git checkout
-        uses: actions/checkout@v2
+        uses: actions/checkout@v4
 
-      - name: Use Node.js 16.x
+      - name: Use Node.js 20.x
         uses: actions/setup-node@v1
         with:
-          node-version: 16.x
+          node-version: 20.x
 
       - run: npm ci
       - run: npm run build --if-present
@@ -31,13 +31,14 @@ jobs:
       - name: build and publish
         run: |
           npm config set //registry.npmjs.org/:_authToken ${{ secrets.NPM_TOKEN }}
+          node ./scripts/bump_version.js ${{ github.event.release.tag_name }}
           npm version --workspaces --include-workspace-root --no-git-tag-version --yes --exact ${{ github.event.release.tag_name }}
           npm publish --workspaces --access public ${{ steps.tag.outputs.tag }} 2>&1
 
       - name: Create PR to increment version
         uses: peter-evans/create-pull-request@v3
         with:
-          base: master
+          base: main
           commit-message: 'chore(actions): publish ${{ github.event.release.tag_name }} to npm'
           committer: GitHub <noreply@github.com>
           author: ${{ github.actor }} <${{ github.actor }}@users.noreply.github.com>

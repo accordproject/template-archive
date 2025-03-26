@@ -16,12 +16,12 @@
 
 const slash = require('slash');
 
-const Introspector = require('@accordproject/concerto-core').Introspector;
-const APModelManager = require('./apmodelmanager');
+const {Introspector, ModelManager} = require('@accordproject/concerto-core');
 const ScriptManager = require('./scriptmanager');
 
 /**
- * Packages the logic for a legal clause or contract template and a given target platform. This includes the model, Ergo logic and compiled version of that logic when required.
+ * Packages the logic for a legal clause or contract template and a given target platform.
+ * This includes the model, TypeScript and ES6 compiled version of that logic when required.
  * @class
  * @public
  * @abstract
@@ -35,7 +35,7 @@ class LogicManager {
      */
     constructor(options) {
         this.contractName = null;
-        this.modelManager = new APModelManager();
+        this.modelManager = new ModelManager(options);
         this.scriptManager = new ScriptManager(this.target, this.modelManager, options);
         this.introspector = new Introspector(this.modelManager);
     }

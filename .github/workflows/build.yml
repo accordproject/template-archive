@@ -2,6 +2,8 @@ name: Build
 
 on:
   push:
+    branches:
+      - main
   pull_request:
     branches:
       - main
@@ -13,27 +15,33 @@ jobs:
     strategy:
       matrix:
         node-version:
-          - 16.x
-          - 18.x
+          - 20.x
         os:
           - ubuntu-latest
-          # - windows-latest
-          - macOS-latest
 
     runs-on: ${{ matrix.os }}
 
     steps:
       - name: git checkout
-        uses: actions/checkout@v2
+        uses: actions/checkout@v4
 
       - name: Use Node.js ${{ matrix.node-version }}
-        uses: actions/setup-node@v1
+        uses: actions/setup-node@v4
         with:
           node-version: ${{ matrix.node-version }}
-    
+
       - run: npm ci
       - run: npm run build --if-present
-      - run: npm test
+      - env:
+          NODE_OPTIONS: "--max_old_space_size=4096"
+        run: npm test
+
+      - name: Archive npm failure logs
+        uses: actions/upload-artifact@v4
+        if: failure()
+        with:
+          name: npm-logs
+          path: C:\npm\cache\_logs\
 
       - name: Calculate code coverage
         run: npm run coverage
@@ -74,15 +82,15 @@ jobs:
 
     steps:
       - name: git checkout
-        uses: actions/checkout@v2
+        uses: actions/checkout@v4
 
-      - name: Use Node.js 18.x
-        uses: actions/setup-node@v1
+      - name: Use Node.js 20.x
+        uses: actions/setup-node@v4
         with:
-          node-version: 18.x    
+          node-version: 20.x
 
-      - name: Build
-        run: npm ci
+      - run: npm ci
+      - run: npm run build --if-present
 
       - name: timestamp
         id: timestamp
@@ -92,5 +100,6 @@ jobs:
       - name: build and publish
         run: |
           npm config set //registry.npmjs.org/:_authToken ${{ secrets.NPM_TOKEN }}
+          node ./scripts/bump_version.js ${{ steps.timestamp.outputs.stamp }}
           npm version --workspaces --include-workspace-root --no-git-tag-version --yes --exact ${{ steps.timestamp.outputs.stamp }}
           npm publish --workspaces --access public --tag=unstable 2>&1
