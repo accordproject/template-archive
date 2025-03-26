@@ -48,7 +48,7 @@ class Template {
      */
     constructor(packageJson, readme, samples, request, logo, options, authorSignature) {
         this.metadata = new Metadata(packageJson, readme, samples, request, logo);
-        this.logicManager = new LogicManager('es6', null, options);
+        this.logicManager = new LogicManager(this.metadata.getRuntime(), null, options);
         this.authorSignature = authorSignature ? authorSignature : null;
         this.template = null;
     }

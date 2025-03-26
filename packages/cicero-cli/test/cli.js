@@ -20,6 +20,7 @@ const tmp = require('tmp-promise');
 const fs = require('fs');
 
 const Template = require('@accordproject/cicero-core').Template;
+const {CodeGen} = require('@accordproject/concerto-codegen');
 
 chai.should();
 chai.use(require('chai-things'));
@@ -28,7 +29,6 @@ chai.use(require('chai-as-promised'));
 const Commands = require('../lib/commands');
 
 const template = path.resolve(__dirname, 'data/latedeliveryandpenalty/');
-const templateArchive = path.resolve(__dirname, 'data/latedeliveryandpenalty.cta');
 
 describe('#validateCompileArgs', () => {
     it('no args specified', () => {
@@ -71,54 +71,31 @@ describe('#validateCompileArgs', () => {
     });
 });
 
-describe('#compile', () => {
+describe('#compile', async () => {
+    const formats = Object.keys(CodeGen.formats);
+    const dir = await tmp.dir({ unsafeCleanup: true });
+    for(let n=0; n<formats.length; n++) {
+        it(`should compile to a ${formats[n]} model`, async () => {
+            const output = path.resolve(dir.path, formats[n]);
+            await Commands.compile(template, formats[n], output, true);
+            fs.readdirSync(output).length.should.be.above(0);
+        });
+    }
+    dir.cleanup();
 
-    it('should compile to a Go model', async () => {
-        const dir = await tmp.dir({ unsafeCleanup: true });
-        await Commands.compile(template, 'Go', dir.path, true);
-        fs.readdirSync(dir.path).length.should.be.above(0);
-        dir.cleanup();
-    });
-    it('should compile to a PlantUML model', async () => {
-        const dir = await tmp.dir({ unsafeCleanup: true });
-        await Commands.compile(template, 'PlantUML', dir.path, true);
-        fs.readdirSync(dir.path).length.should.be.above(0);
-        dir.cleanup();
-    });
-    it('should compile to a Typescript model', async () => {
-        const dir = await tmp.dir({ unsafeCleanup: true });
-        await Commands.compile(template, 'Typescript', dir.path, true);
-        fs.readdirSync(dir.path).length.should.be.above(0);
-        dir.cleanup();
-    });
-    it('should compile to a Java model', async () => {
-        const dir = await tmp.dir({ unsafeCleanup: true });
-        await Commands.compile(template, 'Java', dir.path, true);
-        fs.readdirSync(dir.path).length.should.be.above(0);
-        dir.cleanup();
-    });
-    it('should compile to a Corda model', async () => {
-        const dir = await tmp.dir({ unsafeCleanup: true });
-        await Commands.compile(template, 'Corda', dir.path, true);
-        fs.readdirSync(dir.path).length.should.be.above(0);
-        dir.cleanup();
-    });
-    it('should compile to a JSONSchema model', async () => {
-        const dir = await tmp.dir({ unsafeCleanup: true });
-        await Commands.compile(template, 'JSONSchema', dir.path, true);
-        fs.readdirSync(dir.path).length.should.be.above(0);
-        dir.cleanup();
-    });
     it('should not compile to an unknown model', async () => {
         const dir = await tmp.dir({ unsafeCleanup: true });
         await Commands.compile(template, 'BLAH', dir.path, true);
         fs.readdirSync(dir.path).length.should.be.equal(0);
         dir.cleanup();
     });
+
     it('should compile a template archive to a Typescript model', async () => {
         const dir = await tmp.dir({ unsafeCleanup: true });
-        await Commands.compile(path.resolve(__dirname, 'data/helloworldstate@0.14.0.cta'), 'Typescript', dir.path, true);
-        // console.log(dir.path);
+        const template = await Template.fromDirectory(path.resolve(__dirname, 'data/helloworldstate'));
+        const buffer = await template.toArchive('es6');
+        fs.writeFileSync(path.resolve(dir.path, 'helloworldstate.cta'), buffer);
+        await Commands.compile(path.resolve(dir.path, 'helloworldstate.cta'), 'Typescript', dir.path, true);
         fs.readdirSync(dir.path).length.should.be.above(0);
         dir.cleanup();
     });
@@ -245,12 +222,17 @@ describe('#validateGetArgs', () => {
         args.template.should.match(/cicero-cli[/\\]test[/\\]data[/\\]latedeliveryandpenalty$/);
         args.output.should.match(/cicero-cli[/\\]test[/\\]data[/\\]latedeliveryandpenalty[/\\]model$/);
     });
-    it('template archive specified', () => {
+    it('template archive specified', async () => {
+        const dir = await tmp.dir({ unsafeCleanup: true });
+        const template = await Template.fromDirectory(path.resolve(__dirname, 'data/latedeliveryandpenalty/'));
+        const buffer = await template.toArchive('es6');
+        const archivePath = path.resolve(dir.path, 'latedeliveryandpenalty.cta');
+        fs.writeFileSync(archivePath, buffer);
         process.chdir(path.resolve(__dirname));
         const args  = Commands.validateGetArgs({
-            _: ['get', templateArchive]
+            _: ['get', archivePath]
         });
-        args.template.should.eql(templateArchive);
+        args.template.should.eql(archivePath);
         args.output.should.match(/model$/);
     });
     it('verbose flag specified', () => {
@@ -309,8 +291,18 @@ describe('#validateVerfiyArgs', () => {
 
 describe('#verify', async () => {
     it('should verify the signature of the template author/developer', async () => {
-        const templatePath = path.resolve(__dirname, 'data/signedArchive/');
-        return Commands.verify(templatePath).should.be.fulfilled;
+        const dir = await tmp.dir({ unsafeCleanup: true });
+        const template = await Template.fromDirectory(path.resolve(__dirname, 'data/latedeliveryandpenalty/'));
+        const p12File = fs.readFileSync(path.resolve(__dirname, 'data/keystore/keystore.p12'), { encoding: 'base64' });
+        const keystore = {
+            p12File: p12File,
+            passphrase: 'password'
+        };
+        const archiveBuffer = await template.toArchive('es6', { keystore });
+        const archivePath = path.resolve(dir.path, 'latedeliveryandpenalty.cta');
+        fs.writeFileSync(archivePath, archiveBuffer);
+        process.chdir(path.resolve(__dirname, 'data/'));
+        return Commands.verify(archivePath).should.be.fulfilled;
     });
     it('should throw error when signature is invalid', async () => {
         const templatePath = path.resolve(__dirname, 'data/signedArchiveFail/');

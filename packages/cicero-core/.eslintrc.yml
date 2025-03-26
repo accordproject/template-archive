@@ -4,8 +4,8 @@ env:
     mocha: true
 extends: 'eslint:recommended'
 parserOptions:
-    ecmaVersion: 8
-    sourceType: 'script'
+    ecmaVersion: latest
+    sourceType: commonjs
 rules:
     indent:
         - error

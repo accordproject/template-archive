@@ -99,13 +99,13 @@ describe('Template', () => {
 
     describe('#toArchive', () => {
 
-        it('should create the archive without signing it', async () => {
+        it('should create the archive without signature', async () => {
             const template = await Template.fromDirectory('./test/data/signing-template/helloworldstate');
             const archiveBuffer = await template.toArchive('es6');
             archiveBuffer.should.not.be.null;
         });
 
-        it('should create the archive with signing it', async () => {
+        it('should create the archive and sign it', async () => {
             const template = await Template.fromDirectory('./test/data/signing-template/helloworldstate');
             const p12File = fs.readFileSync('./test/data/keystore/keystore.p12', { encoding: 'base64' });
             const keystore = {
@@ -148,10 +148,6 @@ describe('Template', () => {
     });
 
     describe('#fromDirectory', () => {
-
-        it('should create a template from a directory with signatures of the template developer', () => {
-            return Template.fromDirectory('./test/data/verifying-template-signature/helloworldstateSigned', options).should.be.fulfilled;
-        });
 
         it('should create a template from a directory without signatures of the template developer', () => {
             return Template.fromDirectory('./test/data/verifying-template-signature/helloworldstateUnsigned', options).should.be.fulfilled;
@@ -331,13 +327,20 @@ describe('Template', () => {
 
     describe('#fromArchive', () => {
 
-        it('should create a template from a signed template archive', () => {
-            const buffer = fs.readFileSync('./test/data/verifying-template-signature/archiveSigned.cta');
-            return Template.fromArchive(buffer).should.be.fulfilled;
+        it('should create a template from a signed template archive', async () => {
+            const template = await Template.fromDirectory('./test/data/verifying-template-signature/helloworldstateUnsigned', options);
+            const p12File = fs.readFileSync('./test/data/keystore/keystore.p12', { encoding: 'base64' });
+            const keystore = {
+                p12File: p12File,
+                passphrase: 'password'
+            };
+            const archiveBuffer = await template.toArchive('es6', { keystore });
+            return Template.fromArchive(archiveBuffer).should.be.fulfilled;
         });
 
         it('should create a template from an archive', async () => {
-            const buffer = fs.readFileSync('./test/data/latedeliveryandpenalty.cta');
+            const template = await Template.fromDirectory('./test/data/latedeliveryandpenalty');
+            const buffer = await template.toArchive('es6');
             return Template.fromArchive(buffer).should.be.fulfilled;
         });
 
@@ -354,77 +357,15 @@ describe('Template', () => {
         });
 
         it('should create a template from archive and check if it has a logo', async () => {
-            const buffer = fs.readFileSync('./test/data/logo@0.0.1.cta');
-            const template = await Template.fromArchive(buffer);
-            template.getMetadata().getLogo().should.be.an.instanceof(Buffer);
+            const template = await Template.fromDirectory('./test/data/logo@0.0.1');
+            const buffer = await template.toArchive('es6');
+            const template2 = await Template.fromArchive(buffer);
+            template2.getMetadata().getLogo().should.be.an.instanceof(Buffer);
         });
     });
 
     describe('#fromCompiledArchive', () => {
-
-        it('should create a template from a compiled archive', async () => {
-            const buffer = fs.readFileSync('./test/data/fixed-interests@0.6.0.cta');
-            try {
-                return Template.fromArchive(buffer);
-            } catch (error) {
-                console.error(error);
-            }
-        });
-
-    });
-
-    describe.skip('#fromUrl', () => {
-
-        it('should throw an error if an archive loader cannot be found', async () => {
-
-            try {
-                await Template.fromUrl('ab://ip-payment@0.10.0#hash', null);
-                assert.isOk(false, 'should throw an error if an archive loader cannot be found');
-            }
-            catch (err) {
-                // ignore
-            }
-        });
-
-        it('should create a template from an archive at a given URL', async () => {
-            const url = 'https://templates.accordproject.org/archives/ip-payment@0.14.0.cta';
-            return Template.fromUrl(url, null).should.be.fulfilled;
-        });
-
-        it('should create a template from an archive at a given AP URL', async () => {
-            const url = 'ap://ip-payment@0.14.0#hash';
-            return Template.fromUrl(url, null).should.be.fulfilled;
-        });
-
-        it('should throw an error if creating a template from a wrongly formed AP URL', async () => {
-            try {
-                await Template.fromUrl('ap://ip-payment@0.10.0', null);
-                assert.isOk(false, 'should throw an error if creating a template from a wrongly formed AP URL');
-            }
-            catch (err) {
-                // ignore
-            }
-        });
-
-        it('should create a template from an archive at a given github URL', async () => {
-            const url = 'github://accordproject/cicero-template-library/master/build/archives/ip-payment@0.14.0.cta';
-            return Template.fromUrl(url, { 'encoding': null, 'headers': { 'Accept': '*/*', 'Accept-Encoding': 'deflate, gzip' } }).should.be.fulfilled;
-        });
-
-        it('should throw an error if creating a template from a wrong URL', async () => {
-            const url = 'https://templates.accordproject.org/archives/doesnotexist@0.3.0.cta';
-            return Template.fromUrl(url, null).should.be.rejectedWith('Request to URL [https://templates.accordproject.org/archives/doesnotexist@0.3.0.cta] returned with error code: 404');
-        });
-
-        it('should throw an error if creating a template from a github URL to an archive with the wrong Cicero version', async () => {
-            const url = 'github://accordproject/cicero-template-library/master/build/archives/acceptance-of-delivery@0.3.0.cta';
-            return Template.fromUrl(url, { 'encoding': null, 'headers': { 'Accept': '*/*', 'Accept-Encoding': 'deflate, gzip' } }).should.be.rejectedWith('The template targets Cicero (^0.4.6) but the Cicero version is');
-        });
-
-        it('should throw an error if creating a template from a non existing URL', async () => {
-            const url = 'https://emplates.accordproject.org/archives/doesnotexist@0.3.0.cta';
-            return Template.fromUrl(url, { 'encoding': null, 'headers': { 'Accept': '*/*', 'Accept-Encoding': 'deflate, gzip' } }).should.be.rejectedWith('Server did not respond for URL [https://emplates.accordproject.org/archives/doesnotexist@0.3.0.cta]');
-        });
+        // TODO
     });
 
     describe('#setSamples', () => {

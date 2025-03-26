@@ -115,7 +115,7 @@ class TemplateLoader {
             });
         }
         // check the integrity of the model and logic of the template
-        authorSignature ? template.validate({ verifySignature: true }) : template.validate();
+        authorSignature ? template.validate({ verifySignature: options && options.disableSignatureVerification ? false : true }) : template.validate();
 
         return template; // Returns template
     }
@@ -231,7 +231,7 @@ class TemplateLoader {
         }
 
         // check the template
-        authorSignature ? template.validate({ verifySignature: true }) : template.validate();
+        authorSignature ? template.validate({ verifySignature: options && options.disableSignatureVerification ? false : true }) : template.validate();
 
         return template;
     }
