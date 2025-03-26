@@ -1,6 +1,7 @@
 export = LogicManager;
 /**
- * Packages the logic for a legal clause or contract template and a given target platform. This includes the model, Ergo logic and compiled version of that logic when required.
+ * Packages the logic for a legal clause or contract template and a given target platform.
+ * This includes the model, TypeScript and ES6 compiled version of that logic when required.
  * @class
  * @public
  * @abstract

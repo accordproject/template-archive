@@ -16,25 +16,23 @@
 
 let path = require('path');
 const webpack = require('webpack');
+const NodePolyfillPlugin = require('node-polyfill-webpack-plugin');
+const CopyPlugin = require("copy-webpack-plugin");
+
 const packageJson = require('./package.json');
 
 module.exports = {
-    entry: {
-        client: [
-            './index.js'
-        ]
-    },
+    entry: './index.js',
     output: {
-        path: path.join(__dirname, 'umd'),
-        filename: 'cicero.js',
+        path: path.resolve(__dirname, 'dist'),
+        filename: 'cicero-core.js',
         library: {
-            name: 'cicero',
+            name: 'cicero-core',
             type: 'umd',
         },
-        umdNamedDefine: true,
     },
     plugins: [
-        new webpack.BannerPlugin(`Cicero v${packageJson.version}
+        new webpack.BannerPlugin(`Accord Project Cicero v${packageJson.version}
         Licensed under the Apache License, Version 2.0 (the "License");
         you may not use this file except in compliance with the License.
         You may obtain a copy of the License at
@@ -49,41 +47,50 @@ module.exports = {
                 'NODE_ENV': JSON.stringify('production')
             }
         }),
-        new webpack.IgnorePlugin({
-            resourceRegExp: /^\.$/,
-            contextRegExp: /jsdom$/,
+        new webpack.ProvidePlugin({
+            Buffer: ['buffer', 'Buffer'],
+        }),
+        new webpack.ProvidePlugin({
+            process: 'process/browser', // provide a shim for the global `process` variable
+        }),
+        new NodePolyfillPlugin(),
+        new CopyPlugin({
+            patterns: [
+                {from: "types", to: "types"}
+            ],
         }),
     ],
+
     module: {
         rules: [
             {
                 test: /\.js$/,
-                include: [path.join(__dirname, 'src')],
+                include: [path.join(__dirname, 'lib')],
                 use: ['babel-loader']
             },
             {
                 test: /\.ne$/,
-                use:['raw-loader']
+                use: ['raw-loader']
             }
         ]
     },
     resolve: {
         fallback: {
+            // Webpack 5 no longer polyfills Node.js core modules automatically.
+            // see https://webpack.js.org/configuration/resolve/#resolvefallback
+            // for the list of Node.js core module polyfills.
             'fs': false,
             'tls': false,
             'net': false,
-            'path': false,
-            'os': false,
-            'util': false,
-            'url': false,
             'child_process': false,
-            'assert': require.resolve('assert/'),
-            'constants': require.resolve('constants-browserify'),
-            'crypto': require.resolve('crypto-browserify'),
-            'stream': require.resolve('stream-browserify'),
-            'http': require.resolve('stream-http'),
-            'https': require.resolve('https-browserify'),
-            'zlib': require.resolve('browserify-zlib'),
+            'os': false,
+            'path': false,
+            // 'crypto': require.resolve('crypto-browserify'),
+            // 'stream': require.resolve('stream-browserify'),
+            // 'http': require.resolve('stream-http'),
+            // 'https': require.resolve('https-browserify'),
+            // 'zlib': require.resolve('browserify-zlib'),
+            // 'vm2': require.resolve('vm-browserify'),
         }
     }
 };
