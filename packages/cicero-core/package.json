@@ -11,14 +11,14 @@
   },
   "files": [
     "src",
-    "umd"
+    "dist"
   ],
-  "main": "index.js",
+  "main": "dist/index.js",
   "browser": "dist/cicero-core.js",
   "typings": "dist/index.d.ts",
   "scripts": {
     "postbuild": "npm run webpack",
-    "webpack": "tsc && webpack --config webpack.config.js --mode production",
+    "webpack": "webpack --config webpack.config.js --mode production",
     "prepublishOnly": "npm run webpack",
     "pretest": "npm run lint",
     "lint": "eslint .",
@@ -30,7 +30,7 @@
     "test": "npm run test:mocha",
     "test:cov": "nyc npm run test",
     "jsdoc": "jsdoc -c jsdoc.json package.json",
-    "build:types": "tsc"
+    "build": "tsc"
   },
   "repository": {
     "type": "git",
@@ -70,8 +70,10 @@
     "node-polyfill-webpack-plugin": "4.0.0",
     "nyc": "15.1.0",
     "raw-loader": "^4.0.2",
+    "source-map-loader": "^5.0.0",
     "stream-browserify": "3.0.0",
     "stream-http": "3.2.0",
+    "ts-loader": "^9.5.2",
     "typescript": "5.6.3",
     "webpack": "5.96.1",
     "webpack-cli": "^5.1.4"

@@ -4,14 +4,12 @@
     "noImplicitAny": true,
     "module": "es6",
     "target": "es5",
+    "declaration": true,
     "jsx": "react",
     "allowJs": true,
     "moduleResolution": "node",
-    "emitDeclarationOnly": true,
-    "declaration": true,
+    "esModuleInterop" : true,
+    "allowSyntheticDefaultImports" : true
   },
-  "exclude": [
-        "test",
-        "coverage"
-    ]
+  "include": ["./src/**/*"],
 }
