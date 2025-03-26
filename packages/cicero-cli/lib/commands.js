@@ -222,6 +222,7 @@ class Commands {
                     throw new Error ('Unrecognized code generator: ' + target);
                 }
 
+                console.log('generating code...');
                 let parameters = {};
                 parameters.fileWriter = new FileWriter(outputPath);
                 template.getModelManager().accept(visitor, parameters);

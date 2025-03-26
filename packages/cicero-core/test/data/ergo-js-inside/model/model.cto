@@ -1,4 +1,4 @@
-namespace io.clause.latedeliveryandpenalty@1.0.0
+namespace io.clause.latedeliveryandpenalty@0.1.0
 
 import org.accordproject.time.TemporalUnit from https://models.accordproject.org/time@0.2.0.cto
 import org.accordproject.time.Duration from https://models.accordproject.org/time0@.2.0.cto

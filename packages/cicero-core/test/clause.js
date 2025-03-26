@@ -14,9 +14,6 @@
 
 'use strict';
 
-const fs = require('fs');
-const path = require('path');
-
 const Template = require('../src/template');
 const Clause = require('../src/clause');
 
@@ -27,35 +24,6 @@ chai.use(require('chai-things'));
 chai.use(require('chai-as-promised'));
 
 const options = { offline: false };
-
-const copyrightData = {
-    '$class': 'org.accordproject.copyrightlicense@1.0.0.CopyrightLicenseContract',
-    'contractId': 'e32a2ca7-78c9-4462-935f-487aad6e9c9b',
-    'effectiveDate': '2018-01-01T00:00:00.000-04:00',
-    'licensee': 'resource:org.accordproject.party@0.2.0.Party#Me',
-    'licenseeState': 'NY',
-    'licenseeEntityType': 'Company',
-    'licenseeAddress': '1 Broadway',
-    'licensor': 'resource:org.accordproject.party@0.2.0.Party#Myself',
-    'licensorState': 'NY',
-    'licensorEntityType': 'Company',
-    'licensorAddress': '2 Broadway',
-    'territory': 'United States',
-    'purposeDescription': 'stuff',
-    'workDescription': 'other stuff',
-    'paymentClause': {
-        '$class': 'org.accordproject.copyrightlicense@1.0.0.PaymentClause',
-        'clauseId': '25298022-2129-412c-ac60-b217ff766cb4',
-        'amountText': 'one hundred US Dollars',
-        'amount': {
-            '$class': 'org.accordproject.money@0.3.0.MonetaryAmount',
-            'doubleValue': 100,
-            'currencyCode': 'USD'
-        },
-        'paymentProcedure': 'bank transfer'
-    }
-};
-const copyrightSample = fs.readFileSync(path.resolve(__dirname, 'data/copyright-license', 'text/sample.md'), 'utf8');
 
 describe('Clause', () => {
 
@@ -164,18 +132,6 @@ describe('Clause', () => {
                 'data': data,
                 'template': 'latedeliveryandpenalty@0.0.1'
             });
-        });
-    });
-
-    describe.only('#draft', () => {
-        it('should be able to draft a copyright license', async function () {
-            const template = await Template.fromDirectory('./test/data/copyright-license', options);
-            const clause = new Clause(template);
-            const data = copyrightData;
-            clause.setData(data);
-            const newText = await clause.draft( 'markdown_cicero' );
-            console.log(newText);
-            newText.should.eql(copyrightSample);
         });
     });
 });

@@ -3,7 +3,7 @@
     "version": "0.0.1",
     "accordproject": {
       "template": "contract",
-      "cicero": "^0.24.0",
+      "cicero": "^0.25.0",
       "runtime": "es6"
     }
 }

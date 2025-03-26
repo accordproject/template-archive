@@ -106,6 +106,10 @@ class Metadata {
 
         this.runtime = packageJson.accordproject.runtime;
 
+        if(this.runtime && this.runtime !== 'es6') {
+            throw new Error('Unsupported runtime');
+        }
+
         if(!samples || typeof(samples) !== 'object') {
             throw new Error('sample.md is required');
         }
@@ -390,6 +394,9 @@ class Metadata {
      * @return {object} the new Metadata
      */
     createTargetMetadata(runtimeName) {
+        if(runtimeName !== 'es6') {
+            throw new Error('Unsupported runtime');
+        }
         const packageJson = JSON.parse(JSON.stringify(this.packageJson));
         packageJson.accordproject.runtime = runtimeName;
         return new Metadata(packageJson, this.readme, this.samples, this.request, this.logo);

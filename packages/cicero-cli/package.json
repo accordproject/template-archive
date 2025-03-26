@@ -34,16 +34,16 @@
     "legal",
     "tech"
   ],
-  "author": "clause.io",
+  "author": "Accord Project",
   "license": "Apache-2.0",
   "bugs": {
     "url": "https://github.com/accordproject/cicero/issues"
   },
   "homepage": "https://www.accordproject.org/projects/cicero",
   "dependencies": {
-    "@accordproject/cicero-core": "^0.24.0",
-    "@accordproject/cicero-tools": "^0.24.0",
-    "@accordproject/concerto-util": "3.8.2",
+    "@accordproject/cicero-core": "0.25.0",
+    "@accordproject/cicero-tools": "0.25.0",
+    "@accordproject/concerto-util": "3.20.4",
     "mkdirp": "3.0.1",
     "yargs": "17.7.2"
   },

@@ -89,10 +89,10 @@ class TemplateLoader {
         Logger.debug(method, 'Adding model files to model manager');
         const mm = template.getModelManager();
         ctoModelFiles.forEach( (mf,index) => {
-            mm.addModelFile(mf, ctoModelFileNames[index], true);
+            mm.addCTOModel(mf, ctoModelFileNames[index], true);
         });
 
-        if(options.offline) {
+        if(options && options.offline) {
             mm.validateModelFiles();
         }
         else {
@@ -226,10 +226,9 @@ class TemplateLoader {
                 const resolvedFilePath = slash(fsPath.resolve(file.name));
                 const truncatedPath = resolvedFilePath.replace(resolvedPath+'/', '');
                 template.getLogicManager().addLogicFile(file.contents, truncatedPath);
+                Logger.debug(method, `Loaded ${truncatedPath}`, file.contents);
             });
         }
-
-        Logger.debug(method, 'Loaded grammar.tem.md');
 
         // check the template
         authorSignature ? template.validate({ verifySignature: true }) : template.validate();

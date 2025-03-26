@@ -1,4 +1,4 @@
-namespace io.clause.latedeliveryandpenalty@1.0.0
+namespace io.clause.latedeliveryandpenalty@0.1.0
 
 import org.accordproject.contract.Clause from https://models.accordproject.org/accordproject/contract.cto
 import org.accordproject.runtime@0.2.0.Request from https://models.accordproject.org/accordproject/runtime.cto

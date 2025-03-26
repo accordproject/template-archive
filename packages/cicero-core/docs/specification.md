@@ -190,9 +190,9 @@ The example below illustrates using a JavaScript function to implement the templ
 **
  * Execute the smart clause
  * @param {object} data - the template model data for the clause
- * @param {io.clause.latedeliveryandpenalty.LateDeliveryAndPenaltyRequest} request - the incoming request
- * @param {io.clause.latedeliveryandpenalty.LateDeliveryAndPenaltyResponse} response - result of execution
- * @return {io.clause.latedeliveryandpenalty.LateDeliveryAndPenaltyResponse} result of execution
+ * @param {io.clause.latedeliveryandpenalty@0.1.0.LateDeliveryAndPenaltyRequest} request - the incoming request
+ * @param {io.clause.latedeliveryandpenalty@0.1.0.LateDeliveryAndPenaltyResponse} response - result of execution
+ * @return {io.clause.latedeliveryandpenalty@0.1.0.LateDeliveryAndPenaltyResponse} result of execution
  * @clause
  */
 function execute(data, request, response) {

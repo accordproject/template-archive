@@ -48,9 +48,9 @@
     "tmp-promise": "3.0.3"
   },
   "dependencies": {
-    "@accordproject/concerto-codegen": "^3.14.0",
-    "@accordproject/concerto-core": "^3.8.2",
-    "@accordproject/concerto-util": "3.8.2"
+    "@accordproject/concerto-codegen": "^3.30.5",
+    "@accordproject/concerto-core": "^3.20.4",
+    "@accordproject/concerto-util": "3.20.4"
   },
   
   "nyc": {

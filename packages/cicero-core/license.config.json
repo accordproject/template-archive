@@ -39,7 +39,6 @@
     "packages/concerto-core/api.txt",
     "coverage",
     "index.d.ts",
-    "packages/concerto-core/introspect/parser.js",
     "node_modules",
     ".nyc-output",
     "**/*.pdf",
@@ -49,10 +48,11 @@
     "**/*.feature",
     "*.yml",
     "*.yaml",
-    "*.tgz"
+    "*.tgz",
+    "types/**/*.d.ts"
   ],
    "licenseFormats": {
-    "js|njk|pegjs|cto|acl|qry|ergo": {
+    "js|njk|pegjs|cto|acl|qry": {
       "prepend": "/*",
       "append": " */",
       "eachLine": {
