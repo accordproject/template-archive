@@ -56,7 +56,7 @@ module.exports = {
         new NodePolyfillPlugin(),
         new CopyPlugin({
             patterns: [
-                {from: "types", to: "types"}
+                {from: 'types', to: 'types'}
             ],
         }),
     ],
