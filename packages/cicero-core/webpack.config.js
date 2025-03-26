@@ -17,7 +17,6 @@
 let path = require('path');
 const webpack = require('webpack');
 const NodePolyfillPlugin = require('node-polyfill-webpack-plugin');
-const CopyPlugin = require('copy-webpack-plugin');
 
 const packageJson = require('./package.json');
 
@@ -54,11 +53,6 @@ module.exports = {
             process: 'process/browser', // provide a shim for the global `process` variable
         }),
         new NodePolyfillPlugin(),
-        new CopyPlugin({
-            patterns: [
-                {from: 'types', to: 'types'}
-            ],
-        }),
     ],
 
     module: {
@@ -71,10 +65,16 @@ module.exports = {
             {
                 test: /\.ne$/,
                 use: ['raw-loader']
-            }
+            },
+            {
+                test: /\.tsx?$/,
+                use: 'ts-loader',
+                exclude: /node_modules/,
+            },
         ]
     },
     resolve: {
+        extensions: ['.ts', '.tsx', '.js'],
         fallback: {
             // Webpack 5 no longer polyfills Node.js core modules automatically.
             // see https://webpack.js.org/configuration/resolve/#resolvefallback

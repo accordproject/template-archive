@@ -1,5 +1,17 @@
 {
   "compilerOptions": {
-    "skipLibCheck": false,
-  }
+    "outDir": "./dist/",
+    "noImplicitAny": true,
+    "module": "es6",
+    "target": "es5",
+    "jsx": "react",
+    "allowJs": true,
+    "moduleResolution": "node",
+    "emitDeclarationOnly": true,
+    "declaration": true,
+  },
+  "exclude": [
+        "test",
+        "coverage"
+    ]
 }

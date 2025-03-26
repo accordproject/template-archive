@@ -15,12 +15,11 @@
   ],
   "main": "index.js",
   "browser": "dist/cicero-core.js",
-  "typings": "dist/types/index.d.ts",
+  "typings": "dist/index.d.ts",
   "scripts": {
-    "build": "npm run build:types",
     "postbuild": "npm run webpack",
-    "webpack": "webpack --config webpack.config.js --mode production",
-    "prepublishOnly": "npm run build:types && npm run webpack",
+    "webpack": "tsc && webpack --config webpack.config.js --mode production",
+    "prepublishOnly": "npm run webpack",
     "pretest": "npm run lint",
     "lint": "eslint .",
     "postlint": "npm run licchk",
@@ -31,7 +30,7 @@
     "test": "npm run test:mocha",
     "test:cov": "nyc npm run test",
     "jsdoc": "jsdoc -c jsdoc.json package.json",
-    "build:types": "tsc index.js --declaration --allowJs --emitDeclarationOnly --outDir types"
+    "build:types": "tsc"
   },
   "repository": {
     "type": "git",
@@ -51,7 +50,7 @@
   },
   "homepage": "https://github.com/accordproject/cicero",
   "devDependencies": {
-    "@babel/preset-env": "7.26.0",
+    "@babel/preset-typescript": "^7.27.0",
     "archiver": "5.3.1",
     "assert": "2.0.0",
     "babel-loader": "^9.1.3",
