@@ -1,15 +1,16 @@
 {
   "compilerOptions": {
-    "outDir": "./dist/",
+    "outDir": "./types/",
     "noImplicitAny": true,
     "module": "es6",
     "target": "es5",
     "declaration": true,
+    "emitDeclarationOnly": true,
     "jsx": "react",
     "allowJs": true,
     "moduleResolution": "node",
     "esModuleInterop" : true,
     "allowSyntheticDefaultImports" : true
   },
-  "include": ["./src/**/*"],
+  "include": ["./index.js", "./src/**/*"],
 }

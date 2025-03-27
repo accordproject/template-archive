@@ -43,7 +43,7 @@ node_modules/
 !test/data/with-node_modules/node_modules/
 jspm_packages/
 
-src/types/
+types/
 
 # Optional npm cache directory
 .npm

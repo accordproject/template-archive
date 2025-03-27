@@ -21,7 +21,7 @@ const NodePolyfillPlugin = require("node-polyfill-webpack-plugin");
 const packageJson = require("./package.json");
 
 module.exports = {
-  entry: "./src/index.ts",
+  entry: path.resolve(__dirname, "index.js"),
   output: {
     path: path.resolve(__dirname, "dist"),
     filename: "cicero-core.js",

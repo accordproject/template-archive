@@ -12,20 +12,15 @@
  * limitations under the License.
  */
 
+'use strict';
+
 /**
  * Cicero Core - defines the core data types for Cicero.
  * @module cicero-core
  */
-import Clause from './clause';
-module.exports.Clause = Clause;
 
-import Template from './template';
-module.exports.Template = Template;
-
-import TemplateLoader from './templateloader';
-module.exports.Template = TemplateLoader;
-
-import TemplateLibrary from './templatelibrary';
-module.exports.TemplateLibrary = TemplateLibrary;
-
-module.exports.version = require('../package.json');
+module.exports.Clause = require('./src/clause');
+module.exports.Template = require('./src/template');
+module.exports.TemplateLoader = require('./src/templateloader');
+module.exports.TemplateLibrary = require('./src/templatelibrary');
+module.exports.version = require('./package.json');
