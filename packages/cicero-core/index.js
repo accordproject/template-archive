@@ -33,4 +33,4 @@ module.exports = {
     TemplateLoader,
     TemplateLibrary,
     version
-}
+};
