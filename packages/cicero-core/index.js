@@ -18,9 +18,19 @@
  * Cicero Core - defines the core data types for Cicero.
  * @module cicero-core
  */
+const Clause = require('./src/clause');
+const Template = require('./src/template');
+const TemplateLoader = require('./src/templateloader');
+const TemplateLibrary = require('./src/templatelibrary');
 
-module.exports.Clause = require('./src/clause');
-module.exports.Template = require('./src/template');
-module.exports.TemplateLoader = require('./src/templateloader');
-module.exports.TemplateLibrary = require('./src/templatelibrary');
-module.exports.version = require('./package.json');
+// Version
+/** @type {{ name: string, version: string }} */
+const version = require('./package.json');
+
+module.exports = {
+    Clause,
+    Template,
+    TemplateLoader,
+    TemplateLibrary,
+    version
+}
