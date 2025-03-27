@@ -83,7 +83,6 @@
     "@accordproject/markdown-common": "0.16.25",
     "@accordproject/markdown-template": "0.16.25",
     "@accordproject/markdown-transform": "^0.16.25",
-    "@accordproject/template-engine": "^2.5.14",
     "@types/node": "^22.13.13",
     "axios": "1.4.0",
     "debug": "4.3.4",
