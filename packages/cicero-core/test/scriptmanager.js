@@ -23,9 +23,7 @@ chai.use(require('chai-as-promised'));
 const fs = require('fs');
 
 const ScriptManager = require('../src/scriptmanager');
-const { ModelManager } = require('@accordproject/concerto-core');
 
-const modelManager = new ModelManager();
 const jsSample = fs.readFileSync('./test/data/test.js','utf8');
 const jsSample2 = fs.readFileSync('./test/data/test2.js','utf8');
 
@@ -34,23 +32,21 @@ describe('ScriptManager', () => {
     describe('#constructor', () => {
 
         it('should instantiate a script manager', async function() {
-            (() => new ScriptManager('es6',modelManager)).should.not.be.null;
+            (() => new ScriptManager()).should.not.be.null;
         });
 
         it('should support both JavaScript scripts', async function() {
-            const scriptManager = new ScriptManager('es6',modelManager);
-            const script1 = scriptManager.createScript('test.js','js',jsSample);
+            const scriptManager = new ScriptManager();
+            const script1 = scriptManager.createScript('test.js', 'es6', jsSample);
             scriptManager.addScript(script1);
             scriptManager.getScript('test.js').should.not.be.null;
             scriptManager.getScripts().length.should.equal(1);
-            scriptManager.getScriptsForTarget('es6').length.should.equal(0);
-            scriptManager.getScriptsForTarget('js').length.should.equal(1);
-            scriptManager.getScriptsForTarget('java').length.should.equal(0);
+            scriptManager.getScriptsForTarget('es6').length.should.equal(1);
         });
 
         it('should delete JavaScript scripts if they exist', async function() {
-            const scriptManager = new ScriptManager('es6',modelManager);
-            const script1 = scriptManager.createScript('test.js','.js',jsSample);
+            const scriptManager = new ScriptManager();
+            const script1 = scriptManager.createScript('test.js', 'es6', jsSample);
             scriptManager.addScript(script1);
             scriptManager.getScript('test.js').should.not.be.null;
             scriptManager.deleteScript('test.js');
@@ -58,22 +54,22 @@ describe('ScriptManager', () => {
         });
 
         it('should fail deleting a script which does not exist', async function() {
-            const scriptManager = new ScriptManager('es6',modelManager);
-            const script1 = scriptManager.createScript('test.js','.js',jsSample);
+            const scriptManager = new ScriptManager();
+            const script1 = scriptManager.createScript('test.js', 'es6', jsSample);
             scriptManager.addScript(script1);
             return (() => scriptManager.deleteScript('test.foo')).should.throw('Script file does not exist');
         });
 
         it('should get scripts identifiers', async function() {
-            const scriptManager = new ScriptManager('es6',modelManager);
-            const script1 = scriptManager.createScript('test.js','.js',jsSample);
+            const scriptManager = new ScriptManager();
+            const script1 = scriptManager.createScript('test.js', 'es6', jsSample);
             scriptManager.addScript(script1);
             scriptManager.getScriptIdentifiers().should.deep.equal(['test.js']);
         });
 
         it('should update script', async function() {
-            const scriptManager = new ScriptManager('es6',modelManager);
-            const script1 = scriptManager.createScript('test.js','.js',jsSample);
+            const scriptManager = new ScriptManager();
+            const script1 = scriptManager.createScript('test.js', 'es6', jsSample);
             const script2 = scriptManager.createScript('test.js','.js',jsSample2);
             scriptManager.addScript(script1);
             scriptManager.getScript('test.js').getContents().should.equal(jsSample);
@@ -82,22 +78,22 @@ describe('ScriptManager', () => {
         });
 
         it('should fail updating a script which does not exist', async function() {
-            const scriptManager = new ScriptManager('es6',modelManager);
-            const script1 = scriptManager.createScript('test.js','.js',jsSample);
+            const scriptManager = new ScriptManager();
+            const script1 = scriptManager.createScript('test.js', 'es6', jsSample);
             return (() => scriptManager.updateScript(script1)).should.throw('Script file does not exist');
         });
 
         it('should modify script', async function() {
-            const scriptManager = new ScriptManager('es6',modelManager);
-            const script1 = scriptManager.createScript('test.js','.js',jsSample);
+            const scriptManager = new ScriptManager();
+            const script1 = scriptManager.createScript('test.js', 'es6', jsSample);
             scriptManager.addScript(script1);
-            scriptManager.modifyScript('test.js','.js',jsSample2);
+            scriptManager.modifyScript('test.js','es6',jsSample2);
             scriptManager.getScript('test.js').getContents().should.equal(jsSample2);
         });
 
         it('clear all scripts', async function() {
-            const scriptManager = new ScriptManager('es6',modelManager);
-            const script1 = scriptManager.createScript('test.js','.js',jsSample);
+            const scriptManager = new ScriptManager();
+            const script1 = scriptManager.createScript('test.js', 'es6', jsSample);
             scriptManager.addScript(script1);
             scriptManager.clearScripts();
             return scriptManager.getScripts().length.should.equal(0);

@@ -25,8 +25,6 @@ chai.use(require('chai-as-promised'));
 const fs = require('fs');
 
 const ctoSample = fs.readFileSync('./test/data/test.cto','utf8');
-const jsSample = fs.readFileSync('./test/data/test.js', 'utf8');
-const jsSample2 = fs.readFileSync('./test/data/test2.js', 'utf8');
 
 describe('LogicManager', () => {
     describe('#constructors-accessors', () => {
@@ -50,42 +48,5 @@ describe('LogicManager', () => {
             const modelFiles = logicManager.getModelManager().addModelFiles([ctoSample],['test.cto']);
             modelFiles.should.not.be.null;
         });
-
-        it.skip('should load a logic file to the script manager', () => {
-            const logicManager = new LogicManager('es6');
-            logicManager.getScriptManager().getCompiledScript().getContents().length.should.equal(47864);
-            logicManager.getScriptManager().getCompiledScript().getContents().length.should.equal(47864);
-            logicManager.registerCompiledLogicSync();
-            logicManager.getScriptManager().getCompiledScript().getContents().length.should.equal(47864);
-            logicManager.registerCompiledLogicSync();
-            logicManager.getScriptManager().getCompiledScript().getContents().length.should.equal(47864);
-        });
-
-        it.skip('should register a logic file to the script manager', () => {
-            const logicManager = new LogicManager('es6');
-            logicManager.registerCompiledLogicSync();
-            logicManager.getScriptManager().getCompiledScript().getContents().length.should.equal(47864);
-        });
-
-        it('should succeed creating a dispatch call for a JS logic file with a contract class (ES6)', () => {
-            const logicManager = new LogicManager('es6');
-            logicManager.addLogicFile(jsSample2,'test2.js');
-        });
-
-        it('should succeed creating an invoke call for a JS logic file with a contract class (ES6)', () => {
-            const logicManager = new LogicManager('es6');
-            logicManager.addLogicFile(jsSample2,'test2.js');
-        });
-
-        it('should succeed creating an invoke call for a JS logic file with a contract class (ES6)', () => {
-            const logicManager = new LogicManager('es6');
-            logicManager.addLogicFile(jsSample2,'test2.js');
-        });
-
-        it('should fail creating an invoke call for a JS logic file with no contract class (ES6)', () => {
-            const logicManager = new LogicManager('es6');
-            logicManager.addLogicFile(jsSample,'test.js');
-        });
-
     });
 });

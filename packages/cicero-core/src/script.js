@@ -15,10 +15,7 @@
 'use strict';
 
 /**
- * <p>
- * An executable script.
- * </p>
- * @private
+ * A script that has an identifier, language and contents.
  * @class
  * @memberof module:cicero-core
  */
@@ -27,18 +24,16 @@ class Script {
     /**
      * Create the Script.
      * <p>
-     * @param {ModelManager} modelManager - The ModelManager associated with this Script
      * @param {string} identifier - The identifier of the script
      * @param {string} language - The language type of the script
+     * @param {Function[]} functions - The functions in the script
      * @param {string} contents - The contents of the script
-     * @param {string} contractName - The name of the contract if known or null
      */
-    constructor(modelManager, identifier, language, contents, contractName) {
-        this.modelManager = modelManager;
+    constructor(identifier, language, functions, contents) {
         this.identifier = identifier;
-        this.contractName = contractName;
         this.language = language;
         this.contents = contents;
+        this.functions = functions;
 
         if(!contents) {
             throw new Error('Empty script contents');
@@ -51,14 +46,6 @@ class Script {
      */
     getIdentifier() {
         return this.identifier;
-    }
-
-    /**
-     * Returns the name of the contract for this script
-     * @return {string} the name of the contract, if known
-     */
-    getContractName() {
-        return this.contractName;
     }
 
     /**
@@ -75,6 +62,14 @@ class Script {
      */
     getContents() {
         return this.contents;
+    }
+
+    /**
+     * Returns the function declarations for a script, if any
+     * @returns {Function[]} the function declarations
+     */
+    getFunctions() {
+        return this.functions;
     }
 }
 

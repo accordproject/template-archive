@@ -48,7 +48,7 @@ class Template {
      */
     constructor(packageJson, readme, samples, request, logo, options, authorSignature) {
         this.metadata = new Metadata(packageJson, readme, samples, request, logo);
-        this.logicManager = new LogicManager(this.metadata.getRuntime(), null, options);
+        this.logicManager = new LogicManager(this.metadata.getRuntime() ?? 'typescript', null, options);
         this.authorSignature = authorSignature ? authorSignature : null;
         this.template = null;
     }
@@ -344,7 +344,6 @@ class Template {
      * Provides access to the ScriptManager for this template. The ScriptManager
      * manage access to the scripts that have been defined within this template.
      * @return {ScriptManager} the ScriptManager for this template
-     * @private
      */
     getScriptManager() {
         return this.logicManager.getScriptManager();
@@ -354,7 +353,6 @@ class Template {
      * Provides access to the ModelManager for this template. The ModelManager
      * manage access to the models that have been defined within this template.
      * @return {ModelManager} the ModelManager for this template
-     * @private
      */
     getModelManager() {
         return this.logicManager.getModelManager();

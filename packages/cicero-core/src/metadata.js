@@ -18,6 +18,7 @@ const Logger = require('@accordproject/concerto-util').Logger;
 require('@accordproject/concerto-util').Logger;
 const ciceroVersion = require('../package.json').version;
 const semver = require('semver');
+const LANGUAGES = require('./languages');
 
 const getMimeType = require('./mimetype');
 
@@ -31,8 +32,6 @@ const IMAGE_SIZE = {
     width: 128,
     height: 128,
 };
-
-const RUNTIMES = ['es6', 'typescript'];
 
 /**
  * Defines the metadata for a Template, including the name, version, README markdown.
@@ -108,8 +107,8 @@ class Metadata {
 
         this.runtime = packageJson.accordproject.runtime;
 
-        if(this.runtime && !RUNTIMES.includes(this.runtime)) {
-            throw new Error('Unsupported runtime. The supported runtimes are: ' + RUNTIMES.join(', '));
+        if(this.runtime && !LANGUAGES.includes(this.runtime)) {
+            throw new Error('Unsupported runtime. The supported runtimes are: ' + LANGUAGES.join(', '));
         }
 
         if(!samples || typeof(samples) !== 'object') {
@@ -396,8 +395,8 @@ class Metadata {
      * @return {object} the new Metadata
      */
     createTargetMetadata(runtimeName) {
-        if(!RUNTIMES.includes(runtimeName)) {
-            throw new Error('Unsupported runtime. The supported runtimes are: ' + RUNTIMES.join(', '));
+        if(!LANGUAGES.includes(runtimeName)) {
+            throw new Error('Unsupported language. The supported languages are: ' + LANGUAGES.join(', '));
         }
         const packageJson = JSON.parse(JSON.stringify(this.packageJson));
         packageJson.accordproject.runtime = runtimeName;

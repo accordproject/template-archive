@@ -38,8 +38,8 @@ describe('Script', () => {
     describe('#constructor', () => {
 
         it('should instantiate a JavaScript script', async function() {
-            const script = new Script(modelManager,'test.js','.js',jsSample);
-            script.getLanguage().should.equal('.js');
+            const script = new Script('test.js', 'es6', jsSample, []);
+            script.getLanguage().should.equal('es6');
             script.getIdentifier().should.equal('test.js');
         });
 

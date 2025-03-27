@@ -17,10 +17,7 @@
 const Script = require('./script');
 
 /**
- * <p>
  * Manages a set of scripts.
- * </p>
- * @private
  * @class
  * @memberof module:cicero-core
  */
@@ -28,22 +25,14 @@ class ScriptManager {
 
     /**
      * Create the ScriptManager.
-     * <p>
-     * <strong>Note: Only to be called by framework code. Applications should
-     * retrieve instances from {@link BusinessNetworkDefinition}</strong>
-     * </p>
-     * @param {ModelManager} modelManager - The ModelManager to use for this ScriptManager
-     * @param {Object} options  - e.g., { warnings: true }
+     * @param {any} [options]  - arbitrary options associated with the script manager
      */
-    constructor(modelManager, options) {
-        this.modelManager = modelManager;
+    constructor(options) {
         this.scripts = {};
-        this.warnings = options && options.warnings || false;
-        this.sourceTemplates = [];
     }
 
     /**
-     * Creates a new Script from a string.
+     * Creates a new Script
      *
      * @param {string} identifier - the identifier of the script
      * @param {string} language - the language identifier of the script
@@ -51,7 +40,7 @@ class ScriptManager {
      * @returns {Script} - the instantiated script
      */
     createScript(identifier, language, contents) {
-        return new Script(this.modelManager, identifier, language, contents);
+        return new Script(identifier, language, [], contents);
     }
 
     /**
@@ -62,16 +51,7 @@ class ScriptManager {
      * @param {string} contents - the contents of the script
      */
     modifyScript(identifier, language, contents) {
-        this.updateScript(new Script(this.modelManager, identifier, language, contents));
-    }
-
-    /**
-     * Adds a template file (as a string) to the ScriptManager.
-     * @param {string} templateFile - The template file as a string
-     * @param {string} fileName - an optional file name to associate with the template file
-     */
-    addTemplateFile(templateFile,fileName) {
-        this.sourceTemplates.push({ 'name' : fileName, 'content': templateFile });
+        this.updateScript(this.createScript(identifier, language, contents));
     }
 
     /**
@@ -123,16 +103,16 @@ class ScriptManager {
 
     /**
      * Get the array of Script instances for the given language
-     * @param {string} target - the target language
+     * @param {string} language - the target language
      * @return {Script[]} The Scripts registered
      * @private
      */
-    getScriptsForTarget(target) {
+    getScriptsForTarget(language) {
         let keys = Object.keys(this.scripts);
         let result = [];
 
         for(let n=0; n < keys.length;n++) {
-            if (this.scripts[keys[n]].getLanguage() === target)  {
+            if (this.scripts[keys[n]].getLanguage() === language)  {
                 result.push(this.scripts[keys[n]]);
             }
         }
@@ -168,11 +148,11 @@ class ScriptManager {
      * Helper method to retrieve all function declarations
      * @returns {Array} a list of function declarations
      */
-    allFunctionDeclarations() {
+    getFunctions() {
         let allScripts = this.getAllScripts();
         const functionDeclarations = allScripts
             .map((ele) => {
-                return ele.getFunctionDeclarations();
+                return ele.getFunctions();
             }).reduce((flat, next) => {
                 return flat.concat(next);
             },[]);
@@ -180,30 +160,28 @@ class ScriptManager {
     }
 
     /**
-     * Looks for the presence of a function in the JavaScript logic
+     * Looks for the presence of a function
      * @param {string} name  - the function name
+     * @returns {boolean} true if the function is found, false otherwise
      */
-    hasFunctionDeclaration(name) {
-        // get the function declarations of either init or dispatch
-        const funDecls = this.allFunctionDeclarations();
-        if (!funDecls.some((ele) => { return ele.getName() === name; })) {
-            throw new Error(`Function ${name} was not found in logic`);
+    hasFunction(name) {
+        return this.getFunctions().some((ele) => { return ele.getName() === name; });
+    }
+
+    /**
+     * Gets a function by name
+     * @param {string} name  - the function name
+     * @returns {Function} the function
+     * @throws {Error} if the function is not found
+     */
+    getFunction(name) {
+        const funDecls = this.getFunctions();
+        const found = funDecls.find((ele) => { return ele.getName() === name; });
+        if (!found) {
+            throw new Error(`Function ${name} was not found`);
         }
+        return found;
     }
-    /**
-     * Checks that the logic has a dispatch function
-     */
-    hasDispatch() {
-        this.hasFunctionDeclaration('__dispatch');
-    }
-
-    /**
-     * Checks that the logic has an init function
-     */
-    hasInit() {
-        this.hasFunctionDeclaration('__init');
-    }
-
 }
 
 module.exports = ScriptManager;
