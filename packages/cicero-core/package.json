@@ -25,7 +25,7 @@
     "lint": "eslint .",
     "postlint": "npm run licchk",
     "licchk": "license-check-and-add check -f ./license.config.json",
-    "test:mocha": "tsc && mocha ./dist/test --timeout 40000",
+    "test:mocha": "mocha --timeout 40000",
     "test:watch": "npm run test:mocha -- --watch",
     "test:windows": "npm run test:mocha",
     "test": "npm run test:mocha",
