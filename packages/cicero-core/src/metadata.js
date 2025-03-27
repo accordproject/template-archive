@@ -107,6 +107,10 @@ class Metadata {
 
         this.runtime = packageJson.accordproject.runtime;
 
+        if(!this.runtime) {
+            this.runtime = 'typescript'; // review DCS - do we need to default this!
+        }
+
         if(this.runtime && !LANGUAGES.includes(this.runtime)) {
             throw new Error('Unsupported runtime. The supported runtimes are: ' + LANGUAGES.join(', '));
         }

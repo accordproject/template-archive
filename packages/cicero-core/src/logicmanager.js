@@ -54,6 +54,16 @@ class LogicManager {
     }
 
     /**
+     * Adds a logic file to the underlying script manager
+     * @param {string} contents  the contents of the logic file
+     * @param {string} identifier  the identifier of the logic file
+     */
+    addLogicFile(contents, identifier) {
+        const script = this.scriptManager.createScript(identifier, this.language, contents);
+        this.scriptManager.addScript(script);
+    }
+
+    /**
      * Provides access to the Introspector for the model manager
      * @return {Introspector} the Introspector for the model manager
      */

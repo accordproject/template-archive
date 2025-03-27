@@ -107,13 +107,11 @@ class TemplateLoader {
         }
 
         // load and add the typescript files
-        if (template.getMetadata().getRuntime() === 'typescript') {
-            Logger.debug(method, 'Adding Typescript files to script manager');
-            const scriptFiles = await TemplateLoader.loadZipFilesContents(zip, /logic[/\\].*\.ts$/);
-            scriptFiles.forEach(function (obj) {
-                template.getLogicManager().addLogicFile(obj.contents, obj.name);
-            });
-        }
+        Logger.debug(method, 'Adding Logic files to script manager');
+        const scriptFiles = await TemplateLoader.loadZipFilesContents(zip, /logic[/\\].*\.*$/);
+        scriptFiles.forEach(function (obj) {
+            template.getLogicManager().addLogicFile(obj.contents, obj.name);
+        });
         // check the integrity of the model and logic of the template
         authorSignature ? template.validate({ verifySignature: options && options.disableSignatureVerification ? false : true }) : template.validate();
 
@@ -218,17 +216,15 @@ class TemplateLoader {
             Logger.debug(method, 'Loaded grammar.tem.md', grammar);
         }
 
-        // load and add the typescript files
-        if(template.getMetadata().getRuntime() === 'typescript') {
-            const tsFiles = await TemplateLoader.loadFilesContents(path, /logic[/\\].*\.ts$/);
-            tsFiles.forEach((file) => {
-                const resolvedPath = slash(fsPath.resolve(path));
-                const resolvedFilePath = slash(fsPath.resolve(file.name));
-                const truncatedPath = resolvedFilePath.replace(resolvedPath+'/', '');
-                template.getLogicManager().addLogicFile(file.contents, truncatedPath);
-                Logger.debug(method, `Loaded ${truncatedPath}`, file.contents);
-            });
-        }
+        // load and add the logic files
+        const tsFiles = await TemplateLoader.loadFilesContents(path, /logic[/\\].*\.*$/);
+        tsFiles.forEach((file) => {
+            const resolvedPath = slash(fsPath.resolve(path));
+            const resolvedFilePath = slash(fsPath.resolve(file.name));
+            const truncatedPath = resolvedFilePath.replace(resolvedPath+'/', '');
+            template.getLogicManager().addLogicFile(file.contents, truncatedPath);
+            Logger.debug(method, `Loaded ${truncatedPath}`, file.contents);
+        });
 
         // check the template
         authorSignature ? template.validate({ verifySignature: options && options.disableSignatureVerification ? false : true }) : template.validate();

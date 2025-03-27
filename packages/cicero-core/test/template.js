@@ -169,8 +169,14 @@ describe('Template', () => {
             return Template.fromDirectory('./test/data/template-decorator', options);
         });
 
+        it('should create a template with typescript logic from a directory', async () => {
+            return Template.fromDirectory('./test/data/text-only', options);
+        });
+
         it('should create a template from a directory and download external models by default', async () => {
-            return Template.fromDirectory('./test/data/text-only').should.be.fulfilled;
+            const template = await Template.fromDirectory('./test/data/latedeliveryandpenalty-typescript');
+            template.getLogicManager().getLanguage().should.equal('typescript');
+            template.getLogicManager().getScriptManager().getScript('logic/logic.ts').should.not.be.null;
         });
 
         it('should create a template from a directory', () => {
