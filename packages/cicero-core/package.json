@@ -13,7 +13,7 @@
     "dist",
     "types"
   ],
-  "main": "dist/index.js",
+  "main": "dist/cicero-core.js",
   "browser": "dist/cicero-core.js",
   "typings": "types/index.d.ts",
   "scripts": {
