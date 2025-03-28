@@ -18,8 +18,8 @@ const fs = require('fs');
 const fsPath = require('path');
 const slash = require('slash');
 const JSZip = require('jszip');
-const xregexp = require('xregexp');
-const languageTagRegex = require('ietf-language-tag-regex');
+// const xregexp = require('xregexp');
+// const languageTagRegex = require('ietf-language-tag-regex');
 const promisify = require('util').promisify;
 const Logger = require('@accordproject/concerto-util').Logger;
 
@@ -31,8 +31,10 @@ const stat = fs.stat ? promisify(fs.stat) : undefined;
 const ENCODING = 'utf8';
 
 // Matches 'sample.md' or 'sample_TAG.md' where TAG is an IETF language tag (BCP 47)
-const IETF_REGEXP = languageTagRegex({ exact: false }).toString().slice(1, -2);
-const SAMPLE_FILE_REGEXP = xregexp('text[/\\\\]sample(_(' + IETF_REGEXP + '))?.md$');
+// const IETF_REGEXP = languageTagRegex({ exact: false }).toString().slice(1, -2);
+const SAMPLE_FILE_REGEXP = /text\/sample.md/;
+
+// //xregexp('text[/\\\\]sample(_(' + IETF_REGEXP + '))?.md$');
 
 /**
  * A utility class to create templates from data sources.

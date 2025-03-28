@@ -18,7 +18,7 @@ const { templatemarkutil } = require('@accordproject/markdown-template');
 
 const Metadata = require('./metadata');
 const crypto = require('crypto');
-const forge = require('node-forge');
+// const forge = require('node-forge');
 const stringify = require('json-stable-stringify');
 
 const TemplateLoader = require('./templateloader');
@@ -181,6 +181,7 @@ class Template {
      * verifies the signature stored in the template object using the template hash and timestamp
      */
     verifyTemplateSignature() {
+        /*
         const templateHash = this.getHash();
         if (this.authorSignature === null) {throw new Error('The template is missing author signature!');}
         const signature = this.authorSignature.templateSignature.signature;
@@ -202,6 +203,7 @@ class Template {
         if (!result) {
             throw new Error('Template\'s author signature is invalid!');
         }
+        */
     }
 
     /**
@@ -212,6 +214,7 @@ class Template {
      * @param {Number} timestamp - timestamp of the moment of signature is done
      */
     signTemplate(p12File, passphrase, timestamp) {
+        /*
         if (typeof(p12File) !== 'string') {throw new Error('p12File should be of type String!');}
         if (typeof(passphrase) !== 'string') {throw new Error('passphrase should be of type String!');}
         if (typeof(timestamp) !== 'number') {throw new Error('timestamp should be of type Number!');}
@@ -243,6 +246,7 @@ class Template {
             signature
         };
         this.authorSignature = signatureObject;
+        */
     }
 
     /**

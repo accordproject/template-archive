@@ -21,16 +21,20 @@ const NodePolyfillPlugin = require("node-polyfill-webpack-plugin");
 const packageJson = require("./package.json");
 
 module.exports = {
+  target: 'node',
   entry: path.resolve(__dirname, "index.js"),
   output: {
+    clean: true,
+    // globalObject: 'self',
     path: path.resolve(__dirname, "dist"),
-    globalObject: 'self',
     filename: "cicero-core.js",
     library: {
-      name: "cicero-core",
-      type: "umd",
+      type: "commonjs",
     },
   },
+  // externals: {
+  //   'node-forge': false,
+  // },
   // Enable sourcemaps for debugging webpack's output.
   devtool: "source-map",
   resolve: {

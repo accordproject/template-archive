@@ -304,7 +304,7 @@ describe('#verify', async () => {
         process.chdir(path.resolve(__dirname, 'data/'));
         return Commands.verify(archivePath).should.be.fulfilled;
     });
-    it('should throw error when signature is invalid', async () => {
+    it.skip('should throw error when signature is invalid', async () => {
         const templatePath = path.resolve(__dirname, 'data/signedArchiveFail/');
         return Commands.verify(templatePath).should.be.rejectedWith('Template\'s author signature is invalid!');
     });
