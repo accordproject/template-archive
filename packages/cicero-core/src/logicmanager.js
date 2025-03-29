@@ -17,6 +17,10 @@
 const {Introspector, ModelManager} = require('@accordproject/concerto-core');
 const JavascriptScriptManager = require('./javascriptscriptmanager');
 const TypescriptScriptManager = require('./typescriptscriptmanager');
+
+// eslint-disable-next-line no-unused-vars
+const ScriptManager = require('./scriptmanager');
+
 const LANGUAGES = require('./languages');
 
 /**

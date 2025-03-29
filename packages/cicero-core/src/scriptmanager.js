@@ -88,7 +88,6 @@ class ScriptManager {
     /**
      * Get the array of Script instances
      * @return {Script[]} The Scripts registered
-     * @private
      */
     getScripts() {
         let keys = Object.keys(this.scripts);
@@ -105,7 +104,6 @@ class ScriptManager {
      * Get the array of Script instances for the given language
      * @param {string} language - the target language
      * @return {Script[]} The Scripts registered
-     * @private
      */
     getScriptsForTarget(language) {
         let keys = Object.keys(this.scripts);
@@ -130,7 +128,6 @@ class ScriptManager {
      * Get the Script associated with an identifier
      * @param {string} identifier - the identifier of the Script
      * @return {Script} the Script
-     * @private
      */
     getScript(identifier) {
         return this.scripts[identifier];
