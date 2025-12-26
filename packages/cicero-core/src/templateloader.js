@@ -105,7 +105,28 @@ class TemplateLoader {
         if (!grammar) {
             throw new Error('A template must contain a grammar.tem.md file.');
         } else {
+            // Parse grammar for variables {{var}}
+            const varRegex = /\{\{\s*([a-zA-Z_][a-zA-Z0-9_]*)\s*\}\}/g;
+            let match;
+            const foundVars = new Set();
+            while ((match = varRegex.exec(grammar)) !== null) {
+                foundVars.add(match[1]);
+            }
+            // Check if each variable is in the model
+            const mm = template.getModelManager();
+            const mainModel = mm.getModelFiles().find(mf => !mf.isExternal());
+            let modelDefs = mainModel ? mainModel.getDefinitions() : '';
+            let sampleJson = requestContents || {};
+            for (const v of foundVars) {
+                // Only add if not present in model
+                const re = new RegExp(`\\bo\\s+\\w+\\s+${v}\\b`);
+                if (!re.test(modelDefs)) {
+                    Template.autoAddUndefinedField(v, mm, sampleJson);
+                }
+            }
             template.setTemplate(grammar);
+            // Update requestContents if changed
+            template.setRequest(sampleJson);
         }
 
         // load and add the typescript files

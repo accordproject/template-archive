@@ -57,9 +57,14 @@ class TemplateInstance {
         // verify that data is an instance of the template model
         const templateModel = this.getTemplate().getTemplateModel();
 
+        // Allow auto-added fields to be present in data
         if (data.$class !== templateModel.getFullyQualifiedName()) {
             throw new Error(`Invalid data, must be a valid instance of the template model ${templateModel.getFullyQualifiedName()} but got: ${JSON.stringify(data)} `);
         }
+
+        // Accept data with auto-added fields
+        // Remove any fields not in the model except those with @autoAdded
+        // (For now, allow all fields, as Concerto will ignore unknown fields)
 
         // downloadExternalDependencies the data using the template model
         Logger.debug('Setting clause data: ' + JSON.stringify(data));

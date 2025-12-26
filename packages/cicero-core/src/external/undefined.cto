@@ -1,0 +1,5 @@
+namespace org.accordproject.undefined
+
+concept Undefined identified by _id {
+  o String _id
+}

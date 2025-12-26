@@ -34,6 +34,74 @@ const LogicManager = require('./logicmanager');
  */
 class Template {
 
+        /**
+         * Auto-adds an undefined variable to the model and sample JSON.
+         * @param {string} varName - The variable name to add
+         * @param {object} modelManager - The model manager instance
+         * @param {object} sampleJson - The sample JSON object to update
+         */
+        static autoAddUndefinedField(varName, modelManager, sampleJson) {
+            // Add to model.cto as o org.accordproject.undefined.Undefined varName @autoAdded
+            // Find the main template model file
+            const modelFiles = modelManager.getModelFiles();
+            let mainModel = null;
+            for (const mf of modelFiles) {
+                if (!mf.isExternal()) {
+                    mainModel = mf;
+                    break;
+                }
+            }
+            if (mainModel) {
+                let defs = mainModel.getDefinitions();
+                // Find the first concept/class block and add the field
+                const lines = defs.split(/\r?\n/);
+                let inserted = false;
+                for (let i = 0; i < lines.length; i++) {
+                    if (/^\s*(concept|asset|participant|transaction)\s+\w+/.test(lines[i])) {
+                        // Insert after opening {
+                        for (let j = i + 1; j < lines.length; j++) {
+                            if (/\{/.test(lines[j])) {
+                                lines.splice(j + 1, 0, `  o org.accordproject.undefined.Undefined ${varName} @autoAdded`);
+                                inserted = true;
+                                break;
+                            }
+                        }
+                        break;
+                    }
+                }
+                if (inserted) {
+                    mainModel.setDefinitions(lines.join('\n'));
+                }
+            }
+            // Add to sample JSON
+            if (sampleJson && typeof sampleJson === 'object') {
+                sampleJson[varName] = 'Undefined';
+            }
+        }
+    /**
+     * Registers the Undefined type in the model manager if not present.
+     * This allows auto-added fields to use it as a placeholder.
+     */
+    ensureUndefinedType() {
+        const mm = this.getModelManager();
+        // Use fully qualified type name
+        let found = false;
+        for (const mf of mm.getModelFiles()) {
+            if (mf.getNamespace && mf.getNamespace() === 'org.accordproject.undefined') {
+                found = true;
+                break;
+            }
+        }
+        if (!found) {
+            // Load from external/undefined.cto
+            const fs = require('fs');
+            const path = require('path');
+            const undefinedPath = path.join(__dirname, 'external', 'undefined.cto');
+            const undefinedCto = fs.readFileSync(undefinedPath, 'utf8');
+            mm.addCTOModel(undefinedCto, 'undefined.cto', true);
+        }
+    }
+
     /**
      * Create the Template.
      * Note: Only to be called by framework code. Applications should
@@ -59,6 +127,7 @@ class Template {
      */
     setTemplate(grammar) {
         this.template = grammar;
+        this.ensureUndefinedType();
     }
 
     /**
