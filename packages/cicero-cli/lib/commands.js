@@ -189,11 +189,10 @@ class Commands {
 
         return Commands.loadTemplate(templatePath, options)
             .then((template) => {
-                const VisitorClass = CodeGen.formats[target];
-                if(!VisitorClass) {
+                const visitor = CodeGen.formats[target];
+                if(!visitor) {
                     throw new Error ('Unrecognized code generator: ' + target);
                 }
-                const visitor = new VisitorClass();
                 console.log('generating code...');
                 let parameters = {};
                 parameters.fileWriter = new FileWriter(outputPath);
