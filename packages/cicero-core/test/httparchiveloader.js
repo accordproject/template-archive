@@ -77,5 +77,23 @@ describe('HTTPArchiveLoader', () => {
 
             mock.stop('axios');
         });
+
+        it('should load an archive with a custom timeout', async function() {
+            mock('axios', (params) => {
+                axiosParams = params;
+                return Promise.resolve({ data: 'data' });
+            });
+            HTTPArchiveLoader = mock.reRequire('../src/loaders/httparchiveloader');
+            const loader = new HTTPArchiveLoader();
+
+            // ACT: We ask for a 10-second timeout (10000ms)
+            await loader.load('https://templates.accordproject.org/archives/ip-payment@0.13.0.cta', { timeout: 10000 });
+
+            // ASSERT: We check if Axios actually received that number
+            expect(axiosParams.timeout).to.equal(10000);
+
+            mock.stop('axios');
+        });
+
     });
 });
