@@ -75,17 +75,28 @@ class Template {
      * @param {Object} options  - e.g., { offline: true }
      */
     validate(options = {}) {
-        if (options.verifySignature) {
-            this.verifyTemplateSignature();
-        }
-        if(options && options.offline) {
-            this.getModelManager().validateModelFiles();
-        }
-        else {
-            this.getModelManager().updateExternalModels();
-        }
-        this.getTemplateModel();
+    if (options.verifySignature) {
+        this.verifyTemplateSignature();
     }
+
+    if (options && options.offline) {
+        this.getModelManager().validateModelFiles();
+    } else {
+        this.getModelManager().updateExternalModels();
+    }
+
+    try {
+        this.getTemplateModel();
+    } catch (err) {
+        if (options && options.allowUndefinedFields) {
+            console.warn(
+                'Template contains undefined fields; continuing in text-first mode.'
+            );
+        } else {
+            throw err;
+        }
+    }
+}
 
     /**
      * Returns the template model for the template
