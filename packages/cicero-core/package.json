@@ -91,7 +91,6 @@
     "json-stable-stringify": "1.0.2",
     "jszip": "3.10.1",
     "node-cache": "5.1.2",
-    "request": "2.88.0",
     "semver": "7.5.3",
     "slash": "3.0.0",
     "xregexp": "5.1.1"
