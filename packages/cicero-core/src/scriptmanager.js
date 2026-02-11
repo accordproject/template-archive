@@ -146,7 +146,7 @@ class ScriptManager {
      * @returns {Array} a list of function declarations
      */
     getFunctions() {
-        let allScripts = this.getAllScripts();
+        let allScripts = this.getScripts();
         const functionDeclarations = allScripts
             .map((ele) => {
                 return ele.getFunctions();
