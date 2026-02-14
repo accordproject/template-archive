@@ -23,6 +23,8 @@ chai.use(require('chai-as-promised'));
 const fs = require('fs');
 
 const ScriptManager = require('../src/scriptmanager');
+const Script = require('../src/script');
+const Function = require('../src/function');
 
 const jsSample = fs.readFileSync('./test/data/test.js','utf8');
 const jsSample2 = fs.readFileSync('./test/data/test2.js','utf8');
@@ -99,6 +101,103 @@ describe('ScriptManager', () => {
             return scriptManager.getScripts().length.should.equal(0);
         });
 
+    });
+
+    describe('#getFunctions (regression: dd75611)', () => {
+
+        it('should not throw a TypeError when calling getFunctions', () => {
+            const scriptManager = new ScriptManager();
+            const script1 = scriptManager.createScript('test.js', 'es6', jsSample);
+            scriptManager.addScript(script1);
+            (() => scriptManager.getFunctions()).should.not.throw();
+        });
+
+        it('should return an empty array when scripts have no function declarations', () => {
+            const scriptManager = new ScriptManager();
+            const script1 = scriptManager.createScript('test.js', 'es6', jsSample);
+            scriptManager.addScript(script1);
+            scriptManager.getFunctions().should.deep.equal([]);
+        });
+
+        it('should aggregate function declarations from loaded scripts', () => {
+            const scriptManager = new ScriptManager();
+            const func1 = new Function('paymentClause', []);
+            const func2 = new Function('__dispatch', []);
+            const script1 = new Script('test.js', 'es6', [func1, func2], jsSample);
+            scriptManager.addScript(script1);
+            const functions = scriptManager.getFunctions();
+            functions.length.should.equal(2);
+            functions[0].getName().should.equal('paymentClause');
+            functions[1].getName().should.equal('__dispatch');
+        });
+
+        it('should aggregate functions across multiple scripts', () => {
+            const scriptManager = new ScriptManager();
+            const func1 = new Function('paymentClause', []);
+            const func2 = new Function('__dispatch', []);
+            const script1 = new Script('test.js', 'es6', [func1], jsSample);
+            const script2 = new Script('test2.js', 'es6', [func2], jsSample2);
+            scriptManager.addScript(script1);
+            scriptManager.addScript(script2);
+            const functions = scriptManager.getFunctions();
+            functions.length.should.equal(2);
+            functions.map(f => f.getName()).should.include.members(['paymentClause', '__dispatch']);
+        });
+    });
+
+    describe('#hasFunction (regression: dd75611)', () => {
+
+        it('should return true for an existing function', () => {
+            const scriptManager = new ScriptManager();
+            const func1 = new Function('paymentClause', []);
+            const script1 = new Script('test.js', 'es6', [func1], jsSample);
+            scriptManager.addScript(script1);
+            scriptManager.hasFunction('paymentClause').should.be.true;
+        });
+
+        it('should return false for a non-existent function', () => {
+            const scriptManager = new ScriptManager();
+            const func1 = new Function('paymentClause', []);
+            const script1 = new Script('test.js', 'es6', [func1], jsSample);
+            scriptManager.addScript(script1);
+            scriptManager.hasFunction('nonExistent').should.be.false;
+        });
+
+        it('should not throw a TypeError when checking function existence', () => {
+            const scriptManager = new ScriptManager();
+            const script1 = scriptManager.createScript('test.js', 'es6', jsSample);
+            scriptManager.addScript(script1);
+            (() => scriptManager.hasFunction('anything')).should.not.throw();
+        });
+    });
+
+    describe('#getFunction (regression: dd75611)', () => {
+
+        it('should return the correct function declaration by name', () => {
+            const scriptManager = new ScriptManager();
+            const func1 = new Function('paymentClause', []);
+            const func2 = new Function('__dispatch', []);
+            const script1 = new Script('test.js', 'es6', [func1, func2], jsSample);
+            scriptManager.addScript(script1);
+            const result = scriptManager.getFunction('paymentClause');
+            result.getName().should.equal('paymentClause');
+        });
+
+        it('should throw an error for a non-existent function', () => {
+            const scriptManager = new ScriptManager();
+            const func1 = new Function('paymentClause', []);
+            const script1 = new Script('test.js', 'es6', [func1], jsSample);
+            scriptManager.addScript(script1);
+            (() => scriptManager.getFunction('nonExistent')).should.throw('Function nonExistent was not found');
+        });
+
+        it('should throw a regular Error, not a TypeError, for a missing function', () => {
+            const scriptManager = new ScriptManager();
+            const script1 = scriptManager.createScript('test.js', 'es6', jsSample);
+            scriptManager.addScript(script1);
+            (() => scriptManager.getFunction('anything')).should.throw(Error, /was not found/);
+            (() => scriptManager.getFunction('anything')).should.not.throw(TypeError);
+        });
     });
 
 });
