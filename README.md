@@ -22,6 +22,52 @@ Cicero is an Open Source implementation of the [Accord Project Template Specific
 
 You can read the latest user documentation here: http://docs.accordproject.org.
 
+##  Quick Start
+
+Below is a minimal workflow to create and test a Cicero template.
+
+### 1. Generate a new template
+
+```bash
+yo @accordproject/cicero-template
+```
+### 2. Parse the sample text
+
+```bash
+cicero parse
+```
+
+### 3. Draft a contract using sample data
+```bash
+cicero draft --data data.json
+```
+
+### 4. Trigger the contract logic
+
+```bash
+cicero trigger
+```
+
+## Common Errors
+
+### Invalid or missing identifier
+
+This occurs when your model defines an identifier field but it is not included in data.json.
+Ensure all required fields in model.cto are provided in your JSON data file.
+
+### Missing data.json
+The cicero draft command requires a JSON data file.
+If your file has a different name:
+cicero draft --data your-file.json
+
+### Namespace mismatch
+Ensure the $class value in your JSON matches the namespace and asset name defined in model.cto.
+
+Example: 
+{
+  "$class": "org.accordproject.template.MyClause"
+}
+
 ## Clause Templates
 
 Using Cicero you can take any existing natural language text (typically a clause or a contract) and declaratively bind it to a data model. Cicero generates a parser to parse and validate source text, extracting machine readable/computable data. The Cicero engine can then be used to execute a clause (an instance of a template) against a JSON payload. Accord Project templates can be used to add computable functionality to any document.
