@@ -14,13 +14,14 @@
 
 ## Introduction
 
-Cicero allows you to define natural language contract and clause templates that can be executed by a computer. These could be relatively simple things like `if the goods are more than {{DAYS}} late, then notify the supplier of the goods, with the message {{MESSAGE}}.` or more elaborate natural language and logic such as computing interest on a loan, or calculating penalties based on IoT sensor readings.
+Cicero allows you to define natural language contracts and clause templates that can be executed programmatically. These could be relatively simple things like `if the goods are more than {{DAYS}} late, then notify the supplier of the goods, with the message {{MESSAGE}}.` or more elaborate natural language and logic such as computing interest on a loan, or calculating penalties based on IoT sensor readings.
 
-You can browse the library of Open Source Cicero contract and clause templates at: https://templates.accordproject.org.
+You can browse the library of Open Source Cicero contract and clause templates at:
+ https://templates.accordproject.org.
 
 Cicero is an Open Source implementation of the [Accord Project Template Specification][apspec]. It defines the structure of natural language templates, bound to a data model, that can be executed using request/response JSON messages.
 
-You can read the latest user documentation here: http://docs.accordproject.org.
+You can read the latest user documentation here: https://docs.accordproject.org.
 
 ## Clause Templates
 
@@ -28,7 +29,7 @@ Using Cicero you can take any existing natural language text (typically a clause
 
 ## Structure of the Code Repository
 
-Top level repository (cicero), with sub packages. Each sub-package is published as an independent npm module managed as npm packages:
+Top level repository (cicero) with sub packages. Each sub-package is published as an independent npm module managed as npm packages:
 * [cicero-cli](https://github.com/accordproject/cicero/tree/master/packages/cicero-cli) : Command line interface (for parsing, execution, creating archives) for Accord Project legal templates
 * [cicero-core](https://github.com/accordproject/cicero/tree/master/packages/cicero-core) : Core classes to manage the grammar, models and logic of Accord Project legal templates
 * [generator-cicero-template](https://github.com/accordproject/cicero/tree/master/packages/generator-cicero-template): Utility to create a self-contained directory for a new Accord Project legal template
