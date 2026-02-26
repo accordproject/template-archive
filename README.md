@@ -105,3 +105,4 @@ Copyright 2018-2019 Clause, Inc. All trademarks are the property of their respec
 [creativecommons]: http://creativecommons.org/licenses/by/4.0/
 
 [apspec]: https://docs.accordproject.org/docs/accordproject-template.html
+note: this is just a small note made in this code to show the pull request.
