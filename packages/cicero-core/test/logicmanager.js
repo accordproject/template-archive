@@ -24,7 +24,7 @@ chai.use(require('chai-as-promised'));
 
 const fs = require('fs');
 
-const ctoSample = fs.readFileSync('./test/data/test.cto','utf8');
+const ctoSample = fs.readFileSync('./test/data/test.cto', 'utf8');
 
 describe('LogicManager', () => {
     describe('#constructors-accessors', () => {
@@ -39,14 +39,18 @@ describe('LogicManager', () => {
 
         it('should load a model to the model manager', () => {
             const logicManager = new LogicManager('es6');
-            const modelFile = logicManager.getModelManager().addCTOModel(ctoSample,'test.cto');
+            const modelFile = logicManager.getModelManager().addCTOModel(ctoSample, 'test.cto');
             modelFile.should.not.be.null;
         });
 
         it('should load a model to the model manager (bulk)', () => {
             const logicManager = new LogicManager('es6');
-            const modelFiles = logicManager.getModelManager().addModelFiles([ctoSample],['test.cto']);
+            const modelFiles = logicManager.getModelManager().addModelFiles([ctoSample], ['test.cto']);
             modelFiles.should.not.be.null;
+        });
+
+        it('should throw an error for unsupported language', () => {
+            return (() => new LogicManager('invalid-language')).should.throw('Unknown language invalid-language');
         });
     });
 });
