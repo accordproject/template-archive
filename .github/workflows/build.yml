@@ -52,6 +52,7 @@ jobs:
           github-token: ${{ secrets.GITHUB_TOKEN }}
           flag-name: ${{ matrix.os }}
           parallel: true
+          fail-on-error: false
 
   notify:
     needs:
@@ -67,39 +68,4 @@ jobs:
         with:
           github-token: ${{ secrets.GITHUB_TOKEN }}
           parallel-finished: true
-
-  publish:
-    needs:
-      - build
-      - notify
-
-    name: Publish to npm
-    if: ${{ success() && github.event_name == 'push' && github.repository_owner == 'accordproject' }}
-    runs-on: ubuntu-latest
-
-    outputs:
-      job-status: ${{ job.status }}
-
-    steps:
-      - name: git checkout
-        uses: actions/checkout@v4
-
-      - name: Use Node.js 20.x
-        uses: actions/setup-node@v4
-        with:
-          node-version: 20.x
-
-      - run: npm ci
-      - run: npm run build --if-present
-
-      - name: timestamp
-        id: timestamp
-        run: |
-          node ./scripts/timestamp.js
-
-      - name: build and publish
-        run: |
-          npm config set //registry.npmjs.org/:_authToken ${{ secrets.NPM_TOKEN }}
-          node ./scripts/bump_version.js ${{ steps.timestamp.outputs.stamp }}
-          npm version --workspaces --include-workspace-root --no-git-tag-version --yes --exact ${{ steps.timestamp.outputs.stamp }}
-          npm publish --workspaces --access public --tag=unstable 2>&1
+          fail-on-error: false

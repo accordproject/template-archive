@@ -1,7 +1,6 @@
 {
   "devDependencies": {
     "colors": "1.4.0",
-    "coveralls": "3.1.1",
     "dayjs": "1.11.8",
     "eslint": "^8.43.0",
     "jsdoc": "^4.0.2",
