@@ -71,17 +71,25 @@ describe('#validateCompileArgs', () => {
     });
 });
 
-describe('#compile', async () => {
+describe('#compile', () => {
     const formats = Object.keys(CodeGen.formats);
-    const dir = await tmp.dir({ unsafeCleanup: true });
+    let compileDir;
+
+    before(async () => {
+        compileDir = await tmp.dir({ unsafeCleanup: true });
+    });
+
+    after(() => {
+        if (compileDir) compileDir.cleanup();
+    });
+
     for(let n=0; n<formats.length; n++) {
         it(`should compile to a ${formats[n]} model`, async () => {
-            const output = path.resolve(dir.path, formats[n]);
+            const output = path.resolve(compileDir.path, formats[n]);
             await Commands.compile(template, formats[n], output, true);
             fs.readdirSync(output).length.should.be.above(0);
         });
     }
-    dir.cleanup();
 
     it('should not compile to an unknown model', async () => {
         const dir = await tmp.dir({ unsafeCleanup: true });
