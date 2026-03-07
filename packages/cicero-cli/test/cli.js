@@ -80,7 +80,9 @@ describe('#compile', () => {
     });
 
     after(() => {
-        if (compileDir) compileDir.cleanup();
+        if (compileDir) {
+            compileDir.cleanup();
+        }
     });
 
     for(let n=0; n<formats.length; n++) {
