@@ -33,7 +33,7 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/accordproject/cicero.git",
+    "url": "git+https://github.com/accordproject/template-archive.git",
     "directory": "packages/cicero-core"
   },
   "keywords": [
@@ -45,9 +45,9 @@
   "author": "accordproject.org",
   "license": "Apache-2.0",
   "bugs": {
-    "url": "https://github.com/accordproject/cicero/issues"
+    "url": "https://github.com/accordproject/template-archive/issues"
   },
-  "homepage": "https://github.com/accordproject/cicero",
+  "homepage": "https://github.com/accordproject/template-archive",
   "devDependencies": {
     "@babel/preset-typescript": "^7.27.0",
     "archiver": "5.3.1",

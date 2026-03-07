@@ -26,7 +26,7 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/accordproject/cicero.git",
+    "url": "git+https://github.com/accordproject/template-archive.git",
     "directory": "packages/cicero-cli"
   },
   "keywords": [
@@ -37,7 +37,7 @@
   "author": "Accord Project",
   "license": "Apache-2.0",
   "bugs": {
-    "url": "https://github.com/accordproject/cicero/issues"
+    "url": "https://github.com/accordproject/template-archive/issues"
   },
   "homepage": "https://www.accordproject.org/projects/cicero",
   "dependencies": {
