@@ -12,43 +12,43 @@
  * limitations under the License.
  */
 
-"use strict";
+'use strict';
 
-const Argument = require("../src/argument");
-const ArgumentType = require("../src/argumenttype");
-const Function = require("../src/function");
-const Contract = require("../src/contract");
+const Argument = require('../src/argument');
+const ArgumentType = require('../src/argumenttype');
+const CiceroFunction = require('../src/function');
+const Contract = require('../src/contract');
 
-const chai = require("chai");
+const chai = require('chai');
 chai.should();
-chai.use(require("chai-as-promised"));
+chai.use(require('chai-as-promised'));
 
-describe("Core Classes", () => {
-    describe("Argument", () => {
-        it("should create an Argument", () => {
-            const arg = new Argument("name", "type");
-            arg.getName().should.equal("name");
-            arg.getType().should.equal("type");
+describe('Core Classes', () => {
+    describe('Argument', () => {
+        it('should create an Argument', () => {
+            const arg = new Argument('name', 'type');
+            arg.getName().should.equal('name');
+            arg.getType().should.equal('type');
         });
     });
 
-    describe("ArgumentType", () => {
-        it("should create an ArgumentType", () => {
-            const type = new ArgumentType("type");
-            type.getName().should.equal("type");
+    describe('ArgumentType', () => {
+        it('should create an ArgumentType', () => {
+            const type = new ArgumentType('type');
+            type.getName().should.equal('type');
         });
     });
 
-    describe("Function", () => {
-        it("should create a Function", () => {
-            const func = new Function("name", []);
-            func.getName().should.equal("name");
+    describe('Function', () => {
+        it('should create a Function', () => {
+            const func = new CiceroFunction('name', []);
+            func.getName().should.equal('name');
             func.getArguments().should.deep.equal([]);
         });
     });
 
-    describe("Contract", () => {
-        it("should have a constructor", () => {
+    describe('Contract', () => {
+        it('should have a constructor', () => {
             Contract.should.not.be.null;
         });
     });

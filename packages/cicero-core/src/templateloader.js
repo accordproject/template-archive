@@ -403,8 +403,8 @@ class TemplateLoader {
                 }
             }
             else {
-                const slashtPath = slash(res);
-                if (regex.test(slashtPath)) {
+                const slashPath = slash(res);
+                if (regex.test(slashPath)) {
                     return {
                         name: res,
                         contents: await TemplateLoader.loadFileContents(path, res, false, true)

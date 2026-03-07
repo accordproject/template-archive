@@ -12,51 +12,53 @@
  * limitations under the License.
  */
 
-"use strict";
+'use strict';
 
-const GitHubArchiveLoader = require("../../src/loaders/githubarchiveloader");
-const axios = require("axios");
-const mock = require("mock-require");
+const GitHubArchiveLoader = require('../../src/loaders/githubarchiveloader');
+const mock = require('mock-require');
 
-const chai = require("chai");
+const chai = require('chai');
 chai.should();
-chai.use(require("chai-as-promised"));
+chai.use(require('chai-as-promised'));
 
-describe("GitHubArchiveLoader", () => {
+describe('GitHubArchiveLoader', () => {
     let loader;
 
     beforeEach(() => {
         loader = new GitHubArchiveLoader();
     });
 
-    describe("#accepts", () => {
-        it("should accept a github URL", () => {
-            loader.accepts("github://accordproject/githubarchiveloader").should
+    describe('#accepts', () => {
+        it('should accept a github URL', () => {
+            loader.accepts('github://accordproject/githubarchiveloader').should
                 .be.true;
         });
 
-        it("should not accept a non-github URL", () => {
-            loader.accepts("http://accordproject/githubarchiveloader").should.be
+        it('should not accept a non-github URL', () => {
+            loader.accepts('http://accordproject/githubarchiveloader').should.be
                 .false;
         });
     });
 
-    describe("#load", () => {
-        it("should load an archive from github", async () => {
+    describe('#load', () => {
+        it('should load an archive from github', async () => {
             const axiosMock = (request) => {
-                return Promise.resolve({ data: Buffer.from("test") });
+                return Promise.resolve({ data: Buffer.from('test') });
             };
-            mock("axios", axiosMock);
-            mock.reRequire("../../src/loaders/httparchiveloader");
-            const MockedLoader = mock.reRequire(
-                "../../src/loaders/githubarchiveloader",
-            );
-            const mockedLoader = new MockedLoader();
-            const buffer = await mockedLoader.load(
-                "github://accordproject/githubarchiveloader",
-            );
-            buffer.toString().should.equal("test");
-            mock.stop("axios");
+            mock('axios', axiosMock);
+            try {
+                mock.reRequire('../../src/loaders/httparchiveloader');
+                const MockedLoader = mock.reRequire(
+                    '../../src/loaders/githubarchiveloader',
+                );
+                const mockedLoader = new MockedLoader();
+                const buffer = await mockedLoader.load(
+                    'github://accordproject/githubarchiveloader',
+                );
+                buffer.toString().should.equal('test');
+            } finally {
+                mock.stop('axios');
+            }
         });
     });
 });

@@ -12,23 +12,23 @@
  * limitations under the License.
  */
 
-"use strict";
+'use strict';
 
-const DefaultArchiveLoader = require("../../src/loaders/defaultarchiveloader");
+const DefaultArchiveLoader = require('../../src/loaders/defaultarchiveloader');
 
-const chai = require("chai");
+const chai = require('chai');
 chai.should();
-chai.use(require("chai-as-promised"));
+chai.use(require('chai-as-promised'));
 
-describe("DefaultArchiveLoader", () => {
+describe('DefaultArchiveLoader', () => {
     let loader;
 
     beforeEach(() => {
         loader = new DefaultArchiveLoader();
     });
 
-    describe("#constructor", () => {
-        it("should create a DefaultArchiveLoader", () => {
+    describe('#constructor', () => {
+        it('should create a DefaultArchiveLoader', () => {
             loader.should.not.be.null;
         });
     });
