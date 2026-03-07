@@ -24,10 +24,10 @@ jobs:
         with:
           node-version: '20'
           registry-url: 'https://registry.npmjs.org'
+          cache: 'npm'
 
       # Ensure npm 11.5.1 or later for trusted publishing
       - run: npm install -g npm@latest
-
 
       - run: npm ci
       - run: npm run build --if-present
@@ -39,13 +39,12 @@ jobs:
 
       - name: build and publish
         run: |
-          npm config set //registry.npmjs.org/:_authToken ${{ secrets.NPM_TOKEN }}
           node ./scripts/bump_version.js ${{ github.event.release.tag_name }}
           npm version --workspaces --include-workspace-root --no-git-tag-version --yes --exact ${{ github.event.release.tag_name }}
-          npm publish --workspaces --access public ${{ steps.tag.outputs.tag }} 2>&1
+          npm publish --workspaces --access public --provenance ${{ steps.tag.outputs.tag }} 2>&1
 
       - name: Create PR to increment version
-        uses: peter-evans/create-pull-request@v3
+        uses: peter-evans/create-pull-request@v7
         with:
           base: main
           commit-message: 'chore(actions): publish ${{ github.event.release.tag_name }} to npm'
