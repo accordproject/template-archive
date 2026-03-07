@@ -147,6 +147,19 @@ class Template {
     }
 
     /**
+     * Normalizes line endings to \n to ensure consistent hashing across OS
+     * @param {string} str the string to normalize
+     * @return {string} the normalized string
+     * @private
+     */
+    _normalize(str) {
+        if(str && typeof str === 'string') {
+            return str.replace(/\r/g, '');
+        }
+        return str;
+    }
+
+    /**
      * Gets a content based SHA-256 hash for this template. Hash
      * is based on the metadata for the template plus the contents of
      * all the models and all the script files.
@@ -155,21 +168,36 @@ class Template {
     getHash() {
         const content = {};
         content.metadata = this.getMetadata().toJSON();
+
+        // Normalize README
+        if (content.metadata.README) {
+            content.metadata.README = this._normalize(content.metadata.README);
+        }
+
+        // Normalize Samples
+        if (content.metadata.samples) {
+            Object.keys(content.metadata.samples).forEach(key => {
+                if (typeof content.metadata.samples[key] === 'string') {
+                    content.metadata.samples[key] = this._normalize(content.metadata.samples[key]);
+                }
+            });
+        }
+
         if(this.getTemplate()) {
-            content.grammar = this.getTemplate();
+            content.grammar = this._normalize(this.getTemplate());
         }
         content.models = {};
         content.scripts = {};
 
         let modelFiles = this.getModelManager().getModels();
-        modelFiles.forEach(function (file) {
-            content.models[file.namespace] = file.content;
+        modelFiles.forEach((file) => {
+            content.models[file.namespace] = this._normalize(file.content);
         });
 
         let scriptManager = this.getScriptManager();
         let scriptFiles = scriptManager.getScripts();
-        scriptFiles.forEach(function (file) {
-            content.scripts[file.getIdentifier()] = file.contents;
+        scriptFiles.forEach((file) => {
+            content.scripts[file.getIdentifier()] = this._normalize(file.contents);
         });
 
         const hasher = crypto.createHash('sha256');

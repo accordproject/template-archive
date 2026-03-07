@@ -57,7 +57,8 @@ class HTTPArchiveLoader {
         request.url = requestUrl;
         request.method = 'get';
         request.responseType = 'arraybuffer'; // Necessary for binary archives
-        request.timeout = 5000;
+        // Use the user's timeout, or default to 5000ms
+        request.timeout = options.timeout || 5000;
         if (options.httpAuthHeader) {
             request.headers = {
                 authorization: options.httpAuthHeader,
