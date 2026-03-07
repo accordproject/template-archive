@@ -115,10 +115,10 @@
     ],
     "all": true,
     "check-coverage": true,
-    "statements": 82,
-    "branches": 78,
-    "functions": 76,
-    "lines": 83
+    "statements": 91,
+    "branches": 81,
+    "functions": 89,
+    "lines": 91
   },
   "gitHead": "514fd02f46752e018aedb77e1716a212ef4a59e5"
 }
