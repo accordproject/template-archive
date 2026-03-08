@@ -21,14 +21,14 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/accordproject/cicero.git",
+    "url": "git+https://github.com/accordproject/template-archive.git",
     "directory": "packages/generator-cicero-template"
   },
   "license": "Apache-2.0",
   "bugs": {
-    "url": "https://github.com/accordproject/cicero/issues"
+    "url": "https://github.com/accordproject/template-archive/issues"
   },
-  "homepage": "https://github.com/accordproject/cicero#readme",
+  "homepage": "https://github.com/accordproject/template-archive#readme",
   "files": [
     "generators"
   ],

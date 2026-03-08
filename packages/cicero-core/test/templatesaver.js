@@ -14,10 +14,12 @@
 
 'use strict';
 
+const JSZip = require('jszip');
 const TemplateSaver = require('../src/templatesaver');
 const Template = require('../src/template');
 
 const chai = require('chai');
+const expect = chai.expect;
 chai.should();
 chai.use(require('chai-as-promised'));
 
@@ -35,6 +37,15 @@ describe('TemplateSaver', () => {
             };
             const buffer = await TemplateSaver.toArchive(template);
             buffer.should.not.be.null;
+
+            // Verify the signature.json exists in the archive
+            const zip = await JSZip.loadAsync(buffer);
+            const sigFile = zip.file('signature.json');
+            expect(sigFile).to.not.be.null;
+
+            const sigString = await sigFile.async('string');
+            const sig = JSON.parse(sigString);
+            sig.templateSignature.signature.should.equal('sig');
         });
 
         it('should save a template with multiple locales', async () => {
@@ -44,6 +55,14 @@ describe('TemplateSaver', () => {
             template.getMetadata().getSamples().fr = 'Bonjour';
             const buffer = await TemplateSaver.toArchive(template);
             buffer.should.not.be.null;
+
+            // Verify the French sample text exists in the archive
+            const zip = await JSZip.loadAsync(buffer);
+            const sampleFile = zip.file('text/sample_fr.md');
+            expect(sampleFile).to.not.be.null;
+
+            const content = await sampleFile.async('string');
+            content.should.equal('Bonjour');
         });
     });
 });

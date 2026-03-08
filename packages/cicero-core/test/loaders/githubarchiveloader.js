@@ -46,16 +46,19 @@ describe('GitHubArchiveLoader', () => {
                 return Promise.resolve({ data: Buffer.from('test') });
             };
             mock('axios', axiosMock);
-            mock.reRequire('../../src/loaders/httparchiveloader');
-            const MockedLoader = mock.reRequire(
-                '../../src/loaders/githubarchiveloader',
-            );
-            const mockedLoader = new MockedLoader();
-            const buffer = await mockedLoader.load(
-                'github://accordproject/githubarchiveloader',
-            );
-            buffer.toString().should.equal('test');
-            mock.stop('axios');
+            try {
+                mock.reRequire('../../src/loaders/httparchiveloader');
+                const MockedLoader = mock.reRequire(
+                    '../../src/loaders/githubarchiveloader',
+                );
+                const mockedLoader = new MockedLoader();
+                const buffer = await mockedLoader.load(
+                    'github://accordproject/githubarchiveloader',
+                );
+                buffer.toString().should.equal('test');
+            } finally {
+                mock.stop('axios');
+            }
         });
     });
 });
