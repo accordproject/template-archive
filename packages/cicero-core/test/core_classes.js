@@ -16,7 +16,7 @@
 
 const Argument = require('../src/argument');
 const ArgumentType = require('../src/argumenttype');
-const Function = require('../src/function');
+const CiceroFunction = require('../src/function');
 const Contract = require('../src/contract');
 
 const chai = require('chai');
@@ -41,7 +41,7 @@ describe('Core Classes', () => {
 
     describe('Function', () => {
         it('should create a Function', () => {
-            const func = new Function('name', []);
+            const func = new CiceroFunction('name', []);
             func.getName().should.equal('name');
             func.getArguments().should.deep.equal([]);
         });
