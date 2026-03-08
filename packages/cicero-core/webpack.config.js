@@ -25,7 +25,6 @@ module.exports = {
   entry: path.resolve(__dirname, "index.js"),
   output: {
     clean: true,
-    // globalObject: 'self',
     path: path.resolve(__dirname, "dist"),
     filename: "cicero-core.js",
     library: {
@@ -68,10 +67,6 @@ module.exports = {
     new webpack.ProvidePlugin({
       Buffer: ["buffer", "Buffer"],
     }),
-    new webpack.ProvidePlugin({
-      process: "process/browser", // provide a shim for the global `process` variable
-    }),
-    new NodePolyfillPlugin(),
   ],
   resolve: {
     fallback: {
