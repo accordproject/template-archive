@@ -25,7 +25,7 @@ module.exports = {
   entry: path.resolve(__dirname, "index.js"),
   output: {
     clean: true,
-    // globalObject: 'self',
+    globalObject: 'this',
     path: path.resolve(__dirname, "dist"),
     filename: "cicero-core.js",
     library: {

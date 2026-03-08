@@ -18,7 +18,7 @@ const { templatemarkutil } = require('@accordproject/markdown-template');
 
 const Metadata = require('./metadata');
 const crypto = require('crypto');
-// const forge = require('node-forge');
+const forge = require('node-forge');
 const stringify = require('json-stable-stringify');
 
 const TemplateLoader = require('./templateloader');
@@ -78,7 +78,7 @@ class Template {
         if (options.verifySignature) {
             this.verifyTemplateSignature();
         }
-        if(options && options.offline) {
+        if (options && options.offline) {
             this.getModelManager().validateModelFiles();
         }
         else {
@@ -153,7 +153,7 @@ class Template {
      * @private
      */
     _normalize(str) {
-        if(str && typeof str === 'string') {
+        if (str && typeof str === 'string') {
             return str.replace(/\r/g, '');
         }
         return str;
@@ -183,7 +183,7 @@ class Template {
             });
         }
 
-        if(this.getTemplate()) {
+        if (this.getTemplate()) {
             content.grammar = this._normalize(this.getTemplate());
         }
         content.models = {};
@@ -209,12 +209,12 @@ class Template {
      * verifies the signature stored in the template object using the template hash and timestamp
      */
     verifyTemplateSignature() {
-        /*
         const templateHash = this.getHash();
-        if (this.authorSignature === null) {throw new Error('The template is missing author signature!');}
-        const signature = this.authorSignature.templateSignature.signature;
-        const timestamp = this.authorSignature.templateSignature.timestamp;
-        const signatoryCert = this.authorSignature.templateSignature.signatoryCert;
+        if (this.authorSignature === null) { throw new Error('The template is missing author signature!'); }
+        const authorSignature = this.authorSignature.templateSignature ? this.authorSignature.templateSignature : this.authorSignature;
+        const signature = authorSignature.signature;
+        const timestamp = authorSignature.timestamp;
+        const signatoryCert = authorSignature.signatoryCert;
         //X509 cert converted from PEM to forge type
         const certificateForge = forge.pki.certificateFromPem(signatoryCert);
         //public key in forge type
@@ -231,7 +231,6 @@ class Template {
         if (!result) {
             throw new Error('Template\'s author signature is invalid!');
         }
-        */
     }
 
     /**
@@ -242,10 +241,9 @@ class Template {
      * @param {Number} timestamp - timestamp of the moment of signature is done
      */
     signTemplate(p12File, passphrase, timestamp) {
-        /*
-        if (typeof(p12File) !== 'string') {throw new Error('p12File should be of type String!');}
-        if (typeof(passphrase) !== 'string') {throw new Error('passphrase should be of type String!');}
-        if (typeof(timestamp) !== 'number') {throw new Error('timestamp should be of type Number!');}
+        if (typeof (p12File) !== 'string') { throw new Error('p12File should be of type String!'); }
+        if (typeof (passphrase) !== 'string') { throw new Error('passphrase should be of type String!'); }
+        if (typeof (timestamp) !== 'number') { throw new Error('timestamp should be of type Number!'); }
 
         const templateHash = this.getHash();
         // decode p12 from base64
@@ -274,7 +272,6 @@ class Template {
             signature
         };
         this.authorSignature = signatureObject;
-        */
     }
 
     /**
@@ -300,7 +297,7 @@ class Template {
      * @param {Object} [options] - an optional set of options to configure the instance.
      * @return {Promise<Template>} a Promise to the instantiated template
      */
-    static async fromDirectory(path, options=null) {
+    static async fromDirectory(path, options = null) {
         return TemplateLoader.fromDirectory(Template, path, options);
     }
 
@@ -310,7 +307,7 @@ class Template {
      * @param {Object} [options] - an optional set of options to configure the instance.
      * @return {Promise<Template>} a Promise to the template
      */
-    static async fromArchive(buffer, options=null) {
+    static async fromArchive(buffer, options = null) {
         return TemplateLoader.fromArchive(Template, buffer, options);
     }
 
@@ -320,7 +317,7 @@ class Template {
      * @param {Object} [options] - an optional set of options to configure the instance.
      * @return {Promise} a Promise to the template
      */
-    static async fromUrl(url, options=null) {
+    static async fromUrl(url, options = null) {
         return TemplateLoader.fromUrl(Template, url, options);
     }
 
