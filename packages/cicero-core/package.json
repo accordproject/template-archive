@@ -14,7 +14,8 @@
     "dist",
     "types"
   ],
-  "main": "dist/cicero-core.js",
+  "main": "index.js",
+  "browser": "dist/cicero-core.js",
   "typings": "types/index.d.ts",
   "scripts": {
     "webpack": "webpack --config webpack.config.js --mode production",

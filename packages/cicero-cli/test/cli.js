@@ -20,7 +20,7 @@ const tmp = require('tmp-promise');
 const fs = require('fs');
 
 const Template = require('@accordproject/cicero-core').Template;
-const {CodeGen} = require('@accordproject/concerto-codegen');
+const { CodeGen } = require('@accordproject/concerto-codegen');
 
 chai.should();
 chai.use(require('chai-things'));
@@ -33,14 +33,14 @@ const template = path.resolve(__dirname, 'data/latedeliveryandpenalty/');
 describe('#validateCompileArgs', () => {
     it('no args specified', () => {
         process.chdir(path.resolve(__dirname, 'data/latedeliveryandpenalty/'));
-        const args  = Commands.validateCompileArgs({
+        const args = Commands.validateCompileArgs({
             _: ['compile'],
         });
         args.template.should.match(/cicero-cli[/\\]test[/\\]data[/\\]latedeliveryandpenalty$/);
     });
     it('all args specified', () => {
         process.chdir(path.resolve(__dirname, 'data/latedeliveryandpenalty/'));
-        const args  = Commands.validateCompileArgs({
+        const args = Commands.validateCompileArgs({
             _: ['compile'],
             template: './',
             target: 'Go',
@@ -50,7 +50,7 @@ describe('#validateCompileArgs', () => {
     });
     it('all args specified, parent folder', () => {
         process.chdir(path.resolve(__dirname, 'data/'));
-        const args  = Commands.validateCompileArgs({
+        const args = Commands.validateCompileArgs({
             _: ['compile'],
             template: 'latedeliveryandpenalty',
         });
@@ -85,7 +85,7 @@ describe('#compile', () => {
         }
     });
 
-    for(let n=0; n<formats.length; n++) {
+    for (let n = 0; n < formats.length; n++) {
         it(`should compile to a ${formats[n]} model`, async () => {
             const output = path.resolve(compileDir.path, formats[n]);
             await Commands.compile(template, formats[n], output, true);
@@ -114,14 +114,14 @@ describe('#compile', () => {
 describe('#validateArchiveArgs', () => {
     it('no args specified', () => {
         process.chdir(path.resolve(__dirname, 'data/latedeliveryandpenalty/'));
-        const args  = Commands.validateArchiveArgs({
+        const args = Commands.validateArchiveArgs({
             _: ['archive']
         });
         args.template.should.match(/cicero-cli[/\\]test[/\\]data[/\\]latedeliveryandpenalty$/);
     });
     it('only target arg specified', () => {
         process.chdir(path.resolve(__dirname, 'data/latedeliveryandpenalty/'));
-        const args  = Commands.validateArchiveArgs({
+        const args = Commands.validateArchiveArgs({
             _: ['archive'],
             target: 'typescript'
         });
@@ -129,7 +129,7 @@ describe('#validateArchiveArgs', () => {
     });
     it('template arg specified', () => {
         process.chdir(path.resolve(__dirname));
-        const args  = Commands.validateArchiveArgs({
+        const args = Commands.validateArchiveArgs({
             _: ['archive', 'data/latedeliveryandpenalty/']
         });
         args.template.should.match(/cicero-cli[/\\]test[/\\]data[/\\]latedeliveryandpenalty$/);
@@ -209,7 +209,7 @@ describe('#archive', async () => {
 describe('#validateGetArgs', () => {
     it('no args specified', () => {
         process.chdir(path.resolve(__dirname, 'data/latedeliveryandpenalty/'));
-        const args  = Commands.validateGetArgs({
+        const args = Commands.validateGetArgs({
             _: ['get']
         });
         args.template.should.match(/cicero-cli[/\\]test[/\\]data[/\\]latedeliveryandpenalty$/);
@@ -217,7 +217,7 @@ describe('#validateGetArgs', () => {
     });
     it('only output arg specified', () => {
         process.chdir(path.resolve(__dirname, 'data/latedeliveryandpenalty/'));
-        const args  = Commands.validateGetArgs({
+        const args = Commands.validateGetArgs({
             _: ['get'],
             output: 'foo'
         });
@@ -226,7 +226,7 @@ describe('#validateGetArgs', () => {
     });
     it('template directory specified', () => {
         process.chdir(path.resolve(__dirname));
-        const args  = Commands.validateGetArgs({
+        const args = Commands.validateGetArgs({
             _: ['get', 'data/latedeliveryandpenalty/']
         });
         args.template.should.match(/cicero-cli[/\\]test[/\\]data[/\\]latedeliveryandpenalty$/);
@@ -239,7 +239,7 @@ describe('#validateGetArgs', () => {
         const archivePath = path.resolve(dir.path, 'latedeliveryandpenalty.cta');
         fs.writeFileSync(archivePath, buffer);
         process.chdir(path.resolve(__dirname));
-        const args  = Commands.validateGetArgs({
+        const args = Commands.validateGetArgs({
             _: ['get', archivePath]
         });
         args.template.should.eql(archivePath);
@@ -272,14 +272,14 @@ describe('#get', async () => {
 describe('#validateVerfiyArgs', () => {
     it('no args specified', () => {
         process.chdir(path.resolve(__dirname, 'data/signedArchive/'));
-        const args  = Commands.validateVerifyArgs({
+        const args = Commands.validateVerifyArgs({
             _: ['verify']
         });
         args.template.should.match(/cicero-cli[/\\]test[/\\]data[/\\]signedArchive$/);
     });
     it('template arg specified', () => {
         process.chdir(path.resolve(__dirname));
-        const args  = Commands.validateVerifyArgs({
+        const args = Commands.validateVerifyArgs({
             _: ['verify', 'data/signedArchive/']
         });
         args.template.should.match(/cicero-cli[/\\]test[/\\]data[/\\]signedArchive$/);
@@ -314,7 +314,7 @@ describe('#verify', async () => {
         process.chdir(path.resolve(__dirname, 'data/'));
         return Commands.verify(archivePath).should.be.fulfilled;
     });
-    it.skip('should throw error when signature is invalid', async () => {
+    it('should throw error when signature is invalid', async () => {
         const templatePath = path.resolve(__dirname, 'data/signedArchiveFail/');
         return Commands.verify(templatePath).should.be.rejectedWith('Template\'s author signature is invalid!');
     });
