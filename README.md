@@ -20,7 +20,7 @@ You can browse the library of Open Source Cicero contract and clause templates a
 
 Cicero is an Open Source implementation of the [Accord Project Template Specification][apspec]. It defines the structure of natural language templates, bound to a data model, that can be executed using request/response JSON messages.
 
-You can read the latest user documentation here: http://docs.accordproject.org.
+You can read the latest user documentation here: https://docs.accordproject.org.
 
 ## Clause Templates
 
