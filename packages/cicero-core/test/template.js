@@ -582,4 +582,123 @@ describe('Template', () => {
             return (() => template.accept(visitor, {})).should.not.throw();
         });
     });
+
+    describe('#instanceOf - circular inheritance guard', () => {
+
+        it('should return true for exact type match', () => {
+            const mockDecl = {
+                getFullyQualifiedName: () => 'org.test@1.0.0.Foo',
+                getSuperTypeDeclaration: () => null
+            };
+            Template.instanceOf(mockDecl, 'org.test@1.0.0.Foo').should.be.true;
+        });
+
+        it('should return true when supertype matches', () => {
+            const parentDecl = {
+                getFullyQualifiedName: () => 'org.test@1.0.0.Parent',
+                getSuperTypeDeclaration: () => null
+            };
+            const childDecl = {
+                getFullyQualifiedName: () => 'org.test@1.0.0.Child',
+                getSuperTypeDeclaration: () => parentDecl
+            };
+            Template.instanceOf(childDecl, 'org.test@1.0.0.Parent').should.be.true;
+        });
+
+        it('should return false when no match in hierarchy', () => {
+            const parentDecl = {
+                getFullyQualifiedName: () => 'org.test@1.0.0.Parent',
+                getSuperTypeDeclaration: () => null
+            };
+            const childDecl = {
+                getFullyQualifiedName: () => 'org.test@1.0.0.Child',
+                getSuperTypeDeclaration: () => parentDecl
+            };
+            Template.instanceOf(childDecl, 'org.test@1.0.0.Unrelated').should.be.false;
+        });
+
+        it('should detect 2-way circular inheritance and throw', () => {
+            // A extends B, B extends A
+            const declA = { getFullyQualifiedName: () => 'org.test@1.0.0.A' };
+            const declB = { getFullyQualifiedName: () => 'org.test@1.0.0.B' };
+            declA.getSuperTypeDeclaration = () => declB;
+            declB.getSuperTypeDeclaration = () => declA;
+            (() => Template.instanceOf(declA, 'org.test@1.0.0.Nonexistent'))
+                .should.throw(/Circular inheritance detected/);
+        });
+
+        it('should detect 3-way circular inheritance and throw', () => {
+            // A extends B, B extends C, C extends A
+            const declA = { getFullyQualifiedName: () => 'org.test@1.0.0.A' };
+            const declB = { getFullyQualifiedName: () => 'org.test@1.0.0.B' };
+            const declC = { getFullyQualifiedName: () => 'org.test@1.0.0.C' };
+            declA.getSuperTypeDeclaration = () => declB;
+            declB.getSuperTypeDeclaration = () => declC;
+            declC.getSuperTypeDeclaration = () => declA;
+            (() => Template.instanceOf(declA, 'org.test@1.0.0.Nonexistent'))
+                .should.throw(/Circular inheritance detected/);
+        });
+
+        it('should include type names in the error message', () => {
+            const declA = { getFullyQualifiedName: () => 'org.test@1.0.0.Alpha' };
+            const declB = { getFullyQualifiedName: () => 'org.test@1.0.0.Beta' };
+            declA.getSuperTypeDeclaration = () => declB;
+            declB.getSuperTypeDeclaration = () => declA;
+            (() => Template.instanceOf(declA, 'org.test@1.0.0.Nonexistent'))
+                .should.throw(/org\.test@1\.0\.0\.Alpha/);
+        });
+
+        it('should still find match before hitting cycle', () => {
+            // A extends B, B extends A — but we're looking for B
+            const declA = { getFullyQualifiedName: () => 'org.test@1.0.0.A' };
+            const declB = { getFullyQualifiedName: () => 'org.test@1.0.0.B' };
+            declA.getSuperTypeDeclaration = () => declB;
+            declB.getSuperTypeDeclaration = () => declA;
+            Template.instanceOf(declA, 'org.test@1.0.0.B').should.be.true;
+        });
+
+        it('should handle deep valid hierarchy without false positive', () => {
+            // D extends C extends B extends A extends null
+            const declA = {
+                getFullyQualifiedName: () => 'org.test@1.0.0.A',
+                getSuperTypeDeclaration: () => null
+            };
+            const declB = {
+                getFullyQualifiedName: () => 'org.test@1.0.0.B',
+                getSuperTypeDeclaration: () => declA
+            };
+            const declC = {
+                getFullyQualifiedName: () => 'org.test@1.0.0.C',
+                getSuperTypeDeclaration: () => declB
+            };
+            const declD = {
+                getFullyQualifiedName: () => 'org.test@1.0.0.D',
+                getSuperTypeDeclaration: () => declC
+            };
+            Template.instanceOf(declD, 'org.test@1.0.0.A').should.be.true;
+            Template.instanceOf(declD, 'org.test@1.0.0.B').should.be.true;
+            Template.instanceOf(declD, 'org.test@1.0.0.C').should.be.true;
+            Template.instanceOf(declD, 'org.test@1.0.0.Nonexistent').should.be.false;
+        });
+
+        it('should detect self-referential inheritance', () => {
+            const declA = { getFullyQualifiedName: () => 'org.test@1.0.0.A' };
+            declA.getSuperTypeDeclaration = () => declA;
+            (() => Template.instanceOf(declA, 'org.test@1.0.0.Nonexistent'))
+                .should.throw(/Circular inheritance detected/);
+        });
+    });
+
+    describe('#validateInheritanceGraph', () => {
+
+        it('should pass validation for a well-formed template', async () => {
+            const template = await Template.fromDirectory('./test/data/no-logic', options);
+            (() => template.validateInheritanceGraph()).should.not.throw();
+        });
+
+        it('should pass validation for a template with deep hierarchy', async () => {
+            const template = await Template.fromDirectory('./test/data/latedeliveryandpenalty', options);
+            (() => template.validateInheritanceGraph()).should.not.throw();
+        });
+    });
 });
