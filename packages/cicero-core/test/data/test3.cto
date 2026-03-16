@@ -1,4 +1,4 @@
-namespace org.accordproject.copyrightlicense
+namespace org.accordproject.copyrightlicense@1.0.0
 
 enum Bar {
   o GRR

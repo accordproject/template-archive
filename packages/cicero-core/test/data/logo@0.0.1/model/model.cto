@@ -1,4 +1,4 @@
-namespace logo.support.TemplateLogoClause
+namespace logo.support.TemplateLogoClause@1.0.0
 
 import org.accordproject.contract.* from https://models.accordproject.org/accordproject/contract.cto
 

@@ -1,4 +1,4 @@
-namespace org.accordproject.test
+namespace org.accordproject.test@1.0.0
 
 import org.accordproject.contract.Clause from https://models.accordproject.org/accordproject/contract.cto
 
