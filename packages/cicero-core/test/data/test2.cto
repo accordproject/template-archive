@@ -1,4 +1,4 @@
-namespace org.accordproject.copyrightlicenseNEW
+namespace org.accordproject.copyrightlicenseNEW@1.0.0
 
 transaction PaymentRequest {
   o String input

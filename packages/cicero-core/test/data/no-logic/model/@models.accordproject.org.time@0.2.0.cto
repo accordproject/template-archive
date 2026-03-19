@@ -12,7 +12,7 @@
  * limitations under the License.
  */
 
-namespace org.accordproject.time
+namespace org.accordproject.time@1.0.0
 
 /**
  * Months of the year

@@ -14,7 +14,7 @@
 
 concerto version ">= 1.0.0"
 
-namespace org.accordproject.runtime
+namespace org.accordproject.runtime@1.0.0
 
 import org.accordproject.contract.Contract from https://models.accordproject.org/accordproject/contract.cto
 
