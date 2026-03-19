@@ -21,9 +21,6 @@ const TypescriptScriptManager = require('./typescriptscriptmanager');
 // eslint-disable-next-line no-unused-vars
 const ScriptManager = require('./scriptmanager');
 
-// Fix: ensure npm_package_version reflects concerto's version in workspace environments
-process.env.npm_package_version = require('@accordproject/concerto-core/package.json').version;
-
 const LANGUAGES = require('./languages');
 
 /**
