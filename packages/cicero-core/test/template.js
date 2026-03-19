@@ -204,7 +204,7 @@ describe('Template', () => {
         it('should roundtrip a template with a logo', async () => {
             const template = await Template.fromDirectory('./test/data/template-logo', options);
             template.getIdentifier().should.equal('logo@0.0.1');
-            template.getHash().should.be.equal('04f5ed5fe80b06fdde7083d6f82563808aa45942c6929cf268cb531bf5283cb2');
+            template.getHash().should.be.equal('b9cf5912e8a0269c59738338f514b7b11c38acfa6ce81628a2d3a64565f35eac');
             template.getMetadata().getLogo().should.be.an.instanceof(Buffer);
             template.getMetadata().getSample().should.equal('"Aman" "Sharma" added the support for logo and hence created this template for testing!\n');
             const buffer = await template.toArchive('es6');
@@ -228,7 +228,7 @@ describe('Template', () => {
             template.getDescription().should.equal('Late Delivery and Penalty. In case of delayed delivery except for Force Majeure cases, the Seller shall pay to the Buyer for every 9 DAY of delay penalty amounting to 7.0% of the total value of the Equipment whose delivery has been delayed. Any fractional part of a DAY is to be considered a full DAY. The total amount of penalty shall not however, exceed 2.0% of the total value of the Equipment involved in late delivery. If the delay is more than 2 WEEK, the Buyer is entitled to terminate this Contract.');
             template.getVersion().should.equal('0.0.1');
             template.getMetadata().getSample().should.equal('Late Delivery and Penalty.\n\nIn case of delayed delivery except for Force Majeure cases, the Seller shall pay to the Buyer for every 9 days of delay penalty amounting to 7.0% of the total value of the Equipment whose delivery has been delayed. Any fractional part of a days is to be considered a full days. The total amount of penalty shall not however, exceed 2.0% of the total value of the Equipment involved in late delivery. If the delay is more than 2 weeks, the Buyer is entitled to terminate this Contract.\n');
-            template.getHash().should.equal('31a3046ae91ffbd827e2a7f44e4714e445757904056995e5f18b01a333053b3e');
+            template.getHash().should.equal('84243b43eb55d5edf93b0a2fd6f1d8fa9deca71d1ca2847a5c40a046b2ede5eb');
             const buffer = await template.toArchive('es6');
             buffer.should.not.be.null;
             const template2 = await Template.fromArchive(buffer);
@@ -238,7 +238,7 @@ describe('Template', () => {
             template2.getMetadata().getKeywords().should.eql(template.getMetadata().getKeywords());
             template2.getMetadata().getSamples().should.eql(template.getMetadata().getSamples());
             // Hash doesn't match because setting a target language changes the hash
-            template2.getHash().should.equal('2244409521e2cb5ec24dd9b3766915f6a65b969c395e87f9d803d8d2b850297e');
+            template2.getHash().should.equal('7093874ab9926b28742c06227902dd47f5ba1584a4ee6ca7c2d99869baa2fb91');
             template.getDisplayName().should.equal('Latedeliveryandpenalty');
             const buffer2 = await template2.toArchive('es6');
             buffer2.should.not.be.null;
@@ -255,7 +255,7 @@ describe('Template', () => {
             template.getDescription().should.equal('Late Delivery and Penalty. In case of delayed delivery except for Force Majeure cases, the Seller shall pay to the Buyer for every 9 DAY of delay penalty amounting to 7% of the total value of the Equipment whose delivery has been delayed. Any fractional part of a DAY is to be considered a full DAY. The total amount of penalty shall not however, exceed 2% of the total value of the Equipment involved in late delivery. If the delay is more than 2 WEEK, the Buyer is entitled to terminate this Contract.');
             template.getVersion().should.equal('0.0.1');
             template.getMetadata().getSample().should.equal('Late Delivery and Penalty. In case of delayed delivery except for Force Majeure cases, the Seller shall pay to the Buyer for every 9 days of delay penalty amounting to 7% of the total value of the Equipment whose delivery has been delayed. Any fractional part of a days is to be considered a full days. The total amount of penalty shall not however, exceed 2% of the total value of the Equipment involved in late delivery. If the delay is more than 2 weeks, the Buyer is entitled to terminate this Contract.');
-            template.getHash().should.equal('89a6ab8d1d89d708c10220baa82198d2ad47fb18c7be6c71661bc114508346ef');
+            template.getHash().should.equal('4b20c1f0b0945eaf06744834164babc6587e5ebd503b2f00e528e09ebde6281b');
             const buffer = await template.toArchive('es6');
             buffer.should.not.be.null;
             const template2 = await Template.fromArchive(buffer);
@@ -516,7 +516,7 @@ describe('Template', () => {
     describe('#getHash', () => {
         it('should return a SHA-256 hash', async () => {
             const template = await Template.fromDirectory('./test/data/latedeliveryandpenalty', options);
-            template.getHash().should.equal('2fc0e38c8eaebf42e092929c762d94410ee553f9bc2c30f025ff2f3ec7b6b790');
+            template.getHash().should.equal('c92327c8f85e1346d9f052d7c1b7d8a8242f987d76066b144b1b7a86ee0e440d');
         });
     });
 

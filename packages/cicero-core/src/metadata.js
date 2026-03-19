@@ -156,6 +156,9 @@ class Metadata {
         this.samples = samples;
         this.request = request;
 
+        // the default locale for this template (optional, for vocabulary fallback)
+        this.defaultLocale = packageJson.accordproject.defaultLocale || null;
+
         this.type = templateTypes.CONTRACT;
         if (packageJson.accordproject && packageJson.accordproject.template) {
             if(packageJson.accordproject.template !== 'contract' &&
@@ -227,6 +230,16 @@ class Metadata {
      */
     getRuntime(){
         return this.runtime;
+    }
+
+    /**
+     * Returns the default locale for this template, or null if not specified.
+     * The default locale is used as a fallback when requesting vocabulary
+     * terms for a locale that is not available.
+     * @returns {string} the IETF language tag for the default locale, or null
+     */
+    getDefaultLocale() {
+        return this.defaultLocale;
     }
 
     /**
@@ -418,6 +431,7 @@ class Metadata {
             'samples' : this.getSamples(),
             'request' : this.getRequest(),
             'logo' : this.getLogo() ? this.getLogo().toString('base64') : null,
+            'defaultLocale' : this.getDefaultLocale(),
         };
     }
 }

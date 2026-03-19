@@ -269,6 +269,42 @@ describe('#get', async () => {
     });
 });
 
+describe('#validateVocabularyArgs', () => {
+    it('no args specified', () => {
+        process.chdir(path.resolve(__dirname, 'data/latedeliveryandpenalty-vocab/'));
+        const args  = Commands.validateVocabularyArgs({
+            _: ['vocabulary']
+        });
+        args.template.should.match(/cicero-cli[/\\]test[/\\]data[/\\]latedeliveryandpenalty-vocab$/);
+    });
+    it('template arg specified', () => {
+        process.chdir(path.resolve(__dirname));
+        const args  = Commands.validateVocabularyArgs({
+            _: ['vocabulary', 'data/latedeliveryandpenalty-vocab/']
+        });
+        args.template.should.match(/cicero-cli[/\\]test[/\\]data[/\\]latedeliveryandpenalty-vocab$/);
+    });
+});
+
+describe('#vocabulary', async () => {
+    it('should list vocabulary files for a template', async () => {
+        const templatePath = path.resolve(__dirname, 'data/latedeliveryandpenalty-vocab/');
+        const result = await Commands.vocabulary(templatePath, null, {});
+        result.files.length.should.equal(2);
+        result.defaultLocale.should.equal('en');
+    });
+    it('should query vocabulary terms for a specific locale', async () => {
+        const templatePath = path.resolve(__dirname, 'data/latedeliveryandpenalty-vocab/');
+        const result = await Commands.vocabulary(templatePath, 'en', {});
+        result.should.not.be.null;
+    });
+    it('should report no vocabularies for a template without vocab files', async () => {
+        const templatePath = path.resolve(__dirname, 'data/latedeliveryandpenalty/');
+        const result = await Commands.vocabulary(templatePath, null, {});
+        result.should.deep.equal({});
+    });
+});
+
 describe('#validateVerfiyArgs', () => {
     it('no args specified', () => {
         process.chdir(path.resolve(__dirname, 'data/signedArchive/'));
