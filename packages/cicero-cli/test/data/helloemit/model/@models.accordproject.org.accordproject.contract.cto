@@ -12,7 +12,7 @@
  * limitations under the License.
  */
 
-concerto version ">= 1.0.0"
+concerto version ">=1.0.0"
 
 namespace org.accordproject.contract
 
