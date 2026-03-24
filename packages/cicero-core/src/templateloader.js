@@ -90,15 +90,15 @@ class TemplateLoader {
         // add model files
         Logger.debug(method, 'Adding model files to model manager');
         const mm = template.getModelManager();
-        ctoModelFiles.forEach( (mf,index) => {
+        ctoModelFiles.forEach((mf, index) => {
             mm.addCTOModel(mf, ctoModelFileNames[index], true);
         });
 
-        if(options && options.offline) {
+        if (options && options.offline) {
             mm.validateModelFiles();
         }
         else {
-            mm.updateExternalModels();
+            await mm.updateExternalModels();
         }
 
         Logger.debug(method, 'Setting grammar');
@@ -193,7 +193,7 @@ class TemplateLoader {
         const mm = template.getModelManager();
         mm.addModelFiles(modelFiles, modelFileNames, true);
 
-        if(options && options.offline) {
+        if (options && options.offline) {
             mm.validateModelFiles();
         }
         else {
@@ -202,7 +202,7 @@ class TemplateLoader {
 
         if (!options || !options.offline) {
             mm.getModelFiles().forEach(mf => {
-                if(mf.isExternal()) {
+                if (mf.isExternal()) {
                     fs.writeFileSync(path + '/model/' + mf.getName(), mf.getDefinitions());
                 }
             });
@@ -223,7 +223,7 @@ class TemplateLoader {
         tsFiles.forEach((file) => {
             const resolvedPath = slash(fsPath.resolve(path));
             const resolvedFilePath = slash(fsPath.resolve(file.name));
-            const truncatedPath = resolvedFilePath.replace(resolvedPath+'/', '');
+            const truncatedPath = resolvedFilePath.replace(resolvedPath + '/', '');
             template.getLogicManager().addLogicFile(file.contents, truncatedPath);
             Logger.debug(method, `Loaded ${truncatedPath}`, file.contents);
         });

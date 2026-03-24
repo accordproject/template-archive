@@ -368,6 +368,36 @@ describe('Template', () => {
             const template2 = await Template.fromArchive(buffer);
             template2.getMetadata().getLogo().should.be.an.instanceof(Buffer);
         });
+
+        it('should await updateExternalModels before returning from fromArchive', async () => {
+            const { ModelManager } = require('@accordproject/concerto-core');
+
+            // Build a buffer offline so no network call during setup
+            const source = await Template.fromDirectory('./test/data/latedeliveryandpenalty', { offline: true });
+            const buffer = await source.toArchive('es6');
+
+            // Patch updateExternalModels with an async spy that sets a flag when resolved
+            let externalModelsResolved = false;
+            const original = ModelManager.prototype.updateExternalModels;
+            ModelManager.prototype.updateExternalModels = async function () {
+                // Simulate a small async delay (e.g. network call)
+                await new Promise(resolve => setTimeout(resolve, 50));
+                externalModelsResolved = true;
+            };
+
+            try {
+                // Call fromArchive without offline flag — should hit updateExternalModels path
+                await Template.fromArchive(buffer);
+            } finally {
+                ModelManager.prototype.updateExternalModels = original;
+            }
+
+            // If fromArchive correctly awaits updateExternalModels, the flag must be true here
+            assert.isTrue(
+                externalModelsResolved,
+                'fromArchive() must await updateExternalModels() before returning'
+            );
+        });
     });
 
     describe('#fromCompiledArchive', () => {
