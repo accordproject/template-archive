@@ -1,6 +1,6 @@
 namespace logo.support.TemplateLogoClause@1.0.0
 
-import org.accordproject.contract.* from https://models.accordproject.org/accordproject/contract.cto
+import org.accordproject.contract.Clause from https://models.accordproject.org/accordproject/contract.cto
 
 /**
  * The template model
