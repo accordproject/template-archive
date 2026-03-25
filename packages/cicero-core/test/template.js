@@ -444,10 +444,40 @@ describe('Template', () => {
     });
 
     describe('#setReadme', () => {
+        it('should preserve the logo after calling setReadme', async () => {
+            const template = await Template.fromDirectory('./test/data/template-logo', options);
+            template.getMetadata().getLogo().should.be.an.instanceof(Buffer);
+            template.setReadme('new readme text');
+            template.getMetadata().getLogo().should.be.an.instanceof(Buffer);
+        });
 
         it('should not throw for valid readme text', async () => {
             const template = await Template.fromDirectory('./test/data/latedeliveryandpenalty', options);
             return (() => template.setReadme('readme text')).should.not.throw();
+        });
+    });
+
+    describe('Metadata regression tests', () => {
+        it('should preserve the logo after calling setSamples', async () => {
+            const template = await Template.fromDirectory('./test/data/template-logo', options);
+            template.getMetadata().getLogo().should.be.an.instanceof(Buffer);
+            template.setSamples({ default: 'new sample' });
+            template.getMetadata().getLogo().should.be.an.instanceof(Buffer);
+        });
+
+        it('should preserve the logo after calling setRequest', async () => {
+            const template = await Template.fromDirectory('./test/data/template-logo', options);
+            const newRequest = { $class: 'logo@0.0.1.Request' };
+            template.setRequest(newRequest);
+            template.getMetadata().getLogo().should.be.an.instanceof(Buffer);
+        });
+
+        it('should preserve the logo after calling setPackageJson', async () => {
+            const template = await Template.fromDirectory('./test/data/template-logo', options);
+            const pkg = template.getMetadata().getPackageJson();
+            pkg.name = 'new_name';
+            template.setPackageJson(pkg);
+            template.getMetadata().getLogo().should.be.an.instanceof(Buffer);
         });
     });
 
