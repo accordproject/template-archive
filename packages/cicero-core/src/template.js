@@ -84,7 +84,53 @@ class Template {
         else {
             this.getModelManager().updateExternalModels();
         }
+        this.validateInheritanceGraph();
         this.getTemplateModel();
+    }
+
+    /**
+     * Validates that the type inheritance graph has no cycles.
+     * Detects circular inheritance chains that would cause stack overflow
+     * during type traversal operations like instanceOf or getRequestTypes.
+     * @throws {Error} if a circular inheritance chain is detected
+     * @private
+     */
+    validateInheritanceGraph() {
+        const modelManager = this.getModelManager();
+        const modelFiles = modelManager.getModelFiles();
+        for (const modelFile of modelFiles) {
+            const declarations = modelFile.getAllDeclarations();
+            for (const decl of declarations) {
+                if (typeof decl.getSuperTypeDeclaration !== 'function') {
+                    continue;
+                }
+                const visited = new Set();
+                visited.add(decl.getFullyQualifiedName());
+                let current = null;
+                try {
+                    current = decl.getSuperTypeDeclaration();
+                } catch (e) {
+                    // getSuperTypeDeclaration may throw if the supertype
+                    // cannot be resolved; skip — other validation catches this
+                    continue;
+                }
+                while (current) {
+                    const fqn = current.getFullyQualifiedName();
+                    if (visited.has(fqn)) {
+                        throw new Error(
+                            `Circular inheritance detected: ${decl.getFullyQualifiedName()} ` +
+                            `has a cycle involving ${fqn}`
+                        );
+                    }
+                    visited.add(fqn);
+                    try {
+                        current = current.getSuperTypeDeclaration();
+                    } catch (e) {
+                        break;
+                    }
+                }
+            }
+        }
     }
 
     /**
@@ -507,12 +553,20 @@ class Template {
         if (classDeclaration.getFullyQualifiedName() === fqt) {
             return true;
         }
-        // Now walk the class hierachy looking to see if it's an instance of the specified type.
+        // Now walk the class hierarchy looking to see if it's an instance of the specified type.
+        // Track visited types to guard against circular inheritance chains.
+        const visited = new Set();
+        visited.add(classDeclaration.getFullyQualifiedName());
         let superTypeDeclaration = classDeclaration.getSuperTypeDeclaration();
         while (superTypeDeclaration) {
-            if (superTypeDeclaration.getFullyQualifiedName() === fqt) {
+            const superFqn = superTypeDeclaration.getFullyQualifiedName();
+            if (superFqn === fqt) {
                 return true;
             }
+            if (visited.has(superFqn)) {
+                throw new Error(`Circular inheritance detected: ${classDeclaration.getFullyQualifiedName()} has a cycle involving ${superFqn}`);
+            }
+            visited.add(superFqn);
             superTypeDeclaration = superTypeDeclaration.getSuperTypeDeclaration();
         }
         return false;
