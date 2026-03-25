@@ -20,6 +20,7 @@ const Metadata = require('./metadata');
 const crypto = require('crypto');
 // const forge = require('node-forge');
 const stringify = require('json-stable-stringify');
+const { VocabularyManager } = require('@accordproject/concerto-vocabulary');
 
 const TemplateLoader = require('./templateloader');
 const TemplateSaver = require('./templatesaver');
@@ -51,6 +52,8 @@ class Template {
         this.logicManager = new LogicManager(this.metadata.getRuntime() ?? 'typescript', null, options);
         this.authorSignature = authorSignature ? authorSignature : null;
         this.template = null;
+        this.vocabularyManager = new VocabularyManager();
+        this.vocFiles = []; // raw .voc file contents for round-trip fidelity
     }
 
     /**
@@ -198,6 +201,11 @@ class Template {
         let scriptFiles = scriptManager.getScripts();
         scriptFiles.forEach((file) => {
             content.scripts[file.getIdentifier()] = this._normalize(file.contents);
+        });
+
+        content.vocabularies = {};
+        this.vocFiles.forEach((file) => {
+            content.vocabularies[file.name] = this._normalize(file.contents);
         });
 
         const hasher = crypto.createHash('sha256');
@@ -388,6 +396,48 @@ class Template {
      */
     getModelManager() {
         return this.logicManager.getModelManager();
+    }
+
+    /**
+     * Provides access to the VocabularyManager for this template.
+     * The VocabularyManager manages locale-specific vocabularies
+     * for the model types defined in this template.
+     * @return {VocabularyManager} the VocabularyManager for this template
+     */
+    getVocabularyManager() {
+        return this.vocabularyManager;
+    }
+
+    /**
+     * Returns the raw vocabulary file contents for this template.
+     * These are the original .voc YAML strings used for round-trip
+     * serialization to archives.
+     * @return {object[]} array of {name, contents} objects for each .voc file
+     */
+    getVocFiles() {
+        return this.vocFiles;
+    }
+
+    /**
+     * Gets the vocabulary for a given namespace and locale. If the requested
+     * locale is not available, falls back to the template's defaultLocale.
+     * @param {string} namespace - the namespace for the vocabulary
+     * @param {string} [locale] - the BCP-47 locale identifier. If not specified,
+     * the template's defaultLocale is used.
+     * @param {object} [options] - options for vocabulary lookup
+     * @param {string} [options.localeMatcher] - pass 'lookup' to find a general vocabulary
+     * @return {Vocabulary|null} the vocabulary or null if not found
+     */
+    getVocabulary(namespace, locale, options) {
+        const effectiveLocale = locale || this.getMetadata().getDefaultLocale();
+        if (!effectiveLocale) {
+            return null;
+        }
+        const voc = this.vocabularyManager.getVocabulary(namespace, effectiveLocale, options);
+        if (!voc && locale && this.getMetadata().getDefaultLocale() && locale !== this.getMetadata().getDefaultLocale()) {
+            return this.vocabularyManager.getVocabulary(namespace, this.getMetadata().getDefaultLocale(), options);
+        }
+        return voc;
     }
 
     /**

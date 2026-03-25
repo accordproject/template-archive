@@ -223,6 +223,75 @@ class Commands {
     }
 
     /**
+     * Set default params before we list vocabularies
+     *
+     * @param {object} argv the inbound argument values object
+     * @returns {object} a modfied argument object
+     */
+    static validateVocabularyArgs(argv) {
+        return Commands.validateCommonArgs(argv);
+    }
+
+    /**
+     * List or query vocabulary terms for a template
+     *
+     * @param {string} templatePath - path to the template directory or archive
+     * @param {string} locale - the BCP-47 locale to query
+     * @param {Object} [options] - an optional set of options
+     * @returns {object} Promise to the vocabulary information
+     */
+    static vocabulary(templatePath, locale, options) {
+        return Commands.loadTemplate(templatePath, options)
+            .then((template) => {
+                const vocManager = template.getVocabularyManager();
+                const vocFiles = template.getVocFiles();
+                const defaultLocale = template.getMetadata().getDefaultLocale();
+
+                if (vocFiles.length === 0) {
+                    Logger.info('No vocabulary files found in this template.');
+                    return {};
+                }
+
+                Logger.info(`Found ${vocFiles.length} vocabulary file(s). Default locale: ${defaultLocale || 'not set'}`);
+
+                if (locale) {
+                    // Query terms for a specific locale
+                    const modelFiles = template.getModelManager().getModelFiles().filter(mf => !mf.isSystemModelFile?.());
+                    const results = {};
+
+                    modelFiles.forEach(mf => {
+                        const ns = mf.getNamespace();
+                        const voc = template.getVocabulary(ns, locale);
+                        if (voc) {
+                            Logger.info(`\nVocabulary for ${ns} (locale: ${voc.getLocale()}):`);
+                            const terms = voc.getTerms();
+                            terms.forEach(decl => {
+                                const declName = Object.keys(decl)[0];
+                                Logger.info(`  ${declName}: ${decl[declName]}`);
+                                if (decl.properties) {
+                                    decl.properties.forEach(prop => {
+                                        const propName = Object.keys(prop)[0];
+                                        Logger.info(`    ${propName}: ${prop[propName]}`);
+                                    });
+                                }
+                            });
+                            results[ns] = terms;
+                        } else {
+                            Logger.info(`\nNo vocabulary found for ${ns} in locale: ${locale}`);
+                        }
+                    });
+                    return results;
+                } else {
+                    // List available vocabularies
+                    vocFiles.forEach(file => {
+                        Logger.info(`  - ${file.name}`);
+                    });
+                    return { files: vocFiles.map(f => f.name), defaultLocale };
+                }
+            });
+    }
+
+    /**
      * Fetches all external for a set of models dependencies and
      * saves all the models to a target directory
      *

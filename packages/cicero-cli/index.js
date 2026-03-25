@@ -160,6 +160,40 @@ require('yargs')
             return;
         }
     })
+    .command('vocabulary', 'list or query vocabulary terms for a template', (yargs) => {
+        yargs.option('template', {
+            describe: 'path to the template',
+            type: 'string'
+        });
+        yargs.option('locale', {
+            describe: 'the BCP-47 locale to query (e.g. en, fr, en-ca)',
+            type: 'string',
+            default: null
+        });
+        yargs.option('warnings', {
+            describe: 'print warnings',
+            type: 'boolean',
+            default: false
+        });
+    }, (argv) => {
+        if (argv.verbose) {
+            Logger.info(`list vocabularies for ${argv.template}`);
+        }
+
+        try {
+            argv = Commands.validateVocabularyArgs(argv);
+            const options = {
+                warnings: argv.warnings,
+            };
+            return Commands.vocabulary(argv.template, argv.locale, options)
+                .catch((err) => {
+                    Logger.error(err.message);
+                });
+        } catch (err){
+            Logger.error(err.message);
+            return;
+        }
+    })
     .command('get', 'save local copies of external dependencies', (yargs) => {
         yargs.option('template', {
             describe: 'path to the template',

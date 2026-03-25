@@ -1,0 +1,21 @@
+locale: fr
+namespace: io.clause.latedeliveryandpenalty@0.1.0
+declarations:
+  - TemplateModel: Modèle de gabarit
+    properties:
+      - forceMajeure: Force majeure
+      - penaltyDuration: Durée de la pénalité
+      - penaltyPercentage: Pourcentage de pénalité
+      - capPercentage: Pourcentage plafond
+      - termination: Résiliation
+      - fractionalPart: Partie fractionnaire
+  - LateDeliveryAndPenaltyRequest: Demande de retard de livraison et pénalité
+    properties:
+      - forceMajeure: Force majeure
+      - agreedDelivery: Livraison convenue
+      - deliveredAt: Livré le
+      - goodsValue: Valeur des marchandises
+  - LateDeliveryAndPenaltyResponse: Réponse de retard de livraison et pénalité
+    properties:
+      - penalty: Pénalité
+      - buyerMayTerminate: Acheteur peut résilier
