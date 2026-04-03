@@ -106,7 +106,7 @@ class TemplateSaver {
         const scriptFiles = template.getScriptManager().getScriptsForTarget(language);
         scriptFiles.forEach(function (file) {
             let fileIdentifier = file.getIdentifier();
-            let fileName = fileIdentifier.split('/').pop() || fileIdentifier;
+            let fileName = fileIdentifier.split(/[\\/]/).pop() || fileIdentifier;
             zip.file('logic/' + fileName, file.contents, options);
         });
 
