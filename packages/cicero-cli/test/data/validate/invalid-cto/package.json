@@ -1,0 +1,9 @@
+{
+    "name": "invalid-cto",
+    "version": "0.0.1",
+    "description": "Fixture: .cto references an unknown type so model validation fails",
+    "accordproject": {
+        "template": "clause",
+        "cicero": "^0.25.0"
+    }
+}

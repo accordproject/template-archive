@@ -1,0 +1,9 @@
+{
+    "name": "missing-model",
+    "version": "0.0.1",
+    "description": "Fixture: valid package.json + grammar but no model/ directory",
+    "accordproject": {
+        "template": "clause",
+        "cicero": "^0.25.0"
+    }
+}
