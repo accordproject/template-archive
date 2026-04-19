@@ -1,0 +1,6 @@
+namespace org.accordproject.validate.orphanlogic@1.0.0
+
+@template
+concept TemplateModel {
+  o String name
+}
