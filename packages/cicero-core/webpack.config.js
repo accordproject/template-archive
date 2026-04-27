@@ -21,26 +21,19 @@ const NodePolyfillPlugin = require("node-polyfill-webpack-plugin");
 const packageJson = require("./package.json");
 
 module.exports = {
-  target: 'node',
+  target: 'web',
   entry: path.resolve(__dirname, "index.js"),
   output: {
     clean: true,
-    // globalObject: 'self',
+    globalObject: 'this',
     path: path.resolve(__dirname, "dist"),
     filename: "cicero-core.js",
     library: {
-      type: "commonjs",
+      type: "umd",
     },
   },
-  // externals: {
-  //   'node-forge': false,
-  // },
   // Enable sourcemaps for debugging webpack's output.
   devtool: "source-map",
-  resolve: {
-    // Add '.ts' and '.tsx' as resolvable extensions.
-    extensions: ["", ".webpack.js", ".web.js", ".ts", ".tsx", ".js"],
-  },
   module: {
     rules: [
       // All files with a '.ts' or '.tsx' extension will be handled by 'ts-loader'.
@@ -74,6 +67,8 @@ module.exports = {
     new NodePolyfillPlugin(),
   ],
   resolve: {
+    // Add '.ts' and '.tsx' as resolvable extensions.
+    extensions: [".webpack.js", ".web.js", ".ts", ".tsx", ".js"],
     fallback: {
       // Webpack 5 no longer polyfills Node.js core modules automatically.
       // see https://webpack.js.org/configuration/resolve/#resolvefallback
