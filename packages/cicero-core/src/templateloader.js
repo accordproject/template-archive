@@ -114,6 +114,15 @@ class TemplateLoader {
         scriptFiles.forEach(function (obj) {
             template.getLogicManager().addLogicFile(obj.contents, obj.name);
         });
+
+        // load and add vocabulary files
+        Logger.debug(method, 'Looking for vocabulary files');
+        const vocFiles = await TemplateLoader.loadZipFilesContents(zip, /vocab[/\\].*\.voc$/);
+        vocFiles.forEach(function (obj) {
+            template.vocFiles.push({ name: obj.name, contents: obj.contents });
+            template.getVocabularyManager().addVocabulary(obj.contents);
+        });
+
         // check the integrity of the model and logic of the template
         authorSignature ? template.validate({ verifySignature: options && options.disableSignatureVerification ? false : true }) : template.validate();
 
@@ -226,6 +235,18 @@ class TemplateLoader {
             const truncatedPath = resolvedFilePath.replace(resolvedPath + '/', '');
             template.getLogicManager().addLogicFile(file.contents, truncatedPath);
             Logger.debug(method, `Loaded ${truncatedPath}`, file.contents);
+        });
+
+        // load and add vocabulary files
+        Logger.debug(method, 'Looking for vocabulary files');
+        const vocFiles = await TemplateLoader.loadFilesContents(path, /vocab[/\\].*\.voc$/);
+        vocFiles.forEach((file) => {
+            const resolvedPath = slash(fsPath.resolve(path));
+            const resolvedFilePath = slash(fsPath.resolve(file.name));
+            const truncatedPath = resolvedFilePath.replace(resolvedPath+'/', '');
+            template.vocFiles.push({ name: truncatedPath, contents: file.contents });
+            template.getVocabularyManager().addVocabulary(file.contents);
+            Logger.debug(method, `Loaded vocabulary ${truncatedPath}`);
         });
 
         // check the template
