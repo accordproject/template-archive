@@ -13,8 +13,7 @@ To build Template Archive, you clone the source code repository and use npm to b
 
 ```shell
 # Clone your Github repository:
-git clone https://github.com/<GITHUB_USERNAME>/template-archive.git
-
+git clone https://github.com/PadmaTeja9527/template-archive.git
 # Go to the Template Archive directory:
 cd template-archive
 
