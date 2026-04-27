@@ -112,11 +112,11 @@ class TemplateSaver {
         });
 
         return zip.generateAsync({
-            type: 'nodebuffer'
-        }).then(something => {
-            return Promise.resolve(something).then(result => {
-                return result;
-            });
+            type: 'nodebuffer',
+            compression: 'DEFLATE',
+            compressionOptions: {
+                level: 6
+            }
         });
     }
 }
