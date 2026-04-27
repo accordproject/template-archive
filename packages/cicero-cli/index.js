@@ -160,6 +160,57 @@ require('yargs')
             return;
         }
     })
+    .command('validate', 'validate a template without producing output artifacts', (yargs) => {
+        yargs.option('template', {
+            describe: 'path to the template directory',
+            type: 'string'
+        });
+        yargs.option('warnings', {
+            describe: 'surface non-fatal warnings (e.g. orphaned logic/ directory)',
+            type: 'boolean',
+            default: false
+        });
+    }, async (argv) => {
+        if (argv.verbose) {
+            Logger.info(`validate template at ${argv.template}`);
+        }
+
+        try {
+            argv = Commands.validateValidateArgs(argv);
+            const { results, warnings, valid } = await Commands.validate(argv.template, {
+                warnings: argv.warnings,
+            });
+
+            for (const r of results) {
+                const line = r.ok
+                    ? `\u2713 ${r.layer} ${r.message}`
+                    : `\u2717 ${r.layer} \u2014 ${r.message}`;
+                if (r.ok) {
+                    console.log(line);
+                } else {
+                    console.error(line);
+                }
+            }
+            if (warnings.length > 0) {
+                console.log('');
+                for (const w of warnings) {
+                    console.log(`\u26A0 ${w}`);
+                }
+            }
+            console.log('');
+            if (valid) {
+                console.log('Template is valid.');
+            } else {
+                const errCount = results.filter((r) => !r.ok).length;
+                console.error(`Validation failed. ${errCount} error${errCount === 1 ? '' : 's'} found.`);
+                process.exitCode = 1;
+            }
+        } catch (err) {
+            Logger.error(err.message);
+            process.exitCode = 1;
+        }
+    })
+
     .command('get', 'save local copies of external dependencies', (yargs) => {
         yargs.option('template', {
             describe: 'path to the template',

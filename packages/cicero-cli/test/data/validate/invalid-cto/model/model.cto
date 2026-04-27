@@ -1,0 +1,6 @@
+namespace org.accordproject.validate.invalidcto@1.0.0
+
+@template
+concept TemplateModel {
+  o DoesNotExist name
+}
