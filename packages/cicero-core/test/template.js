@@ -154,10 +154,6 @@ describe('Template', () => {
         });
 
         it('should create a template from a directory with no @ClauseDataLogic in logic', () => {
-            Template.fromDirectory('./test/data/no-logic', options)
-                .catch(err => {
-                    console.log(err);
-                });
             return Template.fromDirectory('./test/data/no-logic', options).should.be.fulfilled;
         });
 
