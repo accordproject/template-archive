@@ -79,8 +79,8 @@
     "node-forge": "^1.4.0"
   },
   "dependencies": {
-    "@accordproject/concerto-core": "^4.0.2",
-    "@accordproject/concerto-util": "^4.0.2",
+    "@accordproject/concerto-core": "^4.0.3",
+    "@accordproject/concerto-util": "^4.0.3",
     "@accordproject/markdown-cicero": "0.18.0",
     "@accordproject/markdown-common": "0.18.0",
     "@accordproject/markdown-template": "0.18.0",
