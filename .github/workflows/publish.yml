@@ -7,6 +7,8 @@ on:
 
 permissions:
   id-token: write  # Required for OIDC / npmjs publish
+  contents: write
+  pull-requests: write
 
 jobs:
   publish:
@@ -44,7 +46,7 @@ jobs:
           npm publish --workspaces --access public --provenance ${{ steps.tag.outputs.tag }} 2>&1
 
       - name: Create PR to increment version
-        uses: peter-evans/create-pull-request@v7
+        uses: peter-evans/create-pull-request@v8
         with:
           base: main
           commit-message: 'chore(actions): publish ${{ github.event.release.tag_name }} to npm'
