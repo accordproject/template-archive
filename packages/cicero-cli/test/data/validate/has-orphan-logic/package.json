@@ -1,0 +1,9 @@
+{
+    "name": "has-orphan-logic",
+    "version": "0.0.1",
+    "description": "Fixture: valid template that still carries an orphan logic/ directory",
+    "accordproject": {
+        "template": "clause",
+        "cicero": "^0.25.0"
+    }
+}

@@ -1,0 +1,6 @@
+namespace org.accordproject.validate.noaccord@1.0.0
+
+@template
+concept TemplateModel {
+  o String name
+}

@@ -319,3 +319,125 @@ describe('#verify', async () => {
         return Commands.verify(templatePath).should.be.rejectedWith('Template\'s author signature is invalid!');
     });
 });
+
+describe('#validateValidateArgs', () => {
+    it('no args specified — defaults to cwd', () => {
+        process.chdir(path.resolve(__dirname, 'data/latedeliveryandpenalty/'));
+        const args = Commands.validateValidateArgs({
+            _: ['validate'],
+        });
+        args.template.should.match(/cicero-cli[/\\]test[/\\]data[/\\]latedeliveryandpenalty$/);
+    });
+    it('template arg specified', () => {
+        process.chdir(path.resolve(__dirname));
+        const args = Commands.validateValidateArgs({
+            _: ['validate', 'data/latedeliveryandpenalty/'],
+        });
+        args.template.should.match(/cicero-cli[/\\]test[/\\]data[/\\]latedeliveryandpenalty$/);
+    });
+    it('does not throw on missing package.json — reporting that is the whole point', () => {
+        process.chdir(path.resolve(__dirname, 'data/'));
+        // Unlike validateCommonArgs, this must NOT throw. If it did, the validate
+        // command would crash on exactly the condition it is supposed to report.
+        (() => Commands.validateValidateArgs({
+            _: ['validate'],
+        })).should.not.throw();
+    });
+});
+
+describe('#validate', () => {
+    const validateFixtures = path.resolve(__dirname, 'data/validate');
+
+    it('passes on a known-good template', async () => {
+        const result = await Commands.validate(
+            path.resolve(__dirname, 'data/latedeliveryandpenalty')
+        );
+        result.valid.should.equal(true);
+        result.results.should.be.an('array').that.is.not.empty;
+        result.results.every((r) => r.ok).should.equal(true);
+    });
+
+    it('fails when the path does not exist', async () => {
+        const result = await Commands.validate('/does/not/exist/anywhere');
+        result.valid.should.equal(false);
+        result.results.should.have.lengthOf(1);
+        result.results[0].layer.should.equal('path');
+        result.results[0].ok.should.equal(false);
+    });
+
+    it('fails and short-circuits when package.json is missing', async () => {
+        const result = await Commands.validate(path.resolve(validateFixtures, 'missing-package-json'));
+        result.valid.should.equal(false);
+        const last = result.results[result.results.length - 1];
+        last.layer.should.equal('package.json');
+        last.ok.should.equal(false);
+        last.message.should.match(/not found/);
+    });
+
+    it('fails when package.json is not valid JSON', async () => {
+        const result = await Commands.validate(path.resolve(validateFixtures, 'invalid-json-package'));
+        result.valid.should.equal(false);
+        const last = result.results[result.results.length - 1];
+        last.layer.should.equal('package.json');
+        last.message.should.match(/not valid JSON/);
+    });
+
+    it('fails when package.json has no accordproject section', async () => {
+        const result = await Commands.validate(path.resolve(validateFixtures, 'no-accord-section'));
+        result.valid.should.equal(false);
+        const last = result.results[result.results.length - 1];
+        last.layer.should.equal('package.json');
+        last.message.should.match(/accordproject/);
+    });
+
+    it('fails when text/grammar.tem.md is missing', async () => {
+        const result = await Commands.validate(path.resolve(validateFixtures, 'missing-grammar'));
+        result.valid.should.equal(false);
+        // package.json should have passed first
+        result.results[0].layer.should.equal('package.json');
+        result.results[0].ok.should.equal(true);
+        const last = result.results[result.results.length - 1];
+        last.layer.should.equal('text/grammar.tem.md');
+        last.ok.should.equal(false);
+    });
+
+    it('fails when model/ has no .cto files', async () => {
+        const result = await Commands.validate(path.resolve(validateFixtures, 'missing-model'));
+        result.valid.should.equal(false);
+        const last = result.results[result.results.length - 1];
+        last.layer.should.equal('model/');
+        last.ok.should.equal(false);
+    });
+
+    it('fails on a .cto that references an unknown type', async () => {
+        const result = await Commands.validate(path.resolve(validateFixtures, 'invalid-cto'));
+        result.valid.should.equal(false);
+        // The structural checks (package.json, grammar, model/) should all pass
+        // — the failure is in the Template coherence layer.
+        const failing = result.results.filter((r) => !r.ok);
+        failing.should.have.lengthOf(1);
+        failing[0].ok.should.equal(false);
+        // The error message should mention the unknown type
+        failing[0].message.should.match(/DoesNotExist/);
+    });
+
+    it('emits no warnings when --warnings is false', async () => {
+        const result = await Commands.validate(
+            path.resolve(__dirname, 'data/latedeliveryandpenalty'),
+            { warnings: false }
+        );
+        result.warnings.should.be.an('array').that.is.empty;
+    });
+
+    it('surfaces orphan logic/ directory as a warning when --warnings is true', async () => {
+        const result = await Commands.validate(
+            path.resolve(validateFixtures, 'has-orphan-logic'),
+            { warnings: true }
+        );
+        // The template itself is valid — the logic dir is just flagged.
+        result.valid.should.equal(true);
+        result.warnings.should.be.an('array').with.lengthOf(1);
+        result.warnings[0].should.match(/logic\//);
+        result.warnings[0].should.match(/Ergo/);
+    });
+});

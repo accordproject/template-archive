@@ -1,0 +1,9 @@
+{
+    "name": "missing-grammar",
+    "version": "0.0.1",
+    "description": "Fixture: valid package.json but no text/grammar.tem.md",
+    "accordproject": {
+        "template": "clause",
+        "cicero": "^0.25.0"
+    }
+}
