@@ -203,10 +203,12 @@ class Template {
             content.scripts[file.getIdentifier()] = this._normalize(file.contents);
         });
 
-        content.vocabularies = {};
-        this.vocFiles.forEach((file) => {
-            content.vocabularies[file.name] = this._normalize(file.contents);
-        });
+        if (this.vocFiles.length > 0) {
+            content.vocabularies = {};
+            this.vocFiles.forEach((file) => {
+                content.vocabularies[file.name] = this._normalize(file.contents);
+            });
+        }
 
         const hasher = crypto.createHash('sha256');
         hasher.update(stringify(content));

@@ -157,7 +157,11 @@ class Metadata {
         this.request = request;
 
         // the default locale for this template (optional, for vocabulary fallback)
-        this.defaultLocale = packageJson.accordproject.defaultLocale || null;
+        const defaultLocale = packageJson.accordproject && packageJson.accordproject.defaultLocale;
+        if (defaultLocale !== undefined && defaultLocale !== null && typeof defaultLocale !== 'string') {
+            throw new Error('defaultLocale property in package.json must be a string when present.');
+        }
+        this.defaultLocale = defaultLocale || null;
 
         this.type = templateTypes.CONTRACT;
         if (packageJson.accordproject && packageJson.accordproject.template) {
@@ -431,7 +435,6 @@ class Metadata {
             'samples' : this.getSamples(),
             'request' : this.getRequest(),
             'logo' : this.getLogo() ? this.getLogo().toString('base64') : null,
-            'defaultLocale' : this.getDefaultLocale(),
         };
     }
 }

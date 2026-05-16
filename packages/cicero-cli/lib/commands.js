@@ -226,7 +226,7 @@ class Commands {
      * Set default params before we list vocabularies
      *
      * @param {object} argv the inbound argument values object
-     * @returns {object} a modfied argument object
+     * @returns {object} a modified argument object
      */
     static validateVocabularyArgs(argv) {
         return Commands.validateCommonArgs(argv);

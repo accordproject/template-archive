@@ -117,7 +117,7 @@ class TemplateLoader {
 
         // load and add vocabulary files
         Logger.debug(method, 'Looking for vocabulary files');
-        const vocFiles = await TemplateLoader.loadZipFilesContents(zip, /vocab[/\\].*\.voc$/);
+        const vocFiles = await TemplateLoader.loadZipFilesContents(zip, /(^|[/\\])vocab[/\\][^/\\]+\.voc$/);
         vocFiles.forEach(function (obj) {
             template.vocFiles.push({ name: obj.name, contents: obj.contents });
             template.getVocabularyManager().addVocabulary(obj.contents);
@@ -239,7 +239,7 @@ class TemplateLoader {
 
         // load and add vocabulary files
         Logger.debug(method, 'Looking for vocabulary files');
-        const vocFiles = await TemplateLoader.loadFilesContents(path, /vocab[/\\].*\.voc$/);
+        const vocFiles = await TemplateLoader.loadFilesContents(path, /(^|[/\\])vocab[/\\][^/\\]+\.voc$/);
         vocFiles.forEach((file) => {
             const resolvedPath = slash(fsPath.resolve(path));
             const resolvedFilePath = slash(fsPath.resolve(file.name));
