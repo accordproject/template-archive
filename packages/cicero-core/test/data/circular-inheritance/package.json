@@ -1,0 +1,9 @@
+{
+    "name": "circular-inheritance",
+    "version": "0.0.1",
+    "description": "Test template with circular inheritance between types",
+    "accordproject": {
+        "template": "clause",
+        "cicero": "^0.25.0"
+    }
+}
