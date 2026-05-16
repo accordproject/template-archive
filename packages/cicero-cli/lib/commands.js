@@ -243,7 +243,6 @@ class Commands {
     static vocabulary(templatePath, locale, options) {
         return Commands.loadTemplate(templatePath, options)
             .then((template) => {
-                const vocManager = template.getVocabularyManager();
                 const vocFiles = template.getVocFiles();
                 const defaultLocale = template.getMetadata().getDefaultLocale();
 
