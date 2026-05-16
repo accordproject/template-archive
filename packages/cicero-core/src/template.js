@@ -81,7 +81,7 @@ class Template {
         if (options.verifySignature) {
             this.verifyTemplateSignature();
         }
-        if(options && options.offline) {
+        if (options && options.offline) {
             this.getModelManager().validateModelFiles();
         }
         else {
@@ -156,7 +156,7 @@ class Template {
      * @private
      */
     _normalize(str) {
-        if(str && typeof str === 'string') {
+        if (str && typeof str === 'string') {
             return str.replace(/\r/g, '');
         }
         return str;
@@ -186,7 +186,7 @@ class Template {
             });
         }
 
-        if(this.getTemplate()) {
+        if (this.getTemplate()) {
             content.grammar = this._normalize(this.getTemplate());
         }
         content.models = {};
@@ -310,7 +310,7 @@ class Template {
      * @param {Object} [options] - an optional set of options to configure the instance.
      * @return {Promise<Template>} a Promise to the instantiated template
      */
-    static async fromDirectory(path, options=null) {
+    static async fromDirectory(path, options = null) {
         return TemplateLoader.fromDirectory(Template, path, options);
     }
 
@@ -320,7 +320,7 @@ class Template {
      * @param {Object} [options] - an optional set of options to configure the instance.
      * @return {Promise<Template>} a Promise to the template
      */
-    static async fromArchive(buffer, options=null) {
+    static async fromArchive(buffer, options = null) {
         return TemplateLoader.fromArchive(Template, buffer, options);
     }
 
@@ -330,7 +330,7 @@ class Template {
      * @param {Object} [options] - an optional set of options to configure the instance.
      * @return {Promise} a Promise to the template
      */
-    static async fromUrl(url, options=null) {
+    static async fromUrl(url, options = null) {
         return TemplateLoader.fromUrl(Template, url, options);
     }
 
@@ -478,7 +478,7 @@ class Template {
      * @private
      */
     setReadme(readme) {
-        this.metadata = new Metadata(this.metadata.getPackageJson(), readme, this.metadata.getSamples(), this.metadata.getRequest());
+        this.metadata = new Metadata(this.metadata.getPackageJson(), readme, this.metadata.getSamples(), this.metadata.getRequest(), this.metadata.getLogo());
     }
 
     /**
