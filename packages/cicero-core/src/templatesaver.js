@@ -111,6 +111,18 @@ class TemplateSaver {
             zip.file('logic/' + fileName, file.contents, options);
         });
 
+        // save vocabulary files if present
+        const vocFiles = template.getVocFiles();
+        if (vocFiles && vocFiles.length > 0) {
+            zip.file('vocab/', null, Object.assign({}, options, {
+                dir: true
+            }));
+            vocFiles.forEach(function (file) {
+                let fileName = fsPath.basename(file.name);
+                zip.file('vocab/' + fileName, file.contents, options);
+            });
+        }
+
         return zip.generateAsync({
             type: 'nodebuffer'
         }).then(something => {

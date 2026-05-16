@@ -1,0 +1,21 @@
+locale: en
+namespace: io.clause.latedeliveryandpenalty@0.1.0
+declarations:
+  - TemplateModel: Template Model
+    properties:
+      - forceMajeure: Force Majeure
+      - penaltyDuration: Penalty Duration
+      - penaltyPercentage: Penalty Percentage
+      - capPercentage: Cap Percentage
+      - termination: Termination
+      - fractionalPart: Fractional Part
+  - LateDeliveryAndPenaltyRequest: Late Delivery And Penalty Request
+    properties:
+      - forceMajeure: Force Majeure
+      - agreedDelivery: Agreed Delivery
+      - deliveredAt: Delivered At
+      - goodsValue: Goods Value
+  - LateDeliveryAndPenaltyResponse: Late Delivery And Penalty Response
+    properties:
+      - penalty: Penalty
+      - buyerMayTerminate: Buyer May Terminate

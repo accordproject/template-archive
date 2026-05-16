@@ -81,6 +81,7 @@
   "dependencies": {
     "@accordproject/concerto-core": "^4.0.3",
     "@accordproject/concerto-util": "^4.0.3",
+    "@accordproject/concerto-vocabulary": "^4.1.0",
     "@accordproject/markdown-cicero": "0.18.0",
     "@accordproject/markdown-common": "0.18.0",
     "@accordproject/markdown-template": "0.18.0",
