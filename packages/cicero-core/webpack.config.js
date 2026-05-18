@@ -16,30 +16,43 @@
 
 let path = require("path");
 const webpack = require("webpack");
-const NodePolyfillPlugin = require("node-polyfill-webpack-plugin");
+const nodeExternals = require("webpack-node-externals");
 
 const packageJson = require("./package.json");
 
 module.exports = {
   target: 'node',
+  // Exclude all node_modules from the bundle (looked up from both local and workspace root).
+  externals: [
+    nodeExternals(),
+    nodeExternals({ modulesDir: path.resolve(__dirname, '../../node_modules') }),
+  ],
   entry: path.resolve(__dirname, "index.js"),
   output: {
     clean: true,
-    // globalObject: 'self',
     path: path.resolve(__dirname, "dist"),
     filename: "cicero-core.js",
     library: {
       type: "commonjs",
     },
   },
-  // externals: {
-  //   'node-forge': false,
-  // },
   // Enable sourcemaps for debugging webpack's output.
   devtool: "source-map",
   resolve: {
     // Add '.ts' and '.tsx' as resolvable extensions.
     extensions: ["", ".webpack.js", ".web.js", ".ts", ".tsx", ".js"],
+    // Prefer CJS ('main') over ESM ('module') for node target to avoid default-export interop issues.
+    mainFields: ["main", "module"],
+    fallback: {
+      // Webpack 5 no longer polyfills Node.js core modules automatically.
+      // see https://webpack.js.org/configuration/resolve/#resolvefallback
+      fs: false,
+      tls: false,
+      net: false,
+      child_process: false,
+      os: false,
+      path: false,
+    },
   },
   module: {
     rules: [
@@ -65,31 +78,5 @@ module.exports = {
         NODE_ENV: JSON.stringify("production"),
       },
     }),
-    new webpack.ProvidePlugin({
-      Buffer: ["buffer", "Buffer"],
-    }),
-    new webpack.ProvidePlugin({
-      process: "process/browser", // provide a shim for the global `process` variable
-    }),
-    new NodePolyfillPlugin(),
   ],
-  resolve: {
-    fallback: {
-      // Webpack 5 no longer polyfills Node.js core modules automatically.
-      // see https://webpack.js.org/configuration/resolve/#resolvefallback
-      // for the list of Node.js core module polyfills.
-      fs: false,
-      tls: false,
-      net: false,
-      child_process: false,
-      os: false,
-      path: false,
-      // 'crypto': require.resolve('crypto-browserify'),
-      // 'stream': require.resolve('stream-browserify'),
-      // 'http': require.resolve('stream-http'),
-      // 'https': require.resolve('https-browserify'),
-      // 'zlib': require.resolve('browserify-zlib'),
-      // 'vm2': require.resolve('vm-browserify'),
-    },
-  },
 };

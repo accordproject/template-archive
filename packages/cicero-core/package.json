@@ -28,6 +28,7 @@
     "test:windows": "npm run test:mocha",
     "test": "npm run test:mocha",
     "test:cov": "nyc npm run test",
+    "test:bundle": "npm run webpack && mocha --timeout 40000 test/bundle.js",
     "jsdoc": "jsdoc -c jsdoc.json package.json",
     "build:types": "tsc index.js --declaration --allowJs --emitDeclarationOnly --outDir types"
   },
@@ -76,7 +77,7 @@
     "typescript": "5.6.3",
     "webpack": "5.104.1",
     "webpack-cli": "^5.1.4",
-    "node-forge": "^1.4.0"
+    "webpack-node-externals": "^3.0.0"
   },
   "dependencies": {
     "@accordproject/concerto-core": "^4.0.3",
@@ -92,6 +93,7 @@
     "json-stable-stringify": "1.0.2",
     "jszip": "3.10.1",
     "node-cache": "5.1.2",
+    "node-forge": "^1.4.0",
     "semver": "7.5.3",
     "slash": "3.0.0",
     "xregexp": "5.1.1"
@@ -116,7 +118,7 @@
     "all": true,
     "check-coverage": true,
     "statements": 91,
-    "branches": 81,
+    "branches": 82,
     "functions": 89,
     "lines": 91
   },
