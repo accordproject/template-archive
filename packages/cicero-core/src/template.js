@@ -255,10 +255,12 @@ class Template {
         const signature = forge.util.bytesToHex(privateKeyForge.sign(md));
 
         this.authorSignature = {
-            templateHash,
-            timestamp,
-            signatoryCert: certificatePem,
-            signature,
+            templateSignature: {
+                templateHash,
+                timestamp,
+                signatoryCert: certificatePem,
+                signature,
+            },
         };
     }
 

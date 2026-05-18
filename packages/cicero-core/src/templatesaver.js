@@ -39,11 +39,7 @@ class TemplateSaver {
 
         //save the signature if present
         if(template.authorSignature){
-            const templateSignatures = {
-                templateSignature: template.authorSignature
-            };
-            const templateSignString =  JSON.stringify(templateSignatures);
-            zip.file('signature.json', templateSignString, options);
+            zip.file('signature.json', JSON.stringify(template.authorSignature), options);
         }
 
         let packageFileContents = JSON.stringify(metadata.getPackageJson());
