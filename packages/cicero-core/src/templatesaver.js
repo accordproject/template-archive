@@ -15,7 +15,6 @@
 'use strict';
 
 const JSZip = require('jszip');
-const fsPath = require('path');
 
 /**
  * A utility to persist templates to data sources.
@@ -40,11 +39,7 @@ class TemplateSaver {
 
         //save the signature if present
         if(template.authorSignature){
-            const templateSignatures = {
-                templateSignature: template.authorSignature
-            };
-            const templateSignString =  JSON.stringify(templateSignatures);
-            zip.file('signature.json', templateSignString, options);
+            zip.file('signature.json', JSON.stringify(template.authorSignature), options);
         }
 
         let packageFileContents = JSON.stringify(metadata.getPackageJson());
@@ -107,7 +102,7 @@ class TemplateSaver {
         const scriptFiles = template.getScriptManager().getScriptsForTarget(language);
         scriptFiles.forEach(function (file) {
             let fileIdentifier = file.getIdentifier();
-            let fileName = fsPath.basename(fileIdentifier);
+            let fileName = fileIdentifier.split(/[\\/]/).pop() || fileIdentifier;
             zip.file('logic/' + fileName, file.contents, options);
         });
 
