@@ -14,6 +14,8 @@
 
 'use strict';
 
+/* eslint-env browser */
+
 const { test, expect } = require('@playwright/test');
 const fs   = require('fs');
 const path = require('path');
@@ -35,6 +37,10 @@ test.beforeAll(async () => {
     signedArchiveB64 = buf.toString('base64');
 });
 
+/**
+ * Navigates to about:blank and injects the browser bundle as a script tag.
+ * @param {object} page - the Playwright page
+ */
 async function injectBundle(page) {
     await page.goto('about:blank');
     await page.addScriptTag({ path: BUNDLE });
@@ -94,5 +100,5 @@ test('tampered signature detected in browser', async ({ page }) => {
         try { t.verifyTemplateSignature(); return null; }
         catch (e) { return e.message; }
     }, signedArchiveB64);
-    expect(err).toBe("Template's author signature is invalid!");
+    expect(err).toBe('Template\'s author signature is invalid!');
 });
