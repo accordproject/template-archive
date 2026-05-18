@@ -30,10 +30,12 @@ describe('TemplateSaver', () => {
                 './test/data/latedeliveryandpenalty',
             );
             template.authorSignature = {
-                templateHash: 'hash',
-                timestamp: Date.now(),
-                signatoryCert: 'cert',
-                signature: 'sig',
+                templateSignature: {
+                    templateHash: 'hash',
+                    timestamp: Date.now(),
+                    signatoryCert: 'cert',
+                    signature: 'sig',
+                },
             };
             const buffer = await TemplateSaver.toArchive(template);
             buffer.should.not.be.null;

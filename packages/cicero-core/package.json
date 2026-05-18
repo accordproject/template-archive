@@ -22,7 +22,7 @@
     "webpack:browser": "webpack --config webpack.browser.config.js --mode production",
     "test:browser": "npm run webpack:browser && npm run test:browser:pw",
     "test:browser:pw": "playwright test",
-    "prepublishOnly": "npm run build:types && npm run webpack",
+    "prepublishOnly": "npm run build:types && npm run webpack && npm run webpack:browser",
     "pretest": "npm run lint",
     "lint": "eslint .",
     "postlint": "npm run licchk",
