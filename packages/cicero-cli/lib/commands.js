@@ -21,6 +21,7 @@ const mkdirp = require('mkdirp');
 const Logger = require('@accordproject/concerto-util').Logger;
 const FileWriter = require('@accordproject/concerto-util').FileWriter;
 const Template = require('@accordproject/cicero-core').Template;
+const { TemplateArchiveProcessor } = require('@accordproject/template-engine');
 const { CodeGen } = require('@accordproject/concerto-codegen');
 
 /**
@@ -132,6 +133,46 @@ class Commands {
                 Logger.info('Creating archive: ' + file);
                 fs.writeFileSync(file, archive);
                 return true;
+            });
+    }
+
+    /**
+     * Set default params before we draft text from a template
+     *
+     * @param {object} argv the inbound argument values object
+     * @returns {object} a modified argument object
+     */
+    static validateDraftArgs(argv) {
+        argv = Commands.validateCommonArgs(argv);
+        if (!argv.data) {
+            argv.data = path.resolve(argv.template, 'data.json');
+        }
+        return argv;
+    }
+
+    /**
+     * Draft sample text by merging a template with contract data
+     *
+     * @param {string} templatePath - path to the template directory or archive
+     * @param {string} dataPath - path to the JSON data for the template
+     * @param {string} outputPath - the output file, prints to the console when null
+     * @param {string} format - the output format
+     * @param {string} currentTime - the definition of 'now'
+     * @param {Object} [options] - an optional set of options
+     * @returns {Promise<string>} Promise to the drafted text
+     */
+    static draft(templatePath, dataPath, outputPath, format, currentTime, options) {
+        const data = JSON.parse(fs.readFileSync(dataPath, 'utf8'));
+        return Commands.loadTemplate(templatePath, options)
+            .then(async (template) => {
+                const processor = new TemplateArchiveProcessor(template);
+                const drafted = await processor.draft(data, format, options, currentTime);
+                const text = typeof drafted === 'string' ? drafted : JSON.stringify(drafted);
+                if (outputPath) {
+                    Logger.info('Creating file: ' + outputPath);
+                    fs.writeFileSync(outputPath, text);
+                }
+                return text;
             });
     }
 

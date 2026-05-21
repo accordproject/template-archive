@@ -206,6 +206,85 @@ describe('#archive', async () => {
     });
 });
 
+describe('#validateDraftArgs', () => {
+    it('no args specified', () => {
+        process.chdir(path.resolve(__dirname, 'data/latedeliveryandpenalty/'));
+        const args  = Commands.validateDraftArgs({
+            _: ['draft'],
+        });
+        args.template.should.match(/cicero-cli[/\\]test[/\\]data[/\\]latedeliveryandpenalty$/);
+        args.data.should.match(/data.json$/);
+    });
+    it('data arg specified', () => {
+        process.chdir(path.resolve(__dirname, 'data/latedeliveryandpenalty/'));
+        const args  = Commands.validateDraftArgs({
+            _: ['draft'],
+            data: 'data.json',
+        });
+        args.template.should.match(/cicero-cli[/\\]test[/\\]data[/\\]latedeliveryandpenalty$/);
+        args.data.should.match(/data.json$/);
+    });
+    it('template arg specified', () => {
+        process.chdir(path.resolve(__dirname));
+        const args  = Commands.validateDraftArgs({
+            _: ['draft', 'data/latedeliveryandpenalty/'],
+        });
+        args.template.should.match(/cicero-cli[/\\]test[/\\]data[/\\]latedeliveryandpenalty$/);
+    });
+    it('verbose flag specified', () => {
+        process.chdir(path.resolve(__dirname, 'data/latedeliveryandpenalty/'));
+        Commands.validateDraftArgs({
+            _: ['draft'],
+            verbose: true
+        });
+    });
+    it('bad package.json', () => {
+        process.chdir(path.resolve(__dirname, 'data/'));
+        (() => Commands.validateDraftArgs({
+            _: ['draft'],
+        })).should.throw(' not a valid cicero template. Make sure that package.json exists and that it has a cicero entry.');
+    });
+});
+
+describe('#draft', () => {
+    const draftData = path.resolve(__dirname, 'data/latedeliveryandpenalty/data.json');
+    const draftDataErr = path.resolve(__dirname, 'data/latedeliveryandpenalty/data_err.json');
+
+    it('should draft markdown text from a template and data', async () => {
+        const result = await Commands.draft(template, draftData, null, 'markdown', null, {});
+        result.should.match(/Late Delivery and Penalty/);
+    });
+    it('should draft html text from a template and data', async () => {
+        const result = await Commands.draft(template, draftData, null, 'html', null, {});
+        result.should.match(/<html>/);
+    });
+    it('should stringify a non-string output format', async () => {
+        const result = await Commands.draft(template, draftData, null, 'ciceromark_parsed', null, {});
+        result.should.be.a('string');
+        JSON.parse(result).should.have.property('$class');
+    });
+    it('should draft from a template archive', async () => {
+        const dir = await tmp.dir({ unsafeCleanup: true });
+        const archiveTemplate = await Template.fromDirectory(template);
+        const buffer = await archiveTemplate.toArchive('es6');
+        const archivePath = path.resolve(dir.path, 'latedeliveryandpenalty.cta');
+        fs.writeFileSync(archivePath, buffer);
+        const result = await Commands.draft(archivePath, draftData, null, 'markdown', null, {});
+        result.should.match(/Late Delivery and Penalty/);
+        dir.cleanup();
+    });
+    it('should write drafted text to an output file', async () => {
+        const dir = await tmp.dir({ unsafeCleanup: true });
+        const outputPath = path.resolve(dir.path, 'output.md');
+        await Commands.draft(template, draftData, outputPath, 'markdown', null, {});
+        fs.readFileSync(outputPath, 'utf8').should.match(/Late Delivery and Penalty/);
+        dir.cleanup();
+    });
+    it('should reject when the data does not match the template model', async () => {
+        return Commands.draft(template, draftDataErr, null, 'markdown', null, {}).should.be.rejected;
+    });
+});
+
 describe('#validateGetArgs', () => {
     it('no args specified', () => {
         process.chdir(path.resolve(__dirname, 'data/latedeliveryandpenalty/'));
