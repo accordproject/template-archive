@@ -118,6 +118,59 @@ require('yargs')
             return;
         }
     })
+    .command('draft', 'create sample text by merging a template with data', (yargs) => {
+        yargs.option('template', {
+            describe: 'path to the template',
+            type: 'string'
+        });
+        yargs.option('data', {
+            describe: 'path to the JSON data for the template',
+            type: 'string'
+        });
+        yargs.option('output', {
+            describe: 'path to the output file',
+            type: 'string',
+            default: null
+        });
+        yargs.option('format', {
+            describe: 'the output format (e.g. markdown, html)',
+            type: 'string',
+            default: 'markdown'
+        });
+        yargs.option('currentTime', {
+            describe: 'set the current time',
+            type: 'string',
+            default: null
+        });
+        yargs.option('warnings', {
+            describe: 'print warnings',
+            type: 'boolean',
+            default: false
+        });
+    }, (argv) => {
+        if (argv.verbose) {
+            Logger.info(`draft sample text from data ${argv.data} using template ${argv.template}`);
+        }
+
+        try {
+            argv = Commands.validateDraftArgs(argv);
+            const options = {
+                warnings: argv.warnings,
+            };
+            return Commands.draft(argv.template, argv.data, argv.output, argv.format, argv.currentTime, options)
+                .then((result) => {
+                    if (result) {
+                        Logger.info(result);
+                    }
+                })
+                .catch((err) => {
+                    Logger.error(err.message);
+                });
+        } catch (err){
+            Logger.error(err.message);
+            return;
+        }
+    })
     .command('compile', 'generate code for a target platform', (yargs) => {
         yargs.option('template', {
             describe: 'path to the template',
