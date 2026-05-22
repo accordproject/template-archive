@@ -45,6 +45,7 @@
     "@accordproject/concerto-codegen": "^4.0.1",
     "@accordproject/concerto-util": "^4.0.3",
     "@accordproject/template-engine": "^3.0.1",
+    "copy-webpack-plugin": "14.0.0",
     "mkdirp": "3.0.1",
     "yargs": "17.7.2"
   },
@@ -55,8 +56,8 @@
     "eslint": "^8.43.0",
     "jsdoc": "^4.0.2",
     "license-check-and-add": "4.0.5",
-    "mocha": "^10.2.0",
-    "nyc": "15.1.0",
+    "mocha": "^8.1.3",
+    "nyc": "^18.0.0",
     "tmp-promise": "3.0.3"
   },
   "nyc": {
