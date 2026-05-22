@@ -413,7 +413,7 @@ describe('Metadata', () => {
             const md = new Metadata({
                 name: 'template',
                 version: '1.0.0',
-                accordproject: {template: 'contract',cicero:'^0.25.0-alpha.1'}
+                accordproject: {template: 'contract',cicero:'^0.27.0-alpha.1'}
             }, null, {});
             md.ciceroVersion = '^0.12.0';
             md.satisfiesCiceroVersion('0.12.0-20190114233635').should.be.equal(true);
