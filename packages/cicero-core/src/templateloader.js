@@ -14,25 +14,17 @@
 
 'use strict';
 
-const fs = require('fs');
-const fsPath = require('path');
 const slash = require('slash');
 const JSZip = require('jszip');
-const xregexp = require('xregexp');
-const languageTagRegex = require('ietf-language-tag-regex');
-const promisify = require('util').promisify;
 const Logger = require('@accordproject/concerto-util').Logger;
-
-const DefaultArchiveLoader = require('./loaders/defaultarchiveloader');
-
-const readdir = fs.readdir ? promisify(fs.readdir) : undefined;
-const stat = fs.stat ? promisify(fs.stat) : undefined;
 
 const ENCODING = 'utf8';
 
 // Matches 'sample.md' or 'sample_TAG.md' where TAG is an IETF language tag (BCP 47)
-const IETF_REGEXP = languageTagRegex({ exact: false }).toString().slice(1, -2);
-const SAMPLE_FILE_REGEXP = xregexp('text[/\\\\]sample(_(' + IETF_REGEXP + '))?.md$');
+// const IETF_REGEXP = languageTagRegex({ exact: false }).toString().slice(1, -2);
+const SAMPLE_FILE_REGEXP = /text\/sample.md/;
+
+// //xregexp('text[/\\\\]sample(_(' + IETF_REGEXP + '))?.md$');
 
 /**
  * A utility class to create templates from data sources.
@@ -126,6 +118,7 @@ class TemplateLoader {
      * @return {Promise} a Promise to the template
      */
     static async fromUrl(Template, url, options) {
+        const DefaultArchiveLoader = require('./loaders/defaultarchiveloader');
         const loader = new DefaultArchiveLoader();
         const buffer = await loader.load(url, options);
         return TemplateLoader.fromArchive(Template, buffer, options);
@@ -142,6 +135,8 @@ class TemplateLoader {
      * @return {Promise<Template>} a Promise to the instantiated template
      */
     static async fromDirectory(Template, path, options = {}) {
+        const fs = require('fs');
+        const fsPath = require('path');
         const method = 'fromDirectory';
 
         // grab the README.md
@@ -313,7 +308,7 @@ class TemplateLoader {
         }
 
         else if (zipFile) {
-            return zipFile.async('nodebuffer');
+            return zipFile.async('nodebuffer').then(data => Buffer.from(data));
         }
 
         return null;
@@ -330,7 +325,8 @@ class TemplateLoader {
      * required is false
      */
     static async loadFileContents(path, fileName, json = false, required = false) {
-
+        const fs = require('fs');
+        const fsPath = require('path');
         Logger.debug('loadFileContents', 'Loading ' + fileName);
         const filePath = fsPath.resolve(path, fileName);
 
@@ -362,7 +358,8 @@ class TemplateLoader {
      * it does not exist and required is false
      */
     static async loadFileBuffer(path, fileName, required = false) {
-
+        const fs = require('fs');
+        const fsPath = require('path');
         Logger.debug('loadFileBuffer', 'Loading ' + fileName);
         const filePath = fsPath.resolve(path, fileName);
 
@@ -386,7 +383,11 @@ class TemplateLoader {
      * @return {Promise<object[]>} a promise to an array of objects with the name and contents of the files
      */
     static async loadFilesContents(path, regex) {
-
+        const fs = require('fs');
+        const fsPath = require('path');
+        const promisify = require('util').promisify;
+        const readdir = promisify(fs.readdir);
+        const stat = promisify(fs.stat);
         Logger.debug('loadFilesContents', 'Loading ' + path);
         const subdirs = await readdir(path);
         const result = await Promise.all(subdirs.map(async (subdir) => {

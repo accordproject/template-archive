@@ -15,15 +15,19 @@
     "types"
   ],
   "main": "dist/cicero-core.js",
+  "browser": "dist/cicero-core.browser.js",
   "typings": "types/index.d.ts",
   "scripts": {
     "webpack": "webpack --config webpack.config.js --mode production",
-    "prepublishOnly": "npm run build:types && npm run webpack",
+    "webpack:browser": "webpack --config webpack.browser.config.js --mode production",
+    "test:browser": "npm run webpack:browser && npm run test:browser:pw",
+    "test:browser:pw": "playwright test",
+    "prepublishOnly": "npm run build:types && npm run webpack && npm run webpack:browser",
     "pretest": "npm run lint",
     "lint": "eslint .",
     "postlint": "npm run licchk",
     "licchk": "license-check-and-add check -f ./license.config.json",
-    "test:mocha": "mocha --timeout 40000 --recursive",
+    "test:mocha": "mocha --timeout 40000 --recursive --ignore 'test/browser/**'",
     "test:watch": "npm run test:mocha -- --watch",
     "test:windows": "npm run test:mocha",
     "test": "npm run test:mocha",
@@ -68,6 +72,10 @@
     "typescript": "5.6.3",
     "webpack": "5.104.1",
     "webpack-cli": "^5.1.4",
+    "@playwright/test": "^1.44.0",
+    "buffer": "^6.0.3",
+    "path-browserify": "^1.0.1",
+    "process": "^0.11.10",
     "webpack-node-externals": "^3.0.0"
   },
   "dependencies": {

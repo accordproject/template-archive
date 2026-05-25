@@ -32,6 +32,19 @@ jobs:
 
       - run: npm ci
       - run: npm run build --if-present
+
+      - name: Build browser bundle (cicero-core)
+        working-directory: packages/cicero-core
+        run: npm run webpack:browser
+
+      - name: Install Playwright browsers
+        working-directory: packages/cicero-core
+        run: npx playwright install --with-deps chromium
+
+      - name: Browser tests — Playwright (cicero-core)
+        working-directory: packages/cicero-core
+        run: npm run test:browser:pw
+
       - env:
           NODE_OPTIONS: "--max_old_space_size=4096"
         run: npm test
