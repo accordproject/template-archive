@@ -160,7 +160,11 @@ require('yargs')
             return;
         }
     })
-    .command('validate', 'validate a template without producing output artifacts', (yargs) => {
+    .command('validate [template]', 'validate a template without producing output artifacts', (yargs) => {
+        yargs.positional('template', {
+            describe: 'path to the template directory',
+            type: 'string'
+        });
         yargs.option('template', {
             describe: 'path to the template directory',
             type: 'string'
