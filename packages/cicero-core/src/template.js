@@ -18,7 +18,7 @@ const { templatemarkutil } = require('@accordproject/markdown-template');
 
 const Metadata = require('./metadata');
 const crypto = require('crypto');
-// const forge = require('node-forge');
+const forge = require('node-forge');
 const stringify = require('json-stable-stringify');
 
 const TemplateLoader = require('./templateloader');
@@ -209,29 +209,25 @@ class Template {
      * verifies the signature stored in the template object using the template hash and timestamp
      */
     verifyTemplateSignature() {
-        /*
         const templateHash = this.getHash();
-        if (this.authorSignature === null) {throw new Error('The template is missing author signature!');}
+        if (this.authorSignature === null) { throw new Error('The template is missing author signature!'); }
         const signature = this.authorSignature.templateSignature.signature;
         const timestamp = this.authorSignature.templateSignature.timestamp;
         const signatoryCert = this.authorSignature.templateSignature.signatoryCert;
-        //X509 cert converted from PEM to forge type
+
         const certificateForge = forge.pki.certificateFromPem(signatoryCert);
-        //public key in forge type
-        const publicKeyForge = certificateForge.publicKey;
-        //convert public key from forge to pem
-        const publicKeyPem = forge.pki.publicKeyToPem(publicKeyForge);
-        //convert public key in pem to public key type in node.
-        const publicKey = crypto.createPublicKey(publicKeyPem);
-        //signature verification process
-        const verify = crypto.createVerify('SHA256');
-        verify.write(templateHash + timestamp);
-        verify.end();
-        const result = verify.verify(publicKey, signature, 'hex');
+        const publicKey = certificateForge.publicKey;
+        const md = forge.md.sha256.create();
+        md.update(templateHash + timestamp, 'utf8');
+        let result;
+        try {
+            result = publicKey.verify(md.digest().bytes(), forge.util.hexToBytes(signature));
+        } catch (e) {
+            throw new Error('Template\'s author signature is invalid!');
+        }
         if (!result) {
             throw new Error('Template\'s author signature is invalid!');
         }
-        */
     }
 
     /**
@@ -242,39 +238,30 @@ class Template {
      * @param {Number} timestamp - timestamp of the moment of signature is done
      */
     signTemplate(p12File, passphrase, timestamp) {
-        /*
-        if (typeof(p12File) !== 'string') {throw new Error('p12File should be of type String!');}
-        if (typeof(passphrase) !== 'string') {throw new Error('passphrase should be of type String!');}
-        if (typeof(timestamp) !== 'number') {throw new Error('timestamp should be of type Number!');}
+        if (typeof(p12File) !== 'string')   { throw new Error('p12File should be of type String!'); }
+        if (typeof(passphrase) !== 'string') { throw new Error('passphrase should be of type String!'); }
+        if (typeof(timestamp) !== 'number')  { throw new Error('timestamp should be of type Number!'); }
 
         const templateHash = this.getHash();
-        // decode p12 from base64
-        const p12Der = forge.util.decode64(p12File);
-        // get p12 as ASN.1 object
+        const p12Der  = forge.util.decode64(p12File);
         const p12Asn1 = forge.asn1.fromDer(p12Der);
-        // decrypt p12 using the passphrase 'password'
-        const p12 = forge.pkcs12.pkcs12FromAsn1(p12Asn1, false, passphrase);
-        //X509 cert forge type
+        const p12     = forge.pkcs12.pkcs12FromAsn1(p12Asn1, false, passphrase);
         const certificateForge = p12.safeContents[0].safeBags[0].cert;
-        //Private Key forge type
-        const privateKeyForge = p12.safeContents[1].safeBags[0].key;
-        //convert cert and private key from forge to PEM
-        const certificatePem = forge.pki.certificateToPem(certificateForge);
-        const privateKeyPem = forge.pki.privateKeyToPem(privateKeyForge);
-        //convert private key in pem to private key type in node
-        const privateKey = crypto.createPrivateKey(privateKeyPem);
-        const sign = crypto.createSign('SHA256');
-        sign.write(templateHash + timestamp);
-        sign.end();
-        const signature = sign.sign(privateKey, 'hex');
-        const signatureObject = {
-            templateHash,
-            timestamp,
-            signatoryCert: certificatePem,
-            signature
+        const privateKeyForge  = p12.safeContents[1].safeBags[0].key;
+        const certificatePem   = forge.pki.certificateToPem(certificateForge);
+
+        const md = forge.md.sha256.create();
+        md.update(templateHash + timestamp, 'utf8');
+        const signature = forge.util.bytesToHex(privateKeyForge.sign(md));
+
+        this.authorSignature = {
+            templateSignature: {
+                templateHash,
+                timestamp,
+                signatoryCert: certificatePem,
+                signature,
+            },
         };
-        this.authorSignature = signatureObject;
-        */
     }
 
     /**

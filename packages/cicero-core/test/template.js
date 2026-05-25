@@ -116,7 +116,7 @@ describe('Template', () => {
             archiveBuffer.should.not.be.null;
         });
 
-        it.skip('should throw an error if passphrase of the keystore is wrong', async () => {
+        it('should throw an error if passphrase of the keystore is wrong', async () => {
             const template = await Template.fromDirectory('./test/data/signing-template/helloworldstate');
             const p12File = fs.readFileSync('./test/data/keystore/keystore.p12', { encoding: 'base64' });
             const keystore = {
@@ -129,7 +129,7 @@ describe('Template', () => {
 
     describe('#signTemplate', () => {
 
-        it.skip('should sign the content hash and timestamp string using the keystore', async () => {
+        it('should sign the content hash and timestamp string using the keystore', async () => {
             const template = await Template.fromDirectory('./test/data/helloworldstate');
             const timestamp = Date.now();
             const templateHash = template.getHash();
@@ -138,10 +138,12 @@ describe('Template', () => {
             template.signTemplate(p12File, 'password', timestamp);
             const result = template.authorSignature;
             const expected = {
-                templateHash,
-                timestamp,
-                signatoryCert: signatureData.certificate,
-                signature: signatureData.signature
+                templateSignature: {
+                    templateHash,
+                    timestamp,
+                    signatoryCert: signatureData.certificate,
+                    signature: signatureData.signature,
+                }
             };
             result.should.deep.equal(expected);
         });
@@ -183,11 +185,11 @@ describe('Template', () => {
             return Template.fromDirectory('./test/data/latedeliveryandpenalty', options).should.be.fulfilled;
         });
 
-        it.skip('should throw error when date of the signature is tampered', async () => {
+        it('should throw error when date of the signature is tampered', async () => {
             return Template.fromDirectory('./test/data/verifying-template-signature/helloworldstateTamperDate', options).should.be.rejectedWith('Template\'s author signature is invalid!');
         });
 
-        it.skip('should throw error when the template signature is tampered', async () => {
+        it('should throw error when the template signature is tampered', async () => {
             return Template.fromDirectory('./test/data/verifying-template-signature/helloworldstateTamperSign', options).should.be.rejectedWith('Template\'s author signature is invalid!');
         });
 
