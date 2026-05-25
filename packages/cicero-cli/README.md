@@ -34,19 +34,20 @@ coherence check via `Template.fromDirectory`. Emits a per-check `✓`/`✗`
 summary and exits with code `1` on any failure — suitable for CI pipelines.
 
 ```bash
-cicero validate --template <path> [--warnings]
+cicero validate [template] [--warnings]
 ```
 
 Options:
-- `--template <path>` — path to the template directory (defaults to `.`)
+- `[template]` — path to the template directory (defaults to `.`)
+- `--template <path>` — alternative named form of the template path
 - `--warnings` — surface non-fatal warnings (e.g. orphan `logic/` directory,
   since Ergo is no longer executed by `cicero-core`)
 
 Example (valid template):
 
 ```
-$ cicero validate --template ./my-template
-✓ package.json valid
+$ cicero validate ./my-template
+✓ package.json contains required template metadata
 ✓ text/grammar.tem.md found
 ✓ model/ found 2 .cto file(s)
 ✓ Template coherence grammar parsed, model validated, template variables match the model
@@ -57,8 +58,8 @@ Template is valid.
 Example (broken template):
 
 ```
-$ cicero validate --template ./my-template
-✓ package.json valid
+$ cicero validate ./my-template
+✓ package.json contains required template metadata
 ✓ text/grammar.tem.md found
 ✓ model/ found 1 .cto file(s)
 ✗ model/ — Undeclared type "PaymentAmount" in "property ...TemplateModel.amount"

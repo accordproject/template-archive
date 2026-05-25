@@ -1,0 +1,8 @@
+{
+    "version": "0.0.1",
+    "description": "Fixture: package.json is missing the required name field",
+    "accordproject": {
+        "template": "clause",
+        "cicero": "^0.25.0"
+    }
+}

@@ -18,6 +18,7 @@ const chai = require('chai');
 const path = require('path');
 const tmp = require('tmp-promise');
 const fs = require('fs');
+const childProcess = require('child_process');
 
 const Template = require('@accordproject/cicero-core').Template;
 const {CodeGen} = require('@accordproject/concerto-codegen');
@@ -67,7 +68,7 @@ describe('#validateCompileArgs', () => {
         process.chdir(path.resolve(__dirname, 'data/'));
         (() => Commands.validateCompileArgs({
             _: ['compile'],
-        })).should.throw(' not a valid cicero template. Make sure that package.json exists and that it has a cicero entry.');
+        })).should.throw(' not a valid cicero template. Make sure that package.json exists and contains the required Cicero metadata.');
     });
 });
 
@@ -145,7 +146,7 @@ describe('#validateArchiveArgs', () => {
         process.chdir(path.resolve(__dirname, 'data/'));
         (() => Commands.validateArchiveArgs({
             _: ['archive']
-        })).should.throw(' not a valid cicero template. Make sure that package.json exists and that it has a cicero entry.');
+        })).should.throw(' not a valid cicero template. Make sure that package.json exists and contains the required Cicero metadata.');
     });
 });
 
@@ -256,7 +257,7 @@ describe('#validateGetArgs', () => {
         process.chdir(path.resolve(__dirname, 'data/'));
         (() => Commands.validateGetArgs({
             _: ['get']
-        })).should.throw(' not a valid cicero template. Make sure that package.json exists and that it has a cicero entry.');
+        })).should.throw(' not a valid cicero template. Make sure that package.json exists and contains the required Cicero metadata.');
     });
 });
 
@@ -295,7 +296,7 @@ describe('#validateVerfiyArgs', () => {
         process.chdir(path.resolve(__dirname, 'data/'));
         (() => Commands.validateVerifyArgs({
             _: ['verify']
-        })).should.throw(' not a valid cicero template. Make sure that package.json exists and that it has a cicero entry.');
+        })).should.throw(' not a valid cicero template. Make sure that package.json exists and contains the required Cicero metadata.');
     });
 });
 
@@ -347,6 +348,7 @@ describe('#validateValidateArgs', () => {
 
 describe('#validate', () => {
     const validateFixtures = path.resolve(__dirname, 'data/validate');
+    const cliPath = path.resolve(__dirname, '..', 'index.js');
 
     it('passes on a known-good template', async () => {
         const result = await Commands.validate(
@@ -388,6 +390,22 @@ describe('#validate', () => {
         const last = result.results[result.results.length - 1];
         last.layer.should.equal('package.json');
         last.message.should.match(/accordproject/);
+    });
+
+    it('fails when package.json is missing a required npm field', async () => {
+        const result = await Commands.validate(path.resolve(validateFixtures, 'missing-name'));
+        result.valid.should.equal(false);
+        const last = result.results[result.results.length - 1];
+        last.layer.should.equal('package.json');
+        last.message.should.match(/"name"/);
+    });
+
+    it('fails when package.json is missing accordproject.cicero', async () => {
+        const result = await Commands.validate(path.resolve(validateFixtures, 'missing-cicero-version'));
+        result.valid.should.equal(false);
+        const last = result.results[result.results.length - 1];
+        last.layer.should.equal('package.json');
+        last.message.should.match(/accordproject\.cicero/);
     });
 
     it('fails when text/grammar.tem.md is missing', async () => {
@@ -439,5 +457,20 @@ describe('#validate', () => {
         result.warnings.should.be.an('array').with.lengthOf(1);
         result.warnings[0].should.match(/logic\//);
         result.warnings[0].should.match(/Ergo/);
+    });
+
+    it('accepts the template path as a positional CLI argument', () => {
+        const result = childProcess.spawnSync(
+            process.execPath,
+            [cliPath, 'validate', path.resolve(validateFixtures, 'no-accord-section')],
+            {
+                cwd: path.resolve(__dirname, '..'),
+                encoding: 'utf8',
+            }
+        );
+
+        result.status.should.equal(1);
+        result.stderr.should.match(/package\.json/);
+        result.stderr.should.not.match(/Unknown argument/);
     });
 });

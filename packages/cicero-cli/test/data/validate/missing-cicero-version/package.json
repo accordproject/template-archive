@@ -1,0 +1,8 @@
+{
+    "name": "missing-cicero-version",
+    "version": "0.0.1",
+    "description": "Fixture: package.json is missing accordproject.cicero",
+    "accordproject": {
+        "template": "clause"
+    }
+}

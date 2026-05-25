@@ -30,6 +30,27 @@ const { CodeGen } = require('@accordproject/concerto-codegen');
  */
 class Commands {
     /**
+     * Resolve the template path from positional or named CLI arguments.
+     *
+     * @param {object} argv the inbound argument values object
+     * @returns {object} a modified argument object
+     */
+    static resolveTemplateArg(argv) {
+        // the user typed 'cicero [command] [template]'
+        if(argv._.length === 2){
+            argv.template = argv._[1];
+        }
+
+        if(!argv.template){
+            Logger.info('Using current directory as template folder');
+            argv.template = '.';
+        }
+
+        argv.template = path.resolve(argv.template);
+        return argv;
+    }
+
+    /**
      * Whether the template path is to a file (template archive)
      * @param {string} templatePath - path to the template directory or archive
      * @return {boolean} true if the path is to a file, false otherwise
@@ -54,34 +75,69 @@ class Commands {
     }
 
     /**
+     * Parse package.json from a template directory.
+     *
+     * @param {string} templatePath - path to the template directory
+     * @returns {object} parse result with `ok`, `message`, and `packageJson`
+     */
+    static validateTemplatePackageJson(templatePath) {
+        const pkgPath = path.resolve(templatePath, 'package.json');
+        if (!fs.existsSync(pkgPath)) {
+            return { ok: false, message: 'file not found' };
+        }
+
+        let packageJson;
+        try {
+            packageJson = JSON.parse(fs.readFileSync(pkgPath, 'utf8'));
+        } catch (err) {
+            return { ok: false, message: `not valid JSON: ${err.message}` };
+        }
+
+        if (!packageJson || typeof packageJson !== 'object' || Array.isArray(packageJson)) {
+            return { ok: false, message: 'must contain a JSON object' };
+        }
+
+        const missingFields = [];
+        if (!packageJson.name) {
+            missingFields.push('name');
+        }
+        if (!packageJson.version) {
+            missingFields.push('version');
+        }
+        if (!packageJson.accordproject || typeof packageJson.accordproject !== 'object' || Array.isArray(packageJson.accordproject)) {
+            missingFields.push('accordproject');
+        } else if (!packageJson.accordproject.cicero) {
+            missingFields.push('accordproject.cicero');
+        }
+
+        if (missingFields.length > 0) {
+            const fields = missingFields.map((field) => `"${field}"`).join(', ');
+            return { ok: false, message: `missing required field(s): ${fields}` };
+        }
+
+        return {
+            ok: true,
+            message: 'contains required template metadata',
+            packageJson,
+        };
+    }
+
+    /**
      * Common default params before we create an archive using a template
      *
      * @param {object} argv - the inbound argument values object
      * @returns {object} a modfied argument object
      */
     static validateCommonArgs(argv) {
-        // the user typed 'cicero [command] [template]'
-        if(argv._.length === 2){
-            argv.template = argv._[1];
-        }
-
-        if(!argv.template){
-            Logger.info('Using current directory as template folder');
-            argv.template = '.';
-        }
-
-        argv.template = path.resolve(argv.template);
+        argv = Commands.resolveTemplateArg(argv);
 
         if (!Commands.isTemplateArchive(argv.template)) {
-            const packageJsonExists = fs.existsSync(path.resolve(argv.template,'package.json'));
-            let isAPTemplate = false;
-            if(packageJsonExists){
-                let packageJsonContents = JSON.parse(fs.readFileSync(path.resolve(argv.template,'package.json')),'utf8');
-                isAPTemplate = packageJsonContents.accordproject;
-            }
-
-            if(!packageJsonExists || !isAPTemplate){
-                throw new Error(`${argv.template} is not a valid cicero template. Make sure that package.json exists and that it has a cicero entry.`);
+            const packageValidation = Commands.validateTemplatePackageJson(argv.template);
+            if (!packageValidation.ok) {
+                throw new Error(
+                    `${argv.template} is not a valid cicero template. ` +
+                    'Make sure that package.json exists and contains the required Cicero metadata.'
+                );
             }
         }
 
@@ -251,15 +307,7 @@ class Commands {
      * @returns {object} a modified argument object
      */
     static validateValidateArgs(argv) {
-        if (argv._.length === 2) {
-            argv.template = argv._[1];
-        }
-        if (!argv.template) {
-            Logger.info('Using current directory as template folder');
-            argv.template = '.';
-        }
-        argv.template = path.resolve(argv.template);
-        return argv;
+        return Commands.resolveTemplateArg(argv);
     }
 
     /**
@@ -272,7 +320,8 @@ class Commands {
      *
      * Checks, in order:
      *   1. template path exists and is a directory
-     *   2. package.json exists, parses as JSON, and contains an accordproject section
+     *   2. package.json exists, parses as JSON, and contains the required
+     *      template metadata fields
      *   3. text/grammar.tem.md exists
      *   4. model/ exists and contains at least one .cto file
      *   5. overall template coherence via Template.fromDirectory
@@ -307,28 +356,17 @@ class Commands {
             return { results, warnings, valid: false };
         }
 
-        // Check 2: package.json exists, parses, has accordproject section
-        const pkgPath = path.resolve(templatePath, 'package.json');
-        if (!fs.existsSync(pkgPath)) {
-            results.push({ layer: 'package.json', ok: false, message: 'file not found' });
-            return { results, warnings, valid: false };
-        }
-        let pkg;
-        try {
-            pkg = JSON.parse(fs.readFileSync(pkgPath, 'utf8'));
-        } catch (err) {
-            results.push({ layer: 'package.json', ok: false, message: `not valid JSON: ${err.message}` });
-            return { results, warnings, valid: false };
-        }
-        if (!pkg.accordproject) {
+        // Check 2: package.json exists, parses, and has required metadata
+        const packageValidation = Commands.validateTemplatePackageJson(templatePath);
+        if (!packageValidation.ok) {
             results.push({
                 layer: 'package.json',
                 ok: false,
-                message: 'missing "accordproject" section (required for Cicero templates)',
+                message: packageValidation.message,
             });
             return { results, warnings, valid: false };
         }
-        results.push({ layer: 'package.json', ok: true, message: 'valid' });
+        results.push({ layer: 'package.json', ok: true, message: packageValidation.message });
 
         // Check 3: grammar.tem.md exists
         const grammarPath = path.resolve(templatePath, 'text', 'grammar.tem.md');
@@ -351,9 +389,11 @@ class Commands {
         }
         results.push({ layer: 'model/', ok: true, message: `found ${ctoFiles.length} .cto file(s)` });
 
-        // Check 5: full coherence via Template.fromDirectory
+        // Check 5: full coherence via Template.fromDirectory without mutating
+        // the template directory or reaching out to the network.
         try {
-            await Commands.loadTemplate(templatePath, options);
+            const loadOptions = Object.assign({}, options, { offline: true });
+            await Commands.loadTemplate(templatePath, loadOptions);
             results.push({
                 layer: 'Template coherence',
                 ok: true,
