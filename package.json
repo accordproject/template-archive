@@ -15,9 +15,9 @@
   },
   "name": "template-archive",
   "description": "This repo uses npm workspaces.",
-  "version": "0.25.0",
+  "version": "0.28.0",
   "private": true,
-  "workspaces":[
+  "workspaces": [
     "packages/*"
   ],
   "scripts": {
