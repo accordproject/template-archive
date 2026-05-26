@@ -47,6 +47,7 @@ module.exports = {
             tls:           false,
             child_process: false,
             os:            false,
+            util:          false,
             crypto: require.resolve('crypto-browserify'),
             stream: require.resolve('stream-browserify'),
             buffer: require.resolve('buffer/'),
