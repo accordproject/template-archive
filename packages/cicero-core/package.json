@@ -54,10 +54,12 @@
   "homepage": "https://github.com/accordproject/template-archive",
   "devDependencies": {
     "@babel/preset-typescript": "^7.27.0",
+    "@playwright/test": "^1.44.0",
     "archiver": "5.3.1",
     "assert": "2.0.0",
     "babel-loader": "^9.1.3",
     "browserify-zlib": "0.2.0",
+    "buffer": "^6.0.3",
     "chai": "4.3.7",
     "chai-as-promised": "7.1.1",
     "chai-things": "0.2.0",
@@ -72,6 +74,8 @@
     "mock-require": "^3.0.3",
     "node-polyfill-webpack-plugin": "4.0.0",
     "nyc": "15.1.0",
+    "path-browserify": "^1.0.1",
+    "process": "^0.11.10",
     "raw-loader": "^4.0.2",
     "source-map-loader": "^5.0.0",
     "stream-browserify": "3.0.0",
@@ -79,11 +83,7 @@
     "ts-loader": "^9.5.2",
     "typescript": "5.6.3",
     "webpack": "5.104.1",
-    "webpack-cli": "^5.1.4",
-    "@playwright/test": "^1.44.0",
-    "buffer": "^6.0.3",
-    "path-browserify": "^1.0.1",
-    "process": "^0.11.10"
+    "webpack-cli": "^5.1.4"
   },
   "dependencies": {
     "@accordproject/concerto-core": "^4.0.3",
@@ -102,6 +102,7 @@
     "node-forge": "^1.4.0",
     "semver": "7.5.3",
     "slash": "3.0.0",
+    "vc-signer": "file:../../../vc-signer",
     "xregexp": "5.1.1"
   },
   "nyc": {

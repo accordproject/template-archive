@@ -18,8 +18,17 @@ const { templatemarkutil } = require('@accordproject/markdown-template');
 
 const Metadata = require('./metadata');
 const crypto = require('crypto');
-const forge = require('node-forge');
 const stringify = require('json-stable-stringify');
+
+// vc-signer is ESM-only. cicero-core is CommonJS, so we use dynamic import().
+// Cached after the first load so we only pay the import cost once.
+let _vcSignerPromise = null;
+function getVcSigner() {
+    if (!_vcSignerPromise) {
+        _vcSignerPromise = import('vc-signer');
+    }
+    return _vcSignerPromise;
+}
 
 const TemplateLoader = require('./templateloader');
 const TemplateSaver = require('./templatesaver');
@@ -44,7 +53,7 @@ class Template {
      * @param {object} request - the JS object for the sample request
      * @param {Buffer} logo - the bytes data of logo
      * @param {Object} options  - e.g., { warnings: true }
-     * @param {Object} authorSignature  - object containing template hash, timestamp, author's certificate, signature
+     * @param {Object} authorSignature  - the signed W3C Verifiable Credential (TemplateAuthorshipCredential)
      */
     constructor(packageJson, readme, samples, request, logo, options, authorSignature) {
         this.metadata = new Metadata(packageJson, readme, samples, request, logo);
@@ -74,9 +83,9 @@ class Template {
      * Throws an exception with the details of any validation errors.
      * @param {Object} options  - e.g., { offline: true }
      */
-    validate(options = {}) {
+    async validate(options = {}) {
         if (options.verifySignature) {
-            this.verifyTemplateSignature();
+            await this.verifyTemplateSignature();
         }
         if (options && options.offline) {
             this.getModelManager().validateModelFiles();
@@ -206,74 +215,79 @@ class Template {
     }
 
     /**
-     * verifies the signature stored in the template object using the template hash and timestamp
+     * Verify the W3C Verifiable Credential stored on the template against the
+     * current template content. Throws if the credential is missing, the
+     * signature is invalid, or the credentialSubject.templateHash does not
+     * match the recomputed hash of the template.
      */
-    verifyTemplateSignature() {
-        const templateHash = this.getHash();
-        if (this.authorSignature === null) { throw new Error('The template is missing author signature!'); }
-        const signature = this.authorSignature.templateSignature.signature;
-        const timestamp = this.authorSignature.templateSignature.timestamp;
-        const signatoryCert = this.authorSignature.templateSignature.signatoryCert;
-
-        const certificateForge = forge.pki.certificateFromPem(signatoryCert);
-        const publicKey = certificateForge.publicKey;
-        const md = forge.md.sha256.create();
-        md.update(templateHash + timestamp, 'utf8');
-        let result;
-        try {
-            result = publicKey.verify(md.digest().bytes(), forge.util.hexToBytes(signature));
-        } catch (e) {
-            throw new Error('Template\'s author signature is invalid!');
+    async verifyTemplateSignature() {
+        if (this.authorSignature === null) {
+            throw new Error('The template is missing author signature!');
         }
-        if (!result) {
-            throw new Error('Template\'s author signature is invalid!');
+        const { verifyCredential } = await getVcSigner();
+        try {
+            await verifyCredential(this.authorSignature, {
+                expectedSubject: { templateHash: this.getHash() },
+            });
+        } catch (e) {
+            throw new Error(`Template's author signature is invalid! ${e.message}`);
         }
     }
 
     /**
-     * signs a string made up of template hash and time stamp using private key derived
-     * from the keystore
-     * @param {String} p12File - encoded string of p12 keystore file
-     * @param {String} passphrase - passphrase for the keystore file
-     * @param {Number} timestamp - timestamp of the moment of signature is done
+     * Sign the template with a W3C Verifiable Credential. The resulting VC is
+     * stored on `authorSignature` and embedded in the archive as
+     * `signature.json`.
+     *
+     * @param {Object} signer - signing options forwarded to vc-signer
+     * @param {Object} [signer.privateKeyPem] - { pem, passphrase }
+     * @param {Object} [signer.privateKeyJwe] - { jwe, passphrase }
+     * @param {String} [signer.issuerDid] - 'did:key' (default) or 'did:web:...'
+     * @param {String} [signer.verificationMethodId] - required for did:web
      */
-    signTemplate(p12File, passphrase, timestamp) {
-        if (typeof(p12File) !== 'string')   { throw new Error('p12File should be of type String!'); }
-        if (typeof(passphrase) !== 'string') { throw new Error('passphrase should be of type String!'); }
-        if (typeof(timestamp) !== 'number')  { throw new Error('timestamp should be of type Number!'); }
-
-        const templateHash = this.getHash();
-        const p12Der  = forge.util.decode64(p12File);
-        const p12Asn1 = forge.asn1.fromDer(p12Der);
-        const p12     = forge.pkcs12.pkcs12FromAsn1(p12Asn1, false, passphrase);
-        const certificateForge = p12.safeContents[0].safeBags[0].cert;
-        const privateKeyForge  = p12.safeContents[1].safeBags[0].key;
-        const certificatePem   = forge.pki.certificateToPem(certificateForge);
-
-        const md = forge.md.sha256.create();
-        md.update(templateHash + timestamp, 'utf8');
-        const signature = forge.util.bytesToHex(privateKeyForge.sign(md));
-
-        this.authorSignature = {
-            templateSignature: {
-                templateHash,
-                timestamp,
-                signatoryCert: certificatePem,
-                signature,
+    async signTemplate(signer) {
+        if (!signer || typeof signer !== 'object') {
+            throw new Error('signTemplate: signer options are required');
+        }
+        const { loadSigningKey, signCredential } = await getVcSigner();
+        const keyInfo = await loadSigningKey({
+            privateKeyPem: signer.privateKeyPem,
+            privateKeyJwe: signer.privateKeyJwe,
+        });
+        const name = this.getMetadata().getName();
+        const version = this.getMetadata().getVersion();
+        this.authorSignature = await signCredential({
+            type: ['VerifiableCredential', 'TemplateAuthorshipCredential'],
+            subject: {
+                id: `ap-template:${name}@${version}`,
+                templateHash: this.getHash(),
+                templateName: name,
+                templateVersion: version,
             },
-        };
+            signer: {
+                keyInfo,
+                issuerDid: signer.issuerDid,
+                verificationMethodId: signer.verificationMethodId,
+            },
+        });
     }
 
     /**
      * Persists this template to a Cicero Template Archive (cta) file.
      * @param {string} [language] - target language for the archive
-     * @param {Object} [options] - JSZip options and keystore object containing path and passphrase for the keystore
+     * @param {Object} [options] - JSZip options and optional signer block
+     * @param {Object} [options.signer] - vc-signer options; see signTemplate()
      * @return {Promise<Buffer>} the zlib buffer
      */
     async toArchive(language, options = {}) {
-        if (options.keystore) {
-            const timestamp = Date.now();
-            this.signTemplate(options.keystore.p12File, options.keystore.passphrase, timestamp);
+        if (options.signer) {
+            // Apply the language-targeted metadata before computing the hash so
+            // it matches what ends up in the archive's package.json (the saver
+            // also calls createTargetMetadata, which is idempotent).
+            if (language) {
+                this.metadata = this.metadata.createTargetMetadata(language);
+            }
+            await this.signTemplate(options.signer);
         }
         return TemplateSaver.toArchive(this, language, options);
     }
