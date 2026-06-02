@@ -49,6 +49,14 @@ jobs:
           NODE_OPTIONS: "--max_old_space_size=4096"
         run: npm test
 
+      - name: Build webpack bundle (cicero-core)
+        working-directory: packages/cicero-core
+        run: npm run webpack
+
+      - name: Bundle tests (cicero-core)
+        working-directory: packages/cicero-core
+        run: npm run test:bundle:mocha
+
       - name: Archive npm failure logs
         uses: actions/upload-artifact@v4
         if: failure()
