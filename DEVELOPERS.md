@@ -24,4 +24,15 @@ git remote add upstream "https://github.com/accordproject/template-archive.git"
 
 **Note:** Template Archive no longer uses `lerna bootstrap`, since `lerna bootstrap` was deprecated at lerne version 7.x.  Now `npm install` automatically resolves packages defined within the "Workspaces" definition inside `package.json`.
 
+### Release Version Sync
+
+The publish workflow runs `node ./scripts/bump_version.js <tag-or-version>` before `npm version` and `npm publish`.
+That script automatically syncs managed Accord Project version references across:
+
+- workspace package dependencies for internal packages
+- template and fixture `package.json` files under `packages/*/test/data/**`
+- both `accordproject.cicero` and managed `@accordproject/*` dependency entries in those fixture manifests
+
+Nested fixture `node_modules` content is treated as test data and is intentionally excluded from those updates.
+
 [apdev]: https://github.com/accordproject/techdocs/blob/master/DEVELOPERS.md
