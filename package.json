@@ -5,25 +5,29 @@
     "eslint": "^8.43.0",
     "jsdoc": "^4.0.2",
     "license-check-and-add": "4.0.5",
+    "nyc": "15.1.0",
     "semver": "7.5.3",
     "sleep-promise": "9.1.0",
     "source-map-support": "0.5.21"
   },
   "engines": {
-    "node": ">=20",
+    "node": ">=22",
     "npm": ">=10"
   },
   "name": "template-archive",
   "description": "This repo uses npm workspaces.",
-  "version": "0.27.0",
+  "version": "1.0.0",
   "private": true,
   "workspaces": [
-    "packages/*"
+    "packages/*",
+    "./e2e"
   ],
   "scripts": {
+    "build": "npm run build -w @accordproject/cicero-core && npm run build -w @accordproject/cicero-cli && npm run build -w @accordproject/generator-cicero-template",
     "coverage": "node ./scripts/coverage.js \"packages/cicero-*\" && nyc report -t coverage --cwd . --report-dir coverage --reporter=lcov && cat ./coverage/lcov.info",
     "pretest": "npm run licchk",
-    "test": "npm run test:cov --workspaces",
+    "test": "npm run build && npm run test:cov --workspaces --if-present",
+    "test:e2e": "npm test -w cicero-e2e",
     "licchk": "license-check-and-add check -f ./license.config.json"
   },
   "repository": {

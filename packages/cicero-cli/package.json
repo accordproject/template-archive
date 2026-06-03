@@ -1,28 +1,33 @@
 {
   "name": "@accordproject/cicero-cli",
-  "version": "0.27.0",
+  "version": "1.0.0",
   "description": "Cicero CLI",
   "engines": {
-    "node": ">=20",
+    "node": ">=22",
     "npm": ">=10"
   },
   "publishConfig": {
     "access": "public"
   },
   "bin": {
-    "cicero": "./index.js"
+    "cicero": "lib/cli.js"
   },
-  "main": "index.js",
+  "main": "lib/index.js",
+  "types": "lib/index.d.ts",
+  "files": [
+    "lib"
+  ],
   "scripts": {
-    "pretest": "npm run lint",
-    "lint": "eslint .",
+    "build": "tsc -p tsconfig.json",
+    "clean": "rimraf lib",
+    "lint": "eslint . --ext .ts",
     "postlint": "npm run licchk",
     "licchk": "license-check-and-add check -f ./license.config.json",
-    "test:mocha": "mocha --timeout 30000",
-    "test:all": "npm run test:mocha",
-    "test:windows": "npm run test:all",
-    "test:cov": "nyc npm run test",
-    "test": "npm run test:all"
+    "pretest": "npm run lint && npm run build",
+    "test": "cross-env NODE_OPTIONS=--experimental-vm-modules jest --silent",
+    "test:noisy": "cross-env NODE_OPTIONS=--experimental-vm-modules jest",
+    "test:watch": "cross-env NODE_OPTIONS=--experimental-vm-modules jest --watch",
+    "test:cov": "npm run lint && npm run build && cross-env NODE_OPTIONS=--experimental-vm-modules jest --coverage --silent"
   },
   "repository": {
     "type": "git",
@@ -41,7 +46,7 @@
   },
   "homepage": "https://www.accordproject.org/projects/cicero",
   "dependencies": {
-    "@accordproject/cicero-core": "0.27.0",
+    "@accordproject/cicero-core": "1.0.0",
     "@accordproject/concerto-codegen": "^4.0.1",
     "@accordproject/concerto-util": "^4.0.3",
     "@accordproject/template-engine": "^3.0.1",
@@ -49,35 +54,19 @@
     "yargs": "17.7.2"
   },
   "devDependencies": {
-    "chai": "4.3.7",
-    "chai-as-promised": "7.1.1",
-    "chai-things": "0.2.0",
-    "eslint": "^8.43.0",
+    "@types/jest": "^29.5.12",
+    "@types/node": "^20.11.30",
+    "@types/yargs": "^17.0.32",
+    "@typescript-eslint/eslint-plugin": "^7.4.0",
+    "@typescript-eslint/parser": "^7.4.0",
+    "cross-env": "^7.0.3",
+    "eslint": "8.57.1",
+    "jest": "^29.7.0",
     "jsdoc": "^4.0.2",
     "license-check-and-add": "4.0.5",
-    "mocha": "^10.2.0",
-    "nyc": "15.1.0",
-    "tmp-promise": "3.0.3"
-  },
-  "nyc": {
-    "produce-source-map": "true",
-    "sourceMap": "inline",
-    "reporter": [
-      "lcov",
-      "text-summary",
-      "html",
-      "json"
-    ],
-    "include": [
-      "lib/**/*.js"
-    ],
-    "exclude": [],
-    "all": true,
-    "check-coverage": true,
-    "statements": 86,
-    "branches": 92,
-    "functions": 81,
-    "lines": 86
-  },
-  "gitHead": "514fd02f46752e018aedb77e1716a212ef4a59e5"
+    "rimraf": "^5.0.5",
+    "tmp-promise": "3.0.3",
+    "ts-jest": "^29.1.2",
+    "typescript": "^5.9.3"
+  }
 }

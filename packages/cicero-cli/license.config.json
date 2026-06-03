@@ -52,7 +52,7 @@
     "*.tgz"
   ],
    "licenseFormats": {
-    "js|njk|pegjs|cto|acl|qry": {
+    "js|cjs|mjs|njk|pegjs|cto|acl|qry|ts": {
       "prepend": "/*",
       "append": " */",
       "eachLine": {

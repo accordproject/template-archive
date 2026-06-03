@@ -1,9 +1,9 @@
 {
   "name": "@accordproject/cicero-core",
-  "version": "0.27.0",
+  "version": "1.0.0",
   "description": "Cicero Core - Implementation of Accord Protocol Template Specification",
   "engines": {
-    "node": ">=20",
+    "node": ">=22",
     "npm": ">=10"
   },
   "type": "commonjs",
@@ -11,29 +11,28 @@
     "access": "public"
   },
   "files": [
-    "dist",
-    "types"
+    "lib",
+    "umd"
   ],
-  "main": "dist/cicero-core.js",
-  "browser": "dist/cicero-core.browser.js",
-  "typings": "types/index.d.ts",
+  "main": "lib/index.js",
+  "types": "lib/index.d.ts",
+  "browser": "umd/cicero-core.js",
   "scripts": {
+    "build": "tsc -p tsconfig.json",
     "webpack": "webpack --config webpack.config.js --mode production",
-    "webpack:browser": "webpack --config webpack.browser.config.js --mode production",
-    "test:browser": "npm run webpack:browser && npm run test:browser:pw",
-    "test:browser:pw": "playwright test",
-    "prepublishOnly": "npm run build:types && npm run webpack && npm run webpack:browser",
-    "pretest": "npm run lint",
-    "lint": "eslint .",
+    "build:dist": "npm run build && npm run webpack",
+    "clean": "rimraf lib umd",
+    "prepublishOnly": "npm run build:dist",
+    "pretest": "npm run lint && npm run build",
+    "lint": "eslint . --ext .ts",
     "postlint": "npm run licchk",
-    "licchk": "license-check-and-add check -f ./license.config.json",
-    "test:mocha": "mocha --timeout 40000 --recursive --ignore 'test/browser/**'",
-    "test:watch": "npm run test:mocha -- --watch",
-    "test:windows": "npm run test:mocha",
-    "test": "npm run test:mocha",
-    "test:cov": "nyc npm run test",
-    "jsdoc": "jsdoc -c jsdoc.json package.json",
-    "build:types": "tsc index.js --declaration --allowJs --emitDeclarationOnly --outDir types"
+    "licchk": "license-check-and-add check -f ./header.config.json",
+    "test": "jest --silent",
+    "test:noisy": "jest",
+    "test:watch": "jest --watch",
+    "test:updateSnapshot": "jest --updateSnapshot --silent",
+    "test:cov": "npm run lint && npm run build && jest --coverage --silent",
+    "jsdoc": "jsdoc -c jsdoc.json package.json"
   },
   "repository": {
     "type": "git",
@@ -53,46 +52,39 @@
   },
   "homepage": "https://github.com/accordproject/template-archive",
   "devDependencies": {
-    "@babel/preset-typescript": "^7.27.0",
+    "@types/archiver": "^6.0.2",
+    "@types/jest": "^29.5.12",
+    "@types/json-stable-stringify": "^1.0.36",
+    "@types/node": "^20.11.30",
+    "@types/node-forge": "^1.3.11",
     "archiver": "5.3.1",
-    "assert": "2.0.0",
-    "babel-loader": "^9.1.3",
-    "browserify-zlib": "0.2.0",
-    "chai": "4.3.7",
-    "chai-as-promised": "7.1.1",
-    "chai-things": "0.2.0",
-    "constants-browserify": "1.0.0",
-    "copy-webpack-plugin": "^13.0.0",
+    "@types/semver": "^7.5.8",
+    "@typescript-eslint/eslint-plugin": "^7.4.0",
+    "@typescript-eslint/parser": "^7.4.0",
+    "buffer": "^6.0.3",
     "crypto-browserify": "3.12.0",
-    "eslint": "^8.43.0",
-    "https-browserify": "1.0.0",
+    "eslint": "8.57.1",
+    "jest": "^29.7.0",
     "jsdoc": "^4.0.2",
     "license-check-and-add": "4.0.5",
-    "mocha": "^10.2.0",
-    "mock-require": "^3.0.3",
-    "node-polyfill-webpack-plugin": "4.0.0",
-    "nyc": "15.1.0",
-    "raw-loader": "^4.0.2",
+    "path-browserify": "^1.0.1",
+    "process": "^0.11.10",
+    "rimraf": "^5.0.5",
     "source-map-loader": "^5.0.0",
     "stream-browserify": "3.0.0",
-    "stream-http": "3.2.0",
+    "ts-jest": "^29.1.2",
     "ts-loader": "^9.5.2",
-    "typescript": "5.6.3",
+    "typescript": "^5.9.3",
     "webpack": "5.104.1",
-    "webpack-cli": "^5.1.4",
-    "@playwright/test": "^1.44.0",
-    "buffer": "^6.0.3",
-    "path-browserify": "^1.0.1",
-    "process": "^0.11.10"
+    "webpack-cli": "^5.1.4"
   },
   "dependencies": {
-    "@accordproject/concerto-core": "^4.0.3",
-    "@accordproject/concerto-util": "^4.0.3",
-    "@accordproject/markdown-cicero": "0.18.0",
-    "@accordproject/markdown-common": "0.18.0",
-    "@accordproject/markdown-template": "0.18.0",
-    "@accordproject/markdown-transform": "0.18.0",
-    "@types/node": "^22.13.13",
+    "@accordproject/concerto-core": "4.1.4",
+    "@accordproject/concerto-util": "4.1.4",
+    "@accordproject/markdown-cicero": "1.0.1",
+    "@accordproject/markdown-common": "1.0.1",
+    "@accordproject/markdown-template": "1.0.1",
+    "@accordproject/markdown-transform": "1.0.1",
     "axios": "1.15.0",
     "debug": "4.3.4",
     "ietf-language-tag-regex": "0.0.5",
@@ -104,29 +96,7 @@
     "slash": "3.0.0",
     "xregexp": "5.1.1"
   },
-  "nyc": {
-    "produce-source-map": "true",
-    "sourceMap": "inline",
-    "reporter": [
-      "lcov",
-      "text",
-      "text-summary",
-      "html",
-      "json"
-    ],
-    "include": [
-      "src/**/*.js"
-    ],
-    "exclude": [
-      "lib/tdl.js",
-      "lib/compiled_template.js"
-    ],
-    "all": true,
-    "check-coverage": true,
-    "statements": 91,
-    "branches": 81,
-    "functions": 89,
-    "lines": 91
-  },
-  "gitHead": "514fd02f46752e018aedb77e1716a212ef4a59e5"
+  "peerDependencies": {
+    "@accordproject/concerto-core": "^4.1.3"
+  }
 }
