@@ -1,9 +1,9 @@
 {
-    "name": "copyright-license",
-    "version": "0.0.1",
-    "accordproject": {
-      "template": "contract",
-      "cicero": "^1.0.0",
-      "runtime": "es6"
-    }
+  "name": "copyright-license",
+  "version": "0.0.1",
+  "accordproject": {
+    "template": "contract",
+    "cicero": "^1.0.1",
+    "runtime": "es6"
+  }
 }
