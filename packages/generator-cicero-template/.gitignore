@@ -1,2 +1,8 @@
 node_modules
-coverage
+generators/app/index.js
+generators/app/index.js.map
+generators/app/index.d.ts
+generators/app/promptingHelpers.js
+generators/app/promptingHelpers.js.map
+generators/app/promptingHelpers.d.ts
+coverage/

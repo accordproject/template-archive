@@ -1,0 +1,17 @@
+# Normalize line endings to LF in the working tree on all platforms.
+# Keeps source consistent and satisfies ESLint's unix linebreak rule on Windows.
+* text=auto eol=lf
+
+# Test fixtures are hashed by content — preserve their exact committed bytes
+# (including the intentional CR line-endings in the *-cr fixtures) on every OS,
+# so content-based hashes are deterministic across Linux, macOS and Windows.
+packages/cicero-core/test/data/** -text
+packages/cicero-cli/test/data/** -text
+
+# Binary assets
+*.png binary
+*.p12 binary
+*.jpg binary
+*.zip binary
+*.cta binary
+*.ctoa binary

@@ -1,9 +1,9 @@
 {
   "name": "@accordproject/generator-cicero-template",
-  "version": "0.27.0",
+  "version": "1.0.0",
   "description": "Code generator for a Cicero Template",
   "engines": {
-    "node": ">=20",
+    "node": ">=22",
     "npm": ">=10"
   },
   "publishConfig": {
@@ -11,13 +11,15 @@
   },
   "author": "clause.io",
   "scripts": {
-    "pretest": "npm run lint",
-    "lint": "eslint .",
+    "build": "tsc -p tsconfig.json",
+    "clean": "rimraf generators/app/*.js generators/app/*.js.map generators/app/*.d.ts",
+    "lint": "eslint . --ext .ts",
     "postlint": "npm run licchk",
     "licchk": "license-check-and-add check -f ./license.config.json",
-    "test": "mocha --timeout 10000",
-    "test:windows": "echo 'No Windows tests for this package'",
-    "test:cov": "nyc npm run test"
+    "pretest": "npm run lint && npm run build",
+    "test": "jest --silent",
+    "test:noisy": "jest",
+    "test:cov": "npm run lint && npm run build && jest --coverage --silent"
   },
   "repository": {
     "type": "git",
@@ -32,7 +34,7 @@
   "files": [
     "generators"
   ],
-  "main": "generators/index.js",
+  "main": "generators/app/index.js",
   "keywords": [
     "cicero",
     "template",
@@ -42,14 +44,19 @@
     "yeoman-generator"
   ],
   "devDependencies": {
-    "chai": "4.3.7",
-    "chai-as-promised": "7.1.1",
-    "chai-things": "0.2.0",
-    "eslint": "^8.43.0",
+    "@types/jest": "^29.5.12",
+    "@types/node": "^20.11.30",
+    "@types/yeoman-assert": "^3.1.4",
+    "@types/yosay": "^2.0.3",
+    "@typescript-eslint/eslint-plugin": "^7.4.0",
+    "@typescript-eslint/parser": "^7.4.0",
+    "eslint": "8.57.1",
+    "jest": "^29.7.0",
     "jsdoc": "^4.0.2",
     "license-check-and-add": "4.0.5",
-    "mocha": "^10.2.0",
-    "nyc": "15.1.0",
+    "rimraf": "^5.0.5",
+    "ts-jest": "^29.1.2",
+    "typescript": "^5.9.3",
     "yeoman-assert": "3.1.1",
     "yeoman-test": "6.3.0"
   },
@@ -57,28 +64,5 @@
     "chalk": "4.1.2",
     "yeoman-generator": "^5.9.0",
     "yosay": "2.0.2"
-  },
-  "nyc": {
-    "produce-source-map": "true",
-    "sourceMap": "inline",
-    "reporter": [
-      "lcov",
-      "text-summary",
-      "html",
-      "json"
-    ],
-    "include": [
-      "generators/app/**/*.js"
-    ],
-    "exclude": [
-      "generators/app/templates/**"
-    ],
-    "all": true,
-    "check-coverage": true,
-    "statements": 86,
-    "branches": 64,
-    "functions": 88,
-    "lines": 85
-  },
-  "gitHead": "514fd02f46752e018aedb77e1716a212ef4a59e5"
+  }
 }

@@ -1,0 +1,16 @@
+{
+  "name": "cicero-e2e",
+  "version": "1.0.0",
+  "private": true,
+  "description": "End-to-end tests that load the cicero-core UMD browser bundle into a real headless Chromium and exercise template loading and signing.",
+  "scripts": {
+    "build:bundles": "npm run build:dist -w @accordproject/cicero-core",
+    "pretest": "npm run build:bundles && npx --yes playwright install chromium",
+    "test": "playwright test"
+  },
+  "devDependencies": {
+    "@accordproject/cicero-core": "*",
+    "@playwright/test": "^1.49.0",
+    "@types/node": "^20.11.30"
+  }
+}

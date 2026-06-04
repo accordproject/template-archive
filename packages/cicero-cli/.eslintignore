@@ -1,5 +1,10 @@
 coverage
 node_modules
 out
-lib/grammar
+umd
+lib
 test/data
+src/grammars
+scripts
+dist
+webpack.config.js

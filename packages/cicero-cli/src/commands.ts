@@ -1,0 +1,283 @@
+/*
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+import * as fs from 'fs';
+import * as path from 'path';
+// eslint-disable-next-line @typescript-eslint/no-var-requires
+const mkdirp = require('mkdirp');
+
+// eslint-disable-next-line @typescript-eslint/no-var-requires
+const { Logger, FileWriter } = require('@accordproject/concerto-util');
+import { Template } from '@accordproject/cicero-core';
+import { TemplateArchiveProcessor } from '@accordproject/template-engine';
+// eslint-disable-next-line @typescript-eslint/no-var-requires
+const { CodeGen } = require('@accordproject/concerto-codegen');
+
+/**
+ * Utility class that implements the commands exposed by the Cicero CLI.
+ * @class
+ * @memberof module:cicero-cli
+ */
+export class Commands {
+    /**
+     * Whether the template path is to a file (template archive)
+     * @param {string} templatePath - path to the template directory or archive
+     * @return {boolean} true if the path is to a file, false otherwise
+     */
+    static isTemplateArchive(templatePath) {
+        return fs.lstatSync(templatePath).isFile();
+    }
+
+    /**
+     * Return a promise to a template from either a directory or an archive file
+     * @param {string} templatePath - path to the template directory or archive
+     * @param {Object} [options] - an optional set of options
+     * @return {Promise<Template>} a Promise to the instantiated template
+     */
+    static loadTemplate(templatePath, options) {
+        if (Commands.isTemplateArchive(templatePath)) {
+            const buffer = fs.readFileSync(templatePath);
+            return Template.fromArchive(buffer, options);
+        } else {
+            return Template.fromDirectory(templatePath, options);
+        }
+    }
+
+    /**
+     * Common default params before we create an archive using a template
+     *
+     * @param {object} argv - the inbound argument values object
+     * @returns {object} a modfied argument object
+     */
+    static validateCommonArgs(argv) {
+        // the user typed 'cicero [command] [template]'
+        if(argv._.length === 2){
+            argv.template = argv._[1];
+        }
+
+        if(!argv.template){
+            Logger.info('Using current directory as template folder');
+            argv.template = '.';
+        }
+
+        argv.template = path.resolve(argv.template);
+
+        if (!Commands.isTemplateArchive(argv.template)) {
+            const packageJsonExists = fs.existsSync(path.resolve(argv.template,'package.json'));
+            let isAPTemplate = false;
+            if(packageJsonExists){
+                const packageJsonContents = JSON.parse(fs.readFileSync(path.resolve(argv.template,'package.json'), 'utf8'));
+                isAPTemplate = packageJsonContents.accordproject;
+            }
+
+            if(!packageJsonExists || !isAPTemplate){
+                throw new Error(`${argv.template} is not a valid cicero template. Make sure that package.json exists and that it has a cicero entry.`);
+            }
+        }
+
+        return argv;
+    }
+
+    /**
+     * Set default params before we create an archive using a template
+     *
+     * @param {object} argv the inbound argument values object
+     * @returns {object} a modfied argument object
+     */
+    static validateArchiveArgs(argv) {
+        return Commands.validateCommonArgs(argv);
+    }
+
+    /**
+     * Create an archive using a template
+     *
+     * @param {string} templatePath - path to the template directory or archive
+     * @param {string} target - target language for the archive
+     * @param {string} outputPath - to the archive file
+     * @param {Object} [options] - an optional set of options
+     * @returns {object} Promise to the code creating an archive
+     */
+    static archive(templatePath, target, outputPath, options) {
+        return Commands.loadTemplate(templatePath, options)
+            .then(async (template) => {
+                let keystore = null;
+                if (options.keystore) {
+                    const p12File = fs.readFileSync(options.keystore.path, { encoding: 'base64' });
+                    const inputKeystore = {
+                        p12File: p12File,
+                        passphrase: options.keystore.passphrase
+                    };
+                    keystore = inputKeystore;
+                }
+                const archive = await template.toArchive(target, {keystore}, options);
+                let file;
+                if (outputPath) {
+                    file = outputPath;
+                }
+                else {
+                    const templateName = template.getMetadata().getName();
+                    const templateVersion = template.getMetadata().getVersion();
+                    file = `${templateName}@${templateVersion}.cta`;
+                }
+                Logger.info('Creating archive: ' + file);
+                fs.writeFileSync(file, archive);
+                return true;
+            });
+    }
+
+    /**
+     * Set default params before we draft text from a template
+     *
+     * @param {object} argv the inbound argument values object
+     * @returns {object} a modified argument object
+     */
+    static validateDraftArgs(argv) {
+        argv = Commands.validateCommonArgs(argv);
+        if (!argv.data) {
+            argv.data = path.resolve(argv.template, 'data.json');
+        }
+        return argv;
+    }
+
+    /**
+     * Draft sample text by merging a template with contract data
+     *
+     * @param {string} templatePath - path to the template directory or archive
+     * @param {string} dataPath - path to the JSON data for the template
+     * @param {string} outputPath - the output file, prints to the console when null
+     * @param {string} format - the output format
+     * @param {string} currentTime - the definition of 'now'
+     * @param {Object} [options] - an optional set of options
+     * @returns {Promise<string>} Promise to the drafted text
+     */
+    static draft(templatePath, dataPath, outputPath, format, currentTime, options) {
+        const data = JSON.parse(fs.readFileSync(dataPath, 'utf8'));
+        return Commands.loadTemplate(templatePath, options)
+            .then(async (template) => {
+                const processor = new TemplateArchiveProcessor(template);
+                const drafted = await processor.draft(data, format, options, currentTime);
+                const text = typeof drafted === 'string' ? drafted : JSON.stringify(drafted);
+                if (outputPath) {
+                    Logger.info('Creating file: ' + outputPath);
+                    fs.writeFileSync(outputPath, text);
+                }
+                return text;
+            });
+    }
+
+    /**
+     * Set default params before we verify signatures of template author/developer
+     *
+     * @param {object} argv the inbound argument values object
+     * @returns {object} a modfied argument object
+     */
+    static validateVerifyArgs(argv) {
+        argv = Commands.validateCommonArgs(argv);
+        return argv;
+    }
+
+    /**
+     * Verify the template developer/author's signatures
+     *
+     * @param {string} templatePath - path to the template directory or archive
+     * @param {Object} [options] - an optional set of options
+     * @returns {object} returns true if signature is valid else false
+     */
+    static verify(templatePath, options?) {
+        return Commands.loadTemplate(templatePath, options)
+            .then((template) => {
+                return template.verifyTemplateSignature();
+            });
+    }
+
+    /**
+     * Set default params before we compile a template
+     *
+     * @param {object} argv the inbound argument values object
+     * @returns {object} a modfied argument object
+     */
+    static validateCompileArgs(argv) {
+        argv = Commands.validateCommonArgs(argv);
+
+        if(argv.verbose) {
+            Logger.info(`compile using a template ${argv.template}`);
+        }
+
+        return argv;
+    }
+
+    /**
+     * Compile the template to a given target
+     *
+     * @param {string} templatePath - path to the template directory or archive
+     * @param {string} target - the target format
+     * @param {string} outputPath - the output directory
+     * @param {Object} [options] - an optional set of options
+     * @returns {object} Promise to the result of code generation
+     */
+    static compile(templatePath, target, outputPath, options) {
+
+        return Commands.loadTemplate(templatePath, options)
+            .then((template) => {
+                const VisitorClass = CodeGen.formats[target];
+                if(!VisitorClass) {
+                    throw new Error ('Unrecognized code generator: ' + target);
+                }
+                const visitor = new VisitorClass();
+                console.log('generating code...');
+                const parameters: any = {};
+                parameters.fileWriter = new FileWriter(outputPath);
+                template.getModelManager().accept(visitor, parameters);
+            })
+            .catch((err) => {
+                Logger.error(err);
+            });
+    }
+
+    /**
+     * Set default params before we download external dependencies
+     *
+     * @param {object} argv the inbound argument values object
+     * @returns {object} a modfied argument object
+     */
+    static validateGetArgs(argv) {
+        argv = Commands.validateCommonArgs(argv);
+        if (!argv.output) {
+            if (Commands.isTemplateArchive(argv.template)) {
+                argv.output = './model';
+            } else {
+                argv.output = path.resolve(argv.template,'model');
+            }
+        }
+        return argv;
+    }
+
+    /**
+     * Fetches all external for a set of models dependencies and
+     * saves all the models to a target directory
+     *
+     * @param {string} templatePath the system model
+     * @param {string} output the output directory
+     * @return {string} message
+     */
+    static async get(templatePath, output) {
+        return Commands.loadTemplate(templatePath, {})
+            .then((template) => {
+                const modelManager = template.getModelManager();
+                mkdirp.sync(output);
+                modelManager.writeModelsToFileSystem(output);
+                return `Loaded external models in '${output}'.`;
+            });
+    }
+}
