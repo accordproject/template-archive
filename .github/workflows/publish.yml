@@ -42,7 +42,7 @@ jobs:
       - name: build and publish
         run: |
           node ./scripts/bump_version.js ${{ github.event.release.tag_name }}
-          npm version --workspaces --include-workspace-root --no-git-tag-version --yes --exact ${{ github.event.release.tag_name }}
+          npm version --workspaces --include-workspace-root --no-git-tag-version --allow-same-version ${{ github.event.release.tag_name }}
           npm publish --workspaces --access public --provenance ${{ steps.tag.outputs.tag }} 2>&1
 
       - name: Create PR to increment version
