@@ -446,6 +446,18 @@ export default class Template {
     }
 
     /**
+     * Returns a list of fully-qualified types that are concrete subclasses of the parameter,
+     * excluding the runtime base type itself.
+     * @param {String} type The fully-qualified type to search for
+     * @return {String[]} An array of fully-qualified types
+     * @private
+     */
+    findConcreteDerivedSubclassNames(type) {
+        return this.findConcreteSubclassNames(type)
+            .filter(subclass => subclass !== type);
+    }
+
+    /**
      * Returns a list of fully-qualified event types declared by this template.
      * @return {String[]} An array of fully-qualified event types
      * @private
@@ -460,11 +472,25 @@ export default class Template {
     }
 
     /**
+     * Returns a list of fully-qualified non-abstract declarations declared by this template.
+     * @return {String[]} An array of fully-qualified types
+     * @private
+     */
+    findConcreteDeclarationNames() {
+        return this.getModelManager()
+            .getModelFiles()
+            .filter(modelFile => !modelFile.isExternal())
+            .flatMap(modelFile => modelFile.getAllDeclarations())
+            .filter(decl => !decl.isAbstract())
+            .map(decl => decl.getFullyQualifiedName());
+    }
+
+    /**
      * Provides a list of the input types that are accepted by this Template. Types use the fully-qualified form.
      * @return {Array} a list of the request types
      */
     getRequestTypes() {
-        return this.findConcreteSubclassNames('org.accordproject.runtime@0.2.0.Request');
+        return this.findConcreteDerivedSubclassNames('org.accordproject.runtime@0.2.0.Request');
     }
 
     /**
@@ -472,7 +498,7 @@ export default class Template {
      * @return {Array} a list of the response types
      */
     getResponseTypes() {
-        return this.findConcreteSubclassNames('org.accordproject.runtime@0.2.0.Response');
+        return this.findConcreteDerivedSubclassNames('org.accordproject.runtime@0.2.0.Response');
     }
 
     /**
@@ -485,12 +511,15 @@ export default class Template {
 
     /**
      * Provides a list of the state types that are expected by this Template. Types use the fully-qualified form.
-     * Doesnot return the base state type since they are not required by stateless templates.
+     * Includes runtime State subclasses and declarations that follow the conventional *State naming.
      * @return {Array} a list of the state types
      */
     getStateTypes() {
-        return this.findConcreteSubclassNames('org.accordproject.runtime@0.2.0.State')
-            .filter(type => type !== 'org.accordproject.runtime@0.2.0.State');
+        const stateTypes = [
+            ...this.findConcreteDerivedSubclassNames('org.accordproject.runtime@0.2.0.State'),
+            ...this.findConcreteDeclarationNames().filter(type => /State$/.test(type)),
+        ];
+        return Array.from(new Set(stateTypes));
     }
 
     /**
