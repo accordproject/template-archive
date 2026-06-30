@@ -446,6 +446,20 @@ export default class Template {
     }
 
     /**
+     * Returns a list of fully-qualified event types declared by this template.
+     * @return {String[]} An array of fully-qualified event types
+     * @private
+     */
+    findConcreteEventNames() {
+        return this.getModelManager()
+            .getModelFiles()
+            .filter(modelFile => !modelFile.isExternal())
+            .flatMap(modelFile => modelFile.getEventDeclarations())
+            .filter(decl => !decl.isAbstract())
+            .map(decl => decl.getFullyQualifiedName());
+    }
+
+    /**
      * Provides a list of the input types that are accepted by this Template. Types use the fully-qualified form.
      * @return {Array} a list of the request types
      */
@@ -466,15 +480,17 @@ export default class Template {
      * @return {Array} a list of the emit types
      */
     getEmitTypes() {
-        return this.findConcreteSubclassNames('org.accordproject.runtime@0.2.0.Obligation');
+        return this.findConcreteEventNames();
     }
 
     /**
      * Provides a list of the state types that are expected by this Template. Types use the fully-qualified form.
+     * Doesnot return the base state type since they are not required by stateless templates.
      * @return {Array} a list of the state types
      */
     getStateTypes() {
-        return this.findConcreteSubclassNames('org.accordproject.runtime@0.2.0.State');
+        return this.findConcreteSubclassNames('org.accordproject.runtime@0.2.0.State')
+            .filter(type => type !== 'org.accordproject.runtime@0.2.0.State');
     }
 
     /**
@@ -483,6 +499,16 @@ export default class Template {
      */
     hasLogic() {
         return this.getScriptManager().getScripts().length > 0;
+    }
+
+    /**
+     * Provides a list of the state types that are expected by this Template. Types use the fully-qualified form.
+     * Doesnot return the base state type since they are not required by stateless templates.
+     * @return {boolean} true if the template is stateful
+     */
+
+    isStateful() {
+        return this.getStateTypes().length > 0;
     }
 
     /**
