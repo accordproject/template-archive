@@ -486,19 +486,45 @@ export default class Template {
     }
 
     /**
-     * Provides a list of the input types that are accepted by this Template. Types use the fully-qualified form.
-     * @return {Array} a list of the request types
+     * Provides the concrete request types declared by this Template, excluding the runtime base Request type.
+     * Types use the fully-qualified form.
+     * @return {String[]} a list of the custom request types
      */
-    getRequestTypes() {
+    getCustomRequestTypes() {
         return this.findConcreteDerivedSubclassNames('org.accordproject.runtime@0.2.0.Request');
     }
 
     /**
-     * Provides a list of the response types that are returned by this Template. Types use the fully-qualified form.
-     * @return {Array} a list of the response types
+     * Provides a list of the input types that are accepted by this Template, including the runtime base Request
+     * type. Types use the fully-qualified form.
+     * @return {String[]} a list of the request types
+     */
+    getRequestTypes() {
+        return [
+            'org.accordproject.runtime@0.2.0.Request',
+            ...this.getCustomRequestTypes(),
+        ];
+    }
+
+    /**
+     * Provides the concrete response types declared by this Template, excluding the runtime base Response type.
+     * Types use the fully-qualified form.
+     * @return {String[]} a list of the custom response types
+     */
+    getCustomResponseTypes() {
+        return this.findConcreteDerivedSubclassNames('org.accordproject.runtime@0.2.0.Response');
+    }
+
+    /**
+     * Provides a list of the response types that are returned by this Template, including the runtime base
+     * Response type. Types use the fully-qualified form.
+     * @return {String[]} a list of the response types
      */
     getResponseTypes() {
-        return this.findConcreteDerivedSubclassNames('org.accordproject.runtime@0.2.0.Response');
+        return [
+            'org.accordproject.runtime@0.2.0.Response',
+            ...this.getCustomResponseTypes(),
+        ];
     }
 
     /**
@@ -510,16 +536,29 @@ export default class Template {
     }
 
     /**
-     * Provides a list of the state types that are expected by this Template. Types use the fully-qualified form.
-     * Includes runtime State subclasses and declarations that follow the conventional *State naming.
-     * @return {Array} a list of the state types
+     * Provides the custom state types declared by this Template, excluding the runtime base State type.
+     * Includes concrete State subclasses and declarations that follow the conventional *State naming.
+     * Types use the fully-qualified form.
+     * @return {String[]} a list of the custom state types
      */
-    getStateTypes() {
+    getCustomStateTypes() {
         const stateTypes = [
             ...this.findConcreteDerivedSubclassNames('org.accordproject.runtime@0.2.0.State'),
             ...this.findConcreteDeclarationNames().filter(type => /State$/.test(type)),
         ];
         return Array.from(new Set(stateTypes));
+    }
+
+    /**
+     * Provides a list of the state types that are expected by this Template, including the runtime base State type.
+     * Types use the fully-qualified form.
+     * @return {String[]} a list of the state types
+     */
+    getStateTypes() {
+        return [
+            'org.accordproject.runtime@0.2.0.State',
+            ...this.getCustomStateTypes(),
+        ];
     }
 
     /**
@@ -531,13 +570,11 @@ export default class Template {
     }
 
     /**
-     * Provides a list of the state types that are expected by this Template. Types use the fully-qualified form.
-     * Doesnot return the base state type since they are not required by stateless templates.
+     * Returns true if the template declares one or more custom state types beyond the runtime base State type.
      * @return {boolean} true if the template is stateful
      */
-
     isStateful() {
-        return this.getStateTypes().length > 0;
+        return this.getCustomStateTypes().length > 0;
     }
 
     /**
