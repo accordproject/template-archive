@@ -451,7 +451,7 @@ export default class Template {
      * Provides a list of the input types that are accepted by this Template. Types use the fully-qualified form.
      * @return {String[]} a list of the request types
      */
-    getRequestTypes(excludeBaseType = false) {
+    getRequestTypes() {
         return this.findConcreteSubclassNames('org.accordproject.runtime@0.2.0.Request');
     }
 
@@ -474,7 +474,7 @@ export default class Template {
     /**
      * Provides a list of the state types that are expected by this Template. Types use the fully-qualified form.
      * @param {boolean} excludeBaseType Exclude the runtime base Response type
-    * @return {Array} a list of the state types
+    * @return {String[]} a list of the state types
      */
     getStateTypes() {
         return this.findConcreteSubclassNames('org.accordproject.runtime@0.2.0.State');
