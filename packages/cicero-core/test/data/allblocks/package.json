@@ -1,9 +1,9 @@
 {
-    "name": "allblocks",
-    "version": "0.0.1",
-    "description": "Test all blocks",
-    "accordproject": {
-      "template": "clause",
-      "cicero": "^1.0.0"
-    }
+  "name": "allblocks",
+  "version": "0.0.1",
+  "description": "Test all blocks",
+  "accordproject": {
+    "template": "clause",
+    "cicero": "^2.0.0"
   }
+}
