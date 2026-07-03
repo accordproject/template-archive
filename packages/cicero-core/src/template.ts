@@ -432,22 +432,24 @@ export default class Template {
 
     /**
      * Returns a list of a fully-qualified types that are concrete sub-classes of the parameter.
-     * Includes the parameter if it is not abstract.
+     * Includes the parameter by default if it is not abstract.
      * @param {String} type The fully-qualified type to search for
+     * @param {boolean} excludeBaseType Exclude the base parameter type
      * @return {String[]} An array of fully-qualified types
      * @private
      */
-    findConcreteSubclassNames(type) {
+    findConcreteSubclassNames(type, excludeBaseType = false) {
         return this.getModelManager()
             .getType(type)
             .getAssignableClassDeclarations()
             .filter(subclass => !subclass.isAbstract())
+            .filter(subclass => !excludeBaseType || subclass.getFullyQualifiedName() !== type)
             .map(decl => decl.getFullyQualifiedName());
     }
 
     /**
      * Provides a list of the input types that are accepted by this Template. Types use the fully-qualified form.
-     * @return {Array} a list of the request types
+     * @return {String[]} a list of the request types
      */
     getRequestTypes() {
         return this.findConcreteSubclassNames('org.accordproject.runtime@0.2.0.Request');
@@ -455,7 +457,7 @@ export default class Template {
 
     /**
      * Provides a list of the response types that are returned by this Template. Types use the fully-qualified form.
-     * @return {Array} a list of the response types
+     * @return {String[]} a list of the response types
      */
     getResponseTypes() {
         return this.findConcreteSubclassNames('org.accordproject.runtime@0.2.0.Response');
@@ -471,7 +473,8 @@ export default class Template {
 
     /**
      * Provides a list of the state types that are expected by this Template. Types use the fully-qualified form.
-     * @return {Array} a list of the state types
+     * @param {boolean} excludeBaseType Exclude the runtime base Response type
+    * @return {String[]} a list of the state types
      */
     getStateTypes() {
         return this.findConcreteSubclassNames('org.accordproject.runtime@0.2.0.State');
@@ -483,6 +486,14 @@ export default class Template {
      */
     hasLogic() {
         return this.getScriptManager().getScripts().length > 0;
+    }
+
+    /**
+     * Returns true if the template declares one or more custom state types beyond the runtime base State type.
+     * @return {boolean} true if the template is stateful
+     */
+    isStateful() {
+        return this.findConcreteSubclassNames('org.accordproject.runtime@0.2.0.State', true).length > 0;
     }
 
     /**
