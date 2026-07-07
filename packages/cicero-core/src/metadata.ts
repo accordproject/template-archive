@@ -47,6 +47,7 @@ export default class Metadata {
     readme: any;
     samples: any;
     request: any;
+    sampleData: any;
     type: any;
 
     /**
@@ -164,6 +165,7 @@ export default class Metadata {
         this.logo = logo;
         this.samples = samples;
         this.request = request;
+        this.sampleData = null;
 
         this.type = templateTypes.CONTRACT;
         if (packageJson.accordproject && packageJson.accordproject.template) {
@@ -276,6 +278,22 @@ export default class Metadata {
      */
     getRequest() {
         return this.request;
+    }
+
+    /**
+     * Returns the sample data for this template.
+     * @return {object} the sample data (from sample.json) or null
+     */
+    getSampleData() {
+        return this.sampleData;
+    }
+
+    /**
+     * Sets the sample data for this template.
+     * @param {object} sampleData - the JS object from sample.json
+     */
+    setSampleData(sampleData) {
+        this.sampleData = sampleData;
     }
 
     /**
@@ -418,7 +436,9 @@ export default class Metadata {
         }
         const packageJson = JSON.parse(JSON.stringify(this.packageJson));
         packageJson.accordproject.runtime = runtimeName;
-        return new Metadata(packageJson, this.readme, this.samples, this.request, this.logo);
+        const metadata = new Metadata(packageJson, this.readme, this.samples, this.request, this.logo);
+        metadata.setSampleData(this.sampleData);
+        return metadata;
     }
 
     /**
@@ -431,6 +451,7 @@ export default class Metadata {
             'readme' : this.getREADME(),
             'samples' : this.getSamples(),
             'request' : this.getRequest(),
+            'sampleData' : this.getSampleData(),
             'logo' : this.getLogo() ? this.getLogo().toString('base64') : null,
         };
     }

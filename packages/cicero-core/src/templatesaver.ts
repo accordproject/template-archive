@@ -86,6 +86,11 @@ export default class TemplateSaver {
             zip.file('request.json', requestFileContents, options);
         }
 
+        // save the sample.json if present
+        if (metadata.getSampleData()) {
+            zip.file('sample.json', JSON.stringify(metadata.getSampleData()), options);
+        }
+
         const modelFiles = template.getModelManager().getModels();
         zip.file('model/', null, Object.assign({}, options, {
             dir: true

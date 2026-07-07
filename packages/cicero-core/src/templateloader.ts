@@ -67,6 +67,7 @@ export default class TemplateLoader {
         const packageJsonObject = await TemplateLoader.loadZipFileContents(zip, 'package.json', true, true);
         const grammar = await TemplateLoader.loadZipFileContents(zip, 'text/grammar.tem.md', false, false);
         const authorSignature = await TemplateLoader.loadZipFileContents(zip, 'signature.json', true, false);
+        const sampleData = await TemplateLoader.loadZipFileContents(zip, 'sample.json', true);
 
         Logger.debug(method, 'Looking for model files');
         const ctoFiles = await TemplateLoader.loadZipFilesContents(zip, /model[/\\].*\.cto$/);
@@ -77,6 +78,9 @@ export default class TemplateLoader {
 
         // create the template
         const template = new Template(packageJsonObject, readmeContents, sampleTextFiles, requestContents, logo, options, authorSignature);
+        if (sampleData) {
+            template.getMetadata().setSampleData(sampleData);
+        }
 
         // add model files
         Logger.debug(method, 'Adding model files to model manager');
@@ -169,8 +173,14 @@ export default class TemplateLoader {
         // grab the signature.json
         const authorSignature = await TemplateLoader.loadFileContents(path, 'signature.json', true, false);
 
+        // grab the sample.json
+        const sampleData = await TemplateLoader.loadFileContents(path, 'sample.json', true, false);
+
         // create the template
         const template = new Template(packageJsonObject, readmeContents, sampleTextFiles, requestJsonObject, logo, options, authorSignature);
+        if (sampleData) {
+            template.getMetadata().setSampleData(sampleData);
+        }
         const modelFiles = [];
         const modelFileNames = [];
         const ctoFiles = await TemplateLoader.loadFilesContents(path, /model[/\\].*\.cto$/);
