@@ -1,0 +1,18 @@
+{
+    "$class": "io.clause.latedeliveryandpenalty@0.1.0.TemplateModel",
+    "clauseId": "39dfbd52-3e77-4d6d-8524-61cb9c5a5c4a",
+    "forceMajeure": false,
+    "penaltyDuration": {
+        "$class": "org.accordproject.time@0.3.0.Duration",
+        "amount": 9,
+        "unit": "days"
+    },
+    "penaltyPercentage": 7.0,
+    "capPercentage": 2.0,
+    "termination": {
+        "$class": "org.accordproject.time@0.3.0.Duration",
+        "amount": 2,
+        "unit": "weeks"
+    },
+    "fractionalPart": "days"
+}

@@ -323,6 +323,19 @@ describe('Template', () => {
         it('should create an archive for a template with two Ergo modules', async () => {
             await expect(Template.fromDirectory('./test/data/hellomodule', options)).resolves.toBeDefined();
         });
+
+        it('should load sample.json and preserve it through archive round-trip', async () => {
+            const template = await Template.fromDirectory('./test/data/latedeliveryandpenalty', options);
+            const sampleData = template.getMetadata().getSampleData();
+            expect(sampleData).not.toBeNull();
+            expect(sampleData['$class']).toBe('io.clause.latedeliveryandpenalty@0.1.0.TemplateModel');
+            expect(sampleData.forceMajeure).toBe(false);
+            expect(sampleData.penaltyPercentage).toBe(7.0);
+
+            const buffer = await template.toArchive('es6');
+            const template2 = await Template.fromArchive(buffer);
+            expect(template2.getMetadata().getSampleData()).toEqual(sampleData);
+        });
     });
 
     describe('#fromArchive', () => {
@@ -567,7 +580,7 @@ describe('Template', () => {
     describe('#getHash', () => {
         it('should return a SHA-256 hash', async () => {
             const template = await Template.fromDirectory('./test/data/latedeliveryandpenalty', options);
-            expect(template.getHash()).toBe('eda8037f39d38474f5db9c06060221b4a8fc85a935922044fc51c6b4eacbe5c8');
+            expect(template.getHash()).toBe('62e7aca26d15063f5a99ad5ba996c5dc54da7f0979a6f03291a6feb87b81a009');
         });
     });
 
