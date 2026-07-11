@@ -20,7 +20,8 @@ import Clause from './clause';
 import Template from './template';
 import TemplateLoader from './templateloader';
 import TemplateLibrary from './templatelibrary';
+import Script from './script';
 // version is read at runtime to avoid pulling package.json into rootDir
 // eslint-disable-next-line @typescript-eslint/no-var-requires
 const version = require('../package.json').version;
-export { Clause, Template, TemplateLoader, TemplateLibrary, version };
+export { Clause, Template, TemplateLoader, TemplateLibrary, Script, version };
