@@ -1,18 +1,23 @@
 {
-    "name": "fixed-interests",
-    "version": "0.6.0",
-    "description": "A Fixed Interests Loan Clause, with a monthly Payment",
-    "author": "Accord Project",
-    "license": "Apache-2.0",
-    "accordproject": {
-        "template": "clause",
-        "cicero": "^1.0.0"
-    },
-    "devDependencies": {
-        "cucumber": "^5.1.0"
-    },
-    "scripts": {
-        "test": "cucumber-js test -r .cucumber.js"
-    },
-    "keywords": ["loan", "interests", "fixed", "principal"]
+  "name": "fixed-interests",
+  "version": "0.6.0",
+  "description": "A Fixed Interests Loan Clause, with a monthly Payment",
+  "author": "Accord Project",
+  "license": "Apache-2.0",
+  "accordproject": {
+    "template": "clause",
+    "cicero": "^2.0.0"
+  },
+  "devDependencies": {
+    "cucumber": "^5.1.0"
+  },
+  "scripts": {
+    "test": "cucumber-js test -r .cucumber.js"
+  },
+  "keywords": [
+    "loan",
+    "interests",
+    "fixed",
+    "principal"
+  ]
 }

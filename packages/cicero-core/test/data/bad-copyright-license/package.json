@@ -1,8 +1,8 @@
 {
-    "name": "copyright-license",
-    "version": "0.0.1",
-    "accordproject": {
-      "template": "contract",
-      "cicero": "^1.0.0"
-    }
+  "name": "copyright-license",
+  "version": "0.0.1",
+  "accordproject": {
+    "template": "contract",
+    "cicero": "^2.0.0"
+  }
 }
