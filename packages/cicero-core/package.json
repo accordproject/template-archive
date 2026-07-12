@@ -85,7 +85,7 @@
     "@accordproject/markdown-common": "1.0.1",
     "@accordproject/markdown-template": "1.0.1",
     "@accordproject/markdown-transform": "1.0.1",
-    "axios": "1.15.0",
+    "axios": "1.16.0",
     "debug": "4.3.4",
     "ietf-language-tag-regex": "0.0.5",
     "json-stable-stringify": "1.0.2",
