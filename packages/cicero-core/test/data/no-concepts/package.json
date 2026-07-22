@@ -1,9 +1,9 @@
 {
-    "name": "conga",
-    "version": "0.0.1",
-    "description": "\"Dan Selman\" agrees to spend 100.0 conga coins on \"swag\"",
-    "accordproject": {
-        "template": "clause",
-        "cicero": "^1.0.0"
-    }
+  "name": "conga",
+  "version": "0.0.1",
+  "description": "\"Dan Selman\" agrees to spend 100.0 conga coins on \"swag\"",
+  "accordproject": {
+    "template": "clause",
+    "cicero": "^2.1.0"
+  }
 }
