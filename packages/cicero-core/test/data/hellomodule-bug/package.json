@@ -1,9 +1,9 @@
 {
-    "name": "hellomodule",
-    "version": "0.1.0",
-    "description": "This is the Hello World of Accord Protocol Templates (with two Ergo modules).",
-    "accordproject": {
-        "template": "clause",
-        "cicero": "^1.0.0"
-    }
+  "name": "hellomodule",
+  "version": "0.1.0",
+  "description": "This is the Hello World of Accord Protocol Templates (with two Ergo modules).",
+  "accordproject": {
+    "template": "clause",
+    "cicero": "^2.1.0"
+  }
 }
