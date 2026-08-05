@@ -112,7 +112,7 @@ export default class TemplateLoader {
         // check the integrity of the model and logic of the template
         template.validate({
             ...options,
-            verifySignature: Boolean(authorSignature && !(options && options.disableSignatureVerification))
+            verifySignature: Boolean(authorSignature && !options?.disableSignatureVerification)
         });
 
         return template; // Returns template
@@ -235,7 +235,7 @@ export default class TemplateLoader {
         // check the template
         template.validate({
             ...options,
-            verifySignature: Boolean(authorSignature && !(options && options.disableSignatureVerification))
+            verifySignature: Boolean(authorSignature && !options?.disableSignatureVerification)
         });
 
         return template;
