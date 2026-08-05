@@ -110,7 +110,10 @@ export default class TemplateLoader {
             template.getLogicManager().addLogicFile(obj.contents, obj.name);
         });
         // check the integrity of the model and logic of the template
-        authorSignature ? template.validate({ verifySignature: options && options.disableSignatureVerification ? false : true }) : template.validate();
+        template.validate({
+            ...options,
+            verifySignature: Boolean(authorSignature && !(options && options.disableSignatureVerification))
+        });
 
         return template; // Returns template
     }
@@ -230,7 +233,10 @@ export default class TemplateLoader {
         });
 
         // check the template
-        authorSignature ? template.validate({ verifySignature: options && options.disableSignatureVerification ? false : true }) : template.validate();
+        template.validate({
+            ...options,
+            verifySignature: Boolean(authorSignature && !(options && options.disableSignatureVerification))
+        });
 
         return template;
     }

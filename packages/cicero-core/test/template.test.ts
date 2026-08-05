@@ -177,6 +177,18 @@ describe('Template', () => {
             await expect(Template.fromDirectory('./test/data/latedeliveryandpenalty', options)).resolves.toBeDefined();
         });
 
+        it('should not update external models when loading a directory offline', async () => {
+            const { ModelManager } = require('@accordproject/concerto-core');
+            const updateExternalModels = jest.spyOn(ModelManager.prototype, 'updateExternalModels').mockResolvedValue(undefined);
+
+            try {
+                await Template.fromDirectory('./test/data/latedeliveryandpenalty', { offline: true });
+                expect(updateExternalModels).not.toHaveBeenCalled();
+            } finally {
+                updateExternalModels.mockRestore();
+            }
+        });
+
         it('should throw error when date of the signature is tampered', async () => {
             await expect(Template.fromDirectory('./test/data/verifying-template-signature/helloworldstateTamperDate', options)).rejects.toThrow('Template\'s author signature is invalid!');
         });
@@ -355,6 +367,20 @@ describe('Template', () => {
             const template = await Template.fromDirectory('./test/data/latedeliveryandpenalty');
             const buffer = await template.toArchive('es6');
             await expect(Template.fromArchive(buffer)).resolves.toBeDefined();
+        });
+
+        it('should not update external models when loading an archive offline', async () => {
+            await writeZip('latedeliveryandpenalty');
+            const buffer = fs.readFileSync('./test/data/archives/latedeliveryandpenalty.zip');
+            const { ModelManager } = require('@accordproject/concerto-core');
+            const updateExternalModels = jest.spyOn(ModelManager.prototype, 'updateExternalModels').mockResolvedValue(undefined);
+
+            try {
+                await Template.fromArchive(buffer, { offline: true });
+                expect(updateExternalModels).not.toHaveBeenCalled();
+            } finally {
+                updateExternalModels.mockRestore();
+            }
         });
 
         it('should throw an error if multiple template models are found', async () => {
