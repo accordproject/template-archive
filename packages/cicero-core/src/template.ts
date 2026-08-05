@@ -194,7 +194,7 @@ export default class Template {
 
         const modelFiles = this.getModelManager().getModels();
         modelFiles.forEach((file) => {
-            content.models[file.namespace] = this._normalize(file.content);
+            content.models[file.name] = this._normalize(file.content);
         });
 
         const scriptManager = this.getScriptManager();
