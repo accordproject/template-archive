@@ -1,6 +1,6 @@
 {
   "name": "cicero-e2e",
-  "version": "1.0.0",
+  "version": "2.0.0",
   "private": true,
   "description": "End-to-end tests that load the cicero-core UMD browser bundle into a real headless Chromium and exercise template loading and signing.",
   "scripts": {
