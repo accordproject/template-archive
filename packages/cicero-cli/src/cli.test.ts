@@ -97,10 +97,10 @@ describe('#compile', () => {
 
     it('should compile a template archive to a Typescript model', async () => {
         const dir = await tmp.dir({ unsafeCleanup: true });
-        const template = await Template.fromDirectory(path.resolve(dataDir, 'helloworldstate'));
+        const template = await Template.fromDirectory(path.resolve(dataDir, 'helloworldstate'), { offline: true });
         const buffer = await template.toArchive('es6');
         fs.writeFileSync(path.resolve(dir.path, 'helloworldstate.cta'), buffer);
-        await Commands.compile(path.resolve(dir.path, 'helloworldstate.cta'), 'Typescript', dir.path, true);
+        await Commands.compile(path.resolve(dir.path, 'helloworldstate.cta'), 'Typescript', dir.path, { offline: true });
         expect(fs.readdirSync(dir.path).length).toBeGreaterThan(0);
         dir.cleanup();
     });

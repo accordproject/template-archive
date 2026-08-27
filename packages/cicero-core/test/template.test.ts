@@ -89,20 +89,22 @@ async function writeZip(template) {
 }
 /* eslint-enable */
 
-const options = { offline: false };
+// runtime@1.0.0 is not published, so every template that imports it must be
+// resolved from the model files cached in the template rather than over HTTP.
+const options = { offline: true };
 
 describe('Template', () => {
 
     describe('#toArchive', () => {
 
         it('should create the archive without signature', async () => {
-            const template = await Template.fromDirectory('./test/data/signing-template/helloworldstate');
+            const template = await Template.fromDirectory('./test/data/signing-template/helloworldstate', options);
             const archiveBuffer = await template.toArchive('es6');
             expect(archiveBuffer).not.toBeNull();
         });
 
         it('should create the archive and sign it', async () => {
-            const template = await Template.fromDirectory('./test/data/signing-template/helloworldstate');
+            const template = await Template.fromDirectory('./test/data/signing-template/helloworldstate', options);
             const p12File = fs.readFileSync('./test/data/keystore/keystore.p12', { encoding: 'base64' });
             const keystore = {
                 p12File: p12File,
@@ -113,7 +115,7 @@ describe('Template', () => {
         });
 
         it('should throw an error if passphrase of the keystore is wrong', async () => {
-            const template = await Template.fromDirectory('./test/data/signing-template/helloworldstate');
+            const template = await Template.fromDirectory('./test/data/signing-template/helloworldstate', options);
             const p12File = fs.readFileSync('./test/data/keystore/keystore.p12', { encoding: 'base64' });
             const keystore = {
                 p12File: p12File,
@@ -126,7 +128,7 @@ describe('Template', () => {
     describe('#signTemplate', () => {
 
         it('should sign the content hash and timestamp string using the keystore', async () => {
-            const template = await Template.fromDirectory('./test/data/helloworldstate');
+            const template = await Template.fromDirectory('./test/data/helloworldstate', options);
             const timestamp = Date.now();
             const templateHash = template.getHash();
             const p12File = fs.readFileSync('./test/data/keystore/keystore.p12', { encoding: 'base64' });
@@ -163,14 +165,21 @@ describe('Template', () => {
             return Template.fromDirectory('./test/data/template-decorator', options);
         });
 
-        it('should create a template with typescript logic from a directory', async () => {
+        it('should create a template from a directory with text only', async () => {
             return Template.fromDirectory('./test/data/text-only', options);
         });
 
-        it('should create a template from a directory and download external models by default', async () => {
-            const template = await Template.fromDirectory('./test/data/latedeliveryandpenalty-typescript');
+        it('should create a template with typescript logic from a directory', async () => {
+            const template = await Template.fromDirectory('./test/data/latedeliveryandpenalty-typescript', options);
             expect(template.getLogicManager().getLanguage()).toBe('typescript');
             expect(template.getLogicManager().getScriptManager().getScript('logic/logic.ts')).not.toBeNull();
+        });
+
+        // this template imports only published namespaces, so it is the one
+        // fixture that can still be resolved over HTTP
+        it('should create a template from a directory and download external models by default', async () => {
+            const template = await Template.fromDirectory('./test/data/template-decorator');
+            expect(template.getModelManager().getModelFile('org.accordproject.time@0.3.0')).not.toBeNull();
         });
 
         it('should create a template from a directory', async () => {
@@ -210,12 +219,12 @@ describe('Template', () => {
         it('should roundtrip a template with a logo', async () => {
             const template = await Template.fromDirectory('./test/data/template-logo', options);
             expect(template.getIdentifier()).toBe('logo@0.0.1');
-            expect(template.getHash()).toBe('16c0dfadd2629b957b3848aa321e8c304be6c4361b86a0885d62641732acf0c6');
+            expect(template.getHash()).toBe('e8e8144c07e4c9f579ab1eca8a34589189b4f29ae66b06c3996e8f959d5c128f');
             expect(template.getMetadata().getLogo()).toBeInstanceOf(Buffer);
             expect(template.getMetadata().getSample()).toBe('"Aman" "Sharma" added the support for logo and hence created this template for testing!\n');
             const buffer = await template.toArchive('es6');
             expect(buffer).not.toBeNull();
-            const template2 = await Template.fromArchive(buffer);
+            const template2 = await Template.fromArchive(buffer, options);
             expect(template2.getIdentifier()).toBe(template.getIdentifier());
             template2.getHash(template.getHash());
             expect(template2.getMetadata().getLogo()).toEqual(template.getMetadata().getLogo());
@@ -234,17 +243,17 @@ describe('Template', () => {
             expect(template.getDescription()).toBe('Late Delivery and Penalty. In case of delayed delivery except for Force Majeure cases, the Seller shall pay to the Buyer for every 9 DAY of delay penalty amounting to 7.0% of the total value of the Equipment whose delivery has been delayed. Any fractional part of a DAY is to be considered a full DAY. The total amount of penalty shall not however, exceed 2.0% of the total value of the Equipment involved in late delivery. If the delay is more than 2 WEEK, the Buyer is entitled to terminate this Contract.');
             expect(template.getVersion()).toBe('0.0.1');
             expect(template.getMetadata().getSample()).toBe('Late Delivery and Penalty.\n\nIn case of delayed delivery except for Force Majeure cases, the Seller shall pay to the Buyer for every 9 days of delay penalty amounting to 7.0% of the total value of the Equipment whose delivery has been delayed. Any fractional part of a days is to be considered a full days. The total amount of penalty shall not however, exceed 2.0% of the total value of the Equipment involved in late delivery. If the delay is more than 2 weeks, the Buyer is entitled to terminate this Contract.\n');
-            expect(template.getHash()).toBe('5c3a8999c7cd3c38b3d9c45b8b335f72d80a34ef640d58ceadd2f6d574786426');
+            expect(template.getHash()).toBe('312186581ecdd9790295c7c2c6b01b21b000b83b5fc56d98be3dd5d969d14d84');
             const buffer = await template.toArchive('es6');
             expect(buffer).not.toBeNull();
-            const template2 = await Template.fromArchive(buffer);
+            const template2 = await Template.fromArchive(buffer, options);
             expect(template2.getIdentifier()).toBe(template.getIdentifier());
             expect(template2.getModelManager().getModelFile('io.clause.latedeliveryandpenalty@0.1.0')).not.toBeNull();
             expect(template2.getMetadata().getREADME()).toBe(template.getMetadata().getREADME());
             expect(template2.getMetadata().getKeywords()).toEqual(template.getMetadata().getKeywords());
             expect(template2.getMetadata().getSamples()).toEqual(template.getMetadata().getSamples());
             // Hash doesn't match because setting a target language changes the hash
-            expect(template2.getHash()).toBe('80d7a26e2b6cb20eb9c8355f0bcb5d11a5bd0a83986b5d2f659478f3ae179f95');
+            expect(template2.getHash()).toBe('d7e1384b08d929470faabdf32fe291ac4c9ec242307397bbc6573b15a9ae29ca');
             expect(template.getDisplayName()).toBe('Latedeliveryandpenalty');
             const buffer2 = await template2.toArchive('es6');
             expect(buffer2).not.toBeNull();
@@ -261,10 +270,10 @@ describe('Template', () => {
             expect(template.getDescription()).toBe('Late Delivery and Penalty. In case of delayed delivery except for Force Majeure cases, the Seller shall pay to the Buyer for every 9 DAY of delay penalty amounting to 7% of the total value of the Equipment whose delivery has been delayed. Any fractional part of a DAY is to be considered a full DAY. The total amount of penalty shall not however, exceed 2% of the total value of the Equipment involved in late delivery. If the delay is more than 2 WEEK, the Buyer is entitled to terminate this Contract.');
             expect(template.getVersion()).toBe('0.0.1');
             expect(template.getMetadata().getSample()).toBe('Late Delivery and Penalty. In case of delayed delivery except for Force Majeure cases, the Seller shall pay to the Buyer for every 9 days of delay penalty amounting to 7% of the total value of the Equipment whose delivery has been delayed. Any fractional part of a days is to be considered a full days. The total amount of penalty shall not however, exceed 2% of the total value of the Equipment involved in late delivery. If the delay is more than 2 weeks, the Buyer is entitled to terminate this Contract.');
-            expect(template.getHash()).toBe('2e2b1de6badf41bebf9cbd9b524ca482a23d0aafd20bdd01225650389ec3e39d');
+            expect(template.getHash()).toBe('cc4484fa6d935b04dbb6a786d771e361e80e72ef3c802e7e9a62b311abf0f335');
             const buffer = await template.toArchive('es6');
             expect(buffer).not.toBeNull();
-            const template2 = await Template.fromArchive(buffer);
+            const template2 = await Template.fromArchive(buffer, options);
             expect(template2.getIdentifier()).toBe(template.getIdentifier());
             expect(template2.getModelManager().getModelFile('io.clause.latedeliveryandpenalty@1.0.0')).not.toBeNull();
             expect(template2.getMetadata().getREADME()).toBe(template.getMetadata().getREADME());
@@ -345,7 +354,7 @@ describe('Template', () => {
             expect(sampleData.penaltyPercentage).toBe(7.0);
 
             const buffer = await template.toArchive('es6');
-            const template2 = await Template.fromArchive(buffer);
+            const template2 = await Template.fromArchive(buffer, options);
             expect(template2.getMetadata().getSampleData()).toEqual(sampleData);
         });
     });
@@ -360,13 +369,13 @@ describe('Template', () => {
                 passphrase: 'password'
             };
             const archiveBuffer = await template.toArchive('es6', { keystore });
-            await expect(Template.fromArchive(archiveBuffer)).resolves.toBeDefined();
+            await expect(Template.fromArchive(archiveBuffer, options)).resolves.toBeDefined();
         });
 
         it('should create a template from an archive', async () => {
-            const template = await Template.fromDirectory('./test/data/latedeliveryandpenalty');
+            const template = await Template.fromDirectory('./test/data/latedeliveryandpenalty', options);
             const buffer = await template.toArchive('es6');
-            await expect(Template.fromArchive(buffer)).resolves.toBeDefined();
+            await expect(Template.fromArchive(buffer, options)).resolves.toBeDefined();
         });
 
         it('should not update external models when loading an archive offline', async () => {
@@ -386,19 +395,19 @@ describe('Template', () => {
         it('should throw an error if multiple template models are found', async () => {
             await writeZip('multiple-concepts');
             const buffer = fs.readFileSync('./test/data/archives/multiple-concepts.zip');
-            await expect(Template.fromArchive(buffer)).rejects.toThrow('Failed to find a concept with the @template decorator. The model for the template must contain a single concept with the @template decoratpr.');
+            await expect(Template.fromArchive(buffer, options)).rejects.toThrow('Failed to find a concept with the @template decorator. The model for the template must contain a single concept with the @template decoratpr.');
         });
 
         it('should throw an error if a package.json file does not exist', async () => {
             await writeZip('no-packagejson');
             const buffer = fs.readFileSync('./test/data/archives/no-packagejson.zip');
-            await expect(Template.fromArchive(buffer)).rejects.toThrow('Failed to find package.json');
+            await expect(Template.fromArchive(buffer, options)).rejects.toThrow('Failed to find package.json');
         });
 
         it('should create a template from archive and check if it has a logo', async () => {
-            const template = await Template.fromDirectory('./test/data/logo@0.0.1');
+            const template = await Template.fromDirectory('./test/data/logo@0.0.1', options);
             const buffer = await template.toArchive('es6');
-            const template2 = await Template.fromArchive(buffer);
+            const template2 = await Template.fromArchive(buffer, options);
             expect(template2.getMetadata().getLogo()).toBeInstanceOf(Buffer);
         });
 
@@ -517,7 +526,7 @@ describe('Template', () => {
             const template = await Template.fromDirectory('./test/data/latedeliveryandpenalty', options);
             const types = template.getRequestTypes();
             expect(types).toEqual([
-                'org.accordproject.runtime@0.2.0.Request',
+                'org.accordproject.runtime@1.0.0.Request',
                 'io.clause.latedeliveryandpenalty@0.1.0.LateDeliveryAndPenaltyRequest',
             ]);
         });
@@ -526,7 +535,7 @@ describe('Template', () => {
             const template = await Template.fromDirectory('./test/data/no-logic', options);
             const types = template.getRequestTypes();
             expect(types).toEqual([
-                'org.accordproject.runtime@0.2.0.Request',
+                'org.accordproject.runtime@1.0.0.Request',
                 'io.clause.latedeliveryandpenalty@0.1.0.LateDeliveryAndPenaltyRequest'
             ]);
         });
@@ -538,16 +547,16 @@ describe('Template', () => {
             const template = await Template.fromDirectory('./test/data/latedeliveryandpenalty', options);
             const types = template.getResponseTypes();
             expect(types).toEqual([
-                'org.accordproject.runtime@0.2.0.Response',
+                'org.accordproject.runtime@1.0.0.Response',
                 'io.clause.latedeliveryandpenalty@0.1.0.LateDeliveryAndPenaltyResponse',
             ]);
         });
 
         it('should return response type when no logic is defined', async () => {
-            const template = await Template.fromDirectory('./test/data/no-logic');
+            const template = await Template.fromDirectory('./test/data/no-logic', options);
             const types = template.getResponseTypes();
             expect(types).toEqual([
-                'org.accordproject.runtime@0.2.0.Response',
+                'org.accordproject.runtime@1.0.0.Response',
                 'io.clause.latedeliveryandpenalty@0.1.0.LateDeliveryAndPenaltyResponse',]);
         });
     });
@@ -577,36 +586,70 @@ describe('Template', () => {
 
     describe('#getStateTypes', () => {
 
-        it('should return the default state type for a clause without state type declaration', async () => {
+        // StateData is abstract, so a template that declares no state of its
+        // own has no state type at all
+        it('should return no state type for a clause without state type declaration', async () => {
             const template = await Template.fromDirectory('./test/data/latedeliveryandpenalty', options);
             const types = template.getStateTypes();
-            expect(types).toEqual([
-                'org.accordproject.runtime@0.2.0.State',
-            ]);
+            expect(types).toEqual([]);
         });
 
         it('should return state type when declared in a clause', async () => {
             const template = await Template.fromDirectory('./test/data/helloemit', options);
             const types = template.getStateTypes();
             expect(types).toEqual([
-                'org.accordproject.runtime@0.2.0.State',
                 'org.accordproject.helloemit@1.0.0.HelloWorldState'
             ]);
         });
 
-        it('should return state type when no logic is defined', async () => {
+        it('should return no state type when no logic is defined', async () => {
             const template = await Template.fromDirectory('./test/data/no-logic', options);
             const types = template.getStateTypes();
-            expect(types).toEqual([
-                'org.accordproject.runtime@0.2.0.State',
-            ]);
+            expect(types).toEqual([]);
+        });
+    });
+
+    describe('#isStateful', () => {
+
+        it('should be true for a template that declares a state type', async () => {
+            const template = await Template.fromDirectory('./test/data/helloworldstate', options);
+            expect(template.isStateful()).toBe(true);
+        });
+
+        it('should be false for a template that declares no state type', async () => {
+            const template = await Template.fromDirectory('./test/data/latedeliveryandpenalty', options);
+            expect(template.isStateful()).toBe(false);
+        });
+    });
+
+    describe('a template written against the 0.2.0 runtime', () => {
+
+        it('should be rejected rather than loaded', async () => {
+            await expect(Template.fromDirectory('./test/data/legacy-runtime', options))
+                .rejects.toThrow('The template targets Cicero version ^1.0.0 but the current Cicero version is');
+        });
+    });
+
+    describe('a template that loads no runtime namespace', () => {
+
+        it('should report no runtime types rather than throwing', async () => {
+            const template = await Template.fromDirectory('./test/data/no-runtime-namespace', options);
+            expect(template.getRequestTypes()).toEqual([]);
+            expect(template.getResponseTypes()).toEqual([]);
+            expect(template.getEmitTypes()).toEqual([]);
+            expect(template.getStateTypes()).toEqual([]);
+        });
+
+        it('should be recognised as stateless', async () => {
+            const template = await Template.fromDirectory('./test/data/no-runtime-namespace', options);
+            expect(template.isStateful()).toBe(false);
         });
     });
 
     describe('#getHash', () => {
         it('should return a SHA-256 hash', async () => {
             const template = await Template.fromDirectory('./test/data/latedeliveryandpenalty', options);
-            expect(template.getHash()).toBe('62e7aca26d15063f5a99ad5ba996c5dc54da7f0979a6f03291a6feb87b81a009');
+            expect(template.getHash()).toBe('6cfbd0187fec28d52ce6aa8e674cdb5d1acecf4236efe0b0202342c1fe6194d2');
         });
     });
 

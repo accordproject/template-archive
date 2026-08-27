@@ -32,6 +32,30 @@ import LogicManager from './logicmanager';
  */
 export default class Template {
 
+    /**
+     * The base request type. A template declares its own request as a subtype.
+     */
+    static REQUEST_TYPE = 'org.accordproject.runtime@1.0.0.Request';
+
+    /**
+     * The base response type. A template declares its own response as a subtype.
+     */
+    static RESPONSE_TYPE = 'org.accordproject.runtime@1.0.0.Response';
+
+    /**
+     * The base emit type. runtime@1.0.0 does not define an obligation of its
+     * own: obligations are durable state in their own namespace, so that
+     * lifecycle is not coupled to the runtime API.
+     */
+    static EMIT_TYPE = 'org.accordproject.obligation@1.0.0.Obligation';
+
+    /**
+     * The base state type. It is abstract, and a template declares one
+     * concrete subtype which the runtime carries in its state envelope
+     * rather than subclassing the envelope itself.
+     */
+    static STATE_TYPE = 'org.accordproject.runtime@1.0.0.StateData';
+
     metadata: any;
     logicManager: any;
     authorSignature: any;
@@ -433,17 +457,28 @@ export default class Template {
     /**
      * Returns a list of a fully-qualified types that are concrete sub-classes of the parameter.
      * Includes the parameter by default if it is not abstract.
+     *
+     * A base type whose namespace the template does not load is not an error:
+     * it simply contributes nothing. A template that declares no state, or
+     * emits nothing, does not import the namespace that base type lives in.
+     *
      * @param {String} type The fully-qualified type to search for
-     * @param {boolean} excludeBaseType Exclude the base parameter type
      * @return {String[]} An array of fully-qualified types
      * @private
      */
-    findConcreteSubclassNames(type, excludeBaseType = false) {
-        return this.getModelManager()
-            .getType(type)
+    findConcreteSubclassNames(type) {
+        let baseType;
+        try {
+            baseType = this.getModelManager().getType(type);
+        } catch (err) {
+            if (err.errorType === 'TypeNotFoundException') {
+                return [];
+            }
+            throw err;
+        }
+        return baseType
             .getAssignableClassDeclarations()
             .filter(subclass => !subclass.isAbstract())
-            .filter(subclass => !excludeBaseType || subclass.getFullyQualifiedName() !== type)
             .map(decl => decl.getFullyQualifiedName());
     }
 
@@ -452,7 +487,7 @@ export default class Template {
      * @return {String[]} a list of the request types
      */
     getRequestTypes() {
-        return this.findConcreteSubclassNames('org.accordproject.runtime@0.2.0.Request');
+        return this.findConcreteSubclassNames(Template.REQUEST_TYPE);
     }
 
     /**
@@ -460,7 +495,7 @@ export default class Template {
      * @return {String[]} a list of the response types
      */
     getResponseTypes() {
-        return this.findConcreteSubclassNames('org.accordproject.runtime@0.2.0.Response');
+        return this.findConcreteSubclassNames(Template.RESPONSE_TYPE);
     }
 
     /**
@@ -468,16 +503,15 @@ export default class Template {
      * @return {Array} a list of the emit types
      */
     getEmitTypes() {
-        return this.findConcreteSubclassNames('org.accordproject.runtime@0.2.0.Obligation');
+        return this.findConcreteSubclassNames(Template.EMIT_TYPE);
     }
 
     /**
      * Provides a list of the state types that are expected by this Template. Types use the fully-qualified form.
-     * @param {boolean} excludeBaseType Exclude the runtime base Response type
-    * @return {String[]} a list of the state types
+     * @return {String[]} a list of the state types
      */
     getStateTypes() {
-        return this.findConcreteSubclassNames('org.accordproject.runtime@0.2.0.State');
+        return this.findConcreteSubclassNames(Template.STATE_TYPE);
     }
 
     /**
@@ -489,11 +523,11 @@ export default class Template {
     }
 
     /**
-     * Returns true if the template declares one or more custom state types beyond the runtime base State type.
+     * Returns true if the template declares one or more state types.
      * @return {boolean} true if the template is stateful
      */
     isStateful() {
-        return this.findConcreteSubclassNames('org.accordproject.runtime@0.2.0.State', true).length > 0;
+        return this.getStateTypes().length > 0;
     }
 
     /**

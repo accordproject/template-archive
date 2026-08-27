@@ -1,0 +1,10 @@
+namespace org.accordproject.noruntimenamespace@1.0.0
+
+/**
+ * The template model. This template deliberately imports no runtime
+ * namespace, so none of the runtime base types resolve.
+ */
+@template
+concept MyClause {
+  o String name
+}

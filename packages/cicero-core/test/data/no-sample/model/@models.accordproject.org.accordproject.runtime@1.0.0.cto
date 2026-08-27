@@ -1,0 +1,44 @@
+/*
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+// A reduced copy of org.accordproject.runtime@1.0.0, carrying only the base
+// types cicero-core resolves by name. The published namespace also defines the
+// agreement state envelope and its clause-state map; cicero-core looks up
+// neither, and the map requires a Concerto version this package does not pin.
+// Kept local because the namespace is not published yet.
+
+concerto version "^3.0.0"
+
+namespace org.accordproject.runtime@1.0.0
+
+/**
+ * Base request for invoking contract logic with no custom request properties.
+ */
+transaction Request {
+}
+
+/**
+ * Base response for contract logic with no custom response properties.
+ */
+transaction Response {
+}
+
+/**
+ * The extension point for template-specific runtime state.
+ *
+ * A template declares one concrete subtype and it is carried in the runtime
+ * state envelope: state is composed into the envelope rather than subclassing
+ * it, which is why this is an abstract concept and not an asset.
+ */
+abstract concept StateData {}
