@@ -74,7 +74,6 @@
     "stream-browserify": "3.0.0",
     "ts-jest": "^29.1.2",
     "ts-loader": "^9.5.2",
-    "typescript": "^5.9.3",
     "webpack": "5.104.1",
     "webpack-cli": "^5.1.4"
   },
@@ -94,7 +93,8 @@
     "node-forge": "^1.4.0",
     "semver": "7.5.3",
     "slash": "3.0.0",
-    "xregexp": "5.1.1"
+    "xregexp": "5.1.1",
+    "typescript": "^5.9.3"
   },
   "peerDependencies": {
     "@accordproject/concerto-core": "^4.1.3"
