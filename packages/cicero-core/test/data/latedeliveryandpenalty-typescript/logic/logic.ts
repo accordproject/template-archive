@@ -1,3 +1,3 @@
-function trigger(request:any) : any {
-    return 'hello!';
+export function trigger(request: LateDeliveryAndPenaltyRequest): LateDeliveryAndPenaltyResponse {
+    return 'hello!' as any;
 }
