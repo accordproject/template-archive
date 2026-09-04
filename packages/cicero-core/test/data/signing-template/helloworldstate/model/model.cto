@@ -1,7 +1,8 @@
 namespace org.accordproject.helloworldstate@1.0.0
 
 import org.accordproject.contract@0.2.0.{Clause, Contract} from https://models.accordproject.org/accordproject/contract@0.2.0.cto
-import org.accordproject.runtime@0.2.0.{Request, Response, State, Obligation} from https://models.accordproject.org/accordproject/runtime@0.2.0.cto
+import org.accordproject.runtime@1.0.0.{Request, Response} from https://models.accordproject.org/accordproject/runtime@1.0.0.cto
+import org.accordproject.templatedata@1.0.0.StateData from https://models.accordproject.org/accordproject/templatedata@1.0.0.cto
 
 transaction MyRequest extends Request {
   o String input
@@ -11,7 +12,7 @@ transaction MyResponse extends Response {
   o String output
 }
 
-asset HelloWorldState extends State {
+concept HelloWorldState extends StateData {
   o Double counter
 }
 

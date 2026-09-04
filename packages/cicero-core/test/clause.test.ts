@@ -17,7 +17,9 @@
 import Template from '../src/template';
 import Clause from '../src/clause';
 
-const options = { offline: false };
+// runtime@1.0.0 is not published, so templates that import it must be resolved
+// from the model files cached in the template rather than over HTTP.
+const options = { offline: true };
 
 describe('Clause', () => {
 

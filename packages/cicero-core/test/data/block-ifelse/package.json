@@ -5,7 +5,7 @@
     "license": "Apache-2.0",
     "accordproject": {
         "template": "contract",
-        "cicero": "^1.0.0",
+        "cicero": "^2.0.0",
         "runtime": "es6"
     },
     "devDependencies": {
