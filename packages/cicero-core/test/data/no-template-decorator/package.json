@@ -1,0 +1,17 @@
+{
+    "name": "no-template-decorator",
+    "displayName": "No Template Decorator",
+    "version": "0.1.0",
+    "description": "A template whose model carries no @template decorator, used to check that its one concrete subtype of TemplateData is found by type rather than by annotation.",
+    "author": "Accord Project",
+    "license": "Apache-2.0",
+    "accordproject": {
+        "template": "clause",
+        "cicero": "^2.0.0",
+        "runtime": "es6"
+    },
+    "keywords": [
+        "template",
+        "templatedata"
+    ]
+}

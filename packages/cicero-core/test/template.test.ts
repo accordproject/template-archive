@@ -15,6 +15,7 @@
 'use strict';
 
 import Template from '../src/template';
+import Clause from '../src/clause';
 import fs from 'fs';
 import forge from 'node-forge';
 import crypto from 'crypto';
@@ -284,10 +285,6 @@ describe('Template', () => {
             expect(buffer2).not.toBeNull();
         });
 
-        it('should throw an error if multiple template models are found', async () => {
-            await expect(Template.fromDirectory('./test/data/multiple-concepts', options)).rejects.toThrow('Failed to find a concept with the @template decorator. The model for the template must contain a single concept with the @template decoratpr');
-        });
-
         it('should throw an error if no template models are found', async () => {
             await expect(Template.fromDirectory('./test/data/no-concepts', options)).rejects.toThrow('Failed to find a concept with the @template decorator. The model for the template must contain a single concept with the @template decoratpr');
         });
@@ -392,10 +389,10 @@ describe('Template', () => {
             }
         });
 
-        it('should throw an error if multiple template models are found', async () => {
+        it('should throw an error if multiple concrete subtypes of TemplateData are found', async () => {
             await writeZip('multiple-concepts');
             const buffer = fs.readFileSync('./test/data/archives/multiple-concepts.zip');
-            await expect(Template.fromArchive(buffer, options)).rejects.toThrow('Failed to find a concept with the @template decorator. The model for the template must contain a single concept with the @template decoratpr.');
+            await expect(Template.fromArchive(buffer, options)).rejects.toThrow('Found multiple concrete subtypes of org.accordproject.templatedata@1.0.0.TemplateData: org.accordproject.conga@1.0.0.TemplateModel, org.accordproject.conga@1.0.0.TemplateModel2.');
         });
 
         it('should throw an error if a package.json file does not exist', async () => {
@@ -622,6 +619,37 @@ describe('Template', () => {
         });
     });
 
+    describe('#getTemplateModel', () => {
+
+        it('should find the template model by its TemplateData supertype, with no @template decorator', async () => {
+            const template = await Template.fromDirectory('./test/data/no-template-decorator', options);
+            const templateModel = template.getTemplateModel();
+            expect(templateModel.getFullyQualifiedName()).toBe('org.accordproject.notemplatedecorator@1.0.0.SomethingData');
+        });
+
+        it('should load and set data for a template model found by TemplateData, with no @template decorator', async () => {
+            const template = await Template.fromDirectory('./test/data/no-template-decorator', options);
+            const clause = new Clause(template);
+            const data = {
+                $class: 'org.accordproject.notemplatedecorator@1.0.0.SomethingData',
+                name: 'Fred Blogs'
+            };
+            clause.setData(data);
+            expect(clause.getData()).toEqual(data);
+            expect(clause.getDataAsConcertoObject().getFullyQualifiedType()).toBe('org.accordproject.notemplatedecorator@1.0.0.SomethingData');
+        });
+
+        it('should fall back to the @template decorator when the model declares no concrete subtype of TemplateData', async () => {
+            const template = await Template.fromDirectory('./test/data/latedeliveryandpenalty', options);
+            const templateModel = template.getTemplateModel();
+            expect(templateModel.getFullyQualifiedName()).toBe('io.clause.latedeliveryandpenalty@0.1.0.TemplateModel');
+        });
+
+        it('should throw an error if multiple concrete subtypes of TemplateData are found', async () => {
+            await expect(Template.fromDirectory('./test/data/multiple-concepts', options)).rejects.toThrow('Found multiple concrete subtypes of org.accordproject.templatedata@1.0.0.TemplateData: org.accordproject.conga@1.0.0.TemplateModel, org.accordproject.conga@1.0.0.TemplateModel2.');
+        });
+    });
+
     describe('a template written against the 0.2.0 runtime', () => {
 
         it('should be rejected rather than loaded', async () => {
@@ -643,6 +671,14 @@ describe('Template', () => {
         it('should be recognised as stateless', async () => {
             const template = await Template.fromDirectory('./test/data/no-runtime-namespace', options);
             expect(template.isStateful()).toBe(false);
+        });
+
+        // this fixture declares no concrete subtype of TemplateData either, so
+        // it also covers the @template decorator fallback for the template model
+        it('should still find its template model via the @template decorator', async () => {
+            const template = await Template.fromDirectory('./test/data/no-runtime-namespace', options);
+            const templateModel = template.getTemplateModel();
+            expect(templateModel.getFullyQualifiedName()).toBe('org.accordproject.noruntimenamespace@1.0.0.MyClause');
         });
     });
 

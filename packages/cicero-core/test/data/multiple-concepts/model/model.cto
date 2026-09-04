@@ -1,21 +1,23 @@
 namespace org.accordproject.conga@1.0.0
 
-import org.accordproject.contract@0.2.0.Clause from https://models.accordproject.org/accordproject/contract@0.2.0.cto
+import org.accordproject.templatedata@1.0.0.TemplateData from https://models.accordproject.org/accordproject/templatedata@1.0.0.cto
 import org.accordproject.runtime@1.0.0.{Request, Response} from https://models.accordproject.org/accordproject/runtime@1.0.0.cto
 
 /**
  * Defines the data model for the Conga template.
  */
-asset TemplateModel extends Clause {
+concept TemplateModel extends TemplateData {
   o Double amount
   o String swag
   --> Participant participant
 }
 
 /**
- * A duplicate data model for testing.
+ * A duplicate data model for testing. A model with two concrete subtypes of
+ * TemplateData is ambiguous: cicero-core cannot tell which one is the
+ * template model, and must reject it rather than guess.
  */
-asset TemplateModel2 extends Clause {
+concept TemplateModel2 extends TemplateData {
   o Double amount
   o String swag
   --> Participant participant

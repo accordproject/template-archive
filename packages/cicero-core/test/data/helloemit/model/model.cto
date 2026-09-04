@@ -1,7 +1,8 @@
 namespace org.accordproject.helloemit@1.0.0
 
 import org.accordproject.contract@0.2.0.{Clause, Contract} from https://models.accordproject.org/accordproject/contract@0.2.0.cto
-import org.accordproject.runtime@1.0.0.{Request, Response, StateData} from https://models.accordproject.org/accordproject/runtime@1.0.0.cto
+import org.accordproject.runtime@1.0.0.{Request, Response} from https://models.accordproject.org/accordproject/runtime@1.0.0.cto
+import org.accordproject.templatedata@1.0.0.StateData from https://models.accordproject.org/accordproject/templatedata@1.0.0.cto
 import org.accordproject.obligation@1.0.0.Obligation from https://models.accordproject.org/accordproject/obligation@1.0.0.cto
 
 transaction MyRequest extends Request {

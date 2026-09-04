@@ -54,7 +54,15 @@ export default class Template {
      * concrete subtype which the runtime carries in its state envelope
      * rather than subclassing the envelope itself.
      */
-    static STATE_TYPE = 'org.accordproject.runtime@1.0.0.StateData';
+    static STATE_TYPE = 'org.accordproject.templatedata@1.0.0.StateData';
+
+    /**
+     * The base template data type. It is abstract, and a template's model
+     * declares exactly one concrete subtype of it: that subtype is the
+     * template model. Extending TemplateData is the declaration, so no
+     * `@template` decorator is required to identify it.
+     */
+    static TEMPLATE_DATA_TYPE = 'org.accordproject.templatedata@1.0.0.TemplateData';
 
     metadata: any;
     logicManager: any;
@@ -115,11 +123,29 @@ export default class Template {
     }
 
     /**
-     * Returns the template model for the template
+     * Returns the template model for the template.
+     *
+     * A template's model declares exactly one concrete subtype of
+     * {@link Template.TEMPLATE_DATA_TYPE}, and that subtype is the template
+     * model: extending `TemplateData` is the declaration, so no `@template`
+     * decorator is required to identify it. Templates whose model does not
+     * import `templatedata@1.0.0` at all - because it predates this
+     * convention, or because the namespace simply is not loaded - fall back
+     * to the legacy `@template` decorator so they keep loading unchanged.
      * @throws {Error} if no template model is found, or multiple template models are found
      * @returns {ClassDeclaration} the template model for the template
      */
     getTemplateModel() {
+        const templateModelNames = this.findConcreteSubclassNames(Template.TEMPLATE_DATA_TYPE);
+
+        if (templateModelNames.length > 1) {
+            throw new Error(`Found multiple concrete subtypes of ${Template.TEMPLATE_DATA_TYPE}: ${templateModelNames.join(', ')}. A template model must declare exactly one concrete subtype of TemplateData.`);
+        }
+
+        if (templateModelNames.length === 1) {
+            return this.getModelManager().getType(templateModelNames[0]);
+        }
+
         return templatemarkutil.findTemplateConcept(this.getIntrospector(), 'clause');
     }
 

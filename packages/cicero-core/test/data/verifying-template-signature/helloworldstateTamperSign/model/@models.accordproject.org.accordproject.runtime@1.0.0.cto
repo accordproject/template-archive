@@ -33,12 +33,3 @@ transaction Request {
  */
 transaction Response {
 }
-
-/**
- * The extension point for template-specific runtime state.
- *
- * A template declares one concrete subtype and it is carried in the runtime
- * state envelope: state is composed into the envelope rather than subclassing
- * it, which is why this is an abstract concept and not an asset.
- */
-abstract concept StateData {}
