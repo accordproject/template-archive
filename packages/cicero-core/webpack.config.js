@@ -40,11 +40,6 @@ module.exports = {
     resolve: {
         extensions: ['.ts', '.tsx', '.js'],
         mainFields: ['browser', 'module', 'main'],
-        alias: {
-            // Force CJS entry so webpack can apply path/fs fallbacks to the source.
-            // The concerto-core pre-built browser bundle has path=false internally.
-            '@accordproject/concerto-core': require.resolve('@accordproject/concerto-core/dist/index.js'),
-        },
         fallback: {
             fs:            false,
             path:          require.resolve('path-browserify'),

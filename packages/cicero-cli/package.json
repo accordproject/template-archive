@@ -47,8 +47,8 @@
   "homepage": "https://www.accordproject.org/projects/cicero",
   "dependencies": {
     "@accordproject/cicero-core": "1.0.0",
-    "@accordproject/concerto-codegen": "^4.0.1",
-    "@accordproject/concerto-util": "^4.0.3",
+    "@accordproject/concerto-codegen": "^6.3.0",
+    "@accordproject/concerto-util": "^5.0.0",
     "@accordproject/template-engine": "^3.0.1",
     "mkdirp": "3.0.1",
     "yargs": "17.7.2"
