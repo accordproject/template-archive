@@ -89,20 +89,20 @@ async function writeZip(template) {
 }
 /* eslint-enable */
 
-const options = { offline: false };
+const options = { offline: true };
 
 describe('Template', () => {
 
     describe('#toArchive', () => {
 
         it('should create the archive without signature', async () => {
-            const template = await Template.fromDirectory('./test/data/signing-template/helloworldstate');
+            const template = await Template.fromDirectory('./test/data/signing-template/helloworldstate', options);
             const archiveBuffer = await template.toArchive('es6');
             expect(archiveBuffer).not.toBeNull();
         });
 
         it('should create the archive and sign it', async () => {
-            const template = await Template.fromDirectory('./test/data/signing-template/helloworldstate');
+            const template = await Template.fromDirectory('./test/data/signing-template/helloworldstate', options);
             const p12File = fs.readFileSync('./test/data/keystore/keystore.p12', { encoding: 'base64' });
             const keystore = {
                 p12File: p12File,
@@ -113,7 +113,7 @@ describe('Template', () => {
         });
 
         it('should throw an error if passphrase of the keystore is wrong', async () => {
-            const template = await Template.fromDirectory('./test/data/signing-template/helloworldstate');
+            const template = await Template.fromDirectory('./test/data/signing-template/helloworldstate', options);
             const p12File = fs.readFileSync('./test/data/keystore/keystore.p12', { encoding: 'base64' });
             const keystore = {
                 p12File: p12File,
@@ -126,7 +126,7 @@ describe('Template', () => {
     describe('#signTemplate', () => {
 
         it('should sign the content hash and timestamp string using the keystore', async () => {
-            const template = await Template.fromDirectory('./test/data/helloworldstate');
+            const template = await Template.fromDirectory('./test/data/helloworldstate', options);
             const timestamp = Date.now();
             const templateHash = template.getHash();
             const p12File = fs.readFileSync('./test/data/keystore/keystore.p12', { encoding: 'base64' });
@@ -168,9 +168,16 @@ describe('Template', () => {
         });
 
         it('should create a template from a directory and download external models by default', async () => {
-            const template = await Template.fromDirectory('./test/data/latedeliveryandpenalty-typescript');
-            expect(template.getLogicManager().getLanguage()).toBe('typescript');
-            expect(template.getLogicManager().getScriptManager().getScript('logic/logic.ts')).not.toBeNull();
+            const { ModelManager } = require('@accordproject/concerto-core');
+            const updateExternalModels = jest.spyOn(ModelManager.prototype, 'updateExternalModels').mockResolvedValue(undefined);
+            try {
+                const template = await Template.fromDirectory('./test/data/latedeliveryandpenalty-typescript');
+                expect(template.getLogicManager().getLanguage()).toBe('typescript');
+                expect(template.getLogicManager().getScriptManager().getScript('logic/logic.ts')).not.toBeNull();
+                expect(updateExternalModels).toHaveBeenCalled();
+            } finally {
+                updateExternalModels.mockRestore();
+            }
         });
 
         it('should create a template from a directory', async () => {
@@ -215,7 +222,7 @@ describe('Template', () => {
             expect(template.getMetadata().getSample()).toBe('"Aman" "Sharma" added the support for logo and hence created this template for testing!\n');
             const buffer = await template.toArchive('es6');
             expect(buffer).not.toBeNull();
-            const template2 = await Template.fromArchive(buffer);
+            const template2 = await Template.fromArchive(buffer, options);
             expect(template2.getIdentifier()).toBe(template.getIdentifier());
             template2.getHash(template.getHash());
             expect(template2.getMetadata().getLogo()).toEqual(template.getMetadata().getLogo());
@@ -237,7 +244,7 @@ describe('Template', () => {
             expect(template.getHash()).toBe('5c3a8999c7cd3c38b3d9c45b8b335f72d80a34ef640d58ceadd2f6d574786426');
             const buffer = await template.toArchive('es6');
             expect(buffer).not.toBeNull();
-            const template2 = await Template.fromArchive(buffer);
+            const template2 = await Template.fromArchive(buffer, options);
             expect(template2.getIdentifier()).toBe(template.getIdentifier());
             expect(template2.getModelManager().getModelFile('io.clause.latedeliveryandpenalty@0.1.0')).not.toBeNull();
             expect(template2.getMetadata().getREADME()).toBe(template.getMetadata().getREADME());
@@ -264,7 +271,7 @@ describe('Template', () => {
             expect(template.getHash()).toBe('2e2b1de6badf41bebf9cbd9b524ca482a23d0aafd20bdd01225650389ec3e39d');
             const buffer = await template.toArchive('es6');
             expect(buffer).not.toBeNull();
-            const template2 = await Template.fromArchive(buffer);
+            const template2 = await Template.fromArchive(buffer, options);
             expect(template2.getIdentifier()).toBe(template.getIdentifier());
             expect(template2.getModelManager().getModelFile('io.clause.latedeliveryandpenalty@1.0.0')).not.toBeNull();
             expect(template2.getMetadata().getREADME()).toBe(template.getMetadata().getREADME());
@@ -345,7 +352,7 @@ describe('Template', () => {
             expect(sampleData.penaltyPercentage).toBe(7.0);
 
             const buffer = await template.toArchive('es6');
-            const template2 = await Template.fromArchive(buffer);
+            const template2 = await Template.fromArchive(buffer, options);
             expect(template2.getMetadata().getSampleData()).toEqual(sampleData);
         });
     });
@@ -360,13 +367,13 @@ describe('Template', () => {
                 passphrase: 'password'
             };
             const archiveBuffer = await template.toArchive('es6', { keystore });
-            await expect(Template.fromArchive(archiveBuffer)).resolves.toBeDefined();
+            await expect(Template.fromArchive(archiveBuffer, options)).resolves.toBeDefined();
         });
 
         it('should create a template from an archive', async () => {
-            const template = await Template.fromDirectory('./test/data/latedeliveryandpenalty');
+            const template = await Template.fromDirectory('./test/data/latedeliveryandpenalty', options);
             const buffer = await template.toArchive('es6');
-            await expect(Template.fromArchive(buffer)).resolves.toBeDefined();
+            await expect(Template.fromArchive(buffer, options)).resolves.toBeDefined();
         });
 
         it('should not update external models when loading an archive offline', async () => {
@@ -386,19 +393,19 @@ describe('Template', () => {
         it('should throw an error if multiple template models are found', async () => {
             await writeZip('multiple-concepts');
             const buffer = fs.readFileSync('./test/data/archives/multiple-concepts.zip');
-            await expect(Template.fromArchive(buffer)).rejects.toThrow('Failed to find a concept with the @template decorator. The model for the template must contain a single concept with the @template decoratpr.');
+            await expect(Template.fromArchive(buffer, options)).rejects.toThrow('Failed to find a concept with the @template decorator. The model for the template must contain a single concept with the @template decoratpr.');
         });
 
         it('should throw an error if a package.json file does not exist', async () => {
             await writeZip('no-packagejson');
             const buffer = fs.readFileSync('./test/data/archives/no-packagejson.zip');
-            await expect(Template.fromArchive(buffer)).rejects.toThrow('Failed to find package.json');
+            await expect(Template.fromArchive(buffer, options)).rejects.toThrow('Failed to find package.json');
         });
 
         it('should create a template from archive and check if it has a logo', async () => {
-            const template = await Template.fromDirectory('./test/data/logo@0.0.1');
+            const template = await Template.fromDirectory('./test/data/logo@0.0.1', options);
             const buffer = await template.toArchive('es6');
-            const template2 = await Template.fromArchive(buffer);
+            const template2 = await Template.fromArchive(buffer, options);
             expect(template2.getMetadata().getLogo()).toBeInstanceOf(Buffer);
         });
 
@@ -530,6 +537,14 @@ describe('Template', () => {
                 'io.clause.latedeliveryandpenalty@0.1.0.LateDeliveryAndPenaltyRequest'
             ]);
         });
+
+        it('should return narrowed request types when typescript logic is present', async () => {
+            const template = await Template.fromDirectory('./test/data/latedeliveryandpenalty-typescript', options);
+            const types = template.getRequestTypes();
+            expect(types).toEqual([
+                'io.clause.latedeliveryandpenalty@0.1.0.LateDeliveryAndPenaltyRequest'
+            ]);
+        });
     });
 
     describe('#getResponseTypes', () => {
@@ -544,11 +559,19 @@ describe('Template', () => {
         });
 
         it('should return response type when no logic is defined', async () => {
-            const template = await Template.fromDirectory('./test/data/no-logic');
+            const template = await Template.fromDirectory('./test/data/no-logic', options);
             const types = template.getResponseTypes();
             expect(types).toEqual([
                 'org.accordproject.runtime@0.2.0.Response',
                 'io.clause.latedeliveryandpenalty@0.1.0.LateDeliveryAndPenaltyResponse',]);
+        });
+
+        it('should return narrowed response types when typescript logic is present', async () => {
+            const template = await Template.fromDirectory('./test/data/latedeliveryandpenalty-typescript', options);
+            const types = template.getResponseTypes();
+            expect(types).toEqual([
+                'io.clause.latedeliveryandpenalty@0.1.0.LateDeliveryAndPenaltyResponse'
+            ]);
         });
     });
 
@@ -572,6 +595,27 @@ describe('Template', () => {
             const template = await Template.fromDirectory('./test/data/no-logic', options);
             const types = template.getEmitTypes();
             expect(types).toEqual([]);
+        });
+
+        it('should return empty array when logic does not emit events', async () => {
+            const template = await Template.fromDirectory('./test/data/latedeliveryandpenalty-typescript', options);
+            const types = template.getEmitTypes();
+            expect(types).toEqual([]);
+        });
+
+        it('should return emit type when typescript logic emits event', async () => {
+            const template = await Template.fromDirectory('./test/data/helloemit', options);
+            template.getLogicManager().addLogicFile(`
+                import { Greeting } from './model';
+                export function clause(request: any, emit: (e: Greeting) => void): any {
+                    emit(new Greeting('hello'));
+                    return 'hello!' as any;
+                }
+            `, 'logic/emit.ts');
+            const types = template.getEmitTypes();
+            expect(types).toEqual([
+                'org.accordproject.helloemit@1.0.0.Greeting'
+            ]);
         });
     });
 
@@ -600,6 +644,39 @@ describe('Template', () => {
             expect(types).toEqual([
                 'org.accordproject.runtime@0.2.0.State',
             ]);
+        });
+
+        it('should return empty array when typescript logic is stateless', async () => {
+            const template = await Template.fromDirectory('./test/data/latedeliveryandpenalty-typescript', options);
+            const types = template.getStateTypes();
+            expect(types).toEqual([]);
+            expect(template.isStateful()).toBe(false);
+        });
+
+        it('should detect state type when typescript logic references state', async () => {
+            const template = await Template.fromDirectory('./test/data/helloworldstate', options);
+            template.getLogicManager().addLogicFile(`
+                import { HelloWorldRequest, HelloWorldResponse, HelloWorldState } from './model';
+                export function clause(request: HelloWorldRequest, state: HelloWorldState): HelloWorldResponse {
+                    return 'hello!' as any;
+                }
+            `, 'logic/stateful.ts');
+            expect(template.getStateTypes()).toEqual([
+                'org.accordproject.helloworldstate@1.0.0.HelloWorldState'
+            ]);
+            expect(template.isStateful()).toBe(true);
+        });
+
+        it('should return empty state types when typescript logic is stateless even if model declares state', async () => {
+            const template = await Template.fromDirectory('./test/data/helloworldstate', options);
+            template.getLogicManager().addLogicFile(`
+                import { HelloWorldRequest, HelloWorldResponse } from './model';
+                export function clause(request: HelloWorldRequest): HelloWorldResponse {
+                    return 'hello!' as any;
+                }
+            `, 'logic/stateless.ts');
+            expect(template.getStateTypes()).toEqual([]);
+            expect(template.isStateful()).toBe(false);
         });
     });
 

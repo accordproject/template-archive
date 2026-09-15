@@ -431,6 +431,22 @@ export default class Template {
     }
 
     /**
+     * Returns a list of ClassDeclaration instances that are concrete sub-classes of the parameter.
+     * Includes the parameter by default if it is not abstract.
+     * @param {String} type The fully-qualified type to search for
+     * @param {boolean} excludeBaseType Exclude the base parameter type
+     * @return {ClassDeclaration[]} An array of ClassDeclaration instances
+     * @private
+     */
+    findConcreteSubclassDeclarations(type, excludeBaseType = false) {
+        return this.getModelManager()
+            .getType(type)
+            .getAssignableClassDeclarations()
+            .filter(subclass => !subclass.isAbstract())
+            .filter(subclass => !excludeBaseType || subclass.getFullyQualifiedName() !== type);
+    }
+
+    /**
      * Returns a list of a fully-qualified types that are concrete sub-classes of the parameter.
      * Includes the parameter by default if it is not abstract.
      * @param {String} type The fully-qualified type to search for
@@ -439,11 +455,38 @@ export default class Template {
      * @private
      */
     findConcreteSubclassNames(type, excludeBaseType = false) {
-        return this.getModelManager()
-            .getType(type)
-            .getAssignableClassDeclarations()
-            .filter(subclass => !subclass.isAbstract())
-            .filter(subclass => !excludeBaseType || subclass.getFullyQualifiedName() !== type)
+        return this.findConcreteSubclassDeclarations(type, excludeBaseType)
+            .map(decl => decl.getFullyQualifiedName());
+    }
+
+    /**
+     * Returns a list of fully-qualified types that are concrete sub-classes of the parameter
+     * and actually processed / referenced by the template's logic scripts.
+     * @param {String} type The fully-qualified type to search for
+     * @param {boolean} excludeBaseType Exclude the base parameter type
+     * @return {String[]} An array of fully-qualified types
+     * @private
+     */
+    private findProcessedSubclassNames(type: string, excludeBaseType = false): string[] {
+        const candidates = this.findConcreteSubclassDeclarations(type, excludeBaseType);
+        const scripts = this.getLogicManager().getScripts();
+        const referencedTypes = new Set<string>();
+        for (const script of scripts) {
+            if (typeof script.getTypes === 'function') {
+                for (const t of script.getTypes()) {
+                    referencedTypes.add(t);
+                }
+            }
+        }
+
+        return candidates
+            .filter(decl => {
+                const fqn = decl.getFullyQualifiedName();
+                const name = decl.getName();
+                const namespace = decl.getModelFile ? decl.getModelFile().getNamespace() : decl.getNamespace();
+                const unversionedFqn = namespace ? `${namespace}.${name}` : name;
+                return referencedTypes.has(fqn) || referencedTypes.has(name) || referencedTypes.has(unversionedFqn);
+            })
             .map(decl => decl.getFullyQualifiedName());
     }
 
@@ -452,7 +495,10 @@ export default class Template {
      * @return {String[]} a list of the request types
      */
     getRequestTypes() {
-        return this.findConcreteSubclassNames('org.accordproject.runtime@0.2.0.Request');
+        if (!this.hasLogic()) {
+            return this.findConcreteSubclassNames('org.accordproject.runtime@0.2.0.Request');
+        }
+        return this.findProcessedSubclassNames('org.accordproject.runtime@0.2.0.Request');
     }
 
     /**
@@ -460,7 +506,10 @@ export default class Template {
      * @return {String[]} a list of the response types
      */
     getResponseTypes() {
-        return this.findConcreteSubclassNames('org.accordproject.runtime@0.2.0.Response');
+        if (!this.hasLogic()) {
+            return this.findConcreteSubclassNames('org.accordproject.runtime@0.2.0.Response');
+        }
+        return this.findProcessedSubclassNames('org.accordproject.runtime@0.2.0.Response');
     }
 
     /**
@@ -468,16 +517,22 @@ export default class Template {
      * @return {Array} a list of the emit types
      */
     getEmitTypes() {
-        return this.findConcreteSubclassNames('org.accordproject.runtime@0.2.0.Obligation');
+        if (!this.hasLogic()) {
+            return this.findConcreteSubclassNames('org.accordproject.runtime@0.2.0.Obligation');
+        }
+        return this.findProcessedSubclassNames('org.accordproject.runtime@0.2.0.Obligation');
     }
 
     /**
      * Provides a list of the state types that are expected by this Template. Types use the fully-qualified form.
-     * @param {boolean} excludeBaseType Exclude the runtime base Response type
-    * @return {String[]} a list of the state types
+     * @param {boolean} excludeBaseType Exclude the runtime base State type
+     * @return {String[]} a list of the state types
      */
-    getStateTypes() {
-        return this.findConcreteSubclassNames('org.accordproject.runtime@0.2.0.State');
+    getStateTypes(excludeBaseType = false) {
+        if (!this.hasLogic()) {
+            return this.findConcreteSubclassNames('org.accordproject.runtime@0.2.0.State', excludeBaseType);
+        }
+        return this.findProcessedSubclassNames('org.accordproject.runtime@0.2.0.State', excludeBaseType);
     }
 
     /**
@@ -493,7 +548,10 @@ export default class Template {
      * @return {boolean} true if the template is stateful
      */
     isStateful() {
-        return this.findConcreteSubclassNames('org.accordproject.runtime@0.2.0.State', true).length > 0;
+        if (!this.hasLogic()) {
+            return this.findConcreteSubclassNames('org.accordproject.runtime@0.2.0.State', true).length > 0;
+        }
+        return this.getStateTypes(true).length > 0;
     }
 
     /**

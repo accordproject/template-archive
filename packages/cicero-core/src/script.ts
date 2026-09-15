@@ -12,66 +12,97 @@
  * limitations under the License.
  */
 
+import CiceroFunction from './function';
+
 /**
- * A script that has an identifier, language and contents.
+ * <p>
+ * An executable script.
+ * </p>
  * @class
  * @memberof module:cicero-core
  */
 export default class Script {
-
-    identifier: any;
-    language: any;
-    contents: any;
-    functions: any;
+    private identifier: string;
+    private language: string;
+    private contents: string;
+    private functions: CiceroFunction[];
+    private types: string[];
 
     /**
      * Create the Script.
      * <p>
-     * @param {string} identifier - The identifier of the script
-     * @param {string} language - The language type of the script
-     * @param {Function[]} functions - The functions in the script
-     * @param {string} contents - The contents of the script
+     * <strong>Note: only to be called by framework code.</strong>
+     * </p>
+     * @param {string} identifier - the identifier of the script
+     * @param {string} language - the language of the script
+     * @param {CiceroFunction[]} functions - the list of functions in the script
+     * @param {string} contents - the contents of the script
+     * @param {string[]} [types] - optional list of referenced types in the script
      */
-    constructor(identifier, language, functions, contents) {
+    constructor(identifier: string, language: string, functions: CiceroFunction[], contents: string, types?: string[]) {
         this.identifier = identifier;
         this.language = language;
-        this.contents = contents;
         this.functions = functions;
-
-        if(!contents) {
-            throw new Error('Empty script contents');
-        }
+        this.contents = contents;
+        this.types = types || [];
     }
 
     /**
-     * Returns the identifier of the script
-     * @return {string} the identifier of the script
+     * Visitor design pattern
+     * @param {Object} visitor - the visitor
+     * @param {Object} parameters  - the parameter
+     * @return {Object} the result of visiting or null
      */
-    getIdentifier() {
+    accept(visitor, parameters) {
+        return visitor.visit(this, parameters);
+    }
+
+    /**
+     * Returns the identifier of this script
+     * @return {string} the identifier of this script
+     */
+    getIdentifier(): string {
         return this.identifier;
     }
 
     /**
-     * Returns the language of the script
-     * @return {string} the language of the script
+     * Returns the functions in this script
+     * @return {CiceroFunction[]} the functions in this script
      */
-    getLanguage() {
+    getFunctions(): CiceroFunction[] {
+        return this.functions;
+    }
+
+    /**
+     * Returns the language of this script
+     * @return {string} the language of this script
+     */
+    getLanguage(): string {
         return this.language;
     }
 
     /**
-     * Returns the contents of the script
-     * @return {string} the content of the script
+     * Returns the contents of this script
+     * @return {string} the contents of this script
      */
-    getContents() {
+    getContents(): string {
         return this.contents;
     }
 
     /**
-     * Returns the function declarations for a script, if any
-     * @returns {Function[]} the function declarations
+     * Get the list of referenced types in the script
+     * @return {string[]} the list of type names
      */
-    getFunctions() {
-        return this.functions;
+    getTypes(): string[] {
+        return this.types;
+    }
+
+    /**
+     * Check if the script references a given type
+     * @param {string} typeName - the type name to check
+     * @return {boolean} true if referenced
+     */
+    hasType(typeName: string): boolean {
+        return this.types.includes(typeName);
     }
 }

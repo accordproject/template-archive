@@ -95,4 +95,49 @@ describe('ScriptManager', () => {
 
     });
 
+    describe('TypescriptScriptManager', () => {
+        it('should parse TypeScript functions and types from AST', () => {
+            const tsScriptManager = new (require('../src/typescriptscriptmanager').default)();
+            const tsCode = `
+                import { MyRequest, MyResponse } from './model';
+                import { MyObligation } from './events';
+
+                export function clause(request: MyRequest, state: MyState, emit: (e: MyObligation) => void): MyResponse {
+                    emit(new MyObligation('test'));
+                    return { ok: true };
+                }
+
+                export const helper = (x: string): number => 42;
+            `;
+            const script = tsScriptManager.createScript('logic.ts', 'typescript', tsCode);
+            expect(script.getFunctions().length).toBe(2);
+            expect(script.getFunctions()[0].getName()).toBe('clause');
+            expect(script.getFunctions()[0].getArguments().length).toBe(3);
+            expect(script.getFunctions()[0].getArguments()[0].getName()).toBe('request');
+            expect(script.getFunctions()[0].getArguments()[0].getType().getName()).toBe('MyRequest');
+            expect(script.getFunctions()[1].getName()).toBe('helper');
+
+            expect(script.hasType('MyRequest')).toBe(true);
+            expect(script.hasType('MyResponse')).toBe(true);
+            expect(script.hasType('MyState')).toBe(true);
+            expect(script.hasType('MyObligation')).toBe(true);
+        });
+    });
+
+    describe('JavascriptScriptManager', () => {
+        it('should parse JavaScript functions and JSDoc types', () => {
+            const jsScriptManager = new (require('../src/javascriptscriptmanager').default)();
+            const script = jsScriptManager.createScript('test.js', 'es6', jsSample);
+            expect(script.getFunctions().length).toBe(2);
+            expect(script.getFunctions()[0].getName()).toBe('paymentClause');
+            expect(script.getFunctions()[0].getArguments().length).toBe(1);
+            expect(script.getFunctions()[0].getArguments()[0].getName()).toBe('context');
+
+            expect(script.hasType('PaymentRequest')).toBe(true);
+            expect(script.hasType('org.accordproject.copyrightlicense.PaymentRequest')).toBe(true);
+            expect(script.hasType('PayOut')).toBe(true);
+        });
+    });
+
 });
+
