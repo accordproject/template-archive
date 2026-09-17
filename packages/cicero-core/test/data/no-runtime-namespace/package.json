@@ -1,0 +1,16 @@
+{
+    "name": "no-runtime-namespace",
+    "displayName": "No Runtime Namespace",
+    "version": "0.1.0",
+    "description": "A template that loads no runtime namespace at all, used to check that the runtime base type lookups degrade to empty rather than throwing.",
+    "author": "Accord Project",
+    "license": "Apache-2.0",
+    "accordproject": {
+        "template": "clause",
+        "cicero": "^2.0.0",
+        "runtime": "es6"
+    },
+    "keywords": [
+        "runtime"
+    ]
+}

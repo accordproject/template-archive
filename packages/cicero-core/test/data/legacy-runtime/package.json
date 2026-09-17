@@ -1,0 +1,17 @@
+{
+    "name": "legacy-runtime",
+    "displayName": "Legacy Runtime",
+    "version": "0.1.0",
+    "description": "A template as it was written against cicero 1.x and org.accordproject.runtime@0.2.0. Used to check that such a template is now rejected rather than silently loading with no runtime types.",
+    "author": "Accord Project",
+    "license": "Apache-2.0",
+    "accordproject": {
+        "template": "clause",
+        "cicero": "^1.0.0",
+        "runtime": "es6"
+    },
+    "keywords": [
+        "legacy",
+        "runtime"
+    ]
+}

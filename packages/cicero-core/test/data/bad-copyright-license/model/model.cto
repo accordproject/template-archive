@@ -4,7 +4,7 @@ import org.accordproject.contract@0.2.0.Contract from https://models.accordproje
 
 import org.accordproject.contract@0.2.0.Clause from https://models.accordproject.org/accordproject/contract@0.2.0.cto
 
-import org.accordproject.runtime@0.2.0.{Request, Response} from https://models.accordproject.org/accordproject/runtime@0.2.0.cto
+import org.accordproject.runtime@1.0.0.{Request, Response} from https://models.accordproject.org/accordproject/runtime@1.0.0.cto
 
 /* Requesting a payment */
 transaction PaymentRequest extends Request {

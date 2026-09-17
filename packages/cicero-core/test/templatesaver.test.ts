@@ -22,7 +22,7 @@ describe('TemplateSaver', () => {
     describe('#toArchive', () => {
         it('should save a template with a signature', async () => {
             const template = await Template.fromDirectory(
-                './test/data/latedeliveryandpenalty',
+                './test/data/latedeliveryandpenalty', { offline: true },
             );
             template.authorSignature = {
                 templateSignature: {
@@ -47,7 +47,7 @@ describe('TemplateSaver', () => {
 
         it('should save a template with multiple locales', async () => {
             const template = await Template.fromDirectory(
-                './test/data/latedeliveryandpenalty',
+                './test/data/latedeliveryandpenalty', { offline: true },
             );
             template.getMetadata().getSamples().fr = 'Bonjour';
             const buffer = await TemplateSaver.toArchive(template, undefined, undefined);

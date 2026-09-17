@@ -1,0 +1,11 @@
+namespace org.accordproject.notemplatedecorator@1.0.0
+
+import org.accordproject.templatedata@1.0.0.TemplateData from https://models.accordproject.org/accordproject/templatedata@1.0.0.cto
+
+/**
+ * The template model. It carries no `@template` decorator: it is found by
+ * being the model's one concrete subtype of TemplateData.
+ */
+concept SomethingData extends TemplateData {
+  o String name
+}

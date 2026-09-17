@@ -247,7 +247,7 @@ describe('Metadata', () => {
             }, '#README', {
                 en: 'sample'
             }, {
-                '$class': 'org.accordproject.runtime@0.2.0.Request'
+                '$class': 'org.accordproject.runtime@1.0.0.Request'
             });
             expect(md.getPackageJson()).not.toBeNull();
             expect(md.getVersion()).toBe('0.1.0');
@@ -263,7 +263,7 @@ describe('Metadata', () => {
             }, '#README', {
                 en: 'sample'
             }, {
-                '$class': 'org.accordproject.runtime@0.2.0.Request'
+                '$class': 'org.accordproject.runtime@1.0.0.Request'
             });
             expect(md.getSamples()).toEqual({
                 en: 'sample'
@@ -277,7 +277,7 @@ describe('Metadata', () => {
             }, '#README', {
                 en: 'sample'
             }, {
-                '$class': 'org.accordproject.runtime@0.2.0.Request'
+                '$class': 'org.accordproject.runtime@1.0.0.Request'
             });
             expect(md.getREADME()).toBe('#README');
         });
@@ -289,10 +289,10 @@ describe('Metadata', () => {
             }, '#README', {
                 en: 'sample'
             }, {
-                '$class': 'org.accordproject.runtime@0.2.0.Request'
+                '$class': 'org.accordproject.runtime@1.0.0.Request'
             });
             expect(md.getRequest()).toEqual({
-                '$class': 'org.accordproject.runtime@0.2.0.Request'
+                '$class': 'org.accordproject.runtime@1.0.0.Request'
             });
         });
     });

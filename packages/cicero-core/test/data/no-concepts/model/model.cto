@@ -1,7 +1,8 @@
 namespace org.accordproject.conga@1.0.0
 
 import org.accordproject.contract@0.2.0.Clause from https://models.accordproject.org/accordproject/contract@0.2.0.cto
-import org.accordproject.runtime@0.2.0.{Request, Response} from https://models.accordproject.org/accordproject/runtime@0.2.0.cto
+import org.accordproject.runtime@1.0.0.{Request, Response} from https://models.accordproject.org/accordproject/runtime@1.0.0.cto
+
 /**
  * Defines the data model for the Conga template.
  */

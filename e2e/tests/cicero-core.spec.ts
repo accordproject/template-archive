@@ -28,7 +28,7 @@ let p12B64: string;
 
 test.beforeAll(async () => {
     p12B64 = fs.readFileSync(KEYSTORE, { encoding: 'base64' });
-    const template = await (Template as any).fromDirectory(TEMPLATE_DIR);
+    const template = await (Template as any).fromDirectory(TEMPLATE_DIR, { offline: true });
     const buf = await template.toArchive('es6', {
         keystore: { p12File: p12B64, passphrase: 'password' },
     });
@@ -58,7 +58,7 @@ test.describe('@accordproject/cicero-core UMD', () => {
         const id = await page.evaluate(async (b64: string) => {
             const bytes = Uint8Array.from(atob(b64), c => c.charCodeAt(0));
             const { Template } = (window as any)['cicero-core'];
-            const t = await Template.fromArchive(bytes.buffer);
+            const t = await Template.fromArchive(bytes.buffer, { offline: true });
             return t.getIdentifier();
         }, signedArchiveB64);
         expect(id).toBe('helloworldstate@0.15.0');
@@ -69,7 +69,7 @@ test.describe('@accordproject/cicero-core UMD', () => {
         const hasSig = await page.evaluate(async (b64: string) => {
             const bytes = Uint8Array.from(atob(b64), c => c.charCodeAt(0));
             const { Template } = (window as any)['cicero-core'];
-            const t = await Template.fromArchive(bytes.buffer);
+            const t = await Template.fromArchive(bytes.buffer, { offline: true });
             return !!t.authorSignature?.templateSignature?.signature;
         }, signedArchiveB64);
         expect(hasSig).toBe(true);
@@ -80,7 +80,7 @@ test.describe('@accordproject/cicero-core UMD', () => {
         const err = await page.evaluate(async ({ b64, p12 }: { b64: string; p12: string }) => {
             const bytes = Uint8Array.from(atob(b64), c => c.charCodeAt(0));
             const { Template } = (window as any)['cicero-core'];
-            const t = await Template.fromArchive(bytes.buffer);
+            const t = await Template.fromArchive(bytes.buffer, { offline: true });
             try {
                 await t.toArchive('es6', { keystore: { p12File: p12, passphrase: 'wrong' } });
                 return null;
