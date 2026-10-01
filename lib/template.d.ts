@@ -324,28 +324,28 @@ export default class Template {
      * @return {String[]} An array of fully-qualified types
      * @private
      */
-    findConcreteSubclassNamesOfAny(types: any, excludeBaseType?: boolean): unknown[];
+    findConcreteSubclassNamesOfAny(types: string[], excludeBaseType?: boolean): string[];
     /**
      * Provides a list of the input types that are accepted by this Template. Types use the fully-qualified form.
      * Includes the concrete subtypes of both {@link Template.REQUEST_TYPE} and
      * the legacy {@link Template.LEGACY_REQUEST_TYPE}, 1.0 types first.
      * @return {String[]} a list of the request types
      */
-    getRequestTypes(): unknown[];
+    getRequestTypes(): string[];
     /**
      * Provides a list of the response types that are returned by this Template. Types use the fully-qualified form.
      * Includes the concrete subtypes of both {@link Template.RESPONSE_TYPE} and
      * the legacy {@link Template.LEGACY_RESPONSE_TYPE}, 1.0 types first.
      * @return {String[]} a list of the response types
      */
-    getResponseTypes(): unknown[];
+    getResponseTypes(): string[];
     /**
      * Provides a list of the emit types that are emitted by this Template. Types use the fully-qualified form.
      * Includes the concrete subtypes of both {@link Template.EMIT_TYPE} and
      * the legacy {@link Template.LEGACY_EMIT_TYPE}, 1.0 types first.
-     * @return {Array} a list of the emit types
+     * @return {String[]} a list of the emit types
      */
-    getEmitTypes(): unknown[];
+    getEmitTypes(): string[];
     /**
      * Provides a list of the state types that are expected by this Template. Types use the fully-qualified form.
      * Includes the concrete subtypes of both {@link Template.STATE_TYPE} and
@@ -354,7 +354,7 @@ export default class Template {
      * `runtime@0.2.0.State` itself.
      * @return {String[]} a list of the state types
      */
-    getStateTypes(): unknown[];
+    getStateTypes(): string[];
     /**
      * Returns true if the template has logic, i.e. has more than one script file.
      * @return {boolean} true if the template has logic
