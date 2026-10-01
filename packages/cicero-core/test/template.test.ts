@@ -658,6 +658,88 @@ describe('Template', () => {
         });
     });
 
+    describe('a cicero 2.x template still written against the 0.2.0 runtime', () => {
+
+        // most of cicero-template-library is shaped like this: it targets
+        // cicero ^2.0.0 but imports org.accordproject.runtime@0.2.0
+        it('should report its legacy request types', async () => {
+            const template = await Template.fromDirectory('./test/data/legacy-runtime-cicero2', options);
+            expect(template.getRequestTypes()).toEqual([
+                'org.accordproject.runtime@0.2.0.Request',
+                'org.accordproject.legacyruntime@1.0.0.MyRequest',
+            ]);
+        });
+
+        it('should report its legacy response types', async () => {
+            const template = await Template.fromDirectory('./test/data/legacy-runtime-cicero2', options);
+            expect(template.getResponseTypes()).toEqual([
+                'org.accordproject.runtime@0.2.0.Response',
+                'org.accordproject.legacyruntime@1.0.0.MyResponse',
+            ]);
+        });
+
+        it('should report its legacy emit types, without the abstract base Obligation', async () => {
+            const template = await Template.fromDirectory('./test/data/legacy-runtime-cicero2', options);
+            expect(template.getEmitTypes()).toEqual([
+                'org.accordproject.legacyruntime@1.0.0.Greeting',
+            ]);
+        });
+
+        // the legacy State is a concrete asset, so it is listed, as it was
+        // before the 1.0 models
+        it('should report its legacy state types', async () => {
+            const template = await Template.fromDirectory('./test/data/legacy-runtime-cicero2', options);
+            expect(template.getStateTypes()).toEqual([
+                'org.accordproject.runtime@0.2.0.State',
+                'org.accordproject.legacyruntime@1.0.0.HelloWorldState',
+            ]);
+        });
+
+        it('should be recognised as stateful', async () => {
+            const template = await Template.fromDirectory('./test/data/legacy-runtime-cicero2', options);
+            expect(template.isStateful()).toBe(true);
+        });
+
+        it('should still find its template model via the @template decorator', async () => {
+            const template = await Template.fromDirectory('./test/data/legacy-runtime-cicero2', options);
+            expect(template.getTemplateModel().getFullyQualifiedName()).toBe('org.accordproject.legacyruntime@1.0.0.HelloWorldClause');
+        });
+    });
+
+    describe('a template written against the 1.0 runtime', () => {
+
+        it('should report its 1.0 runtime types', async () => {
+            const template = await Template.fromDirectory('./test/data/helloemit', options);
+            expect(template.getRequestTypes()).toEqual([
+                'org.accordproject.runtime@1.0.0.Request',
+                'org.accordproject.helloemit@1.0.0.MyRequest',
+            ]);
+            expect(template.getResponseTypes()).toEqual([
+                'org.accordproject.runtime@1.0.0.Response',
+                'org.accordproject.helloemit@1.0.0.MyResponse',
+            ]);
+            expect(template.getEmitTypes()).toEqual([
+                'org.accordproject.helloemit@1.0.0.Greeting',
+            ]);
+            expect(template.getStateTypes()).toEqual([
+                'org.accordproject.helloemit@1.0.0.HelloWorldState',
+            ]);
+        });
+
+        it('should be stateful when it declares a subtype of StateData', async () => {
+            const template = await Template.fromDirectory('./test/data/helloemit', options);
+            expect(template.isStateful()).toBe(true);
+        });
+
+        // this fixture loads templatedata@1.0.0, so the abstract StateData
+        // resolves, but it declares no subtype of it
+        it('should be stateless when it loads StateData but declares no subtype of it', async () => {
+            const template = await Template.fromDirectory('./test/data/no-template-decorator', options);
+            expect(template.getStateTypes()).toEqual([]);
+            expect(template.isStateful()).toBe(false);
+        });
+    });
+
     describe('a template that loads no runtime namespace', () => {
 
         it('should report no runtime types rather than throwing', async () => {

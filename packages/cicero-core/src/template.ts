@@ -64,6 +64,39 @@ export default class Template {
      */
     static TEMPLATE_DATA_TYPE = 'org.accordproject.templatedata@1.0.0.TemplateData';
 
+    /**
+     * The legacy base request type, from `org.accordproject.runtime@0.2.0`.
+     *
+     * Templates written before the 1.0 models (for example most of
+     * cicero-template-library) still declare their requests as subtypes of
+     * this. Its concrete subtypes are reported alongside those of
+     * {@link Template.REQUEST_TYPE}, so those templates keep working unchanged.
+     */
+    static LEGACY_REQUEST_TYPE = 'org.accordproject.runtime@0.2.0.Request';
+
+    /**
+     * The legacy base response type, from `org.accordproject.runtime@0.2.0`.
+     * Its concrete subtypes are reported alongside those of
+     * {@link Template.RESPONSE_TYPE}.
+     */
+    static LEGACY_RESPONSE_TYPE = 'org.accordproject.runtime@0.2.0.Response';
+
+    /**
+     * The legacy base emit type, from `org.accordproject.runtime@0.2.0`. It is
+     * abstract. Its concrete subtypes are reported alongside those of
+     * {@link Template.EMIT_TYPE}.
+     */
+    static LEGACY_EMIT_TYPE = 'org.accordproject.runtime@0.2.0.Obligation';
+
+    /**
+     * The legacy base state type, from `org.accordproject.runtime@0.2.0`.
+     * Its concrete subtypes are reported alongside those of
+     * {@link Template.STATE_TYPE}. Unlike `StateData` it is a concrete (empty)
+     * asset, so {@link Template#isStateful} excludes it explicitly: a legacy
+     * template is only stateful if it declares a subtype of its own.
+     */
+    static LEGACY_STATE_TYPE = 'org.accordproject.runtime@0.2.0.State';
+
     metadata: any;
     logicManager: any;
     authorSignature: any;
@@ -489,10 +522,11 @@ export default class Template {
      * emits nothing, does not import the namespace that base type lives in.
      *
      * @param {String} type The fully-qualified type to search for
+     * @param {boolean} excludeBaseType Exclude the base parameter type, even if it is concrete
      * @return {String[]} An array of fully-qualified types
      * @private
      */
-    findConcreteSubclassNames(type) {
+    findConcreteSubclassNames(type, excludeBaseType = false) {
         let baseType;
         try {
             baseType = this.getModelManager().getType(type);
@@ -505,39 +539,68 @@ export default class Template {
         return baseType
             .getAssignableClassDeclarations()
             .filter(subclass => !subclass.isAbstract())
+            .filter(subclass => !excludeBaseType || subclass.getFullyQualifiedName() !== type)
             .map(decl => decl.getFullyQualifiedName());
     }
 
     /**
+     * Returns the concrete sub-classes of each of the given base types, in the
+     * order the base types are given, without duplicates. Base types whose
+     * namespace is not loaded contribute nothing.
+     *
+     * This is how the runtime type lookups report the 1.0 models and the
+     * legacy `runtime@0.2.0` models side by side.
+     *
+     * @param {String[]} types The fully-qualified base types to search for
+     * @param {boolean} excludeBaseType Exclude each base parameter type, even if it is concrete
+     * @return {String[]} An array of fully-qualified types
+     * @private
+     */
+    findConcreteSubclassNamesOfAny(types, excludeBaseType = false) {
+        const names = types.flatMap(type => this.findConcreteSubclassNames(type, excludeBaseType));
+        return Array.from(new Set(names));
+    }
+
+    /**
      * Provides a list of the input types that are accepted by this Template. Types use the fully-qualified form.
+     * Includes the concrete subtypes of both {@link Template.REQUEST_TYPE} and
+     * the legacy {@link Template.LEGACY_REQUEST_TYPE}, 1.0 types first.
      * @return {String[]} a list of the request types
      */
     getRequestTypes() {
-        return this.findConcreteSubclassNames(Template.REQUEST_TYPE);
+        return this.findConcreteSubclassNamesOfAny([Template.REQUEST_TYPE, Template.LEGACY_REQUEST_TYPE]);
     }
 
     /**
      * Provides a list of the response types that are returned by this Template. Types use the fully-qualified form.
+     * Includes the concrete subtypes of both {@link Template.RESPONSE_TYPE} and
+     * the legacy {@link Template.LEGACY_RESPONSE_TYPE}, 1.0 types first.
      * @return {String[]} a list of the response types
      */
     getResponseTypes() {
-        return this.findConcreteSubclassNames(Template.RESPONSE_TYPE);
+        return this.findConcreteSubclassNamesOfAny([Template.RESPONSE_TYPE, Template.LEGACY_RESPONSE_TYPE]);
     }
 
     /**
      * Provides a list of the emit types that are emitted by this Template. Types use the fully-qualified form.
+     * Includes the concrete subtypes of both {@link Template.EMIT_TYPE} and
+     * the legacy {@link Template.LEGACY_EMIT_TYPE}, 1.0 types first.
      * @return {Array} a list of the emit types
      */
     getEmitTypes() {
-        return this.findConcreteSubclassNames(Template.EMIT_TYPE);
+        return this.findConcreteSubclassNamesOfAny([Template.EMIT_TYPE, Template.LEGACY_EMIT_TYPE]);
     }
 
     /**
      * Provides a list of the state types that are expected by this Template. Types use the fully-qualified form.
+     * Includes the concrete subtypes of both {@link Template.STATE_TYPE} and
+     * the legacy {@link Template.LEGACY_STATE_TYPE}, 1.0 types first. As
+     * before 1.0, a legacy template's list includes the concrete base
+     * `runtime@0.2.0.State` itself.
      * @return {String[]} a list of the state types
      */
     getStateTypes() {
-        return this.findConcreteSubclassNames(Template.STATE_TYPE);
+        return this.findConcreteSubclassNamesOfAny([Template.STATE_TYPE, Template.LEGACY_STATE_TYPE]);
     }
 
     /**
@@ -549,11 +612,15 @@ export default class Template {
     }
 
     /**
-     * Returns true if the template declares one or more state types.
+     * Returns true if the template declares one or more state types of its
+     * own: a concrete subtype of {@link Template.STATE_TYPE}, or of the
+     * legacy {@link Template.LEGACY_STATE_TYPE}. Neither base type counts:
+     * `StateData` is abstract, and the legacy `State` is excluded explicitly
+     * because it is a concrete asset.
      * @return {boolean} true if the template is stateful
      */
     isStateful() {
-        return this.getStateTypes().length > 0;
+        return this.findConcreteSubclassNamesOfAny([Template.STATE_TYPE, Template.LEGACY_STATE_TYPE], true).length > 0;
     }
 
     /**

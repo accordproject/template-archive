@@ -1,0 +1,17 @@
+{
+    "name": "legacy-runtime-cicero2",
+    "displayName": "Legacy Runtime Cicero 2",
+    "version": "0.1.0",
+    "description": "A template that targets cicero 2.x but still models its request, response, state and obligations with org.accordproject.runtime@0.2.0, as most of cicero-template-library does. Used to check that its runtime types are still reported alongside the 1.0 ones.",
+    "author": "Accord Project",
+    "license": "Apache-2.0",
+    "accordproject": {
+        "template": "clause",
+        "cicero": "^2.0.0",
+        "runtime": "es6"
+    },
+    "keywords": [
+        "legacy",
+        "runtime"
+    ]
+}
