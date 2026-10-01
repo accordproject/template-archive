@@ -1,0 +1,11 @@
+namespace org.accordproject.composedlatepayment@1.0.0
+
+import org.accordproject.templatedata@1.0.0.TemplateData from https://models.accordproject.org/accordproject/templatedata@1.0.0.cto
+
+/**
+ * A copy of the composed late-payment clause's template model. It is a
+ * concrete subtype of TemplateData too, but it is not this template's model.
+ */
+concept LatePaymentData extends TemplateData {
+  o Double penaltyPercentage
+}

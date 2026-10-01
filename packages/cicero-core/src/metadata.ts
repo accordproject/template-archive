@@ -42,6 +42,7 @@ export default class Metadata {
 
     runtime: any;
     ciceroVersion: any;
+    templateModelName: string | undefined;
     logo: any;
     packageJson: any;
     readme: any;
@@ -123,6 +124,15 @@ export default class Metadata {
 
         if(this.runtime && !LANGUAGES.includes(this.runtime)) {
             throw new Error('Unsupported runtime. The supported runtimes are: ' + LANGUAGES.join(', '));
+        }
+
+        // the fully-qualified name of the template model, when the model
+        // declares more than one candidate (e.g. it carries copies of the
+        // models of the templates it composes)
+        this.templateModelName = packageJson.accordproject.templateModel;
+
+        if(this.templateModelName !== undefined && (typeof this.templateModelName !== 'string' || this.templateModelName.length === 0)) {
+            throw new Error('The accordproject templateModel in package.json must be the fully-qualified name of a type.');
         }
 
         if(!samples || typeof(samples) !== 'object') {
@@ -238,6 +248,19 @@ export default class Metadata {
      */
     getRuntime(){
         return this.runtime;
+    }
+
+    /**
+     * Returns the fully-qualified name of the template model, as named by
+     * `accordproject.templateModel` in package.json. A template only needs to
+     * name it when its model declares more than one concrete subtype of
+     * `org.accordproject.templatedata@1.0.0.TemplateData`, for example
+     * because it carries copies of the models of the templates it composes.
+     * @returns {string|undefined} the fully-qualified name of the template
+     * model, or undefined if package.json does not name one
+     */
+    getTemplateModelName(){
+        return this.templateModelName;
     }
 
     /**

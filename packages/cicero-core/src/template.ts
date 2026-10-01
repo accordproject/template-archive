@@ -158,21 +158,38 @@ export default class Template {
     /**
      * Returns the template model for the template.
      *
-     * A template's model declares exactly one concrete subtype of
-     * {@link Template.TEMPLATE_DATA_TYPE}, and that subtype is the template
-     * model: extending `TemplateData` is the declaration, so no `@template`
-     * decorator is required to identify it. Templates whose model does not
-     * import `templatedata@1.0.0` at all - because it predates this
-     * convention, or because the namespace simply is not loaded - fall back
-     * to the legacy `@template` decorator so they keep loading unchanged.
-     * @throws {Error} if no template model is found, or multiple template models are found
+     * The template model is resolved in this order:
+     *
+     * 1. If package.json names it with `accordproject.templateModel`, that
+     *    type. It must be a concrete subtype of
+     *    {@link Template.TEMPLATE_DATA_TYPE}, or, for legacy templates, a
+     *    concrete type with the `@template` decorator. A template that
+     *    composes other templates carries copies of their models, each with
+     *    its own subtype of `TemplateData`, so it must say which one is its
+     *    own.
+     * 2. Otherwise, the model's one concrete subtype of
+     *    {@link Template.TEMPLATE_DATA_TYPE}: extending `TemplateData` is the
+     *    declaration, so no `@template` decorator is required to identify it.
+     *    More than one is an error.
+     * 3. Otherwise - the model does not import `templatedata@1.0.0` at all,
+     *    because it predates this convention or the namespace is simply not
+     *    loaded - the legacy `@template` decorator, so those templates keep
+     *    loading unchanged.
+     *
+     * @throws {Error} if no template model is found, multiple template models
+     * are found, or the named template model is missing or not a template model
      * @returns {ClassDeclaration} the template model for the template
      */
     getTemplateModel() {
+        const namedTemplateModel = this.getMetadata().getTemplateModelName();
+        if (namedTemplateModel) {
+            return this.getNamedTemplateModel(namedTemplateModel);
+        }
+
         const templateModelNames = this.findConcreteSubclassNames(Template.TEMPLATE_DATA_TYPE);
 
         if (templateModelNames.length > 1) {
-            throw new Error(`Found multiple concrete subtypes of ${Template.TEMPLATE_DATA_TYPE}: ${templateModelNames.join(', ')}. A template model must declare exactly one concrete subtype of TemplateData.`);
+            throw new Error(`Found multiple concrete subtypes of ${Template.TEMPLATE_DATA_TYPE}: ${templateModelNames.join(', ')}. A template model must declare exactly one concrete subtype of TemplateData, or name its template model with "accordproject.templateModel" in package.json.`);
         }
 
         if (templateModelNames.length === 1) {
@@ -180,6 +197,32 @@ export default class Template {
         }
 
         return templatemarkutil.findTemplateConcept(this.getIntrospector(), 'clause');
+    }
+
+    /**
+     * Returns the template model named by `accordproject.templateModel` in
+     * package.json, checking that it is one.
+     * @param {string} name the fully-qualified name of the template model
+     * @throws {Error} if the type is not found, or is not a concrete subtype of
+     * TemplateData or a concrete type with the `@template` decorator
+     * @returns {ClassDeclaration} the template model for the template
+     * @private
+     */
+    getNamedTemplateModel(name) {
+        let templateModel;
+        try {
+            templateModel = this.getModelManager().getType(name);
+        } catch (err) {
+            throw new Error(`The template model "${name}" named by accordproject.templateModel in package.json was not found in the template's model: ${err.message}`);
+        }
+
+        const isTemplateData = Template.instanceOf(templateModel, Template.TEMPLATE_DATA_TYPE);
+        const isDecorated = !!templateModel.getDecorator('template');
+        if (templateModel.isAbstract() || (!isTemplateData && !isDecorated)) {
+            throw new Error(`The template model "${name}" named by accordproject.templateModel in package.json must be a concrete subtype of ${Template.TEMPLATE_DATA_TYPE}, or a concrete type with the @template decorator.`);
+        }
+
+        return templateModel;
     }
 
     /**

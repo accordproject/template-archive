@@ -648,6 +648,96 @@ describe('Template', () => {
         it('should throw an error if multiple concrete subtypes of TemplateData are found', async () => {
             await expect(Template.fromDirectory('./test/data/multiple-concepts', options)).rejects.toThrow('Found multiple concrete subtypes of org.accordproject.templatedata@1.0.0.TemplateData: org.accordproject.conga@1.0.0.TemplateModel, org.accordproject.conga@1.0.0.TemplateModel2.');
         });
+
+        it('should suggest accordproject.templateModel when multiple concrete subtypes of TemplateData are found', async () => {
+            await expect(Template.fromDirectory('./test/data/multiple-concepts', options)).rejects.toThrow('name its template model with "accordproject.templateModel" in package.json');
+        });
+    });
+
+    describe('#getTemplateModel with accordproject.templateModel', () => {
+
+        /**
+         * Returns a copy of the template's package.json naming a template model
+         * @param {Template} template the template
+         * @param {string} templateModel the fully-qualified name to set
+         * @returns {object} the new package.json
+         */
+        function withTemplateModel(template, templateModel) {
+            const packageJson = JSON.parse(JSON.stringify(template.getMetadata().getPackageJson()));
+            packageJson.accordproject.templateModel = templateModel;
+            return packageJson;
+        }
+
+        // the fixture carries a copy of a composed template's model, so it
+        // declares two concrete subtypes of TemplateData
+        it('should pick the template model named in package.json when there are several TemplateData subtypes', async () => {
+            const template = await Template.fromDirectory('./test/data/composed-template-model', options);
+            expect(template.getMetadata().getTemplateModelName()).toBe('org.accordproject.composedlicence@1.0.0.LicenceData');
+            expect(template.getTemplateModel().getFullyQualifiedName()).toBe('org.accordproject.composedlicence@1.0.0.LicenceData');
+        });
+
+        it('should parse and set data against the named template model', async () => {
+            const template = await Template.fromDirectory('./test/data/composed-template-model', options);
+            const clause = new Clause(template);
+            const data = {
+                $class: 'org.accordproject.composedlicence@1.0.0.LicenceData',
+                licensee: 'Acme Corp'
+            };
+            clause.setData(data);
+            expect(clause.getDataAsConcertoObject().getFullyQualifiedType()).toBe('org.accordproject.composedlicence@1.0.0.LicenceData');
+        });
+
+        it('should keep the named template model through an archive round-trip', async () => {
+            const template = await Template.fromDirectory('./test/data/composed-template-model', options);
+            const buffer = await template.toArchive('es6');
+            const template2 = await Template.fromArchive(buffer, options);
+            expect(template2.getMetadata().getTemplateModelName()).toBe('org.accordproject.composedlicence@1.0.0.LicenceData');
+            expect(template2.getTemplateModel().getFullyQualifiedName()).toBe('org.accordproject.composedlicence@1.0.0.LicenceData');
+        });
+
+        it('should still throw, mentioning accordproject.templateModel, when no template model is named', async () => {
+            const template = await Template.fromDirectory('./test/data/composed-template-model', options);
+            template.setPackageJson(withTemplateModel(template, undefined));
+            expect(() => template.getTemplateModel()).toThrow('Found multiple concrete subtypes of org.accordproject.templatedata@1.0.0.TemplateData: org.accordproject.composedlatepayment@1.0.0.LatePaymentData, org.accordproject.composedlicence@1.0.0.LicenceData.');
+            expect(() => template.getTemplateModel()).toThrow('accordproject.templateModel');
+        });
+
+        it('should throw if the named template model is not in the model', async () => {
+            const template = await Template.fromDirectory('./test/data/composed-template-model', options);
+            template.setPackageJson(withTemplateModel(template, 'org.accordproject.composedlicence@1.0.0.Missing'));
+            expect(() => template.getTemplateModel()).toThrow('The template model "org.accordproject.composedlicence@1.0.0.Missing" named by accordproject.templateModel in package.json was not found in the template\'s model');
+        });
+
+        it('should throw if the named template model is in a namespace the template does not load', async () => {
+            const template = await Template.fromDirectory('./test/data/composed-template-model', options);
+            template.setPackageJson(withTemplateModel(template, 'org.example.missing@1.0.0.Data'));
+            expect(() => template.getTemplateModel()).toThrow('named by accordproject.templateModel in package.json was not found');
+        });
+
+        it('should throw if the named type is not a template model', async () => {
+            const template = await Template.fromDirectory('./test/data/composed-template-model', options);
+            template.setPackageJson(withTemplateModel(template, 'org.accordproject.templatedata@1.0.0.StateData'));
+            expect(() => template.getTemplateModel()).toThrow('must be a concrete subtype of org.accordproject.templatedata@1.0.0.TemplateData, or a concrete type with the @template decorator');
+        });
+
+        it('should throw if the named type is the abstract TemplateData itself', async () => {
+            const template = await Template.fromDirectory('./test/data/composed-template-model', options);
+            template.setPackageJson(withTemplateModel(template, 'org.accordproject.templatedata@1.0.0.TemplateData'));
+            expect(() => template.getTemplateModel()).toThrow('must be a concrete subtype of org.accordproject.templatedata@1.0.0.TemplateData');
+        });
+
+        it('should accept a named legacy template model with the @template decorator', async () => {
+            const template = await Template.fromDirectory('./test/data/legacy-runtime-cicero2', options);
+            template.setPackageJson(withTemplateModel(template, 'org.accordproject.legacyruntime@1.0.0.HelloWorldClause'));
+            expect(template.getTemplateModel().getFullyQualifiedName()).toBe('org.accordproject.legacyruntime@1.0.0.HelloWorldClause');
+        });
+
+        it('should reject a template whose package.json names a missing template model when it is loaded', async () => {
+            const template = await Template.fromDirectory('./test/data/composed-template-model', options);
+            template.setPackageJson(withTemplateModel(template, 'org.accordproject.composedlicence@1.0.0.Missing'));
+            const buffer = await template.toArchive('es6');
+            await expect(Template.fromArchive(buffer, options)).rejects.toThrow('was not found in the template\'s model');
+        });
     });
 
     describe('a template written against the 0.2.0 runtime', () => {

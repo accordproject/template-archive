@@ -1,0 +1,19 @@
+{
+    "name": "composed-template-model",
+    "displayName": "Composed Template Model",
+    "version": "0.1.0",
+    "description": "A template that composes another template and so carries a copy of its model, giving two concrete subtypes of TemplateData. Used to check that accordproject.templateModel picks the template's own model.",
+    "author": "Accord Project",
+    "license": "Apache-2.0",
+    "accordproject": {
+        "template": "clause",
+        "cicero": "^2.0.0",
+        "runtime": "es6",
+        "templateModel": "org.accordproject.composedlicence@1.0.0.LicenceData"
+    },
+    "keywords": [
+        "template",
+        "templatedata",
+        "composition"
+    ]
+}
