@@ -1,0 +1,13 @@
+namespace org.accordproject.composedlicence@1.0.0
+
+import org.accordproject.templatedata@1.0.0.TemplateData from https://models.accordproject.org/accordproject/templatedata@1.0.0.cto
+import org.accordproject.composedlatepayment@1.0.0.LatePaymentData
+
+/**
+ * The template model of the licence, named by accordproject.templateModel
+ * in package.json.
+ */
+concept LicenceData extends TemplateData {
+  o String licensee
+  o LatePaymentData latePayment optional
+}

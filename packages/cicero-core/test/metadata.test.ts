@@ -520,6 +520,43 @@ describe('Metadata', () => {
         });
     });
 
+    describe('#getTemplateModelName', () => {
+        it('should return undefined when package.json does not name a template model', () => {
+            const md = new Metadata({
+                name: 'template',
+                version: '1.0.0',
+                accordproject: {cicero:caretRange(ciceroVersion)}
+            }, null, {});
+            expect(md.getTemplateModelName()).toBeUndefined();
+        });
+
+        it('should return the template model named in package.json', () => {
+            const md = new Metadata({
+                name: 'template',
+                version: '1.0.0',
+                accordproject: {cicero:caretRange(ciceroVersion), templateModel: 'org.example@1.0.0.Data'}
+            }, null, {});
+            expect(md.getTemplateModelName()).toBe('org.example@1.0.0.Data');
+        });
+
+        it('should keep the named template model in the metadata for a target runtime', () => {
+            const md = new Metadata({
+                name: 'template',
+                version: '1.0.0',
+                accordproject: {cicero:caretRange(ciceroVersion), templateModel: 'org.example@1.0.0.Data'}
+            }, null, {});
+            expect(md.createTargetMetadata('es6').getTemplateModelName()).toBe('org.example@1.0.0.Data');
+        });
+
+        it('should throw if the named template model is not a string', () => {
+            expect(() => new Metadata({
+                name: 'template',
+                version: '1.0.0',
+                accordproject: {cicero:caretRange(ciceroVersion), templateModel: 42}
+            }, null, {})).toThrow('The accordproject templateModel in package.json must be the fully-qualified name of a type.');
+        });
+    });
+
     describe('#checkImage', () => {
         it('should not throw for correct png with correct dimensions', async () => {
             const buffer = await TemplateLoader.loadFileBuffer('./test/data', 'logo_128_128.png', true);
