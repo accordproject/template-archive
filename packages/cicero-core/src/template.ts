@@ -599,8 +599,8 @@ export default class Template {
      * @return {String[]} An array of fully-qualified types
      * @private
      */
-    findConcreteSubclassNamesOfAny(types, excludeBaseType = false) {
-        const names = types.flatMap(type => this.findConcreteSubclassNames(type, excludeBaseType));
+    findConcreteSubclassNamesOfAny(types: string[], excludeBaseType = false): string[] {
+        const names: string[] = types.flatMap(type => this.findConcreteSubclassNames(type, excludeBaseType));
         return Array.from(new Set(names));
     }
 
@@ -610,7 +610,7 @@ export default class Template {
      * the legacy {@link Template.LEGACY_REQUEST_TYPE}, 1.0 types first.
      * @return {String[]} a list of the request types
      */
-    getRequestTypes() {
+    getRequestTypes(): string[] {
         return this.findConcreteSubclassNamesOfAny([Template.REQUEST_TYPE, Template.LEGACY_REQUEST_TYPE]);
     }
 
@@ -620,7 +620,7 @@ export default class Template {
      * the legacy {@link Template.LEGACY_RESPONSE_TYPE}, 1.0 types first.
      * @return {String[]} a list of the response types
      */
-    getResponseTypes() {
+    getResponseTypes(): string[] {
         return this.findConcreteSubclassNamesOfAny([Template.RESPONSE_TYPE, Template.LEGACY_RESPONSE_TYPE]);
     }
 
@@ -628,9 +628,9 @@ export default class Template {
      * Provides a list of the emit types that are emitted by this Template. Types use the fully-qualified form.
      * Includes the concrete subtypes of both {@link Template.EMIT_TYPE} and
      * the legacy {@link Template.LEGACY_EMIT_TYPE}, 1.0 types first.
-     * @return {Array} a list of the emit types
+     * @return {String[]} a list of the emit types
      */
-    getEmitTypes() {
+    getEmitTypes(): string[] {
         return this.findConcreteSubclassNamesOfAny([Template.EMIT_TYPE, Template.LEGACY_EMIT_TYPE]);
     }
 
@@ -642,7 +642,7 @@ export default class Template {
      * `runtime@0.2.0.State` itself.
      * @return {String[]} a list of the state types
      */
-    getStateTypes() {
+    getStateTypes(): string[] {
         return this.findConcreteSubclassNamesOfAny([Template.STATE_TYPE, Template.LEGACY_STATE_TYPE]);
     }
 
