@@ -1,0 +1,17 @@
+/*!
+ * Accord Project Cicero v2.2.0 — browser build
+ * Licensed under the Apache License, Version 2.0
+ */
+
+/*!
+ * The buffer module from node.js, for the browser.
+ *
+ * @author   Feross Aboukhadijeh <https://feross.org>
+ * @license  MIT
+ */
+
+/*! Axios v1.15.0 Copyright (c) 2026 Matt Zabriskie and contributors */
+
+/*! ieee754. BSD-3-Clause License. Feross Aboukhadijeh <https://feross.org/opensource> */
+
+/*! safe-buffer. MIT License. Feross Aboukhadijeh <https://feross.org/opensource> */
