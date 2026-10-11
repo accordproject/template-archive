@@ -95,4 +95,81 @@ describe('ScriptManager', () => {
 
     });
 
+    describe('TypescriptScriptManager', () => {
+        it('should instantiate with constructor arguments', () => {
+            const TypescriptScriptManager = require('../src/typescriptscriptmanager').default;
+            expect(new TypescriptScriptManager('typescript', null, {})).toBeDefined();
+        });
+
+        it('should parse TypeScript functions and types from AST', () => {
+            const tsScriptManager = new (require('../src/typescriptscriptmanager').default)();
+            const tsCode = `
+                import { MyRequest, MyResponse } from './model';
+                import { MyObligation } from './events';
+
+                export function clause(request: MyRequest, state: MyState, emit: (e: MyObligation) => void): MyResponse {
+                    const localCount = 42;
+                    const randomString = "some_random_value";
+                    emit(new MyObligation('test'));
+                    return { $class: 'org.accordproject.MyResponse', ok: true };
+                }
+
+                export const helper = (x: string): number => 42;
+            `;
+            const script = tsScriptManager.createScript('logic.ts', 'typescript', tsCode);
+            expect(script.getFunctions().length).toBe(2);
+            expect(script.getFunctions()[0].getName()).toBe('clause');
+            expect(script.getFunctions()[0].getArguments().length).toBe(3);
+            expect(script.getFunctions()[0].getArguments()[0].getName()).toBe('request');
+            expect(script.getFunctions()[0].getArguments()[0].getType().getName()).toBe('MyRequest');
+            expect(script.getFunctions()[1].getName()).toBe('helper');
+
+            expect(script.hasType('MyRequest')).toBe(true);
+            expect(script.hasType('MyResponse')).toBe(true);
+            expect(script.hasType('MyState')).toBe(true);
+            expect(script.hasType('MyObligation')).toBe(true);
+            expect(script.hasType('org.accordproject.MyResponse')).toBe(true);
+
+            // Should NOT treat random variable names or string literals as model types
+            expect(script.hasType('localCount')).toBe(false);
+            expect(script.hasType('randomString')).toBe(false);
+            expect(script.hasType('some_random_value')).toBe(false);
+        });
+
+        it('should support Concerto codegen I-prefix interface types', () => {
+            const tsScriptManager = new (require('../src/typescriptscriptmanager').default)();
+            const tsCode = `
+                export function clause(request: IHelloWorldRequest): IHelloWorldResponse {
+                    return { ok: true } as any;
+                }
+            `;
+            const script = tsScriptManager.createScript('logic.ts', 'typescript', tsCode);
+            expect(script.hasType('IHelloWorldRequest')).toBe(true);
+            expect(script.hasType('HelloWorldRequest')).toBe(true);
+            expect(script.hasType('IHelloWorldResponse')).toBe(true);
+            expect(script.hasType('HelloWorldResponse')).toBe(true);
+        });
+    });
+
+    describe('JavascriptScriptManager', () => {
+        it('should instantiate with constructor arguments', () => {
+            const JavascriptScriptManager = require('../src/javascriptscriptmanager').default;
+            expect(new JavascriptScriptManager('javascript', null, {})).toBeDefined();
+        });
+
+        it('should parse JavaScript functions and JSDoc types', () => {
+            const jsScriptManager = new (require('../src/javascriptscriptmanager').default)();
+            const script = jsScriptManager.createScript('test.js', 'es6', jsSample);
+            expect(script.getFunctions().length).toBe(2);
+            expect(script.getFunctions()[0].getName()).toBe('paymentClause');
+            expect(script.getFunctions()[0].getArguments().length).toBe(1);
+            expect(script.getFunctions()[0].getArguments()[0].getName()).toBe('context');
+
+            expect(script.hasType('PaymentRequest')).toBe(true);
+            expect(script.hasType('org.accordproject.copyrightlicense.PaymentRequest')).toBe(true);
+            expect(script.hasType('PayOut')).toBe(true);
+        });
+    });
+
 });
+
