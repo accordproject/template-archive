@@ -15,6 +15,7 @@
 import fs from 'fs';
 import fsPath from 'path';
 import { promisify } from 'util';
+import { Buffer } from 'buffer';
 import slash from 'slash';
 import JSZip from 'jszip';
 import { Logger } from '@accordproject/concerto-util';
@@ -323,7 +324,7 @@ export default class TemplateLoader {
         }
 
         else if (zipFile) {
-            return zipFile.async('nodebuffer').then(data => Buffer.from(data));
+            return zipFile.async('uint8array').then(data => Buffer.from(data));
         }
 
         return null;

@@ -12,6 +12,7 @@
  * limitations under the License.
  */
 
+import { Buffer } from 'buffer';
 import JSZip from 'jszip';
 
 /**
@@ -110,11 +111,7 @@ export default class TemplateSaver {
         });
 
         return zip.generateAsync({
-            type: 'nodebuffer'
-        }).then(something => {
-            return Promise.resolve(something).then(result => {
-                return result;
-            });
-        });
+            type: 'uint8array'
+        }).then(result => Buffer.from(result));
     }
 }

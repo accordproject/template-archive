@@ -12,7 +12,8 @@
  * limitations under the License.
  */
 
-import crypto from 'crypto';
+import { sha256 } from '@noble/hashes/sha2';
+import { bytesToHex, utf8ToBytes } from '@noble/hashes/utils';
 
 import { Logger } from '@accordproject/concerto-util';
 import { CiceroMarkTransformer } from '@accordproject/markdown-cicero';
@@ -105,9 +106,7 @@ export default class TemplateInstance {
 
         if (this.data) {
             const textToHash = JSON.stringify(this.getData());
-            const hasher = crypto.createHash('sha256');
-            hasher.update(textToHash);
-            hash = '-' + hasher.digest('hex');
+            hash = '-' + bytesToHex(sha256(utf8ToBytes(textToHash)));
         }
         return this.getTemplate().getIdentifier() + hash;
     }

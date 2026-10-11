@@ -15,7 +15,8 @@
 import { templatemarkutil } from '@accordproject/markdown-template';
 
 import Metadata from './metadata';
-import crypto from 'crypto';
+import { sha256 } from '@noble/hashes/sha2';
+import { bytesToHex, utf8ToBytes } from '@noble/hashes/utils';
 import forge from 'node-forge';
 import stringify from 'json-stable-stringify';
 
@@ -203,9 +204,7 @@ export default class Template {
             content.scripts[file.getIdentifier()] = this._normalize(file.contents);
         });
 
-        const hasher = crypto.createHash('sha256');
-        hasher.update(stringify(content));
-        return hasher.digest('hex');
+        return bytesToHex(sha256(utf8ToBytes(stringify(content))));
     }
 
     /**
