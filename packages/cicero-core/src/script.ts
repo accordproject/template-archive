@@ -23,6 +23,7 @@ export default class Script {
     language: any;
     contents: any;
     functions: any;
+    types: string[];
 
     /**
      * Create the Script.
@@ -31,12 +32,14 @@ export default class Script {
      * @param {string} language - The language type of the script
      * @param {Function[]} functions - The functions in the script
      * @param {string} contents - The contents of the script
+     * @param {string[]} [types] - The types referenced in the script
      */
-    constructor(identifier, language, functions, contents) {
+    constructor(identifier, language, functions, contents, types = []) {
         this.identifier = identifier;
         this.language = language;
         this.contents = contents;
         this.functions = functions;
+        this.types = types || [];
 
         if(!contents) {
             throw new Error('Empty script contents');
@@ -73,5 +76,22 @@ export default class Script {
      */
     getFunctions() {
         return this.functions;
+    }
+
+    /**
+     * Returns the types referenced in the script
+     * @returns {string[]} the type names
+     */
+    getTypes() {
+        return this.types;
+    }
+
+    /**
+     * Checks if a type is referenced in the script
+     * @param {string} name - the type name to check
+     * @returns {boolean} true if the type is referenced, false otherwise
+     */
+    hasType(name) {
+        return this.types.includes(name);
     }
 }

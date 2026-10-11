@@ -23,6 +23,7 @@ import stringify from 'json-stable-stringify';
 import TemplateLoader from './templateloader';
 import TemplateSaver from './templatesaver';
 import LogicManager from './logicmanager';
+import { matchesDeclaration } from './astutils';
 
 /**
  * A template for a legal clause or contract. A Template has a template model request/response transaction types,
@@ -447,11 +448,51 @@ export default class Template {
     }
 
     /**
+     * Returns a list of fully-qualified types that are concrete sub-classes of the parameter
+     * and are processed / referenced by the template's logic.
+     * @param {String} type The fully-qualified type to search for
+     * @param {boolean} excludeBaseType Exclude the base parameter type
+     * @param {boolean} fallbackToModel Fallback to ModelManager declarations if no types matched in logic
+     * @return {String[]} An array of fully-qualified types
+     * @private
+     */
+    findProcessedSubclassNames(type, excludeBaseType = false, fallbackToModel = true) {
+        const typeDecl = this.getModelManager().getType(type);
+        const candidates = typeDecl
+            .getAssignableClassDeclarations()
+            .filter(subclass => !subclass.isAbstract())
+            .filter(subclass => !excludeBaseType || subclass.getFullyQualifiedName() !== type);
+
+        const scripts = this.getScriptManager().getScripts();
+        const referencedTypes = new Set<string>();
+        for (const script of scripts) {
+            if (typeof script.getTypes === 'function') {
+                for (const t of script.getTypes()) {
+                    referencedTypes.add(t);
+                }
+            }
+        }
+
+        const matched = candidates
+            .filter(decl => matchesDeclaration(decl, referencedTypes))
+            .map(decl => decl.getFullyQualifiedName());
+
+        if (matched.length > 0 || !fallbackToModel) {
+            return matched;
+        }
+
+        return this.findConcreteSubclassNames(type, excludeBaseType);
+    }
+
+    /**
      * Provides a list of the input types that are accepted by this Template. Types use the fully-qualified form.
      * @return {String[]} a list of the request types
      */
     getRequestTypes() {
-        return this.findConcreteSubclassNames('org.accordproject.runtime@0.2.0.Request');
+        if (!this.hasLogic()) {
+            return this.findConcreteSubclassNames('org.accordproject.runtime@0.2.0.Request');
+        }
+        return this.findProcessedSubclassNames('org.accordproject.runtime@0.2.0.Request', false, true);
     }
 
     /**
@@ -459,7 +500,10 @@ export default class Template {
      * @return {String[]} a list of the response types
      */
     getResponseTypes() {
-        return this.findConcreteSubclassNames('org.accordproject.runtime@0.2.0.Response');
+        if (!this.hasLogic()) {
+            return this.findConcreteSubclassNames('org.accordproject.runtime@0.2.0.Response');
+        }
+        return this.findProcessedSubclassNames('org.accordproject.runtime@0.2.0.Response', false, true);
     }
 
     /**
@@ -467,16 +511,29 @@ export default class Template {
      * @return {Array} a list of the emit types
      */
     getEmitTypes() {
-        return this.findConcreteSubclassNames('org.accordproject.runtime@0.2.0.Obligation');
+        if (!this.hasLogic()) {
+            return this.findConcreteSubclassNames('org.accordproject.runtime@0.2.0.Obligation');
+        }
+        return this.findProcessedSubclassNames('org.accordproject.runtime@0.2.0.Obligation', false, false);
     }
 
     /**
      * Provides a list of the state types that are expected by this Template. Types use the fully-qualified form.
-     * @param {boolean} excludeBaseType Exclude the runtime base Response type
-    * @return {String[]} a list of the state types
+     * @param {boolean} excludeBaseType Exclude the runtime base State type
+     * @return {String[]} a list of the state types
      */
-    getStateTypes() {
-        return this.findConcreteSubclassNames('org.accordproject.runtime@0.2.0.State');
+    getStateTypes(excludeBaseType = false) {
+        if (!this.hasLogic()) {
+            return this.findConcreteSubclassNames('org.accordproject.runtime@0.2.0.State', excludeBaseType);
+        }
+        const customStates = this.findProcessedSubclassNames('org.accordproject.runtime@0.2.0.State', true, false);
+        if (excludeBaseType) {
+            return customStates;
+        }
+        if (customStates.length > 0) {
+            return [...customStates, 'org.accordproject.runtime@0.2.0.State'];
+        }
+        return ['org.accordproject.runtime@0.2.0.State'];
     }
 
     /**
@@ -492,7 +549,10 @@ export default class Template {
      * @return {boolean} true if the template is stateful
      */
     isStateful() {
-        return this.findConcreteSubclassNames('org.accordproject.runtime@0.2.0.State', true).length > 0;
+        if (!this.hasLogic()) {
+            return this.findConcreteSubclassNames('org.accordproject.runtime@0.2.0.State', true).length > 0;
+        }
+        return this.getStateTypes(true).length > 0;
     }
 
     /**

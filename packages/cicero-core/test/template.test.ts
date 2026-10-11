@@ -530,6 +530,41 @@ describe('Template', () => {
                 'io.clause.latedeliveryandpenalty@0.1.0.LateDeliveryAndPenaltyRequest'
             ]);
         });
+
+        it('should fall back to model request types when typescript logic is untyped', async () => {
+            const template = await Template.fromDirectory('./test/data/latedeliveryandpenalty-typescript', options);
+            const types = template.getRequestTypes();
+            expect(types).toEqual([
+                'org.accordproject.runtime@0.2.0.Request',
+                'io.clause.latedeliveryandpenalty@0.1.0.LateDeliveryAndPenaltyRequest'
+            ]);
+        });
+
+        it('should return narrowed request types when typescript logic specifies request type', async () => {
+            const template = await Template.fromDirectory('./test/data/latedeliveryandpenalty-typescript', options);
+            template.getLogicManager().addLogicFile(`
+                export function trigger(request: LateDeliveryAndPenaltyRequest): any {
+                    return 'hello!' as any;
+                }
+            `, 'logic/typed.ts');
+            const types = template.getRequestTypes();
+            expect(types).toEqual([
+                'io.clause.latedeliveryandpenalty@0.1.0.LateDeliveryAndPenaltyRequest'
+            ]);
+        });
+
+        it('should strip I-prefix when matching concerto codegen interface request types', async () => {
+            const template = await Template.fromDirectory('./test/data/latedeliveryandpenalty-typescript', options);
+            template.getLogicManager().addLogicFile(`
+                export function trigger(request: ILateDeliveryAndPenaltyRequest): any {
+                    return 'hello!' as any;
+                }
+            `, 'logic/typed_interface.ts');
+            const types = template.getRequestTypes();
+            expect(types).toEqual([
+                'io.clause.latedeliveryandpenalty@0.1.0.LateDeliveryAndPenaltyRequest'
+            ]);
+        });
     });
 
     describe('#getResponseTypes', () => {
@@ -549,6 +584,28 @@ describe('Template', () => {
             expect(types).toEqual([
                 'org.accordproject.runtime@0.2.0.Response',
                 'io.clause.latedeliveryandpenalty@0.1.0.LateDeliveryAndPenaltyResponse',]);
+        });
+
+        it('should fall back to model response types when typescript logic is untyped', async () => {
+            const template = await Template.fromDirectory('./test/data/latedeliveryandpenalty-typescript', options);
+            const types = template.getResponseTypes();
+            expect(types).toEqual([
+                'org.accordproject.runtime@0.2.0.Response',
+                'io.clause.latedeliveryandpenalty@0.1.0.LateDeliveryAndPenaltyResponse'
+            ]);
+        });
+
+        it('should return narrowed response types when typescript logic specifies response type', async () => {
+            const template = await Template.fromDirectory('./test/data/latedeliveryandpenalty-typescript', options);
+            template.getLogicManager().addLogicFile(`
+                export function trigger(request: any): LateDeliveryAndPenaltyResponse {
+                    return 'hello!' as any;
+                }
+            `, 'logic/typed.ts');
+            const types = template.getResponseTypes();
+            expect(types).toEqual([
+                'io.clause.latedeliveryandpenalty@0.1.0.LateDeliveryAndPenaltyResponse'
+            ]);
         });
     });
 
@@ -572,6 +629,27 @@ describe('Template', () => {
             const template = await Template.fromDirectory('./test/data/no-logic', options);
             const types = template.getEmitTypes();
             expect(types).toEqual([]);
+        });
+
+        it('should return empty array when typescript logic does not emit events', async () => {
+            const template = await Template.fromDirectory('./test/data/latedeliveryandpenalty-typescript', options);
+            const types = template.getEmitTypes();
+            expect(types).toEqual([]);
+        });
+
+        it('should return emit type when typescript logic emits event', async () => {
+            const template = await Template.fromDirectory('./test/data/helloemit', options);
+            template.getLogicManager().addLogicFile(`
+                import { Greeting } from './model';
+                export function clause(request: any, emit: (e: Greeting) => void): any {
+                    emit(new Greeting('hello'));
+                    return 'hello!' as any;
+                }
+            `, 'logic/emit.ts');
+            const types = template.getEmitTypes();
+            expect(types).toEqual([
+                'org.accordproject.helloemit@1.0.0.Greeting'
+            ]);
         });
     });
 
@@ -600,6 +678,30 @@ describe('Template', () => {
             expect(types).toEqual([
                 'org.accordproject.runtime@0.2.0.State',
             ]);
+        });
+
+        it('should return base state type when typescript logic is stateless', async () => {
+            const template = await Template.fromDirectory('./test/data/latedeliveryandpenalty-typescript', options);
+            const types = template.getStateTypes();
+            expect(types).toEqual([
+                'org.accordproject.runtime@0.2.0.State'
+            ]);
+            expect(template.getStateTypes(true)).toEqual([]);
+            expect(template.isStateful()).toBe(false);
+        });
+
+        it('should detect state type when typescript logic references state', async () => {
+            const template = await Template.fromDirectory('./test/data/helloemit', options);
+            template.getLogicManager().addLogicFile(`
+                import { MyRequest, MyResponse, HelloWorldState } from './model';
+                export function clause(request: MyRequest, state: HelloWorldState): MyResponse {
+                    return 'hello!' as any;
+                }
+            `, 'logic/stateful.ts');
+            expect(template.getStateTypes(true)).toEqual([
+                'org.accordproject.helloemit@1.0.0.HelloWorldState'
+            ]);
+            expect(template.isStateful()).toBe(true);
         });
     });
 
