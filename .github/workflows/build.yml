@@ -88,9 +88,6 @@ jobs:
       - name: Build packages (dep order)
         run: npm run build
 
-      - name: Build UMD bundle
-        run: npm run -w cicero-e2e build:bundles
-
       - name: Get Playwright version
         id: playwright-version
         run: echo "version=$(node -p "require('./e2e/node_modules/@playwright/test/package.json').version")" >> $GITHUB_OUTPUT
