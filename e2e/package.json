@@ -1,6 +1,6 @@
 {
   "name": "cicero-e2e",
-  "version": "2.2.0",
+  "version": "3.0.0",
   "private": true,
   "description": "End-to-end tests that bundle the cicero-core browser ES module build and exercise template loading and signing in a real headless Chromium.",
   "scripts": {
