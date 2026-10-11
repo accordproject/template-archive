@@ -61,5 +61,37 @@ describe('TemplateSaver', () => {
             const content = await sampleFile.async('string');
             expect(content).toBe('Bonjour');
         });
+
+        it('should compress archive entries with DEFLATE', async () => {
+            const template = await Template.fromDirectory(
+                './test/data/latedeliveryandpenalty',
+            );
+            const buffer = await TemplateSaver.toArchive(template, undefined, undefined);
+
+            // Walk the local file headers and check the compression method of each file entry
+            const methods: Record<string, number> = {};
+            let offset = 0;
+            while (buffer.readUInt32LE(offset) === 0x04034b50) {
+                const method = buffer.readUInt16LE(offset + 8);
+                const compressedSize = buffer.readUInt32LE(offset + 18);
+                const nameLength = buffer.readUInt16LE(offset + 26);
+                const extraLength = buffer.readUInt16LE(offset + 28);
+                const name = buffer.toString('utf8', offset + 30, offset + 30 + nameLength);
+                methods[name] = method;
+                offset += 30 + nameLength + extraLength + compressedSize;
+            }
+            const fileNames = Object.keys(methods).filter(name => !name.endsWith('/'));
+            expect(fileNames.length).toBeGreaterThan(0);
+            fileNames.forEach(name => expect(methods[name]).toBe(8)); // 8 = DEFLATE
+
+            // The same entries stored without compression should produce a larger archive
+            const zip = await JSZip.loadAsync(buffer);
+            const stored = new JSZip();
+            for (const name of fileNames) {
+                stored.file(name, await zip.file(name).async('uint8array'));
+            }
+            const storedBuffer = await stored.generateAsync({ type: 'uint8array', compression: 'STORE' });
+            expect(buffer.length).toBeLessThan(storedBuffer.length);
+        });
     });
 });

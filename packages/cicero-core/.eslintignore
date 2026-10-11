@@ -1,10 +1,8 @@
 coverage
 node_modules
 out
-umd
 lib
 test/data
 src/grammars
 scripts
 dist
-webpack.config.js

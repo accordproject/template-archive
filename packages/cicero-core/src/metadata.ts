@@ -12,6 +12,7 @@
  * limitations under the License.
  */
 
+import { Buffer } from 'buffer';
 import { Logger } from '@accordproject/concerto-util';
 import semver from 'semver';
 import LANGUAGES from './languages';

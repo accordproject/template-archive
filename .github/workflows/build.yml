@@ -40,6 +40,9 @@ jobs:
       - run: npm ci
       - run: npm run build --if-present
 
+      - name: cicero-core ES module smoke test
+        run: npm run test:esm -w @accordproject/cicero-core
+
       - name: Lint, build and unit tests (all packages)
         env:
           NODE_OPTIONS: "--max_old_space_size=4096"
@@ -84,9 +87,6 @@ jobs:
 
       - name: Build packages (dep order)
         run: npm run build
-
-      - name: Build UMD bundle
-        run: npm run -w cicero-e2e build:bundles
 
       - name: Get Playwright version
         id: playwright-version

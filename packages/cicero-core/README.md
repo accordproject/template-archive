@@ -14,27 +14,24 @@ npm install @accordproject/cicero-core --save
 
 ## Usage
 
-`cicero-core` is a native TypeScript package. The Node.js entry point is `lib/index.js`
-(typed via `lib/index.d.ts`); a pre-built UMD browser bundle is published at
-`umd/cicero-core.js` and exposes the public API on the `cicero-core` global.
+`cicero-core` is a native TypeScript package, typed via `lib/index.d.ts`. Its `exports` map
+selects one of three builds:
+
+- `require()` loads the CommonJS build in `lib/`;
+- Node's `import` loads the ES module build in `lib/esm/`;
+- a bundler targeting the web (webpack 5, Vite, Rollup, esbuild) loads the browser ES module
+  build in `lib/esm-browser/`.
 
 ```js
-// Node / bundlers
 import { Template, Clause, TemplateLoader, TemplateLibrary } from '@accordproject/cicero-core';
 ```
 
-```html
-<!-- Browser (UMD) -->
-<script src="https://unpkg.com/@accordproject/cicero-core/umd/cicero-core.js"></script>
-<script>
-  const { Template } = window['cicero-core'];
-</script>
-```
+There is no prebuilt browser bundle; import the package from a bundled application. See
+[MIGRATION.md](../../MIGRATION.md) if you used the UMD bundle of earlier versions.
 
 ## Browser support
 
-The browser bundle deliberately stubs out Node built-ins (`fs`, `path`, `http`/`https`,
-`os`, `tls`, `net`). APIs that read from the filesystem or the network are therefore
+The browser build replaces Node built-ins (`fs`, `path`, `util`) with empty modules. APIs that read from the filesystem or the network are therefore
 **not available in the browser** and will throw if called. Browser usage is intended for
 in-memory archives (e.g. an archive fetched as an `ArrayBuffer`).
 
@@ -56,7 +53,7 @@ in-memory archives (e.g. an archive fetched as an `ArrayBuffer`).
   draft/trigger logic.
 
 These are exercised by the Playwright end-to-end tests in the repository's `e2e/` workspace,
-which load `umd/cicero-core.js` into a headless Chromium.
+which bundle `lib/esm-browser` and run it in a headless Chromium.
 
 ## Development
 
@@ -64,9 +61,8 @@ which load `umd/cicero-core.js` into a headless Chromium.
 Node.js >= 22.
 
 ```bash
-npm run build         # tsc: src -> lib (+ .d.ts)
-npm run webpack       # build the UMD browser bundle -> umd/cicero-core.js
-npm run build:dist    # build + webpack (run before publishing)
+npm run build         # tsc: src -> lib (+ .d.ts), then esbuild: lib/esm and lib/esm-browser
+npm run test:esm      # smoke test of the ES module builds (after build)
 npm run lint          # eslint + license header check
 npm test              # lint + build + jest unit tests
 npm run test:cov      # the above, with coverage
