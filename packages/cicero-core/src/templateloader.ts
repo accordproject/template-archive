@@ -14,6 +14,7 @@
 
 import fs from 'fs';
 import fsPath from 'path';
+import { promisify } from 'util';
 import slash from 'slash';
 import JSZip from 'jszip';
 import { Logger } from '@accordproject/concerto-util';
@@ -393,7 +394,6 @@ export default class TemplateLoader {
      * @return {Promise<object[]>} a promise to an array of objects with the name and contents of the files
      */
     static async loadFilesContents(path, regex) {
-        const promisify = require('util').promisify;
         const readdir = promisify(fs.readdir);
         const stat = promisify(fs.stat);
         Logger.debug('loadFilesContents', 'Loading ' + path);
