@@ -11,18 +11,27 @@
     "access": "public"
   },
   "files": [
-    "lib",
-    "umd"
+    "lib"
   ],
   "main": "lib/index.js",
+  "module": "lib/esm/index.mjs",
   "types": "lib/index.d.ts",
-  "browser": "umd/cicero-core.js",
+  "exports": {
+    ".": {
+      "types": "./lib/index.d.ts",
+      "browser": "./lib/esm-browser/index.mjs",
+      "import": "./lib/esm/index.mjs",
+      "require": "./lib/index.js"
+    },
+    "./package.json": "./package.json"
+  },
+  "sideEffects": false,
   "scripts": {
-    "build": "tsc -p tsconfig.json",
-    "webpack": "webpack --config webpack.config.js --mode production",
-    "build:dist": "npm run build && npm run webpack",
-    "clean": "rimraf lib umd",
-    "prepublishOnly": "npm run build:dist",
+    "build": "tsc -p tsconfig.json && npm run build:esm",
+    "build:esm": "node scripts/build-esm.js",
+    "test:esm": "node scripts/smoke-esm.mjs",
+    "clean": "rimraf lib",
+    "prepublishOnly": "npm run build",
     "pretest": "npm run lint && npm run build",
     "lint": "eslint . --ext .ts",
     "postlint": "npm run licchk",
@@ -61,22 +70,14 @@
     "@types/semver": "^7.5.8",
     "@typescript-eslint/eslint-plugin": "^7.4.0",
     "@typescript-eslint/parser": "^7.4.0",
-    "buffer": "^6.0.3",
-    "crypto-browserify": "3.12.0",
+    "esbuild": "^0.27.7",
     "eslint": "8.57.1",
     "jest": "^29.7.0",
     "jsdoc": "^4.0.2",
     "license-check-and-add": "4.0.5",
-    "path-browserify": "^1.0.1",
-    "process": "^0.11.10",
     "rimraf": "^5.0.5",
-    "source-map-loader": "^5.0.0",
-    "stream-browserify": "3.0.0",
     "ts-jest": "^29.1.2",
-    "ts-loader": "^9.5.2",
-    "typescript": "^5.9.3",
-    "webpack": "5.104.1",
-    "webpack-cli": "^5.1.4"
+    "typescript": "^5.9.3"
   },
   "dependencies": {
     "@accordproject/concerto-core": "^5.0.0",
@@ -85,7 +86,9 @@
     "@accordproject/markdown-common": "^2.0.0",
     "@accordproject/markdown-template": "^2.0.0",
     "@accordproject/markdown-transform": "^2.0.0",
+    "@noble/hashes": "^1.8.0",
     "axios": "1.15.0",
+    "buffer": "^6.0.3",
     "debug": "4.3.4",
     "ietf-language-tag-regex": "0.0.5",
     "json-stable-stringify": "1.0.2",

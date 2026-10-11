@@ -32,7 +32,6 @@ module.exports = {
     ignorePatterns: [
         'node_modules/',
         'lib/',
-        'umd/',
         'dist/',
         'coverage/',
         '**/*.snap',

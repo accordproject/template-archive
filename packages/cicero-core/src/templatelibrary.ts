@@ -15,7 +15,8 @@
 import NodeCache from 'node-cache';
 import Template from './template';
 import axios from 'axios';
-import crypto from 'crypto';
+import { sha256 } from '@noble/hashes/sha2';
+import { bytesToHex, utf8ToBytes } from '@noble/hashes/utils';
 import stringify from 'json-stable-stringify';
 import semver from 'semver';
 
@@ -252,9 +253,7 @@ export default class TemplateLibrary {
     getTemplateIndexCacheKey(options) {
         let prefix = '';
         if(options) {
-            const hasher = crypto.createHash('sha256');
-            hasher.update(stringify(options));
-            prefix = `${hasher.digest('hex')}-`;
+            prefix = `${bytesToHex(sha256(utf8ToBytes(stringify(options))))}-`;
         }
 
         return `${this.url}/${prefix}template-library.json`;

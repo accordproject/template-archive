@@ -30,7 +30,6 @@
     "HEADER",
     "NOTICE",
     "docs/",
-    "umd/",
     "lib/",
     "test/data/",
     "generators/app/templates",
