@@ -606,6 +606,8 @@ describe('Template', () => {
     describe('#getHash', () => {
         it('should return a SHA-256 hash', async () => {
             const template = await Template.fromDirectory('./test/data/latedeliveryandpenalty', options);
+            // The fixture must contain several model files, so the hash covers every one of them
+            expect(template.getModelManager().getModels().length).toBeGreaterThan(1);
             expect(template.getHash()).toBe('e4823f2cb4e8c21ff5a7a2693e27a075afa6262b5173fa5621556834816b6da0');
         });
     });
