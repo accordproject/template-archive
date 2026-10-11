@@ -17,7 +17,8 @@ You are affected if you:
 - load the UMD bundle (`umd/cicero-core.js`) with a `<script>` tag, or read `window['cicero-core']`;
 - import a file inside the package, such as `@accordproject/cicero-core/lib/...`;
 - build with a tool that does not read the `exports` field (webpack 4, browserify, Parcel 1);
-- load cicero-core with both `import` and `require()` in one Node process.
+- load cicero-core with both `import` and `require()` in one Node process;
+- load a template whose `package.json` targets cicero `^2.x` or older (see below).
 
 These commands find the first two:
 
@@ -27,6 +28,24 @@ grep -rnE "window\[['\"]cicero-core['\"]\]" .
 ```
 
 ## Breaking changes
+
+### Templates must target cicero 3.0
+
+cicero-core checks every template it loads against the `accordproject.cicero` range in the template's `package.json`, and throws if its own version is outside that range. A template written for cicero 2.x or older (`^2.0.0`, `^0.25.0`, ...) is rejected by `Template.fromDirectory()`, `Template.fromArchive()` and `Template.fromUrl()` alike, with:
+
+```
+The template targets Cicero version ^2.0.0 but the current Cicero version is 3.0.0.
+```
+
+To fix it, set `accordproject.cicero` to `^3.0.0`, or to a range that includes 3.0:
+
+```json
+"accordproject": {
+    "cicero": "^3.0.0"
+}
+```
+
+The range is part of the template hash, so re-create `.cta` archives after the change and sign them again if they were signed.
 
 ### The UMD bundle is removed
 
