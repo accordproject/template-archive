@@ -111,7 +111,9 @@ export default class TemplateSaver {
         });
 
         return zip.generateAsync({
-            type: 'uint8array'
+            type: 'uint8array',
+            compression: 'DEFLATE',
+            compressionOptions: { level: 6 }
         }).then(result => Buffer.from(result));
     }
 }
