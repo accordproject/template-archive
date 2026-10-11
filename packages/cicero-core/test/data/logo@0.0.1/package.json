@@ -4,7 +4,7 @@
   "description": "Aman Sharma added logo suport",
   "accordproject": {
     "template": "clause",
-    "cicero": "^2.2.0"
+    "cicero": "^3.0.0"
   },
   "keywords": []
 }
