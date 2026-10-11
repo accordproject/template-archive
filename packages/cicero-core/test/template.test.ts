@@ -145,6 +145,24 @@ describe('Template', () => {
         });
     });
 
+    describe('#verifyTemplateSignature', () => {
+
+        it('should verify a freshly signed template', async () => {
+            const template = await Template.fromDirectory('./test/data/helloworldstate');
+            const p12File = fs.readFileSync('./test/data/keystore/keystore.p12', { encoding: 'base64' });
+            template.signTemplate(p12File, 'password', Date.now());
+            expect(() => template.verifyTemplateSignature()).not.toThrow();
+        });
+
+        it('should explain when the signed template hash does not match the computed hash', async () => {
+            const template = await Template.fromDirectory('./test/data/helloworldstate');
+            const p12File = fs.readFileSync('./test/data/keystore/keystore.p12', { encoding: 'base64' });
+            template.signTemplate(p12File, 'password', Date.now());
+            template.authorSignature.templateSignature.templateHash = '0'.repeat(64);
+            expect(() => template.verifyTemplateSignature()).toThrow(/does not match the signed template hash .* re-sign the template/);
+        });
+    });
+
     describe('#fromDirectory', () => {
 
         it('should create a template from a directory without signatures of the template developer', async () => {
@@ -606,6 +624,8 @@ describe('Template', () => {
     describe('#getHash', () => {
         it('should return a SHA-256 hash', async () => {
             const template = await Template.fromDirectory('./test/data/latedeliveryandpenalty', options);
+            // The fixture must contain several model files, so the hash covers every one of them
+            expect(template.getModelManager().getModels().length).toBeGreaterThan(1);
             expect(template.getHash()).toBe('e4823f2cb4e8c21ff5a7a2693e27a075afa6262b5173fa5621556834816b6da0');
         });
     });

@@ -213,6 +213,10 @@ export default class Template {
     verifyTemplateSignature() {
         const templateHash = this.getHash();
         if (this.authorSignature === null) { throw new Error('The template is missing author signature!'); }
+        const signedHash = this.authorSignature.templateSignature.templateHash;
+        if (signedHash && signedHash !== templateHash) {
+            throw new Error(`Template's author signature is invalid! The template hash (${templateHash}) does not match the signed template hash (${signedHash}). The template may have been modified, or signed with an older version of cicero-core that computed a different hash; re-sign the template to fix this.`);
+        }
         const signature = this.authorSignature.templateSignature.signature;
         const timestamp = this.authorSignature.templateSignature.timestamp;
         const signatoryCert = this.authorSignature.templateSignature.signatoryCert;
