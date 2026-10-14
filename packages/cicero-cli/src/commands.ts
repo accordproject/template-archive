@@ -161,10 +161,51 @@ export class Commands {
      * @param {Object} [options] - an optional set of options
      * @returns {Promise<string>} Promise to the drafted text
      */
-    static draft(templatePath, dataPath, outputPath, format, currentTime, options) {
-        const data = JSON.parse(fs.readFileSync(dataPath, 'utf8'));
+    static async draft(templatePath, dataPath, outputPath, format, currentTime, options) {
+        if (!fs.existsSync(dataPath)) {
+            throw new Error(`Data file not found: "${dataPath}". Please provide a valid data JSON file with --data.`);
+        }
+        let data;
+        try {
+            data = JSON.parse(fs.readFileSync(dataPath, 'utf8'));
+        } catch (err: any) {
+            throw new Error(`Failed to parse data file "${dataPath}": ${err.message}`);
+        }
         return Commands.loadTemplate(templatePath, options)
             .then(async (template) => {
+                let expectedModel: string | null = null;
+                try {
+                    const templateModel = template.getTemplateModel();
+                    if (templateModel && typeof templateModel.getFullyQualifiedName === 'function') {
+                        expectedModel = templateModel.getFullyQualifiedName();
+                    }
+                } catch {
+                    // Ignore if template has no @template concept
+                }
+
+                if (expectedModel) {
+                    if (!data || typeof data !== 'object' || Array.isArray(data) || !data.$class) {
+                        const received = !data
+                            ? String(data)
+                            : Array.isArray(data)
+                                ? 'an array'
+                                : typeof data !== 'object'
+                                    ? typeof data
+                                    : 'an object without a $class property';
+                        throw new Error(
+                            `Invalid data provided for drafting. Expected an instance of "${expectedModel}", but received ${received}. ` +
+                            'Please ensure you are providing template clause data (e.g., data.json) rather than an execution request (e.g., request.json).'
+                        );
+                    }
+
+                    if (data.$class !== expectedModel) {
+                        throw new Error(
+                            `Invalid data provided for drafting. Expected an instance of "${expectedModel}", but received "${data.$class}". ` +
+                            'Please ensure you are providing template clause data (e.g., data.json) rather than an execution request (e.g., request.json).'
+                        );
+                    }
+                }
+
                 const processor = new TemplateArchiveProcessor(template);
                 const drafted = await processor.draft(data, format, options, currentTime);
                 const text = typeof drafted === 'string' ? drafted : JSON.stringify(drafted);

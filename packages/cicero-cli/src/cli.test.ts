@@ -276,7 +276,48 @@ describe('#draft', () => {
         dir.cleanup();
     });
     it('should reject when the data does not match the template model', async () => {
-        await expect(Commands.draft(template, draftDataErr, null, 'markdown', null, {})).rejects.toThrow();
+        await expect(Commands.draft(template, draftDataErr, null, 'markdown', null, {}))
+            .rejects.toThrow('Invalid data provided for drafting. Expected an instance of "org.accordproject.latedeliveryandpenalty@1.0.0.TemplateModel", but received "org.accordproject.foo.TemplateModel". Please ensure you are providing template clause data (e.g., data.json) rather than an execution request (e.g., request.json).');
+    });
+    it('should reject when the data is missing a $class property', async () => {
+        const dir = await tmp.dir({ unsafeCleanup: true });
+        const invalidDataPath = path.resolve(dir.path, 'data_no_class.json');
+        fs.writeFileSync(invalidDataPath, JSON.stringify({ name: 'Dan' }));
+        await expect(Commands.draft(template, invalidDataPath, null, 'markdown', null, {}))
+            .rejects.toThrow('Invalid data provided for drafting. Expected an instance of "org.accordproject.latedeliveryandpenalty@1.0.0.TemplateModel", but received an object without a $class property. Please ensure you are providing template clause data (e.g., data.json) rather than an execution request (e.g., request.json).');
+        dir.cleanup();
+    });
+    it('should reject when the data is an array', async () => {
+        const dir = await tmp.dir({ unsafeCleanup: true });
+        const invalidDataPath = path.resolve(dir.path, 'data_array.json');
+        fs.writeFileSync(invalidDataPath, JSON.stringify([{ name: 'Dan' }]));
+        await expect(Commands.draft(template, invalidDataPath, null, 'markdown', null, {}))
+            .rejects.toThrow('Invalid data provided for drafting. Expected an instance of "org.accordproject.latedeliveryandpenalty@1.0.0.TemplateModel", but received an array. Please ensure you are providing template clause data (e.g., data.json) rather than an execution request (e.g., request.json).');
+        dir.cleanup();
+    });
+    it('should reject when an execution request is passed instead of clause data', async () => {
+        const dir = await tmp.dir({ unsafeCleanup: true });
+        const requestDataPath = path.resolve(dir.path, 'request.json');
+        fs.writeFileSync(requestDataPath, JSON.stringify({
+            $class: 'org.accordproject.latedeliveryandpenalty@1.0.0.LateDeliveryAndPenaltyRequest',
+            forceMajeure: false,
+        }));
+        await expect(Commands.draft(template, requestDataPath, null, 'markdown', null, {}))
+            .rejects.toThrow('Invalid data provided for drafting. Expected an instance of "org.accordproject.latedeliveryandpenalty@1.0.0.TemplateModel", but received "org.accordproject.latedeliveryandpenalty@1.0.0.LateDeliveryAndPenaltyRequest". Please ensure you are providing template clause data (e.g., data.json) rather than an execution request (e.g., request.json).');
+        dir.cleanup();
+    });
+    it('should reject when the data file does not exist', async () => {
+        const nonExistentPath = path.resolve(dataDir, 'non_existent_data.json');
+        await expect(Commands.draft(template, nonExistentPath, null, 'markdown', null, {}))
+            .rejects.toThrow(`Data file not found: "${nonExistentPath}". Please provide a valid data JSON file with --data.`);
+    });
+    it('should reject when the data file contains invalid JSON', async () => {
+        const dir = await tmp.dir({ unsafeCleanup: true });
+        const invalidJsonPath = path.resolve(dir.path, 'invalid.json');
+        fs.writeFileSync(invalidJsonPath, 'invalid json content');
+        await expect(Commands.draft(template, invalidJsonPath, null, 'markdown', null, {}))
+            .rejects.toThrow(`Failed to parse data file "${invalidJsonPath}":`);
+        dir.cleanup();
     });
 });
 

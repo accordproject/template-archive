@@ -125,7 +125,7 @@ yargs
             type: 'string'
         });
         yargs.option('data', {
-            describe: 'path to the JSON data for the template',
+            describe: 'path to the JSON clause/contract data for the template (e.g. data.json)',
             type: 'string'
         });
         yargs.option('output', {
