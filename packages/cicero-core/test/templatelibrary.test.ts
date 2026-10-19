@@ -296,6 +296,39 @@ describe('TemplateLibrary', () => {
         });
     });
 
+    describe('#filterTemplateIndexCiceroVersion', () => {
+        const templateIndex = {
+            'legacy@1.0.0': { ciceroVersion: '^1.0.0' },
+            'current@1.0.0': { ciceroVersion: '^2.0.0' },
+            'latest@1.0.0': { ciceroVersion: '^3.0.0' },
+            'future@1.0.0': { ciceroVersion: '^4.0.0' },
+        };
+
+        it('should include templates from earlier majors within the compatibility window', () => {
+            const result = TemplateLibrary.filterTemplateIndexCiceroVersion(templateIndex, '3.0.0');
+            expect(Object.keys(result)).toEqual(['current@1.0.0', 'latest@1.0.0']);
+        });
+
+        it('should include templates from earlier majors for a prerelease build', () => {
+            const result = TemplateLibrary.filterTemplateIndexCiceroVersion(templateIndex, '3.0.1-20261011143353');
+            expect(Object.keys(result)).toEqual(['current@1.0.0', 'latest@1.0.0']);
+        });
+
+        it('should exclude entries with an invalid or missing ciceroVersion range', () => {
+            const result = TemplateLibrary.filterTemplateIndexCiceroVersion({
+                ...templateIndex,
+                'invalid@1.0.0': { ciceroVersion: 'invalid' },
+                'missing@1.0.0': {},
+            }, '3.0.0');
+            expect(Object.keys(result)).toEqual(['current@1.0.0', 'latest@1.0.0']);
+        });
+
+        it('should not widen the filter for cicero versions below the floor', () => {
+            const result = TemplateLibrary.filterTemplateIndexCiceroVersion(templateIndex, '1.0.1');
+            expect(Object.keys(result)).toEqual(['legacy@1.0.0']);
+        });
+    });
+
     describe('#getTemplateCacheKey', () => {
 
         it('should get a cache key for a template', async function() {

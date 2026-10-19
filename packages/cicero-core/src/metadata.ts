@@ -16,6 +16,7 @@ import { Buffer } from 'buffer';
 import { Logger } from '@accordproject/concerto-util';
 import semver from 'semver';
 import LANGUAGES from './languages';
+import { withinCompatibilityWindow } from './compatibility';
 
 import getMimeType from './mimetype';
 
@@ -260,9 +261,11 @@ export default class Metadata {
         // Compare against the coerced release version so that prerelease / nightly builds of
         // Cicero (e.g. 1.0.0-20250101) satisfy the same target ranges their release version
         // would. (For 0.x ranges a caret range already admitted prereleases of the floor; this
-        // keeps that behaviour consistent for 1.x and beyond.)
+        // keeps that behaviour consistent for 1.x and beyond.) A range from an earlier major
+        // also satisfies when it overlaps the template compatibility window (see compatibility.ts).
         const release = semver.coerce(version)?.version ?? version;
-        return semver.satisfies(release, this.getCiceroVersion(), { includePrerelease: true });
+        return semver.satisfies(release, this.getCiceroVersion(), { includePrerelease: true }) ||
+            withinCompatibilityWindow(release, this.getCiceroVersion());
     }
 
     /**

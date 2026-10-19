@@ -18,7 +18,7 @@ You are affected if you:
 - import a file inside the package, such as `@accordproject/cicero-core/lib/...`;
 - build with a tool that does not read the `exports` field (webpack 4, browserify, Parcel 1);
 - load cicero-core with both `import` and `require()` in one Node process;
-- load a template whose `package.json` targets cicero `^2.x` or older (see below).
+- load a template whose `package.json` targets cicero `^1.x` or older, or `^2.x` with cicero-core 3.0.x (see below).
 
 These commands find the first two:
 
@@ -46,6 +46,8 @@ To fix it, set `accordproject.cicero` to `^3.0.0`, or to a range that includes 3
 ```
 
 The range is part of the template hash, so re-create `.cta` archives after the change and sign them again if they were signed.
+
+**From cicero-core 3.1, templates that target `^2.x` load unchanged.** 3.0 did not change what a template contains, so cicero-core now also accepts a template whose range overlaps a *compatibility window*. The window runs from the oldest Cicero version whose templates still load unchanged (`TEMPLATE_COMPATIBILITY_FLOOR`, currently `2.0.0`) up to the running version. A `^2.0.0` template therefore loads in 3.1 with the same hash and signature, and `TemplateLibrary` lists it for a 3.x `ciceroVersion` filter. Templates that target `^1.x` or older are still rejected: 2.0 required event types to extend `Obligation`. A future major release that changes what templates must contain will raise the floor to that version.
 
 ### The UMD bundle is removed
 

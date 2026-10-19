@@ -19,6 +19,7 @@ import semver from 'semver';
 
 import MetadataImport from '../src/metadata';
 import TemplateLoader from '../src/templateloader';
+import { TEMPLATE_COMPATIBILITY_FLOOR } from '../src/compatibility';
 
 // The src signatures do not mark optional params as optional; alias to a
 // permissive type so call sites that omit defaulted args still type-check.
@@ -441,6 +442,47 @@ describe('Metadata', () => {
             }, null, {});
             md.ciceroVersion = caretRange(ciceroVersion);
             expect(md.satisfiesCiceroVersion(`${trimPreRelease(ciceroVersion)}-20190114233635`)).toBe(true);
+        });
+
+        describe('compatibility window', () => {
+            const satisfies = (range: string, version: string) => {
+                const md = new Metadata({
+                    name: 'template',
+                    version: '1.0.0',
+                    accordproject: {template: 'contract',cicero:caretRange(ciceroVersion)}
+                }, null, {});
+                md.ciceroVersion = range;
+                return md.satisfiesCiceroVersion(version);
+            };
+
+            it('should satisfy a range from an earlier major at or above the floor', () => {
+                expect(satisfies(`^${TEMPLATE_COMPATIBILITY_FLOOR}`, '3.0.0')).toBe(true);
+                expect(satisfies('^2.3.0', '3.4.1')).toBe(true);
+                expect(satisfies('~2.1.0', '3.0.0')).toBe(true);
+            });
+            it('should satisfy a range from an earlier major for a prerelease build', () => {
+                expect(satisfies('^2.0.0', '3.0.1-20261011143353')).toBe(true);
+            });
+            it('should not satisfy a range entirely below the floor', () => {
+                expect(satisfies('^1.0.0', '3.0.0')).toBe(false);
+                expect(satisfies('^0.26.0', '3.0.0')).toBe(false);
+            });
+            it('should not satisfy a range entirely above the cicero version', () => {
+                expect(satisfies('^4.0.0', '3.0.0')).toBe(false);
+                expect(satisfies('^3.1.0', '3.0.0')).toBe(false);
+            });
+            it('should not widen ranges for cicero versions below the floor', () => {
+                expect(satisfies('^1.0.0', '1.5.0')).toBe(true);
+                expect(satisfies('^0.28.0', '1.0.0')).toBe(false);
+            });
+            it('should load a template that targets the floor', () => {
+                const md = new Metadata({
+                    name: 'template',
+                    version: '1.0.0',
+                    accordproject: {template: 'contract',cicero:`^${TEMPLATE_COMPATIBILITY_FLOOR}`}
+                }, null, {});
+                expect(md.getCiceroVersion()).toBe(`^${TEMPLATE_COMPATIBILITY_FLOOR}`);
+            });
         });
     });
 
