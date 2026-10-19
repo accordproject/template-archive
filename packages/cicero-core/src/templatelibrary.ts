@@ -19,6 +19,7 @@ import { sha256 } from '@noble/hashes/sha2';
 import { bytesToHex, utf8ToBytes } from '@noble/hashes/utils';
 import stringify from 'json-stable-stringify';
 import semver from 'semver';
+import { withinCompatibilityWindow } from './compatibility';
 
 import { Logger } from '@accordproject/concerto-util';
 
@@ -114,7 +115,9 @@ export default class TemplateLibrary {
         for(const key of Object.keys(templateIndex)) {
             const template = templateIndex[key];
 
-            if(semver.satisfies(ciceroVersion, template.ciceroVersion, { includePrerelease: true })) {
+            const release = semver.coerce(ciceroVersion)?.version ?? ciceroVersion;
+            if(semver.satisfies(ciceroVersion, template.ciceroVersion, { includePrerelease: true }) ||
+                withinCompatibilityWindow(release, template.ciceroVersion)) {
                 result[key] = template;
             }
         }
