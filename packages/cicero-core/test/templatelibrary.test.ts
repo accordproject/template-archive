@@ -314,6 +314,15 @@ describe('TemplateLibrary', () => {
             expect(Object.keys(result)).toEqual(['current@1.0.0', 'latest@1.0.0']);
         });
 
+        it('should exclude entries with an invalid or missing ciceroVersion range', () => {
+            const result = TemplateLibrary.filterTemplateIndexCiceroVersion({
+                ...templateIndex,
+                'invalid@1.0.0': { ciceroVersion: 'invalid' },
+                'missing@1.0.0': {},
+            }, '3.0.0');
+            expect(Object.keys(result)).toEqual(['current@1.0.0', 'latest@1.0.0']);
+        });
+
         it('should not widen the filter for cicero versions below the floor', () => {
             const result = TemplateLibrary.filterTemplateIndexCiceroVersion(templateIndex, '1.0.1');
             expect(Object.keys(result)).toEqual(['legacy@1.0.0']);

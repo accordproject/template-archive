@@ -33,10 +33,11 @@ export const TEMPLATE_COMPATIBILITY_FLOOR = '2.0.0';
  *
  * @param {string} release the Cicero release version (without a prerelease tag)
  * @param {string} range the semver range of Cicero versions the template targets
- * @returns {boolean} true if the range overlaps the compatibility window
+ * @returns {boolean} true if the range overlaps the compatibility window; false if it is not a valid range
  */
 export function withinCompatibilityWindow(release: string, range: string): boolean {
-    if (!semver.valid(release) || semver.lt(release, TEMPLATE_COMPATIBILITY_FLOOR)) {
+    // semver.intersects throws on an invalid range, where semver.satisfies returns false
+    if (!semver.valid(release) || !semver.validRange(range) || semver.lt(release, TEMPLATE_COMPATIBILITY_FLOOR)) {
         return false;
     }
     return semver.intersects(range, `>=${TEMPLATE_COMPATIBILITY_FLOOR} <=${release}`);
