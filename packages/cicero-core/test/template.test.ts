@@ -379,6 +379,17 @@ describe('Template', () => {
                 expect(template.getMetadata().getSampleData()).toEqual(sample);
             });
 
+            it('should ignore a malformed data.json beside sample.json, in a directory and an archive', async () => {
+                fs.writeFileSync(path.join(dir, 'data.json'), '{"broken":');
+                const template = await Template.fromDirectory(dir, options);
+                expect(template.getMetadata().getSampleData()).toEqual(sample);
+
+                const zip = await JSZip.loadAsync(await template.toArchive('es6'));
+                zip.file('data.json', '{"broken":');
+                const template2 = await Template.fromArchive(await zip.generateAsync({ type: 'nodebuffer' }), options);
+                expect(template2.getMetadata().getSampleData()).toEqual(sample);
+            });
+
             it('should load data.json from an archive that has no sample.json', async () => {
                 const template = await Template.fromDirectory(dir, options);
                 const zip = await JSZip.loadAsync(await template.toArchive('es6'));

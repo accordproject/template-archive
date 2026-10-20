@@ -70,7 +70,7 @@ export default class TemplateLoader {
         const grammar = await TemplateLoader.loadZipFileContents(zip, 'text/grammar.tem.md', false, false);
         const authorSignature = await TemplateLoader.loadZipFileContents(zip, 'signature.json', true, false);
         const sampleData = await TemplateLoader.pickSampleData(
-            (fileName) => TemplateLoader.loadZipFileContents(zip, fileName, true), 'The archive');
+            (fileName) => TemplateLoader.loadZipFileContents(zip, fileName), 'The archive');
 
         Logger.debug(method, 'Looking for model files');
         const ctoFiles = await TemplateLoader.loadZipFilesContents(zip, /model[/\\].*\.cto$/);
@@ -181,7 +181,7 @@ export default class TemplateLoader {
 
         // grab the sample data (sample.json, or data.json as older templates name it)
         const sampleData = await TemplateLoader.pickSampleData(
-            (fileName) => TemplateLoader.loadFileContents(path, fileName, true, false), `The template at ${path}`);
+            (fileName) => TemplateLoader.loadFileContents(path, fileName), `The template at ${path}`);
 
         // create the template
         const template = new Template(packageJsonObject, readmeContents, sampleTextFiles, requestJsonObject, logo, options, authorSignature);
@@ -260,22 +260,24 @@ export default class TemplateLoader {
      * Picks a template's sample data. sample.json is Cicero's name for it,
      * and the one toArchive writes; data.json is the name many templates use
      * (it is the default data file of `cicero draft`), so it is read when
-     * there is no sample.json. When both exist, sample.json wins.
+     * there is no sample.json. When both exist, sample.json wins, and the
+     * other file is not parsed, so a malformed data.json beside it is ignored.
      *
-     * @param {Function} load - loads a JSON file of the template by name, or returns null
+     * @param {Function} load - loads a file of the template as text by name, or returns null
      * @param {string} where - the template, for the warning when both files exist
      * @return {Promise<object|null>} the sample data, or null if there is none
      * @private
      */
-    static async pickSampleData(load: (fileName: string) => Promise<any>, where: string) {
-        const sampleData = await load('sample.json');
-        const legacyData = await load('data.json');
-        if (sampleData && legacyData) {
+    static async pickSampleData(load: (fileName: string) => Promise<string | null>, where: string) {
+        const sampleText = await load('sample.json');
+        const legacyText = await load('data.json');
+        if (sampleText && legacyText) {
             Logger.warn(`${where} has both sample.json and data.json; using sample.json.`);
-        } else if (legacyData) {
+        } else if (legacyText) {
             Logger.debug('pickSampleData', 'Using data.json as the sample data');
         }
-        return sampleData || legacyData || null;
+        const text = sampleText || legacyText;
+        return text ? JSON.parse(text) : null;
     }
 
     /**
