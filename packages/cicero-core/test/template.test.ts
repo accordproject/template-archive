@@ -16,6 +16,9 @@
 
 import Template from '../src/template';
 import fs from 'fs';
+import os from 'os';
+import path from 'path';
+import JSZip from 'jszip';
 import forge from 'node-forge';
 import crypto from 'crypto';
 
@@ -347,6 +350,54 @@ describe('Template', () => {
             const buffer = await template.toArchive('es6');
             const template2 = await Template.fromArchive(buffer);
             expect(template2.getMetadata().getSampleData()).toEqual(sampleData);
+        });
+
+        describe('sample data named data.json', () => {
+            const sample = JSON.parse(fs.readFileSync('./test/data/latedeliveryandpenalty/sample.json', 'utf8'));
+            let dir;
+            beforeEach(() => {
+                dir = fs.mkdtempSync(path.join(os.tmpdir(), 'cicero-data-json-'));
+                fs.cpSync('./test/data/latedeliveryandpenalty', dir, { recursive: true });
+            });
+            afterEach(() => {
+                fs.rmSync(dir, { recursive: true, force: true });
+            });
+
+            it('should load data.json when there is no sample.json, and archive it as sample.json', async () => {
+                fs.renameSync(path.join(dir, 'sample.json'), path.join(dir, 'data.json'));
+                const template = await Template.fromDirectory(dir, options);
+                expect(template.getMetadata().getSampleData()).toEqual(sample);
+
+                const zip = await JSZip.loadAsync(await template.toArchive('es6'));
+                expect(zip.file('data.json')).toBeNull();
+                expect(JSON.parse(await zip.file('sample.json').async('string'))).toEqual(sample);
+            });
+
+            it('should prefer sample.json when a template has both', async () => {
+                fs.writeFileSync(path.join(dir, 'data.json'), JSON.stringify({ ...sample, penaltyPercentage: 99 }));
+                const template = await Template.fromDirectory(dir, options);
+                expect(template.getMetadata().getSampleData()).toEqual(sample);
+            });
+
+            it('should ignore a malformed data.json beside sample.json, in a directory and an archive', async () => {
+                fs.writeFileSync(path.join(dir, 'data.json'), '{"broken":');
+                const template = await Template.fromDirectory(dir, options);
+                expect(template.getMetadata().getSampleData()).toEqual(sample);
+
+                const zip = await JSZip.loadAsync(await template.toArchive('es6'));
+                zip.file('data.json', '{"broken":');
+                const template2 = await Template.fromArchive(await zip.generateAsync({ type: 'nodebuffer' }), options);
+                expect(template2.getMetadata().getSampleData()).toEqual(sample);
+            });
+
+            it('should load data.json from an archive that has no sample.json', async () => {
+                const template = await Template.fromDirectory(dir, options);
+                const zip = await JSZip.loadAsync(await template.toArchive('es6'));
+                zip.file('data.json', await zip.file('sample.json').async('string'));
+                zip.remove('sample.json');
+                const template2 = await Template.fromArchive(await zip.generateAsync({ type: 'nodebuffer' }), options);
+                expect(template2.getMetadata().getSampleData()).toEqual(sample);
+            });
         });
     });
 

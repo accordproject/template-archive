@@ -210,6 +210,18 @@ describe('#validateDraftArgs', () => {
         expect(args.template).toMatch(/cicero-cli[/\\]test[/\\]data[/\\]latedeliveryandpenalty$/);
         expect(args.data).toMatch(/data.json$/);
     });
+    it('no args specified, and the template has a sample.json', async () => {
+        const dir = await tmp.dir({ unsafeCleanup: true });
+        fs.cpSync(path.resolve(dataDir, 'latedeliveryandpenalty'), dir.path, { recursive: true });
+        fs.copyFileSync(path.resolve(dir.path, 'data.json'), path.resolve(dir.path, 'sample.json'));
+        process.chdir(dir.path);
+        const args  = Commands.validateDraftArgs({
+            _: ['draft'],
+        });
+        expect(args.data).toMatch(/sample.json$/);
+        process.chdir(dataDir);
+        await dir.cleanup();
+    });
     it('data arg specified', () => {
         process.chdir(path.resolve(dataDir, 'latedeliveryandpenalty/'));
         const args  = Commands.validateDraftArgs({

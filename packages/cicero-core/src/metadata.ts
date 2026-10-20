@@ -286,7 +286,7 @@ export default class Metadata {
 
     /**
      * Returns the sample data for this template.
-     * @return {object} the sample data (from sample.json) or null
+     * @return {object} the sample data (from sample.json, else data.json) or null
      */
     getSampleData() {
         return this.sampleData;
