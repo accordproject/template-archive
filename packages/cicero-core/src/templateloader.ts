@@ -69,7 +69,8 @@ export default class TemplateLoader {
         const packageJsonObject = await TemplateLoader.loadZipFileContents(zip, 'package.json', true, true);
         const grammar = await TemplateLoader.loadZipFileContents(zip, 'text/grammar.tem.md', false, false);
         const authorSignature = await TemplateLoader.loadZipFileContents(zip, 'signature.json', true, false);
-        const sampleData = await TemplateLoader.loadZipFileContents(zip, 'sample.json', true);
+        const sampleData = await TemplateLoader.pickSampleData(
+            (fileName) => TemplateLoader.loadZipFileContents(zip, fileName, true), 'The archive');
 
         Logger.debug(method, 'Looking for model files');
         const ctoFiles = await TemplateLoader.loadZipFilesContents(zip, /model[/\\].*\.cto$/);
@@ -178,8 +179,9 @@ export default class TemplateLoader {
         // grab the signature.json
         const authorSignature = await TemplateLoader.loadFileContents(path, 'signature.json', true, false);
 
-        // grab the sample.json
-        const sampleData = await TemplateLoader.loadFileContents(path, 'sample.json', true, false);
+        // grab the sample data (sample.json, or data.json as older templates name it)
+        const sampleData = await TemplateLoader.pickSampleData(
+            (fileName) => TemplateLoader.loadFileContents(path, fileName, true, false), `The template at ${path}`);
 
         // create the template
         const template = new Template(packageJsonObject, readmeContents, sampleTextFiles, requestJsonObject, logo, options, authorSignature);
@@ -252,6 +254,28 @@ export default class TemplateLoader {
         // we replace all \r and \n with \n
         const text = input.replace(/\r/gm, '');
         return text;
+    }
+
+    /**
+     * Picks a template's sample data. sample.json is Cicero's name for it,
+     * and the one toArchive writes; data.json is the name many templates use
+     * (it is the default data file of `cicero draft`), so it is read when
+     * there is no sample.json. When both exist, sample.json wins.
+     *
+     * @param {Function} load - loads a JSON file of the template by name, or returns null
+     * @param {string} where - the template, for the warning when both files exist
+     * @return {Promise<object|null>} the sample data, or null if there is none
+     * @private
+     */
+    static async pickSampleData(load: (fileName: string) => Promise<any>, where: string) {
+        const sampleData = await load('sample.json');
+        const legacyData = await load('data.json');
+        if (sampleData && legacyData) {
+            Logger.warn(`${where} has both sample.json and data.json; using sample.json.`);
+        } else if (legacyData) {
+            Logger.debug('pickSampleData', 'Using data.json as the sample data');
+        }
+        return sampleData || legacyData || null;
     }
 
     /**

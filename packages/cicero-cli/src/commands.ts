@@ -145,7 +145,9 @@ export class Commands {
     static validateDraftArgs(argv) {
         argv = Commands.validateCommonArgs(argv);
         if (!argv.data) {
-            argv.data = path.resolve(argv.template, 'data.json');
+            // sample.json is Cicero's name for a template's sample data; data.json is the older one.
+            const sampleData = path.resolve(argv.template, 'sample.json');
+            argv.data = fs.existsSync(sampleData) ? sampleData : path.resolve(argv.template, 'data.json');
         }
         return argv;
     }
