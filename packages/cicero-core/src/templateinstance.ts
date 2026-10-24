@@ -18,6 +18,11 @@ import { bytesToHex, utf8ToBytes } from '@noble/hashes/utils';
 import { Logger } from '@accordproject/concerto-util';
 import { CiceroMarkTransformer } from '@accordproject/markdown-cicero';
 import { TemplateMarkTransformer } from '@accordproject/markdown-template';
+import JSZip from 'jszip';
+
+import Template from './template';
+import TemplateLoader from './templateloader';
+import TemplateSaver from './templatesaver';
 
 /**
  * A TemplateInstance is an instance of a Clause or Contract template. It is executable business logic, linked to
@@ -128,5 +133,44 @@ export default class TemplateInstance {
             template: this.getTemplate().getIdentifier(),
             data: this.getData()
         };
+    }
+
+    /**
+     * Persists this instance to an archive: the Cicero Template Archive (cta)
+     * of its template, plus the data of the instance in instance.json.
+     * The archive can still be loaded as a template with {@link Template.fromArchive}.
+     * @param {string} [language] - target language for the archive
+     * @param {Object} [options] - JSZip options and keystore object containing path and passphrase for the keystore
+     * @return {Promise<Buffer>} the zlib buffer
+     */
+    async toArchive(language?, options: any = {}) {
+        if (!this.data) {
+            throw new Error('Cannot archive a template instance without data. Call setData first.');
+        }
+        const template = this.getTemplate();
+        if (options.keystore) {
+            const timestamp = Date.now();
+            template.signTemplate(options.keystore.p12File, options.keystore.passphrase, timestamp);
+        }
+        return TemplateSaver.toArchive(template, language, options, this.getData());
+    }
+
+    /**
+     * Create an instance from an archive written by {@link TemplateInstance#toArchive}.
+     * Call it on the subclass to construct, e.g. Clause.fromArchive(buffer).
+     * @param {Buffer} buffer  - the buffer to the archive
+     * @param {Object} [options] - an optional set of options to configure the template.
+     * @return {Promise<TemplateInstance>} a Promise to the instance, with its data set
+     */
+    static async fromArchive(buffer, options = null) {
+        const template = await Template.fromArchive(buffer, options);
+        const zip = await JSZip.loadAsync(buffer);
+        const data = await TemplateLoader.loadZipFileContents(zip, 'instance.json', true);
+        if (!data) {
+            throw new Error('Failed to find instance.json in archive file. Use Template.fromArchive to load a template archive.');
+        }
+        const instance = new (this as any)(template);
+        instance.setData(data);
+        return instance;
     }
 }
