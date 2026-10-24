@@ -8,4 +8,4 @@ The main channel for support with Cicero is the [#technology-cicero Discord Chan
 
 [apcontribute]: https://github.com/accordproject/techdocs/blob/master/CONTRIBUTING.md
 [apdiscord]: https://discord.com/invite/Zm99SKhhtA
-[apcicerodiscord]: https://discord.gg/FZw5fwse
+[apcicerodiscord]: https://discord.com/invite/Zm99SKhhtA
