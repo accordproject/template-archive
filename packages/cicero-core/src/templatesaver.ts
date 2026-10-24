@@ -29,9 +29,10 @@ export default class TemplateSaver {
      * @param {string} [language] - target language for the archive
      * @param {Object} [options] - JSZip options
      * @param {Buffer} logoBuffer - Bytes data of the PNG file
+     * @param {object} [instanceData] - the data of a template instance, saved as instance.json
      * @return {Promise<Buffer>} the zlib buffer
      */
-    static async toArchive(template, language, options) {
+    static async toArchive(template, language, options, instanceData = null) {
         const metadata = language ? template.getMetadata().createTargetMetadata(language) : template.getMetadata();
 
         const zip = new JSZip();
@@ -90,6 +91,11 @@ export default class TemplateSaver {
         // save the sample.json if present
         if (metadata.getSampleData()) {
             zip.file('sample.json', JSON.stringify(metadata.getSampleData()), options);
+        }
+
+        // save the instance.json if this is a template instance archive
+        if (instanceData) {
+            zip.file('instance.json', JSON.stringify(instanceData), options);
         }
 
         const modelFiles = template.getModelManager().getModels();
