@@ -399,9 +399,53 @@ describe('Template', () => {
                 expect(template2.getMetadata().getSampleData()).toEqual(sample);
             });
         });
+
+        describe('logic and model files', () => {
+            let parent;
+            beforeEach(() => {
+                parent = fs.mkdtempSync(path.join(os.tmpdir(), 'cicero-template-files-'));
+            });
+            afterEach(() => {
+                fs.rmSync(parent, { recursive: true, force: true });
+            });
+
+            it('should not depend on the directory names above the template', async () => {
+                const expected = await Template.fromDirectory('./test/data/latedeliveryandpenalty-typescript', options);
+                const dir = path.join(parent, 'logic', 'model', 'latedeliveryandpenalty-typescript');
+                fs.cpSync('./test/data/latedeliveryandpenalty-typescript', dir, { recursive: true });
+
+                const template = await Template.fromDirectory(dir, options);
+                expect(template.getScriptManager().getScriptIdentifiers()).toEqual(['logic/logic.ts']);
+                expect(template.getHash()).toEqual(expected.getHash());
+            });
+
+            it('should load them only from the top-level logic/ and model/ folders', async () => {
+                const dir = path.join(parent, 'latedeliveryandpenalty-typescript');
+                fs.cpSync('./test/data/latedeliveryandpenalty-typescript', dir, { recursive: true });
+                fs.mkdirSync(path.join(dir, 'docs', 'logic'), { recursive: true });
+                fs.mkdirSync(path.join(dir, 'docs', 'model'), { recursive: true });
+                fs.writeFileSync(path.join(dir, 'docs', 'logic', 'notes.md'), '# Notes');
+                fs.writeFileSync(path.join(dir, 'docs', 'model', 'old.cto'), 'not a model');
+
+                const expected = await Template.fromDirectory('./test/data/latedeliveryandpenalty-typescript', options);
+                const template = await Template.fromDirectory(dir, options);
+                expect(template.getScriptManager().getScriptIdentifiers()).toEqual(['logic/logic.ts']);
+                expect(template.getHash()).toEqual(expected.getHash());
+            });
+        });
     });
 
     describe('#fromArchive', () => {
+
+        it('should load logic and model files only from the top-level logic/ and model/ folders', async () => {
+            const template = await Template.fromDirectory('./test/data/latedeliveryandpenalty-typescript', options);
+            const zip = await JSZip.loadAsync(await template.toArchive('typescript'));
+            zip.file('docs/logic/notes.md', '# Notes');
+            zip.file('docs/model/old.cto', 'not a model');
+            const template2 = await Template.fromArchive(await zip.generateAsync({ type: 'nodebuffer' }), options);
+            expect(template2.getScriptManager().getScriptIdentifiers()).toEqual(['logic/logic.ts']);
+            expect(template2.getHash()).toEqual(template.getHash());
+        });
 
         it('should create a template from a signed template archive', async () => {
             const template = await Template.fromDirectory('./test/data/verifying-template-signature/helloworldstateUnsigned', options);

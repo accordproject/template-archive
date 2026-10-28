@@ -29,6 +29,11 @@ const SAMPLE_FILE_REGEXP = /text\/sample.md/;
 
 // //xregexp('text[/\\\\]sample(_(' + IETF_REGEXP + '))?.md$');
 
+// Matched against paths relative to the template root, so the directory the
+// template sits in (e.g. /home/me/logic/my-template) cannot match them
+const MODEL_FILE_REGEXP = /^model[/\\].*\.cto$/;
+const LOGIC_FILE_REGEXP = /^logic[/\\]/;
+
 /**
  * A utility class to create templates from data sources.
  * @class
@@ -73,7 +78,7 @@ export default class TemplateLoader {
             (fileName) => TemplateLoader.loadZipFileContents(zip, fileName), 'The archive');
 
         Logger.debug(method, 'Looking for model files');
-        const ctoFiles = await TemplateLoader.loadZipFilesContents(zip, /model[/\\].*\.cto$/);
+        const ctoFiles = await TemplateLoader.loadZipFilesContents(zip, MODEL_FILE_REGEXP);
         ctoFiles.forEach(async (file) => {
             ctoModelFileNames.push(file.name);
             ctoModelFiles.push(file.contents);
@@ -108,7 +113,7 @@ export default class TemplateLoader {
 
         // load and add the typescript files
         Logger.debug(method, 'Adding Logic files to script manager');
-        const scriptFiles = await TemplateLoader.loadZipFilesContents(zip, /logic[/\\].*\.*$/);
+        const scriptFiles = await TemplateLoader.loadZipFilesContents(zip, LOGIC_FILE_REGEXP);
         scriptFiles.forEach(function (obj) {
             template.getLogicManager().addLogicFile(obj.contents, obj.name);
         });
@@ -190,7 +195,7 @@ export default class TemplateLoader {
         }
         const modelFiles = [];
         const modelFileNames = [];
-        const ctoFiles = await TemplateLoader.loadFilesContents(path, /model[/\\].*\.cto$/);
+        const ctoFiles = await TemplateLoader.loadFilesContents(path, MODEL_FILE_REGEXP);
         ctoFiles.forEach((file) => {
             modelFileNames.push(slash(file.name));
             modelFiles.push(file.contents);
@@ -227,7 +232,7 @@ export default class TemplateLoader {
         }
 
         // load and add the logic files
-        const tsFiles = await TemplateLoader.loadFilesContents(path, /logic[/\\].*\.*$/);
+        const tsFiles = await TemplateLoader.loadFilesContents(path, LOGIC_FILE_REGEXP);
         tsFiles.forEach((file) => {
             const resolvedPath = slash(fsPath.resolve(path));
             const resolvedFilePath = slash(fsPath.resolve(file.name));
@@ -417,10 +422,11 @@ export default class TemplateLoader {
      * Note that any directories called node_modules are ignored.
      * @internal
      * @param {*} path the file path
-     * @param {RegExp} regex the regex to match files
+     * @param {RegExp} regex the regex to match files, tested against their path relative to root
+     * @param {string} [root] the template root directory, defaults to path
      * @return {Promise<object[]>} a promise to an array of objects with the name and contents of the files
      */
-    static async loadFilesContents(path, regex) {
+    static async loadFilesContents(path, regex, root = path) {
         const readdir = promisify(fs.readdir);
         const stat = promisify(fs.stat);
         Logger.debug('loadFilesContents', 'Loading ' + path);
@@ -430,15 +436,15 @@ export default class TemplateLoader {
 
             if ((await stat(res)).isDirectory()) {
                 if (/.*node_modules$/.test(res) === false) {
-                    return TemplateLoader.loadFilesContents(res, regex);
+                    return TemplateLoader.loadFilesContents(res, regex, root);
                 }
                 else {
                     return null;
                 }
             }
             else {
-                const slashPath = slash(res);
-                if (regex.test(slashPath)) {
+                const relativePath = slash(fsPath.relative(root, res));
+                if (regex.test(relativePath)) {
                     return {
                         name: res,
                         contents: await TemplateLoader.loadFileContents(path, res, false, true)
