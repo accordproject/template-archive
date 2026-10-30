@@ -95,6 +95,65 @@ describe('Metadata', () => {
             }, null, {}, 'request')).toThrow('request.json must be an object');
         });
 
+        it('should throw an error if sampleData is not an object', () => {
+            expect(() => new Metadata({
+                name: 'template',
+                version: '1.0.0',
+                accordproject: {template: 'contract',cicero:caretRange(ciceroVersion)}
+            }, null, {}, null, null, 'sampleData')).toThrow('sample.json must be an object');
+            expect(() => new Metadata({
+                name: 'template',
+                version: '1.0.0',
+                accordproject: {template: 'contract',cicero:caretRange(ciceroVersion)}
+            }, null, {}, null, null, 123)).toThrow('sample.json must be an object');
+            expect(() => new Metadata({
+                name: 'template',
+                version: '1.0.0',
+                accordproject: {template: 'contract',cicero:caretRange(ciceroVersion)}
+            }, null, {}, null, null, ['sampleData'])).toThrow('sample.json must be an object');
+            expect(() => new Metadata({
+                name: 'template',
+                version: '1.0.0',
+                accordproject: {template: 'contract',cicero:caretRange(ciceroVersion)}
+            }, null, {}, null, null, false)).toThrow('sample.json must be an object');
+            expect(() => new Metadata({
+                name: 'template',
+                version: '1.0.0',
+                accordproject: {template: 'contract',cicero:caretRange(ciceroVersion)}
+            }, null, {}, null, null, 0)).toThrow('sample.json must be an object');
+            expect(() => new Metadata({
+                name: 'template',
+                version: '1.0.0',
+                accordproject: {template: 'contract',cicero:caretRange(ciceroVersion)}
+            }, null, {}, null, null, '')).toThrow('sample.json must be an object');
+        });
+
+        it('should accept sampleData in constructor and set it', () => {
+            const sampleData = { $class: 'org.example.Model', value: 'test' };
+            const md = new Metadata({
+                name: 'template',
+                version: '1.0.0',
+                accordproject: {template: 'contract',cicero:caretRange(ciceroVersion)}
+            }, null, {}, null, null, sampleData);
+            expect(md.getSampleData()).toEqual(sampleData);
+        });
+
+        it('should default sampleData to null when omitted or passed null', () => {
+            const md1 = new Metadata({
+                name: 'template',
+                version: '1.0.0',
+                accordproject: {template: 'contract',cicero:caretRange(ciceroVersion)}
+            }, null, {});
+            expect(md1.getSampleData()).toBeNull();
+
+            const md2 = new Metadata({
+                name: 'template',
+                version: '1.0.0',
+                accordproject: {template: 'contract',cicero:caretRange(ciceroVersion)}
+            }, null, {}, null, null, null);
+            expect(md2.getSampleData()).toBeNull();
+        });
+
         it('should throw an error if package.json does not contain a valid name', () => {
             expect(() => new Metadata({version: '1.0.0', accordproject: {template: 'contract',cicero:caretRange(ciceroVersion)}}, null, {})).toThrow('template name can only contain lowercase alphanumerics, _ or -');
             expect(() => new Metadata({
@@ -559,6 +618,80 @@ describe('Metadata', () => {
             expect(mdes5.getPackageJson()).not.toBeNull();
             expect(mdes5.getName()).toBe('template');
             expect(mdes5.getRuntime()).toBe('es6');
+        });
+
+        it('should preserve sampleData when creating target metadata', () => {
+            const sampleData = { $class: 'org.example.Model', value: 'test' };
+            const md = new Metadata({
+                name: 'template',
+                version: '1.0.0',
+                accordproject: {cicero:caretRange(ciceroVersion)}
+            }, null, {
+                en: 'sample'
+            }, null, null, sampleData);
+            const mdes5 = md.createTargetMetadata('es6');
+            expect(mdes5.getSampleData()).toEqual(sampleData);
+        });
+    });
+
+    describe('#sampleData', () => {
+        it('should return null by default', () => {
+            const md = new Metadata({
+                name: 'template',
+                version: '1.0.0',
+                accordproject: {cicero:caretRange(ciceroVersion)}
+            }, null, {});
+            expect(md.getSampleData()).toBeNull();
+        });
+
+        it('should set sampleData when valid object is passed', () => {
+            const md = new Metadata({
+                name: 'template',
+                version: '1.0.0',
+                accordproject: {cicero:caretRange(ciceroVersion)}
+            }, null, {});
+            const sampleData = { foo: 'bar' };
+            md.setSampleData(sampleData);
+            expect(md.getSampleData()).toEqual(sampleData);
+        });
+
+        it('should throw an error if sampleData is not an object', () => {
+            const md = new Metadata({
+                name: 'template',
+                version: '1.0.0',
+                accordproject: {cicero:caretRange(ciceroVersion)}
+            }, null, {});
+            expect(() => md.setSampleData('invalid')).toThrow('sample.json must be an object');
+            expect(() => md.setSampleData(42)).toThrow('sample.json must be an object');
+            expect(() => md.setSampleData(['invalid'])).toThrow('sample.json must be an object');
+            expect(() => md.setSampleData(false)).toThrow('sample.json must be an object');
+            expect(() => md.setSampleData(0)).toThrow('sample.json must be an object');
+            expect(() => md.setSampleData('')).toThrow('sample.json must be an object');
+        });
+
+        it('should allow setting sampleData to null or undefined', () => {
+            const md = new Metadata({
+                name: 'template',
+                version: '1.0.0',
+                accordproject: {cicero:caretRange(ciceroVersion)}
+            }, null, {});
+            md.setSampleData({ foo: 'bar' });
+            md.setSampleData(null);
+            expect(md.getSampleData()).toBeNull();
+
+            md.setSampleData({ foo: 'bar' });
+            md.setSampleData(undefined);
+            expect(md.getSampleData()).toBeNull();
+        });
+
+        it('should include sampleData in toJSON', () => {
+            const sampleData = { $class: 'org.example.Model', value: 'test' };
+            const md = new Metadata({
+                name: 'template',
+                version: '1.0.0',
+                accordproject: {cicero:caretRange(ciceroVersion)}
+            }, null, {}, null, null, sampleData);
+            expect(md.toJSON().sampleData).toEqual(sampleData);
         });
     });
 

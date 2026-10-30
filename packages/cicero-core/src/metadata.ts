@@ -63,6 +63,7 @@ export default class Metadata {
      * @param {object} samples - the sample markdown for the template in different locales,
      * @param {object} request - the JS object for the sample request
      * @param {Buffer} logo - the bytes data for the image
+     * @param {object} [sampleData] - the JS object from sample.json (or data.json)
      * represented as an object whose keys are the locales and whose values are the sample markdown.
      * For example:
      *  {
@@ -73,7 +74,7 @@ export default class Metadata {
      * Locale keys (with the exception of default) conform to the IETF Language Tag specification (BCP 47).
      * THe `default` key represents sample template text in a non-specified language, stored in a file called `sample.md`.
      */
-    constructor(packageJson, readme, samples, request, logo) {
+    constructor(packageJson, readme, samples, request, logo, sampleData = null) {
         // name of the runtime that this template targets (if the template contains compiled code)
         this.runtime = null;
 
@@ -135,6 +136,14 @@ export default class Metadata {
             throw new Error('request.json must be an object');
         }
 
+        if (
+            sampleData !== null &&
+            sampleData !== undefined &&
+            (typeof sampleData !== 'object' || Array.isArray(sampleData))
+        ) {
+            throw new Error('sample.json must be an object');
+        }
+
         if (!packageJson.name || !this._validName(packageJson.name)) {
             throw new Error ('template name can only contain lowercase alphanumerics, _ or -');
         }
@@ -167,7 +176,7 @@ export default class Metadata {
         this.logo = logo;
         this.samples = samples;
         this.request = request;
-        this.sampleData = null;
+        this.sampleData = sampleData ?? null;
 
         this.type = templateTypes.CONTRACT;
         if (packageJson.accordproject && packageJson.accordproject.template) {
@@ -297,7 +306,14 @@ export default class Metadata {
      * @param {object} sampleData - the JS object from sample.json
      */
     setSampleData(sampleData) {
-        this.sampleData = sampleData;
+        if (
+            sampleData !== null &&
+            sampleData !== undefined &&
+            (typeof sampleData !== 'object' || Array.isArray(sampleData))
+        ) {
+            throw new Error('sample.json must be an object');
+        }
+        this.sampleData = sampleData ?? null;
     }
 
     /**
@@ -440,8 +456,7 @@ export default class Metadata {
         }
         const packageJson = JSON.parse(JSON.stringify(this.packageJson));
         packageJson.accordproject.runtime = runtimeName;
-        const metadata = new Metadata(packageJson, this.readme, this.samples, this.request, this.logo);
-        metadata.setSampleData(this.sampleData);
+        const metadata = new Metadata(packageJson, this.readme, this.samples, this.request, this.logo, this.sampleData);
         return metadata;
     }
 

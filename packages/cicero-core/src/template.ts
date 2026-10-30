@@ -387,7 +387,7 @@ export default class Template {
      * @private
      */
     setSamples(samples) {
-        this.metadata = new Metadata(this.metadata.getPackageJson(), this.metadata.getREADME(), samples, this.metadata.getRequest(), this.metadata.getLogo());
+        this.metadata = new Metadata(this.metadata.getPackageJson(), this.metadata.getREADME(), samples, this.metadata.getRequest(), this.metadata.getLogo(), this.metadata.getSampleData());
     }
 
     /**
@@ -399,7 +399,7 @@ export default class Template {
     setSample(sample, locale) {
         const samples = this.metadata.getSamples();
         samples[locale] = sample;
-        this.metadata = new Metadata(this.metadata.getPackageJson(), this.metadata.getREADME(), samples, this.metadata.getRequest(), this.metadata.getLogo());
+        this.metadata = new Metadata(this.metadata.getPackageJson(), this.metadata.getREADME(), samples, this.metadata.getRequest(), this.metadata.getLogo(), this.metadata.getSampleData());
     }
 
     /**
@@ -408,7 +408,7 @@ export default class Template {
      * @private
      */
     setRequest(request) {
-        this.metadata = new Metadata(this.metadata.getPackageJson(), this.metadata.getREADME(), this.metadata.getSamples(), request, this.metadata.getLogo());
+        this.metadata = new Metadata(this.metadata.getPackageJson(), this.metadata.getREADME(), this.metadata.getSamples(), request, this.metadata.getLogo(), this.metadata.getSampleData());
     }
 
     /**
@@ -417,7 +417,7 @@ export default class Template {
      * @private
      */
     setReadme(readme) {
-        this.metadata = new Metadata(this.metadata.getPackageJson(), readme, this.metadata.getSamples(), this.metadata.getRequest(), this.metadata.getLogo());
+        this.metadata = new Metadata(this.metadata.getPackageJson(), readme, this.metadata.getSamples(), this.metadata.getRequest(), this.metadata.getLogo(), this.metadata.getSampleData());
     }
 
     /**
@@ -426,7 +426,7 @@ export default class Template {
      * @private
      */
     setPackageJson(packageJson) {
-        this.metadata = new Metadata(packageJson, this.metadata.getREADME(), this.metadata.getSamples(), this.metadata.getRequest(), this.metadata.getLogo());
+        this.metadata = new Metadata(packageJson, this.metadata.getREADME(), this.metadata.getSamples(), this.metadata.getRequest(), this.metadata.getLogo(), this.metadata.getSampleData());
     }
 
     /**

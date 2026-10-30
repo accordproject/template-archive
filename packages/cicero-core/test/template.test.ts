@@ -352,6 +352,76 @@ describe('Template', () => {
             expect(template2.getMetadata().getSampleData()).toEqual(sampleData);
         });
 
+        it('should preserve sampleData across metadata updates (setReadme, setRequest, setPackageJson, setSamples, setSample)', async () => {
+            const template = await Template.fromDirectory('./test/data/latedeliveryandpenalty', options);
+            const originalSampleData = template.getMetadata().getSampleData();
+            expect(originalSampleData).not.toBeNull();
+
+            // setReadme
+            template.setReadme('New custom README');
+            expect(template.getMetadata().getREADME()).toBe('New custom README');
+            expect(template.getMetadata().getSampleData()).toEqual(originalSampleData);
+
+            // setRequest
+            const newRequest = { $class: 'org.accordproject.runtime.Request' };
+            template.setRequest(newRequest);
+            expect(template.getMetadata().getRequest()).toEqual(newRequest);
+            expect(template.getMetadata().getSampleData()).toEqual(originalSampleData);
+
+            // setPackageJson
+            const newPkg = { ...template.getMetadata().getPackageJson(), description: 'Updated description' };
+            template.setPackageJson(newPkg);
+            expect(template.getMetadata().getDescription()).toBe('Updated description');
+            expect(template.getMetadata().getSampleData()).toEqual(originalSampleData);
+
+            // setSamples
+            template.setSamples({ default: 'new default sample text' });
+            expect(template.getMetadata().getSample()).toBe('new default sample text');
+            expect(template.getMetadata().getSampleData()).toEqual(originalSampleData);
+
+            // setSample
+            template.setSample('texte d\'exemple', 'fr');
+            expect(template.getMetadata().getSample('fr')).toBe('texte d\'exemple');
+            expect(template.getMetadata().getSampleData()).toEqual(originalSampleData);
+        });
+
+        it('should preserve sample.json in exported archive and loaded template after metadata updates', async () => {
+            const template = await Template.fromDirectory('./test/data/latedeliveryandpenalty', options);
+            const sampleData = template.getMetadata().getSampleData();
+            expect(sampleData).not.toBeNull();
+
+            template.setReadme('Modified README before export');
+            const buffer = await template.toArchive('es6');
+
+            const zip = await JSZip.loadAsync(buffer);
+            expect(zip.file('sample.json')).not.toBeNull();
+            const archiveSampleData = JSON.parse(await zip.file('sample.json').async('string'));
+            expect(archiveSampleData).toEqual(sampleData);
+
+            const roundTripped = await Template.fromArchive(buffer);
+            expect(roundTripped.getMetadata().getSampleData()).toEqual(sampleData);
+        });
+
+        it('should maintain consistent hash behavior when metadata setters are called and reflect sampleData changes', async () => {
+            const template = await Template.fromDirectory('./test/data/latedeliveryandpenalty', options);
+            const initialHash = template.getHash();
+
+            // Re-setting readme to identical content should not change template hash (sampleData must not be wiped)
+            template.setReadme(template.getMetadata().getREADME());
+            expect(template.getHash()).toBe(initialHash);
+
+            // Changing sampleData should change the hash
+            const originalSample = template.getMetadata().getSampleData();
+            const updatedSample = { ...originalSample, penaltyPercentage: 99.0 };
+            template.getMetadata().setSampleData(updatedSample);
+            const updatedHash = template.getHash();
+            expect(updatedHash).not.toBe(initialHash);
+
+            // Restoring original sampleData should restore initial hash
+            template.getMetadata().setSampleData(originalSample);
+            expect(template.getHash()).toBe(initialHash);
+        });
+
         describe('sample data named data.json', () => {
             const sample = JSON.parse(fs.readFileSync('./test/data/latedeliveryandpenalty/sample.json', 'utf8'));
             let dir;
