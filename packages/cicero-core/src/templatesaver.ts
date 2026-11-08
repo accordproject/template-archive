@@ -14,6 +14,7 @@
 
 import { Buffer } from 'buffer';
 import JSZip from 'jszip';
+import slash from 'slash';
 
 /**
  * A utility to persist templates to data sources.
@@ -31,7 +32,12 @@ export default class TemplateSaver {
      * @param {Buffer} logoBuffer - Bytes data of the PNG file
      * @return {Promise<Buffer>} the zlib buffer
      */
-    static async toArchive(template, language, options) {
+    static async toArchive(template, language?, options?) {
+        if (typeof language === 'object' && language !== null) {
+            options = language;
+            language = undefined;
+        }
+        options = options || {};
         const metadata = language ? template.getMetadata().createTargetMetadata(language) : template.getMetadata();
 
         const zip = new JSZip();
@@ -103,11 +109,16 @@ export default class TemplateSaver {
         zip.file('logic/', null, Object.assign({}, options, {
             dir: true
         }));
-        const scriptFiles = template.getScriptManager().getScriptsForTarget(language);
+        const scriptFiles = language
+            ? template.getScriptManager().getScriptsForTarget(language)
+            : template.getScriptManager().getScripts();
         scriptFiles.forEach(function (file) {
             const fileIdentifier = file.getIdentifier();
-            const fileName = fileIdentifier.split(/[\\/]/).pop() || fileIdentifier;
-            zip.file('logic/' + fileName, file.contents, options);
+            const normalized = slash(fileIdentifier);
+            const relName = normalized.replace(/^(\.\/|\/)?logic\//, '');
+            if (relName) {
+                zip.file('logic/' + relName, file.contents, options);
+            }
         });
 
         return zip.generateAsync({

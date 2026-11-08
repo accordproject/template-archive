@@ -124,6 +124,52 @@ describe('Template', () => {
             };
             await expect(template.toArchive('es6', { keystore })).rejects.toThrow('PKCS#12 MAC could not be verified. Invalid password?');
         });
+
+        it('should roundtrip a template with logic when toArchive is called without arguments', async () => {
+            const template = await Template.fromDirectory('./test/data/latedeliveryandpenalty-typescript');
+            expect(template.hasLogic()).toBe(true);
+            const archiveBuffer = await template.toArchive();
+            expect(archiveBuffer).not.toBeNull();
+            const reloaded = await Template.fromArchive(archiveBuffer);
+            expect(reloaded.hasLogic()).toBe(true);
+            expect(reloaded.getScriptManager().getScript('logic/logic.ts')).not.toBeNull();
+            expect(reloaded.getHash()).toBe(template.getHash());
+        });
+
+        it('should accept options as the first argument to toArchive', async () => {
+            const template = await Template.fromDirectory('./test/data/signing-template/helloworldstate');
+            const p12File = fs.readFileSync('./test/data/keystore/keystore.p12', { encoding: 'base64' });
+            const keystore = {
+                p12File: p12File,
+                passphrase: 'password'
+            };
+            const archiveBuffer = await template.toArchive({ keystore });
+            expect(archiveBuffer).not.toBeNull();
+            const reloaded = await Template.fromArchive(archiveBuffer);
+            expect(reloaded.authorSignature).not.toBeNull();
+        });
+
+        it('should roundtrip a template with logic when toArchive language is null', async () => {
+            const template = await Template.fromDirectory('./test/data/latedeliveryandpenalty-typescript');
+            expect(template.hasLogic()).toBe(true);
+            const archiveBuffer = await template.toArchive(null);
+            expect(archiveBuffer).not.toBeNull();
+            const reloaded = await Template.fromArchive(archiveBuffer);
+            expect(reloaded.hasLogic()).toBe(true);
+            expect(reloaded.getScriptManager().getScript('logic/logic.ts')).not.toBeNull();
+            expect(reloaded.getHash()).toBe(template.getHash());
+        });
+
+        it('should reject toArchive with an unsupported language', async () => {
+            const template = await Template.fromDirectory('./test/data/latedeliveryandpenalty-typescript');
+            await expect(template.toArchive('invalidLang')).rejects.toThrow('Unsupported language');
+        });
+
+        it('should handle options when options is explicitly null', async () => {
+            const template = await Template.fromDirectory('./test/data/latedeliveryandpenalty-typescript');
+            const archiveBuffer = await template.toArchive('typescript', null);
+            expect(archiveBuffer).not.toBeNull();
+        });
     });
 
     describe('#signTemplate', () => {

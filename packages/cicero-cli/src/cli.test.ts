@@ -173,6 +173,34 @@ describe('#archive', () => {
         fs.unlinkSync(archiveName);
     });
 
+    it('should create an archive preserving logic when target is null', async () => {
+        const tsTemplate = path.resolve(__dirname, '../../cicero-core/test/data/latedeliveryandpenalty-typescript');
+        const archiveName = 'test-logic.cta';
+        const options = {};
+        const result = await Commands.archive(tsTemplate, null, archiveName, options);
+        expect(result).toEqual(true);
+        const newTemplate = await Template.fromArchive(fs.readFileSync(archiveName));
+        expect(newTemplate.hasLogic()).toBe(true);
+        expect(newTemplate.getScriptManager().getScript('logic/logic.ts')).not.toBeNull();
+        fs.unlinkSync(archiveName);
+    });
+
+    it('should create an archive when options argument is omitted', async () => {
+        const tsTemplate = path.resolve(__dirname, '../../cicero-core/test/data/latedeliveryandpenalty-typescript');
+        const archiveName = 'test-no-options.cta';
+        const result = await Commands.archive(tsTemplate, null, archiveName);
+        expect(result).toEqual(true);
+        const newTemplate = await Template.fromArchive(fs.readFileSync(archiveName));
+        expect(newTemplate.hasLogic()).toBe(true);
+        fs.unlinkSync(archiveName);
+    });
+
+    it('should throw an error if target is an unsupported language', async () => {
+        const tsTemplate = path.resolve(__dirname, '../../cicero-core/test/data/latedeliveryandpenalty-typescript');
+        const archiveName = 'test-invalid-target.cta';
+        await expect(Commands.archive(tsTemplate, 'invalidLang', archiveName)).rejects.toThrow('Unsupported language');
+    });
+
     it('should create a valid typescript archive with a default name', async () => {
         const archiveName = 'latedeliveryandpenalty@0.0.1.cta';
         const options = {};

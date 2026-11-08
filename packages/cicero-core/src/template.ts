@@ -272,7 +272,12 @@ export default class Template {
      * @param {Object} [options] - JSZip options and keystore object containing path and passphrase for the keystore
      * @return {Promise<Buffer>} the zlib buffer
      */
-    async toArchive(language, options: any = {}) {
+    async toArchive(language?, options: any = {}) {
+        if (typeof language === 'object' && language !== null) {
+            options = language;
+            language = undefined;
+        }
+        options = options || {};
         if (options.keystore) {
             const timestamp = Date.now();
             this.signTemplate(options.keystore.p12File, options.keystore.passphrase, timestamp);

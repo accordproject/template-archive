@@ -93,5 +93,85 @@ describe('TemplateSaver', () => {
             const storedBuffer = await stored.generateAsync({ type: 'uint8array', compression: 'STORE' });
             expect(buffer.length).toBeLessThan(storedBuffer.length);
         });
+
+        it('should preserve logic files in archive when target language is omitted', async () => {
+            const template = await Template.fromDirectory(
+                './test/data/latedeliveryandpenalty-typescript',
+            );
+            expect(template.hasLogic()).toBe(true);
+            const buffer = await TemplateSaver.toArchive(template, undefined, undefined);
+            expect(buffer).not.toBeNull();
+
+            const zip = await JSZip.loadAsync(buffer);
+            const logicFile = zip.file('logic/logic.ts');
+            expect(logicFile).not.toBeNull();
+            const logicContent = await logicFile.async('string');
+            expect(logicContent.length).toBeGreaterThan(0);
+
+            const reloaded = await Template.fromArchive(buffer);
+            expect(reloaded.hasLogic()).toBe(true);
+            expect(reloaded.getScriptManager().getScript('logic/logic.ts')).not.toBeNull();
+            expect(reloaded.getHash()).toBe(template.getHash());
+        });
+
+        it('should preserve nested logic file paths in archive', async () => {
+            const template = await Template.fromDirectory(
+                './test/data/latedeliveryandpenalty-typescript',
+            );
+            const sm = template.getScriptManager();
+            const helperScript = sm.createScript('logic/helpers/util.ts', 'typescript', 'export function util() { return 42; }');
+            sm.addScript(helperScript);
+
+            const buffer = await TemplateSaver.toArchive(template, undefined, undefined);
+            const zip = await JSZip.loadAsync(buffer);
+            expect(zip.file('logic/helpers/util.ts')).not.toBeNull();
+            expect(zip.file('logic/util.ts')).toBeNull();
+        });
+
+        it('should accept options as the second argument when language is omitted', async () => {
+            const template = await Template.fromDirectory(
+                './test/data/latedeliveryandpenalty-typescript',
+            );
+            const buffer = await TemplateSaver.toArchive(template, {});
+            expect(buffer).not.toBeNull();
+            const reloaded = await Template.fromArchive(buffer);
+            expect(reloaded.hasLogic()).toBe(true);
+        });
+
+        it('should normalize Windows-style backslashes in script paths into forward slashes in archive', async () => {
+            const template = await Template.fromDirectory(
+                './test/data/latedeliveryandpenalty-typescript',
+            );
+            const sm = template.getScriptManager();
+            const winScript = sm.createScript('logic\\helpers\\winutil.ts', 'typescript', 'export function winutil() { return 1; }');
+            sm.addScript(winScript);
+
+            const buffer = await TemplateSaver.toArchive(template);
+            const zip = await JSZip.loadAsync(buffer);
+            expect(zip.file('logic/helpers/winutil.ts')).not.toBeNull();
+            expect(zip.file('logic/helpers\\winutil.ts')).toBeNull();
+
+            const reloaded = await Template.fromArchive(buffer);
+            expect(reloaded.getScriptManager().getScript('logic/helpers/winutil.ts')).not.toBeNull();
+        });
+
+        it('should throw when an unsupported target language is provided', async () => {
+            const template = await Template.fromDirectory(
+                './test/data/latedeliveryandpenalty-typescript',
+            );
+            await expect(TemplateSaver.toArchive(template, 'invalidLang')).rejects.toThrow('Unsupported language');
+        });
+
+        it('should preserve logic when target language is explicitly null', async () => {
+            const template = await Template.fromDirectory(
+                './test/data/latedeliveryandpenalty-typescript',
+            );
+            const buffer = await TemplateSaver.toArchive(template, null);
+            expect(buffer).not.toBeNull();
+            const reloaded = await Template.fromArchive(buffer);
+            expect(reloaded.hasLogic()).toBe(true);
+            expect(reloaded.getScriptManager().getScript('logic/logic.ts')).not.toBeNull();
+        });
     });
 });
+

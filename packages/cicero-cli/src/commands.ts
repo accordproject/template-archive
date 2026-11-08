@@ -108,7 +108,8 @@ export class Commands {
      * @param {Object} [options] - an optional set of options
      * @returns {object} Promise to the code creating an archive
      */
-    static archive(templatePath, target, outputPath, options) {
+    static archive(templatePath, target, outputPath, options: any = {}) {
+        options = options || {};
         return Commands.loadTemplate(templatePath, options)
             .then(async (template) => {
                 let keystore = null;
@@ -120,7 +121,7 @@ export class Commands {
                     };
                     keystore = inputKeystore;
                 }
-                const archive = await template.toArchive(target, {keystore}, options);
+                const archive = await template.toArchive(target, { ...options, keystore });
                 let file;
                 if (outputPath) {
                     file = outputPath;
