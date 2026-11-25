@@ -23,8 +23,7 @@ import { TemplateMarkTransformer } from '@accordproject/markdown-template';
  * A TemplateInstance is an instance of a Clause or Contract template. It is executable business logic, linked to
  * a natural language (legally enforceable) template.
  * A TemplateInstance must be constructed with a template and then prior to execution the data for the clause must be set.
- * Set the data for the TemplateInstance by either calling the setData method or by
- * calling the parse method and passing in natural language text that conforms to the template grammar.
+ * Set the data for the TemplateInstance by calling the setData method.
  * @public
  * @abstract
  * @class
