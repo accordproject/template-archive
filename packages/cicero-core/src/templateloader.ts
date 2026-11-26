@@ -20,6 +20,7 @@ import slash from 'slash';
 import JSZip from 'jszip';
 import { Logger } from '@accordproject/concerto-util';
 import DefaultArchiveLoader from './loaders/defaultarchiveloader';
+import LogicManager from './logicmanager';
 
 const ENCODING = 'utf8';
 
@@ -91,6 +92,8 @@ export default class TemplateLoader {
         ctoModelFiles.forEach((mf, index) => {
             mm.addCTOModel(mf, ctoModelFileNames[index], true);
         });
+
+        LogicManager.validateNoCircularInheritance(mm);
 
         if (options && options.offline) {
             mm.validateModelFiles();
@@ -200,6 +203,8 @@ export default class TemplateLoader {
         Logger.debug(method, 'Adding model files to model manager');
         const mm = template.getModelManager();
         mm.addModelFiles(modelFiles, modelFileNames, true);
+
+        LogicManager.validateNoCircularInheritance(mm);
 
         if (options && options.offline) {
             mm.validateModelFiles();

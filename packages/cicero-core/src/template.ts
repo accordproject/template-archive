@@ -82,6 +82,7 @@ export default class Template {
         if (options.verifySignature) {
             this.verifyTemplateSignature();
         }
+        LogicManager.validateNoCircularInheritance(this.getModelManager());
         if (options && options.offline) {
             this.getModelManager().validateModelFiles();
         }
@@ -505,16 +506,23 @@ export default class Template {
      * qualified type name, false otherwise.
      */
     static instanceOf(classDeclaration, fqt) {
+        const fqn = classDeclaration.getFullyQualifiedName();
         // Check to see if this is an exact instance of the specified type.
-        if (classDeclaration.getFullyQualifiedName() === fqt) {
+        if (fqn === fqt) {
             return true;
         }
         // Now walk the class hierachy looking to see if it's an instance of the specified type.
+        const visited = new Set([fqn]);
         let superTypeDeclaration = classDeclaration.getSuperTypeDeclaration();
         while (superTypeDeclaration) {
-            if (superTypeDeclaration.getFullyQualifiedName() === fqt) {
+            const superFqn = superTypeDeclaration.getFullyQualifiedName();
+            if (superFqn === fqt) {
                 return true;
             }
+            if (visited.has(superFqn)) {
+                break;
+            }
+            visited.add(superFqn);
             superTypeDeclaration = superTypeDeclaration.getSuperTypeDeclaration();
         }
         return false;
