@@ -15,6 +15,8 @@
 'use strict';
 
 import Template from '../src/template';
+import LogicManager from '../src/logicmanager';
+import { IllegalModelException, ModelManager } from '@accordproject/concerto-core';
 import fs from 'fs';
 import os from 'os';
 import path from 'path';
@@ -723,6 +725,197 @@ describe('Template', () => {
             };
             const template = await Template.fromDirectory('./test/data/latedeliveryandpenalty', options);
             expect(() => template.accept(visitor, {})).not.toThrow();
+        });
+    });
+
+    describe('#circularInheritance', () => {
+        const createTempTemplateDir = (models: Record<string, string>) => {
+            const tmpDir = fs.mkdtempSync(path.join(os.tmpdir(), 'cicero-cycle-'));
+            fs.mkdirSync(path.join(tmpDir, 'model'));
+            fs.mkdirSync(path.join(tmpDir, 'text'));
+            fs.writeFileSync(path.join(tmpDir, 'package.json'), JSON.stringify({
+                name: 'cycle-test',
+                version: '1.0.0',
+                accordproject: { template: 'clause', cicero: '^3.0.0' }
+            }));
+            fs.writeFileSync(path.join(tmpDir, 'text', 'grammar.tem.md'), 'Hello {{x}}');
+            for (const [name, content] of Object.entries(models)) {
+                fs.writeFileSync(path.join(tmpDir, 'model', name), content);
+            }
+            return tmpDir;
+        };
+
+        it('should reject self-inheritance without stack overflow', async () => {
+            const tmpDir = createTempTemplateDir({
+                'model.cto': `namespace test@1.0.0
+concept A extends A {
+  o String x
+}
+`
+            });
+            try {
+                await expect(Template.fromDirectory(tmpDir, { offline: true }))
+                    .rejects.toThrow(/cannot extend itself/);
+            } finally {
+                fs.rmSync(tmpDir, { recursive: true, force: true });
+            }
+        });
+
+        it('should reject 2-node circular inheritance with IllegalModelException', async () => {
+            const tmpDir = createTempTemplateDir({
+                'model.cto': `namespace test@1.0.0
+concept A extends B {
+  o String x
+}
+concept B extends A {
+  o String y
+}
+`
+            });
+            try {
+                await expect(Template.fromDirectory(tmpDir, { offline: true }))
+                    .rejects.toThrow(IllegalModelException);
+                await expect(Template.fromDirectory(tmpDir, { offline: true }))
+                    .rejects.toThrow(/Circular inheritance detected: test@1\.0\.0\.A -> test@1\.0\.0\.B -> test@1\.0\.0\.A/);
+            } finally {
+                fs.rmSync(tmpDir, { recursive: true, force: true });
+            }
+        });
+
+        it('should reject multi-hop circular inheritance and report exact cycle path', async () => {
+            const tmpDir = createTempTemplateDir({
+                'model.cto': `namespace test@1.0.0
+concept A extends B {
+  o String x
+}
+concept B extends C {
+  o String y
+}
+concept C extends A {
+  o String z
+}
+concept D extends A {
+  o String w
+}
+`
+            });
+            try {
+                await expect(Template.fromDirectory(tmpDir, { offline: true }))
+                    .rejects.toThrow(/Circular inheritance detected: test@1\.0\.0\.A -> test@1\.0\.0\.B -> test@1\.0\.0\.C -> test@1\.0\.0\.A/);
+            } finally {
+                fs.rmSync(tmpDir, { recursive: true, force: true });
+            }
+        });
+
+        it('should reject cross-namespace circular inheritance across model files', async () => {
+            const tmpDir = createTempTemplateDir({
+                'a.cto': `namespace a@1.0.0
+import b@1.0.0.B
+concept A extends B {
+  o String x
+}
+`,
+                'b.cto': `namespace b@1.0.0
+import a@1.0.0.A
+concept B extends A {
+  o String y
+}
+`
+            });
+            try {
+                await expect(Template.fromDirectory(tmpDir, { offline: true }))
+                    .rejects.toThrow(IllegalModelException);
+            } finally {
+                fs.rmSync(tmpDir, { recursive: true, force: true });
+            }
+        });
+
+        it('should reject circular inheritance when loading from archive', async () => {
+            const zip = new JSZip();
+            zip.file('package.json', JSON.stringify({
+                name: 'cycle-archive-test',
+                version: '1.0.0',
+                accordproject: { template: 'clause', cicero: '^3.0.0' }
+            }));
+            zip.file('text/grammar.tem.md', 'Hello {{x}}');
+            zip.file('model/model.cto', `namespace test@1.0.0
+concept A extends B {
+  o String x
+}
+concept B extends A {
+  o String y
+}
+`);
+            const buffer = await zip.generateAsync({ type: 'nodebuffer' });
+            await expect(Template.fromArchive(buffer, { offline: true }))
+                .rejects.toThrow(IllegalModelException);
+        });
+
+        it('should reject circular inheritance in Template.validate', async () => {
+            const template = await Template.fromDirectory('./test/data/latedeliveryandpenalty', options);
+            template.getModelManager().addCTOModel(`namespace cycle@1.0.0
+concept X extends Y {
+  o String a
+}
+concept Y extends X {
+  o String b
+}
+`, 'cycle.cto', true);
+            expect(() => template.validate({ offline: true })).toThrow(IllegalModelException);
+        });
+
+        it('should terminate cleanly in Template.instanceOf when given a cyclic declaration', () => {
+            const mm = new ModelManager();
+            mm.addCTOModel(`namespace test@1.0.0
+concept A extends B {
+  o String x
+}
+concept B extends A {
+  o String y
+}
+`, 'cycle.cto', true);
+            const declA = mm.getType('test@1.0.0.A');
+            expect(Template.instanceOf(declA, 'test@1.0.0.NonExistent')).toBe(false);
+            expect(Template.instanceOf(declA, 'test@1.0.0.B')).toBe(true);
+        });
+
+        it('should skip unresolved external supertypes before updateExternalModels', () => {
+            const mm = new ModelManager();
+            mm.addCTOModel(`namespace test@1.0.0
+import org.accordproject.runtime@0.2.0.Clause from https://models.accordproject.org/accordproject/runtime@0.2.0.cto
+concept MyClause extends Clause {
+  o String x
+}
+`, 'external.cto', true);
+            expect(() => LogicManager.validateNoCircularInheritance(mm)).not.toThrow();
+        });
+
+        it('should load valid multi-level inheritance templates without regression', async () => {
+            const tmpDir = createTempTemplateDir({
+                'model.cto': `namespace org.accordproject.runtime@0.2.0
+@template
+abstract concept Clause {}
+`,
+                'template.cto': `namespace test@1.0.0
+import org.accordproject.runtime@0.2.0.Clause
+abstract concept BaseClause extends Clause {
+  o String baseField
+}
+abstract concept MidClause extends BaseClause {
+  o String midField
+}
+@template
+concept LeafClause extends MidClause {
+  o String x
+}
+`
+            });
+            try {
+                const template = await Template.fromDirectory(tmpDir, { offline: true });
+                expect(template.getTemplateModel().getFullyQualifiedName()).toBe('test@1.0.0.LeafClause');
+            } finally {
+                fs.rmSync(tmpDir, { recursive: true, force: true });
+            }
         });
     });
 });

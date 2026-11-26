@@ -12,7 +12,7 @@
  * limitations under the License.
  */
 
-import { Introspector, ModelManager } from '@accordproject/concerto-core';
+import { IllegalModelException, Introspector, ModelManager } from '@accordproject/concerto-core';
 import JavascriptScriptManager from './javascriptscriptmanager';
 import TypescriptScriptManager from './typescriptscriptmanager';
 import LANGUAGES from './languages';
@@ -88,5 +88,66 @@ export default class LogicManager {
      */
     getModelManager() {
         return this.modelManager;
+    }
+
+    /**
+     * Validates that no loaded model declarations form a circular inheritance chain.
+     * Unresolved external/imported supertypes are skipped so callers can run this
+     * before ModelManager.updateExternalModels().
+     * @param {ModelManager} modelManager - the ModelManager containing loaded model files
+     * @throws {IllegalModelException} if a circular inheritance chain is detected
+     */
+    static validateNoCircularInheritance(modelManager) {
+        const visited = new Set<string>();
+        const resolveSuperType = (decl) => {
+            if (typeof decl.getSuperTypeDeclaration !== 'function') {
+                return null;
+            }
+            try {
+                return decl.getSuperTypeDeclaration();
+            } catch {
+                // Skip unresolved external/imported supertypes before updateExternalModels()
+                return null;
+            }
+        };
+
+        for (const modelFile of modelManager.getModelFiles()) {
+            for (const decl of modelFile.getAllDeclarations()) {
+                if (typeof decl.getSuperTypeDeclaration !== 'function') {
+                    continue;
+                }
+                const startFqn = decl.getFullyQualifiedName();
+                if (visited.has(startFqn)) {
+                    continue;
+                }
+
+                const path: string[] = [];
+                const pathIndex = new Map<string, number>();
+                let current = decl;
+
+                while (current) {
+                    const fqn = current.getFullyQualifiedName();
+                    if (pathIndex.has(fqn)) {
+                        const cycleStart = pathIndex.get(fqn) as number;
+                        const cyclePath = [...path.slice(cycleStart), fqn].join(' -> ');
+                        throw new IllegalModelException(
+                            `Circular inheritance detected: ${cyclePath}`,
+                            current.getModelFile(),
+                            current.ast?.location
+                        );
+                    }
+                    if (visited.has(fqn)) {
+                        break;
+                    }
+                    pathIndex.set(fqn, path.length);
+                    path.push(fqn);
+                    current = resolveSuperType(current);
+                }
+
+                for (const fqn of path) {
+                    visited.add(fqn);
+                }
+            }
+        }
     }
 }
